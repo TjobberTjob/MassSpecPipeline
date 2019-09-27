@@ -5,7 +5,7 @@ import sys
 import shutil
 import random
 import re
-datapath = "Data/Images/"
+datapath = "/data/ProteomeToolsRaw/Images/"
 trainpath = datapath+'training/'
 valpath = datapath+'validation/'
 

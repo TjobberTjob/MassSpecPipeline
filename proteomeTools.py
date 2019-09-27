@@ -337,7 +337,10 @@ if __name__ == '__main__':
 
 	import sys
 	inputs = sys.argv[1]
-	datapath = 'Data/' #Server datapath
+	datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	is not os.path.exists(datatpath+"Images"):
+		os.mkdir(datatpath+'Images')
+
 
 	if inputs == 'all':
 		URL = sys.argv[2]+"/"
