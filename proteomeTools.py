@@ -26,12 +26,6 @@ def download(url):
 	http = urllib3.PoolManager()
 	urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 	start = datetime.now()
-	print(datapath+filename+'/'+filename+'.raw')
-	print('mv '+datapath+filename+'/'+filename+'.raw '+datapath+filename+'/file.raw')
-	quit()
-	# if os.path.exists(datapath+filename+'/'+filename+'.raw')
-	# 	print('mv 'datapath+filename+'/'+filename+'.raw 'datapath+filename+'/file.raw')
-	# 	quit()
 
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw'):
@@ -382,6 +376,12 @@ if __name__ == '__main__':
 			urls.append('https://www' + f[15:-4])
 	else: urls = [inputs]
 	
+	for f in urls:
+		filename = f[59:]
+		if os.path.exists(datapath+filename+'/'+filename+'.raw'):
+			print('mv 'datapath+filename+'/'+filename+'.raw 'datapath+filename+'/file.raw')
+	quit()
+
 	for f in urls:
 		year = f[41:45]
 		filename = f[59:]
