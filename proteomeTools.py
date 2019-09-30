@@ -26,8 +26,13 @@ def download(url):
 	http = urllib3.PoolManager()
 	urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 	start = datetime.now()
+
+	if os.path.exists(datapath+filename+'/'+filename+'.raw')
+		print('mv 'datapath+filename+'/'+filename+'.raw 'datapath+filename+'/file.raw')
+		quit()
+
 	#Check if Raw file exists
-	if os.path.exists(datapath+filename+'/mzML.json'):
+	if os.path.exists(datapath+filename+'/file.raw'):
 		print('Parsed files already exists')
 	else:
 		print('Starting rawfile download of '+filename)
@@ -115,7 +120,7 @@ def internalmzML(filename):
 		f = open(datapath+filename+'/mzML.json','w')
 		f.write(json.dumps(extracted))
 		f.close()
-		os.remove(datapath+filename+'/file.mzml')
+		# os.remove(datapath+filename+'/file.mzml')
 
 def full_image(interval,resolution,filename,show=False):
 	if os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
