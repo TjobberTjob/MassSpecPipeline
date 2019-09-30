@@ -350,7 +350,7 @@ if __name__ == '__main__':
 		ftp.retrbinary('RETR ' + URL + 'README.txt' ,open(datapath+'intermediary.txt', 'wb').write)
 		ftp.close()
 		print('Downloading intermediary file(s)')
-		df = pd.read_csv(datapath+'ntermediary.txt',sep='\t')
+		df = pd.read_csv(datapath+'+ntermediary.txt',sep='\t')
 		os.remove(datapath+'intermediary.txt')
 		urls = []
 		for f in df.loc[df['TYPE'] == 'RAW',]['URI']:
