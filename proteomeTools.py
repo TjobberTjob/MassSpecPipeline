@@ -66,11 +66,13 @@ def download(url):
 		
 def formatFile(filename):
 	#Check whether the docker file is implemented or not
-	output = subprocess.check_output('docker image ls',shell = True)
-	if 'thermorawparser' not in str(output):
-		os.chdir('ThermoRawFileParser/')
-		subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
-		os.chdir('..')
+	# output = subprocess.check_output('docker image ls',shell = True)
+	# if 'thermorawparser' not in str(output):
+	# 	os.chdir('..')
+	# 	os.chdir('ThermoRawFileParser/')
+	# 	subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
+	# 	os.chdir('..')
+	# 	os.chdir('MassSpecPipeline/')
 
 	if os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json'):
 		print('Already formatted to mzML')
