@@ -346,11 +346,11 @@ if __name__ == '__main__':
 		URL = sys.argv[2]+"/"
 		ftp = FTP('ftp.pride.ebi.ac.uk')
 		ftp.login('anonymous')
-		ftp.retrbinary('RETR ' + URL + 'README.txt' ,open('Data/intermediary.txt', 'wb').write)
+		ftp.retrbinary('RETR ' + URL + 'README.txt' ,open(datapath+'intermediary.txt', 'wb').write)
 		ftp.close()
 		print('Downloading intermediary file(s)')
-		df = pd.read_csv('Data/intermediary.txt',sep='\t')
-		os.remove('Data/intermediary.txt')
+		df = pd.read_csv(datapath+'ntermediary.txt',sep='\t')
+		os.remove(datapath+'intermediary.txt')
 		urls = []
 		for f in df.loc[df['TYPE'] == 'RAW',]['URI']:
 			urls.append('https://www' + f[15:-4])
@@ -359,15 +359,15 @@ if __name__ == '__main__':
 		URL2017 = '/pride/data/archive/2017/02/PXD004732/'
 		ftp = FTP('ftp.pride.ebi.ac.uk')
 		ftp.login('anonymous')
-		ftp.retrbinary('RETR ' + URL2019 + 'README.txt' ,open('Data/intermediary2019.txt', 'wb').write)
-		ftp.retrbinary('RETR ' + URL2017 +  'README.txt' ,open('Data/intermediary2017.txt', 'wb').write)
+		ftp.retrbinary('RETR ' + URL2019 + 'README.txt' ,open(datapath+'intermediary2019.txt', 'wb').write)
+		ftp.retrbinary('RETR ' + URL2017 +  'README.txt' ,open(datapath+'intermediary2017.txt', 'wb').write)
 		ftp.close()
 		#extract the urls we need and remove the intermediary files
 		print('Downloading intermediary files')
-		df1 = pd.read_csv('Data/intermediary2019.txt',sep='\t')
-		df2 = pd.read_csv('Data/intermediary2017.txt',sep='\t') 
-		os.remove('Data/intermediary2019.txt')
-		os.remove('Data/intermediary2017.txt')
+		df1 = pd.read_csv(datapath+'intermediary2019.txt',sep='\t')
+		df2 = pd.read_csv(datapath+'intermediary2017.txt',sep='\t') 
+		os.remove(datapath+'intermediary2019.txt')
+		os.remove(datapath+'intermediary2017.txt')
 		urls = []
 		for f in df1.loc[df1['TYPE'] == 'RAW',]['URI']:
 			urls.append('https://www' + f[15:-4])
