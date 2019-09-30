@@ -29,9 +29,9 @@ def download(url):
 	print(datapath+filename+'/'+filename+'.raw')
 	print('mv '+datapath+filename+'/'+filename+'.raw '+datapath+filename+'/file.raw')
 	quit()
-	if os.path.exists(datapath+filename+'/'+filename+'.raw')
-		print('mv 'datapath+filename+'/'+filename+'.raw 'datapath+filename+'/file.raw')
-		quit()
+	# if os.path.exists(datapath+filename+'/'+filename+'.raw')
+	# 	print('mv 'datapath+filename+'/'+filename+'.raw 'datapath+filename+'/file.raw')
+	# 	quit()
 
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw'):
