@@ -384,12 +384,6 @@ if __name__ == '__main__':
 		for f in df2.loc[df2['TYPE'] == 'RAW',]['URI']:
 			urls.append('https://www' + f[15:-4])
 	else: urls = [inputs]
-	
-	for f in urls:
-		filename = f[59:]
-		if os.path.exists(datapath+filename+'/'+filename+'.zip'):
-			os.system('mv '+datapath+filename+'/'+filename+'.zip '+datapath+filename+'/file.zip')
-	quit()
 
 	for f in urls:
 		year = f[41:45]
