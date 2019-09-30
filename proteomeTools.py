@@ -238,8 +238,9 @@ def sub_images(wash_out,resolution,filename):
 	rt_interval = 5
 	j=0
 	outpath = datapath+'Images'
-	if not os.path.exists(outdir):
-		os.mkdir(outdir)
+	if not os.path.exists(outpath):
+		os.mkdir(outpath)
+	
 	outfile = open(join(outpath,'metadata.json'),'a')
 	for i in range(len(df['Sequence'])):
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
