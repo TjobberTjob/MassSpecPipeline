@@ -27,7 +27,7 @@ def download(url):
 	urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 	start = datetime.now()
 	print(datapath+filename+'/'+filename+'.raw')
-	print('mv 'datapath+filename+'/'+filename+'.raw 'datapath+filename+'/file.raw')
+	print('mv '+datapath+filename+'/'+filename+'.raw '+datapath+filename+'/file.raw')
 	quit()
 	if os.path.exists(datapath+filename+'/'+filename+'.raw')
 		print('mv 'datapath+filename+'/'+filename+'.raw 'datapath+filename+'/file.raw')
