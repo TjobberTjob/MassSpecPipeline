@@ -66,20 +66,20 @@ def download(url):
 		
 def formatFile(filename):
 	#Check whether the docker file is implemented or not
-	# output = subprocess.check_output('docker image ls',shell = True)
-	# if 'thermorawparser' not in str(output):
-	# 	os.chdir('..')
-	# 	os.chdir('ThermoRawFileParser/')
-	# 	subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
-	# 	os.chdir('..')
-	# 	os.chdir('MassSpecPipeline/')
+	output = subprocess.check_output('docker image ls',shell = True)
+	if 'thermorawparser' not in str(output):
+		os.chdir('..')
+		os.chdir('ThermoRawFileParser/')
+		subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
+		os.chdir('..')
+		os.chdir('MassSpecPipeline/')
 
 	if os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json'):
 		print('Already formatted to mzML')
 	else:
 		print('Formatting '+filename+' to mzML')
 		subprocess.run('docker run -v \"'+os.getcwd()+'/Data:/data_input\" -i -t thermorawparser  mono /home/biodocker/bin/bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
-		# os.remove(datapath+filename+'/file-metadata.txt')
+		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
 		
 def process_ms1(spectrum):
