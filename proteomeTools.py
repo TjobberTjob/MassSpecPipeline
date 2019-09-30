@@ -40,6 +40,15 @@ def download(url):
 	#Check if txt file exists
 	if os.path.exists(datapath+filename+'/allPeptides.txt'):
 		print('Txt file already exists')
+	elif os.path.exists(datapath+filename+'/file.zip'):
+		subprocess.run('unzip -j Data/'+filename+'/file.zip txt/allPeptides.txt -d Data/'+filename+'/',shell = True)
+		os.remove(datapath+filename+'/file.zip')
+		df = pd.read_csv(datapath+filename+'/allPeptides.txt', sep = '\t')
+		df2 = df.loc[df['Sequence'] != ' ',]
+		pd.DataFrame.to_csv(df2,datapath+filename+'/allPeptides.txt')
+		end2 = datetime.now()
+		diff2 = end2 - start
+		print('Files downloaded and handled \ntime: '+str(diff2))
 	else:
 		print('Starting zipfile download of '+filename)
 		with http.request('GET', url+'.zip', preload_content=False) as r, open(datapath+filename+'/file.zip', 'wb') as out_file:		
@@ -378,8 +387,8 @@ if __name__ == '__main__':
 	
 	for f in urls:
 		filename = f[59:]
-		if os.path.exists(datapath+filename+'/'+filename+'.raw'):
-			os.system('mv '+datapath+filename+'/'+filename+'.raw '+datapath+filename+'/file.raw')
+		if os.path.exists(datapath+filename+'/'+filename+'.zip'):
+			os.system('mv '+datapath+filename+'/'+filename+'.zip '+datapath+filename+'/file.zip')
 	quit()
 
 	for f in urls:
