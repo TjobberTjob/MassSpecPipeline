@@ -379,7 +379,7 @@ if __name__ == '__main__':
 	for f in urls:
 		filename = f[59:]
 		if os.path.exists(datapath+filename+'/'+filename+'.raw'):
-			print('mv '+datapath+filename+'/'+filename+'.raw '+datapath+filename+'/file.raw')
+			os.system('mv '+datapath+filename+'/'+filename+'.raw '+datapath+filename+'/file.raw')
 	quit()
 
 	for f in urls:
