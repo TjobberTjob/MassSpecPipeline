@@ -79,6 +79,8 @@ def formatFile(filename):
 	else:
 		print('Formatting '+filename+' to mzML')
 		print(datapath[:-1])
+		file = datapath+filename+"/file.raw"
+		File.SetAttributes(file, FileAttributes.Normal)
 		subprocess.run('docker run -v \"'+datapath+':/data_input\" -i -t thermorawparser  mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
