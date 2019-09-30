@@ -18,6 +18,12 @@ if __name__ == '__main__':
 	import os 
 	from os.path import join
 
+os.chdir('..')
+os.chdir('ThermoRawFileParser/')
+subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
+os.chdir('..')
+os.chdir('MassSpecPipeline/')
+
 def download(url):
 	#Start Process
 	Path(datapath+filename+'/'+year).touch()
