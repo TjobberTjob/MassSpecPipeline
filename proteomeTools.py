@@ -78,7 +78,7 @@ def formatFile(filename):
 		print('Already formatted to mzML')
 	else:
 		print('Formatting '+filename+' to mzML')
-		subprocess.run('docker run -v \"'+os.getcwd()+'/Data:/data_input\" -i -t thermorawparser  mono /home/biodocker/bin/bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
+		subprocess.run('docker run -v \"'+os.getcwd()+'/Data:/data_input\" -i -t thermorawparser  mono /src/bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
 		
@@ -240,7 +240,7 @@ def sub_images(wash_out,resolution,filename):
 	outpath = datapath+'Images'
 	if not os.path.exists(outpath):
 		os.mkdir(outpath)
-	
+
 	outfile = open(join(outpath,'metadata.json'),'a')
 	for i in range(len(df['Sequence'])):
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
@@ -419,5 +419,5 @@ if __name__ == '__main__':
 # python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
 # python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/01974c_BA1-TUM_missing_first_1_01_01-ETD-1h-R4
 # python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/02208a_GE7-TUM_second_addon_55_01_01-ETD-1h-R1
-# python proteomeTools.py all /pride/data/archive/2019/05/PXD010595
+# python3 proteomeTools.py all /pride/data/archive/2019/05/PXD010595
 
