@@ -333,6 +333,7 @@ def sub_images(wash_out,resolution,filename):
 		plt.set_cmap('hot')
 		ax.imshow(image, aspect='equal',cmap = colMap)#,vmin = 5, vmax = 16)
 		plt.savefig(datapath+'Images/'+filename+'-'+str(i+1)+'.png')
+		plt.close(fig)
 		print(str(i+1)+' of '+str(len(df['Sequence']))+' subimages created')
  
 		new_metadata = {}
