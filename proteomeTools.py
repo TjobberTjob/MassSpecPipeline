@@ -78,9 +78,9 @@ def formatFile(filename):
 		print('Already formatted to mzML')
 	else:
 		print('Formatting '+filename+' to mzML')
-		# print('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser  mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')
-		# quit()
-		subprocess.run('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser  mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
+		print('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser  mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')
+		quit()
+		# subprocess.run('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser  mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
 		
