@@ -398,8 +398,6 @@ if __name__ == '__main__':
 		year = f[41:45]
 		filename = f[59:]
 		print('file: '+filename)
-		if filename == '02208a_GE7-TUM_second_addon_55_01_01-DDA-1h-R1':
-			continue
 
 		if not os.path.exists(datapath+filename):
 			os.mkdir(datapath+filename)
