@@ -160,10 +160,10 @@ def full_image(interval,resolution,filename,show=False):
 		scan_ids = []
 		for scan_id in mzml['ms1']:
 			scan_ids.append(int(scan_id))
-		intensitys = []
-		for intensity in mzml['ms1']:
-			intensity = intensity['intensity']
-			intensitys.append(int(intensity))
+		# intensitys = []
+		# for intensity in mzml['ms1']:
+		# 	intensity = intensity['intensity']
+		# 	intensitys.append(int(intensity))
 
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)

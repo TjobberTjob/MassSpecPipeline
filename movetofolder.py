@@ -1,3 +1,4 @@
+# Used to move .raw and .zip files from directory into a folder of same name
 import os 
 import glob
 datapath = "/data/ProteomeToolsRaw/"
