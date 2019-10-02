@@ -109,8 +109,6 @@ def internalmzML(filename):
 		print('Extracting data from mzML')
 		data = mzml.MzML(datapath+filename+'/file.mzML')
 
-		stats = {'ms-levels':{1:0}}
-
 		#Extracted data
 		extracted = {'ms1':{}}
 		i= 0 
