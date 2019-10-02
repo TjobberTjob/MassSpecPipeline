@@ -122,7 +122,7 @@ def internalmzML(filename):
 			
 			i+=1
 			if i%1000 == 0 :
-				print(i+"/"+max_spec)
+				print(i+"/"+str(max_spec))
 		
 			if spectrum['ms level'] != 1:
 				continue
