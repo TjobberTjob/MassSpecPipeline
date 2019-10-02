@@ -112,7 +112,7 @@ def internalmzML(filename):
 		stats = {'ms-levels':{1:0}}
 
 		for spectrum in data[-1]:
-			print(str(scan_id = int(spectrum['id'].split('scan=')[1])))
+			# print(str(scan_id = int(spectrum['id'].split('scan=')[1])))
 			max_spec = scan_id = int(spectrum['id'].split('scan=')[1])
 		#Extracted data
 		extracted = {'ms1':{}}
