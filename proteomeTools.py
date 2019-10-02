@@ -103,7 +103,7 @@ def internalmzML(filename):
 		print('mzML data already extracted')
 	else:
 		print('Extracting data from mzML file')
-		data = mzml.MzML(datapath+filename+'/file.mzml')
+		data = mzml.MzML(datapath+filename+'/file.mzML')
 
 		stats = {'ms-levels':{1:0}}
 
