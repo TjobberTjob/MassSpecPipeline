@@ -92,7 +92,7 @@ def process_ms1(spectrum):
 	#Time
 	scan_time = scan_info['scan'][0]['scan start time']
 	#mass to charge (m/z)
-	mz = spectrum['m/z array']
+	mz = spectrum["m/z array"]
 	
 	#ion intensity
 	intensity = spectrum['intensity array']
@@ -162,8 +162,7 @@ def full_image(interval,resolution,filename,show=False):
 			scan_ids.append(int(scan_id))
 		# intensitys = []
 		# for intensity in mzml['ms1']:
-		# 	intensity = intensity['intensity']
-		# 	intensitys.append(int(intensity))
+		# 	# intensitys.append(int(intensity))
 
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
@@ -279,7 +278,6 @@ def sub_images(wash_out,resolution,filename):
 		intensitys = []
 		for intensity in mzml['ms1']:
 			intensitys.append(int(intensity))
-		 
  
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
@@ -406,7 +404,7 @@ if __name__ == '__main__':
 			}
 		resolution = {'x':500,'y':300}
 		
-		full_image(interval,resolution,filename = filename,show=False)
+		# full_image(interval,resolution,filename = filename,show=False)
 		
 		# shutil.rmtree(datapath+'Images')	#For testing metadata
 		# os.mkdir(datapath+'Images')		#For testing metadata
