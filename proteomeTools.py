@@ -28,7 +28,7 @@ def download(url):
 	start = datetime.now()
 
 	#Check if Raw file exists
-	if os.path.exists(datapath+filename+'/file.raw'):
+	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json'):
 		print('Parsed files already exists')
 	else:
 		print('Starting rawfile download of '+filename)
@@ -355,7 +355,6 @@ if __name__ == '__main__':
 	datapath = '/data/ProteomeToolsRaw/' #Server datapath
 	if not os.path.exists(datapath+"Images"):
 		os.mkdir(datapath+'Images')
-
 
 	if inputs == 'all':
 		URL = sys.argv[2]+"/"
