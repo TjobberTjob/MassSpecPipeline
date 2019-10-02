@@ -391,6 +391,7 @@ if __name__ == '__main__':
 	for f in urls:
 		year = f[41:45]
 		filename = f[59:]
+		print(filename)
 		if not os.path.exists(datapath+filename):
 			os.mkdir(datapath+filename)
 
