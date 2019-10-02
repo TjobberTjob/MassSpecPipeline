@@ -111,10 +111,6 @@ def internalmzML(filename):
 
 		stats = {'ms-levels':{1:0}}
 
-		for spectrum in data[1000:]:
-			# print(str(scan_id = int(spectrum['id'].split('scan=')[1])))
-			max_spec = spectrum['id'].split('scan=')[1]
-			print(max_spec)
 		#Extracted data
 		extracted = {'ms1':{}}
 		i= 0 
@@ -123,7 +119,7 @@ def internalmzML(filename):
 			
 			i+=1
 			if i%1000 == 0 :
-				print(i+"/"+str(max_spec))
+				print(i)
 		
 			if spectrum['ms level'] != 1:
 				continue
