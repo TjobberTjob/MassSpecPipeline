@@ -223,7 +223,7 @@ def full_image(interval,resolution,filename,show=False):
 			plt.show()
 		elif show == False:
 			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
-docker run -v /data/ProteomeToolsRaw:/data_input -i -t thermorawparser  mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/02208a_GE7-TUM_second_addon_55_01_01-ETD-1h-R1/file.raw -o=/data_input/02208a_GE7-TUM_second_addon_55_01_01-ETD-1h-R1/ -f=1 -m=1
+
 def sub_images(wash_out,resolution,filename):
 	print('Creating subimages')
 
