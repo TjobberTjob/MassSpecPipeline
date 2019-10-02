@@ -92,16 +92,11 @@ def process_ms1(spectrum):
 	#Time
 	scan_time = scan_info['scan'][0]['scan start time']
 
-	im_info = spectrum['binaryDataArrayList']
-	if im_info['count'] !=2:
-		print('Data missing')
-		quit()
-
 	#mass to charge (m/z)
-	mz = im_info['m/z array']
+	mz = spectrum['m/z array']
 	
 	#ion intensity
-	intensity = im_info['intensity array']
+	intensity = spectrum['intensity array']
 	return {'scan_time':scan_time,'intensity':intensity.tolist(),'mz':mz.tolist()}
 
 def internalmzML(filename):
