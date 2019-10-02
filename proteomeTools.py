@@ -29,9 +29,9 @@ def download(url):
 
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json'):
-		print('Parsed files already exists')
+		print('raw or parsed file exists')
 	else:
-		print('Starting rawfile download of '+filename)
+		print('downloading raw file')
 		with http.request('GET', url+ '.raw', preload_content=False) as r, open(datapath+filename+'/file.raw', 'wb') as out_file:
 			shutil.copyfileobj(r, out_file)
 		end1 = datetime.now()
@@ -39,7 +39,7 @@ def download(url):
 		print('Rawfile downloaded \ntime: '+str(diff1))
 	#Check if txt file exists
 	if os.path.exists(datapath+filename+'/allPeptides.txt'):
-		print('Txt file already exists')
+		print('txt file exists')
 	elif os.path.exists(datapath+filename+'/file.zip'):
 		subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
 		os.remove(datapath+filename+'/file.zip')
@@ -50,7 +50,7 @@ def download(url):
 		diff2 = end2 - start
 		print('Files downloaded and handled \ntime: '+str(diff2))
 	else:
-		print('Starting zipfile download of '+filename)
+		print('downloading txt file')
 		with http.request('GET', url+'.zip', preload_content=False) as r, open(datapath+filename+'/file.zip', 'wb') as out_file:		
 			shutil.copyfileobj(r, out_file)
 		subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
@@ -75,9 +75,9 @@ def formatFile(filename):
 		os.chdir('MassSpecPipeline/')
 
 	if os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json'):
-		print('Already formatted to mzML')
+		print('mzML file exists')
 	else:
-		print('Formatting '+filename+' to mzML')
+		print('Formatting file to mzML')
 		subprocess.run('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser  mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
@@ -103,7 +103,7 @@ def internalmzML(filename):
 	if os.path.exists(datapath+filename+'/mzML.json'):
 		print('mzML data already extracted')
 	else:
-		print('Extracting data from mzML file')
+		print('Extracting data from mzML')
 		data = mzml.MzML(datapath+filename+'/file.mzML')
 
 		stats = {'ms-levels':{1:0}}
