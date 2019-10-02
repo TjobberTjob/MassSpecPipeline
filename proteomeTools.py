@@ -323,7 +323,7 @@ def sub_images(wash_out,resolution,filename):
 		colMap.set_bad('black')
 		# Save image
 		fig = plt.figure()
-		fig.set_size_inches((1,1))
+		fig.set_size_inches((2,2))
 		ax = plt.Axes(fig, [0., 0., 1., 1.])
 		ax.set_axis_off()
 		fig.add_axes(ax)
