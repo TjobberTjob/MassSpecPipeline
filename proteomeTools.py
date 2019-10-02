@@ -121,6 +121,8 @@ def internalmzML(filename):
 			if i%1000 == 0 :
 				print(i)
 		
+			if spectrum['ms_level'] != 1:
+				continue
 			#Scan id
 			scan_id = int(spectrum['id'].split('scan=')[1])
 			
