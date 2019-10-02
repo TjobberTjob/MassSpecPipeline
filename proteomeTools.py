@@ -91,10 +91,13 @@ def process_ms1(spectrum):
 			
 	#Time
 	scan_time = scan_info['scan'][0]['scan start time']
-
-	#mass to charge (m/z)
-	mz = spectrum['m/z array']
-	
+	try:
+		#mass to charge (m/z)
+		mz = spectrum['m/z array']
+	except:
+		import pprint
+		pprint.pprint(spectrum)
+		quit()
 	#ion intensity
 	intensity = spectrum['intensity array']
 	return {'scan_time':scan_time,'intensity':intensity.tolist(),'mz':mz.tolist()}
