@@ -17,8 +17,17 @@ classnum = {}
 for f in files:
 	folderclass = f[[m.start() for m in re.finditer('/', f)][-1]+1:]
 	classnum.update({"class: "+str(folderclass) : len([f for f in glob.glob(trainpath+folderclass + "/*.png", recursive=True)])})
-print("classes are distributed thusly: \n"+str(classnum))
-print("Guessing only the most abundant would result in "+str((round(max(classnum.items(), key=operator.itemgetter(1))[1] / sum(classnum.values())*100,2)))+"% accuracy")
+#print("classes are distributed thusly: \n"+str(classnum))
+#print("Guessing only the most abundant would result in "+str((round(max(classnum.items(), key=operator.itemgetter(1))[1] / sum(classnum.values())*100,2)))+"% accuracy")
+
+dirs = [os.path.dirname(p) for p in glob.glob(trainpath+"/*/*")]
+classes = [] 
+for x in dirs:  
+	if x not in udirs: 
+		classes.append(x)
+classes = len(classes)
+print(classes)
+quit()
 
 trainImageDataGen = ImageDataGenerator(rescale=1/255.)
 validationImageDataGen = ImageDataGenerator(rescale=1/255.)
