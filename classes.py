@@ -33,6 +33,7 @@ if not udirs == [ ]:
 	reset = input()
 	if reset == "yes" or reset == "y":
 		for f in udirs:
+			print(str(f)+"/*")
 			os.system("mv "+str(f)+"/* "+datapath)
 			shutil.rmtree(f) 	
 	else: quit()
