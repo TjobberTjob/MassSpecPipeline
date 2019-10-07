@@ -26,20 +26,19 @@ if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 	for x in dirs:  
 		if x not in udirs:
 			udirs.append(x)
-print(udirs)
+
 
 if not udirs == [ ]:
-	print("Do you want to reset image folders?")
+	print("Do you want to reset image folders? y/n")
 	reset = input()
 	if reset == "yes" or reset == "y":
 		for f in udirs:
-			print("mv "+str(f)+"/* "+datapath)
 			os.system("mv "+str(f)+"/* "+datapath)
 			shutil.rmtree(f) 	
 	else: quit()
 
 def classifyImages(classes):
-	print("Do you wanna split the data into training and validation?")
+	print("Do you wanna split the data into training and validation? y/n")
 	split = input()
 	if split == "yes" or split == "y":
 
