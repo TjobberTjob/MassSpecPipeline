@@ -26,7 +26,7 @@ if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 	for x in dirs:  
 		if x not in udirs:
 			udirs.append(x)
-
+print(udirs)
 
 if not udirs == [ ]:
 	print("Do you want to reset image folders?")
@@ -34,7 +34,7 @@ if not udirs == [ ]:
 	if reset == "yes" or reset == "y":
 		for f in udirs:
 			os.system("mv "+str(f)+"/* "+datapath)
-			shutil.rmtree(f)
+			shutil.rmtree(f) 	
 	else: quit()
 
 def classifyImages(classes):
