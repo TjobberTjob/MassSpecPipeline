@@ -15,7 +15,6 @@ for line in open(datapath+'metadata.json'):
 		print(j)
 	data = json.loads(line)
 	imname = data['image']
-	if not os.path.exists(datapath+imname):
-		print(datapath+imname)
+	if not os.path.exists(datapath+imname+".png"):
 		i = i+1
 print(i)
