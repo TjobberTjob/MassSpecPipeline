@@ -33,7 +33,7 @@ if not udirs == [ ]:
 	reset = input()
 	if reset == "yes" or reset == "y":
 		for f in udirs:
-			imags = [os.path.dirname(p) for p in glob.glob(udirs+"/*/*")]
+			imags = [os.path.dirname(p) for p in glob.glob(f+"/*/*")]
 			for g in imags[1]:
 				print(g)
 			print("mv "+f+"/* "+datapath)
