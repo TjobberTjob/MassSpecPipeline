@@ -17,5 +17,4 @@ for line in open(datapath+'metadata.json'):
 	imname = data['image']
 	if not os.path.exists(datapath+imname):
 		i = i+1
-		print("doesnt exist")
 print(i)
