@@ -33,8 +33,8 @@ if not udirs == [ ]:
 	reset = input()
 	if reset == "yes" or reset == "y":
 		for f in udirs:
-			os.system("mv "+str(f)+"/* "+datapath)
-			shutil.rmtree(f) 	
+			print("mv "+str(f)+"/* "+datapath)
+			#shutil.rmtree(f) 	
 	else: quit()
 
 def classifyImages(classes):
