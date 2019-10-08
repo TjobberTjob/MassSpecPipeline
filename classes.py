@@ -36,7 +36,7 @@ if not udirs == [ ]:
 			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
 			for imgs in images:
 				print("mv "+imgs+"/* "+datapath)
-			prtin(files)
+			print(files)
 			#shutil.rmtree(files) 	
 	else: quit()
 
