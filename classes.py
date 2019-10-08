@@ -32,11 +32,11 @@ if not udirs == [ ]:
 	print("Do you want to reset image folders? y/n")
 	reset = input()
 	if reset == "yes" or reset == "y":
-		for f in udirs:
-			imags = [os.path.dirname(p) for p in glob.glob(f+"/*/*")]
+		for files in udirs:
+			imags = [f for f in glob.glob(path + "**/*.png", recursive=True)]
 			print(imags)
-			print("mv "+f+"/* "+datapath)
-			#shutil.rmtree(f) 	
+			print("mv "+files+"/* "+datapath)
+			#shutil.rmtree(files) 	
 	else: quit()
 
 def classifyImages(classes):
