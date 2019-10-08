@@ -52,12 +52,15 @@ def classifyImages(classes):
 		if not os.path.exists(valpath):
 			os.mkdir(valpath)
 
+		#CREATING TRAINING DATA
 		for line in open(datapath+'metadata.json'):
 			data = json.loads(line)
 			if not os.path.exists(trainpath+data[imClass]):
 				os.mkdir(trainpath+data[imClass])
 			os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")	
 
+
+		#CREATING VALIDATION DATA
 		dirs = [os.path.dirname(p) for p in glob.glob(trainpath+"/*/*")]
 		udirs = [] 
 		for x in dirs:  
@@ -65,17 +68,18 @@ def classifyImages(classes):
 				udirs.append(x)
 
 		for f in udirs:
+			#Creating the folders in the validation folder
 			folderclass = f[[m.start() for m in re.finditer('/', f)][-1]+1:]
 			if not os.path.exists(valpath+str(folderclass)):
 				os.mkdir(valpath+str(folderclass))
 			mlist = os.listdir(f+"/")
-			print(mlist)
+			
+			#Splitting the data
 			splits = round(len(os.listdir(f))*(int(splitratio)/100))
-			print(splits)
-			mlist = random.choices(mlist,k=splits)
+			mlist = random.sample(mlist,k=splits)
 			if mlist == [[]]:
 				continue
-			else:
+			else: #Moving the data into the folder
 				for image in mlist:
 					os.system("mv "+trainpath+str(folderclass)+"/"+str(image)+" "+valpath+str(folderclass))
 
