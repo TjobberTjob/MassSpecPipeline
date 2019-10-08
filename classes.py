@@ -33,7 +33,7 @@ if not udirs == [ ]:
 	reset = input()
 	if reset == "yes" or reset == "y":
 		for f in udirs:
-			imags = [os.path.dirname(p) for p in glob.glob(f+"*")]
+			imags = [os.path.dirname(p) for p in glob.glob(f+"*/*/*")]
 			print(imags)
 			print("mv "+f+"/* "+datapath)
 			#shutil.rmtree(f) 	
