@@ -33,9 +33,10 @@ if not udirs == [ ]:
 	reset = input()
 	if reset == "yes" or reset == "y":
 		for files in udirs:
-			imags = [f for f in glob.glob(files + "**/*.png", recursive=True)]
-			print(imags)
-			print("mv "+files+"/* "+datapath)
+			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
+			for imgs in images:
+				print("mv "+imgs+"/* "+datapath)
+			prtin(files)
 			#shutil.rmtree(files) 	
 	else: quit()
 
