@@ -68,6 +68,6 @@ callbacks_list = [checkpoint, early_stopping]
 
 trainfiles = [f for f in glob.glob(trainpath + "*", recursive=True)]
 valfiles = [f for f in glob.glob(valpath + "*", recursive=True)]
-
+print(len(trainfiles))
 #Run model
 model.fit_generator(generator = trainGen, steps_per_epoch = len(trainfiles)//128, epochs = 50, callbacks = callbacks_list, validation_data = valGen, validation_steps = len(valfiles)//64)
