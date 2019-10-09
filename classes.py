@@ -37,7 +37,7 @@ if not udirs == [ ]:
 			for imgs in images:
 				os.system("mv "+imgs+" "+datapath)
 			shutil.rmtree(files) 	
-	else: quit()
+	else: 
 
 def classifyImages(classes):
 	print("Do you wanna split the data into training and validation? y/n")
