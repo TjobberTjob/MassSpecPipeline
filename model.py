@@ -9,6 +9,7 @@ if 'import' == 'import':
 	from keras import regularizers
 	import glob
 	import re
+	import os
 	import operator
 
 #Pre-information and folderhandling
