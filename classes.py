@@ -10,7 +10,7 @@ if 'import' == 'import':
 	from collections import defaultdict
 
 #Pathfinding
-datapath = "/data/ProteomeToolsRaw/Images"
+datapath = "/data/ProteomeToolsRaw/Images/"
 trainpath = datapath+'training/'
 valpath = datapath+'validation/'
 
