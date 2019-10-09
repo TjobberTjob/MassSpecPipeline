@@ -15,7 +15,7 @@ if not os.path.exists(datapath):
 #Reset images
 dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
 udirs = [] 
-for x in dirs:  
+for x in dirs:	
 	if x not in udirs: 
 		udirs.append(x)
 
@@ -52,36 +52,45 @@ def classifyImages(classes):
 		if not os.path.exists(valpath):
 			os.mkdir(valpath)
 
+		imgdata = []
 		#CREATING TRAINING DATA
 		for line in open(datapath+'metadata.json'):
 			data = json.loads(line)
+			imgdata.append(str(data[imClass]+"/"+data['image']+".png"))
+			
 			if not os.path.exists(trainpath+data[imClass]):
 				os.mkdir(trainpath+data[imClass])
+			if not os.path.exists(valpath+data[imClass]):
+				os.mkdir(valpath+data[imClass])
 			os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")	
+		
+		splits = round(len(imgdata)*(int(splitratio)/100))
+		mlist = random.sample(imgdata,k=splits)
+		for elements in mlist:
+			os.system("mv "+trainpath+elements+" "+valpath+elements)
+		
+	# 	#CREATING VALIDATION DATA
+	# 	dirs = [os.path.dirname(p) for p in glob.glob(trainpath+"/*/*")]
+	# 	udirs = [] 
+	# 	for x in dirs:  
+	# 		if x not in udirs: 
+	# 			udirs.append(x)
 
-
-		#CREATING VALIDATION DATA
-		dirs = [os.path.dirname(p) for p in glob.glob(trainpath+"/*/*")]
-		udirs = [] 
-		for x in dirs:  
-			if x not in udirs: 
-				udirs.append(x)
-
-		for f in udirs:
-			#Creating the folders in the validation folder
-			folderclass = f[[m.start() for m in re.finditer('/', f)][-1]+1:]
-			if not os.path.exists(valpath+str(folderclass)):
-				os.mkdir(valpath+str(folderclass))
-			mlist = os.listdir(f+"/")
+	# 	for f in udirs:
+	# 		#Creating the folders in the validation folder
+	# 		folderclass = f[[m.start() for m in re.finditer('/', f)][-1]+1:]
+	# 		if not os.path.exists(valpath+str(folderclass)):
+	# 			os.mkdir(valpath+str(folderclass))
+	# 		mlist = os.listdir(f+"/")
 			
-			#Splitting the data
-			splits = round(len(os.listdir(f))*(int(splitratio)/100))
-			mlist = random.sample(mlist,k=splits)
-			if mlist == [[]]:
-				continue
-			else: #Moving the data into the folder
-				for image in mlist:
-					os.system("mv "+trainpath+str(folderclass)+"/"+str(image)+" "+valpath+str(folderclass))
+	# 		#Splitting the data
+	# 		splits = round(len(os.listdir(f))*(int(splitratio)/100))
+	# 		mlist = random.sample(mlist,k=splits)
+	# 		if mlist == [[]]:
+	# 			continue
+	# 		else: #Moving the data into the folder
+	# 			for image in mlist:
+	# 				os.system("mv "+trainpath+str(folderclass)+"/"+str(image)+" "+valpath+str(folderclass))
 
 	else:
 		for line in open(datapath+'metadata.json'):
