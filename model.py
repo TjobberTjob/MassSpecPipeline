@@ -1,5 +1,6 @@
 if 'import' == 'import':
 	import keras
+	import tensorboard
 	from keras.utils import plot_model
 	from keras.preprocessing.image import ImageDataGenerator
 	from keras.layers import Activation, Dropout, Flatten, Dense, Input, Concatenate, BatchNormalization, Conv2D, MaxPooling2D
@@ -62,7 +63,7 @@ model.compile(loss = 'categorical_crossentropy', metrics=['accuracy'], optimizer
 #Create callbacks
 checkpoint  = keras.callbacks.ModelCheckpoint("bestweight.h5", monitor='val_acc', save_best_only=True)
 early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
-callbacks_list = [checkpoint, tensorboard, early_stopping]
+callbacks_list = [checkpoint, early_stopping]
 
 
 trainfiles = [f for f in glob.glob(trainpath + "*", recursive=True)]
