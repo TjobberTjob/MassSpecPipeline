@@ -36,8 +36,8 @@ if not udirs == [ ]:
 			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
 			for imgs in images:
 				os.system("mv "+imgs+" "+datapath)
-			shutil.rmtree(files) 	
-	else: 
+			shutil.rmtree(files) 	 
+
 
 def classifyImages(classes):
 	print("Do you wanna split the data into training and validation? y/n")
