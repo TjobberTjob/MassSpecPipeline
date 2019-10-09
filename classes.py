@@ -1,11 +1,16 @@
-import json
-import os
-import glob
-import sys
-import shutil
-import random
-import re
-datapath = "/data/ProteomeToolsRaw/Images/"
+if 'import' == 'import':
+	import json
+	import os
+	import glob
+	import sys
+	import shutil
+	import random
+	import re
+	import numpy as np
+	from collections import defaultdict
+
+#Pathfinding
+datapath = "/data/ProteomeToolsRaw/Images"
 trainpath = datapath+'training/'
 valpath = datapath+'validation/'
 
@@ -14,21 +19,13 @@ if not os.path.exists(datapath):
 
 #Reset images
 dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
-udirs = [] 
-for x in dirs:	
-	if x not in udirs: 
-		udirs.append(x)
-
+udirs = np.unique(dirs)
 
 if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 	dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
-	udirs = [] 
-	for x in dirs:  
-		if x not in udirs:
-			udirs.append(x)
+	udirs = np.unique(dirs) 
 
-
-if not udirs == [ ]:
+if len(udirs) != 0:
 	print("Do you want to reset image folders? y/n")
 	reset = input()
 	if reset == "yes" or reset == "y":
@@ -38,7 +35,7 @@ if not udirs == [ ]:
 				os.system("mv "+imgs+" "+datapath)
 			shutil.rmtree(files) 	 
 
-
+#Move images
 def classifyImages(classes):
 	print("Do you wanna split the data into training and validation? y/n")
 	split = input()
@@ -52,52 +49,37 @@ def classifyImages(classes):
 		if not os.path.exists(valpath):
 			os.mkdir(valpath)
 
-		imgdata = []
+		imgdata = {}
 		#CREATING TRAINING DATA
 		for line in open(datapath+'metadata.json'):
 			data = json.loads(line)
-			imgdata.append(str(data[imClass]+"/"+data['image']+".png"))
-			
+
+			names = data[imClass]+"/"+data['image']+".png"
+			imgdata[names] = data[imClass]
+
 			if not os.path.exists(trainpath+data[imClass]):
 				os.mkdir(trainpath+data[imClass])
 			if not os.path.exists(valpath+data[imClass]):
 				os.mkdir(valpath+data[imClass])
 			os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")	
 		
-		splits = round(len(imgdata)*(int(splitratio)/100))
-		mlist = random.sample(imgdata,k=splits)
-		for elements in mlist:
-			os.system("mv "+trainpath+elements+" "+valpath+elements)
-		
-	# 	#CREATING VALIDATION DATA
-	# 	dirs = [os.path.dirname(p) for p in glob.glob(trainpath+"/*/*")]
-	# 	udirs = [] 
-	# 	for x in dirs:  
-	# 		if x not in udirs: 
-	# 			udirs.append(x)
+		#CREATING VALIDATION DATA
+		imgadata = defaultdict(list)
+		for k, v in imgdata.items():
+			imgadata[v].append(k)
+		for f in imgadata:
+			splits = round(len(imgadata[f])*(int(splitratio)/100))
+			mlist = random.sample(imgadata[f],k=splits)
+			for elements in mlist:
+				os.system("mv "+trainpath+elements+" "+valpath+elements)
 
-	# 	for f in udirs:
-	# 		#Creating the folders in the validation folder
-	# 		folderclass = f[[m.start() for m in re.finditer('/', f)][-1]+1:]
-	# 		if not os.path.exists(valpath+str(folderclass)):
-	# 			os.mkdir(valpath+str(folderclass))
-	# 		mlist = os.listdir(f+"/")
-			
-	# 		#Splitting the data
-	# 		splits = round(len(os.listdir(f))*(int(splitratio)/100))
-	# 		mlist = random.sample(mlist,k=splits)
-	# 		if mlist == [[]]:
-	# 			continue
-	# 		else: #Moving the data into the folder
-	# 			for image in mlist:
-	# 				os.system("mv "+trainpath+str(folderclass)+"/"+str(image)+" "+valpath+str(folderclass))
-
-	else:
+	elif split == "no" or split == "n":
 		for line in open(datapath+'metadata.json'):
 			data = json.loads(line)
 			if not os.path.exists(datapath+data[imClass]):
 				os.mkdir(datapath+data[imClass])
 			os.system("mv "+datapath+data['image']+".png "+datapath+data[imClass]+"/")	
+	else: quit()
 
 
 if __name__ == '__main__':
