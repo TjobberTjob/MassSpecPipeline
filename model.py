@@ -9,6 +9,7 @@ if 'import' == 'import':
 	from keras import regularizers
 	import glob
 	import re
+	import numpy as np
 	import os
 	import operator
 
