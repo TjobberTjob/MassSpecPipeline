@@ -1,20 +1,22 @@
-import keras
-from keras.utils import plot_model
-from keras.preprocessing.image import ImageDataGenerator
-from keras.layers import Activation, Dropout, Flatten, Dense, Input, Concatenate, BatchNormalization, Conv2D, MaxPooling2D
-from keras import backend as K
-from keras.models import Model
-from keras.callbacks import ModelCheckpoint
-from keras import regularizers
-import glob
-import re
-import operator
+if 'import' == 'import':
+	import keras
+	from keras.utils import plot_model
+	from keras.preprocessing.image import ImageDataGenerator
+	from keras.layers import Activation, Dropout, Flatten, Dense, Input, Concatenate, BatchNormalization, Conv2D, MaxPooling2D
+	from keras import backend as K
+	from keras.models import Model
+	from keras.callbacks import ModelCheckpoint
+	from keras import regularizers
+	import glob
+	import re
+	import operator
 
 #Pre-information and folderhandling
 datapath = "/data/ProteomeToolsRaw/Images/"
 #datapath = "Data/Images"
 trainpath = datapath+'training/'
 valpath = datapath+'validation/'
+
 files = [f for f in glob.glob(trainpath + "*", recursive=True)]
 classnum = {}
 for f in files:
@@ -24,24 +26,20 @@ print("classes are distributed thusly: \n"+str(classnum))
 print("Guessing only the most abundant would result in "+str((round(max(classnum.items(), key=operator.itemgetter(1))[1] / sum(classnum.values())*100)))+"% accuracy")
 
 dirs = [os.path.dirname(p) for p in glob.glob(trainpath+"/*/*")]
-classes = [] 
-for x in dirs:  
-	if x not in udirs: 
-		classes.append(x)
-classes = len(classes)
+classes = len(np.unique(dirs))
 
 #Developing the imagegenerator
 trainImageDataGen = ImageDataGenerator(rescale=1/255.)
 validationImageDataGen = ImageDataGenerator(rescale=1/255.)
 datapath = "Data/Images/"
 trainGen = trainImageDataGen.flow_from_directory(trainpath,
-	target_size=(300,300),
-	batch_size=16,
+	target_size=(200,200),
+	batch_size=128,
 	class_mode="categorical")
 
 valGen = validationImageDataGen.flow_from_directory(valpath,
-	target_size=(300,300),
-	batch_size=16,
+	target_size=(200,200),
+	batch_size=64,
 	class_mode="categorical")	
 
 #Create model
@@ -54,16 +52,19 @@ x2 = Conv2D(4, kernel_size=(5,5), activation = 'relu', padding = "same")(x2)
 x  = Concatenate()([x, x1, x2])
 x  = Flatten()(x)
 x  = Dropout(rate = 0.25)(x)
+outputs = Dense(64, activation = 'relu')(x)
 outputs = Dense(classes, activation = 'softmax')(x)
 model   = keras.Model(inputs,outputs)
 
 model.compile(loss = 'categorical_crossentropy', metrics=['accuracy'], optimizer = 'adam') 
 #Create callbacks
-checkpoint  = keras.callbacks.ModelCheckpoint("bestweight_C.h5", monitor='val_acc', save_best_only=True)
+checkpoint  = keras.callbacks.ModelCheckpoint("bestweight.h5", monitor='val_acc', save_best_only=True)
 early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 callbacks_list = [checkpoint, tensorboard, early_stopping]
 
-#Run model
-model.fit_generator(generator = trainGen, steps_per_epoch = 100, epochs = 50, callbacks = callbacks_list, validation_data = valGen, validation_steps = 100)
 
-# model.save('model_C_run.h5')
+trainfiles = [f for f in glob.glob(trainpath + "*", recursive=True)]
+valfiles = [f for f in glob.glob(valpath + "*", recursive=True)]
+
+#Run model
+model.fit_generator(generator = trainGen, steps_per_epoch = len(trainfiles)//128, epochs = 50, callbacks = callbacks_list, validation_data = valGen, validation_steps = len(valfiles)//64)

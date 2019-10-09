@@ -51,6 +51,7 @@ def classifyImages(classes):
 
 		imgdata = {}
 		#CREATING TRAINING DATA
+		print("Sorting into training data")
 		for line in open(datapath+'metadata.json'):
 			data = json.loads(line)
 
@@ -64,6 +65,7 @@ def classifyImages(classes):
 			os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")	
 		
 		#CREATING VALIDATION DATA
+		print("Sorting into Validation data")
 		imgadata = defaultdict(list)
 		for k, v in imgdata.items():
 			imgadata[v].append(k)
