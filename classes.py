@@ -31,16 +31,11 @@ if len(udirs) != 0:
 	if reset == "yes" or reset == "y":
 		for files in udirs:
 			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
-			for i in range(0,len(images),10000):
-				yield images[i:i+10000]
-				images
 
-			#for imgs in images:
-			#	print("\n \n \n")
-			#	print("mv "+imgs+" "+datapath[range(0,len(images),1000)])
-				#os.system("mv "+imgs+" "+datapath)
-			#shutil.rmtree(files) 	 
-quit()
+			for imgs in images:
+				os.system("mv "+imgs+" "+datapath)
+			shutil.rmtree(files) 	 
+
 #Move images
 def classifyImages(classes):
 	print("Do you wanna split the data into training and validation? y/n")
