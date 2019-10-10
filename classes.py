@@ -57,7 +57,7 @@ def classifyImages(classes):
 			data = json.loads(line)
 			print(float(data['m/z']) > 100)
 			quit()
-			if float(data['m/z']) > 363 and float(data['m/z']) < 366: #Filter m/z
+			if (float(data['m/z']) > 420 and float(data['m/z']) < 425): #Filter m/z
 				names = data[imClass]+"/"+data['image']+".png"
 				imgdata[names] = data[imClass]
 
