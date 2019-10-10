@@ -32,9 +32,13 @@ if len(udirs) != 0:
 		for files in udirs:
 			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
 
-			for imgs in images:
-				os.system("mv "+imgs+" "+datapath)
-			shutil.rmtree(files) 	 
+			for i in range(0,len(images),10000):
+				imgs = images[i,i+10000]
+				print"mv "+imgs+" "+datapath)
+
+			#for imgs in images:
+			#	os.system("mv "+imgs+" "+datapath)
+			#shutil.rmtree(files) 	 
 
 #Move images
 def classifyImages(classes):
