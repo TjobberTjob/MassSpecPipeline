@@ -1,7 +1,7 @@
 if 'import' == 'import':
 	import keras
 	import tensorboard
-	import pillow
+	#import pillow
 	from keras.utils import plot_model
 	from keras.preprocessing.image import ImageDataGenerator
 	from keras.layers import Activation, Dropout, Flatten, Dense, Input, Concatenate, BatchNormalization, Conv2D, MaxPooling2D
