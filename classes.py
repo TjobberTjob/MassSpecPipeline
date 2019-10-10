@@ -31,10 +31,11 @@ if len(udirs) != 0:
 	if reset == "yes" or reset == "y":
 		for files in udirs:
 			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
-			for imgs in images:
-				os.system("mv "+imgs+" "+datapath)
-			shutil.rmtree(files) 	 
-
+			print(images)
+			#for imgs in images:
+			#	os.system("mv "+imgs+" "+datapath)
+			#shutil.rmtree(files) 	 
+quit()
 #Move images
 def classifyImages(classes):
 	print("Do you wanna split the data into training and validation? y/n")
@@ -55,7 +56,7 @@ def classifyImages(classes):
 		for line in open(datapath+'metadata.json'):
 			data = json.loads(line)
 
-			if data['m/z'] > 360 or data['m/z'] < 370:
+			if data['m/z'] > 360 or data['m/z'] < 370: #Filter m/z 
 
 				names = data[imClass]+"/"+data['image']+".png"
 				imgdata[names] = data[imClass]
@@ -64,7 +65,9 @@ def classifyImages(classes):
 					os.mkdir(trainpath+data[imClass])
 				if not os.path.exists(valpath+data[imClass]):
 					os.mkdir(valpath+data[imClass])
-				os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")	
+				os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")
+			else:
+				continue
 		
 		#CREATING VALIDATION DATA
 		print("Sorting into Validation data")
