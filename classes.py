@@ -31,7 +31,7 @@ if len(udirs) != 0:
 	if reset == "yes" or reset == "y":
 		for files in udirs:
 			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
-			print(range(0,len(images),10000))
+			print(range(0,len(images),1000))
 			#print(images[0:10000])
 			#for imgs in images:
 			#	os.system("mv "+imgs+" "+datapath)
