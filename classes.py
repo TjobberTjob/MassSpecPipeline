@@ -31,10 +31,10 @@ if len(udirs) != 0:
 	if reset == "yes" or reset == "y":
 		for files in udirs:
 			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
-			print(range(0,len(images),1000))
-			#print(images[0:10000])
-			#for imgs in images:
-			#	os.system("mv "+imgs+" "+datapath)
+			for imgs in images:
+				print("\n \n \n")
+				print("mv "+imgs+" "+datapath[range(0,len(images),1000)])
+				#os.system("mv "+imgs+" "+datapath)
 			#shutil.rmtree(files) 	 
 quit()
 #Move images
