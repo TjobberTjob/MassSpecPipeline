@@ -34,12 +34,12 @@ if len(udirs) != 0:
 
 			for i in range(0,len(images),10000):
 				imgs = images[i,i+10000]
-				print"mv "+imgs+" "+datapath)
+				print("mv "+imgs+" "+datapath)
 
 			#for imgs in images:
 			#	os.system("mv "+imgs+" "+datapath)
 			#shutil.rmtree(files) 	 
-
+quit()
 #Move images
 def classifyImages(classes):
 	print("Do you wanna split the data into training and validation? y/n")
