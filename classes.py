@@ -55,14 +55,16 @@ def classifyImages(classes):
 		for line in open(datapath+'metadata.json'):
 			data = json.loads(line)
 
-			names = data[imClass]+"/"+data['image']+".png"
-			imgdata[names] = data[imClass]
+			if data['m/z'] > 360 or data['m/z'] < 370:
 
-			if not os.path.exists(trainpath+data[imClass]):
-				os.mkdir(trainpath+data[imClass])
-			if not os.path.exists(valpath+data[imClass]):
-				os.mkdir(valpath+data[imClass])
-			os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")	
+				names = data[imClass]+"/"+data['image']+".png"
+				imgdata[names] = data[imClass]
+
+				if not os.path.exists(trainpath+data[imClass]):
+					os.mkdir(trainpath+data[imClass])
+				if not os.path.exists(valpath+data[imClass]):
+					os.mkdir(valpath+data[imClass])
+				os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")	
 		
 		#CREATING VALIDATION DATA
 		print("Sorting into Validation data")

@@ -340,7 +340,7 @@ def sub_images(wash_out,resolution,filename):
 				continue
 			else:
 				new_metadata.update({str(ele) : str(df[ele][i])})
-		# full = {filename+'-'+str(i+1) : new_metadata}
+
 		outfile.write(json.dumps(new_metadata)+'\n')
 	outfile.close()
 	print(str(j)+' Images were out of bounds')
