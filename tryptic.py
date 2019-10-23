@@ -17,7 +17,7 @@ for f in files:
 	if i > 1:
 		quit()
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
-	df.head()
+	print(df.head())
 	i=i+1
 	#df2 = df.loc[df['Sequence'] != ' ',]
 	#pd.DataFrame.to_csv(df2,f+'/allPeptides.txt')
