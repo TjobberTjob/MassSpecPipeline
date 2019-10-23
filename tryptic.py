@@ -2,7 +2,7 @@ datapath = "/data/ProteomeToolsRaw/tryptic/"
 import os 
 import glob
 import re
-import pd
+import pandas as pd
 import subprocess
 files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
 
