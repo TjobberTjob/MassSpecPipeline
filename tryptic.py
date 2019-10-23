@@ -24,7 +24,7 @@ print(files)
 files = np.unique(files)
 for f in files:
 	file = f[31:]+".zip"
-	if os.path.exists(f+'/'+file):
+	if os.path.exists(f+'/*.zip'):
 		print(file)
 
 
