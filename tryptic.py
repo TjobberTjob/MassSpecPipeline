@@ -32,6 +32,7 @@ files = np.unique(files)
 for f in files:
 	file = f[31:]+".zip"
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
+	print(f+'/'+file, '/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
 	try:
 		shutil.move(f+'/'+file, '/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
 	except:
