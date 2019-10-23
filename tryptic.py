@@ -24,6 +24,6 @@ files = np.unique(files)
 for f in files:
 	file = f[23:]+".raw"
 	if os.path.exists(f+"/"+file):
-		os.system(f+"/"+file+" "+f+"/file.raw")
+		shutil.move(f+"/"+file, f+"/file.raw")
 	else:
 		continue
