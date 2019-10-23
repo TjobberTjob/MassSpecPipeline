@@ -244,12 +244,12 @@ def sub_images(wash_out,resolution,filename):
 	outfile = open(join(outpath,'metadata.json'),'a')
 	for i in range(len(df['Sequence'])):
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
-			print(str(i+1)+' of '+str(len(df['Sequence']))+' was already created')
+			#print(str(i+1)+' of '+str(len(df['Sequence']))+' was already created')
 			continue
   
 		if df['Retention time'][i]-rt_interval < min(df['Retention time'])+wash_out or df['Retention time'][i]+rt_interval > max(df['Retention time']) or df['m/z'][i]-mz_interval < min(df['m/z']) or df['m/z'][i]+mz_interval > max(df['m/z']):
 			j+=1
-			print(str(i+1)+' of '+str(len(df['Sequence']))+' was out of bounds')
+			#print(str(i+1)+' of '+str(len(df['Sequence']))+' was out of bounds')
 			continue
   
 		interval = {
@@ -331,7 +331,8 @@ def sub_images(wash_out,resolution,filename):
 		ax.imshow(image, aspect='equal',cmap = colMap)#,vmin = 5, vmax = 16)
 		plt.savefig(datapath+'Images/'+filename+'-'+str(i+1)+'.png')
 		plt.close(fig)
-		print(str(i+1)+' of '+str(len(df['Sequence']))+' subimages created')
+		if i%%10 == 0:
+			print(str(i+1)+' of '+str(len(df['Sequence'])), end = ' ') #PRINT CREATED IMAGE
  
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i+1)})
@@ -342,6 +343,7 @@ def sub_images(wash_out,resolution,filename):
 				new_metadata.update({str(ele) : str(df[ele][i])})
 
 		outfile.write(json.dumps(new_metadata)+'\n')
+
 	outfile.close()
 	print(str(j)+' Images were out of bounds')
 
