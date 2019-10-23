@@ -26,11 +26,11 @@ for f in files:
 		continue
 	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
 
-len(files)
+print(len(files))
 
-for f in files:
-	if f == '/data/ProteomeToolsRaw/tryptic/TUM_first_pool_97_01_01_2xIT_2xHCD-1h-R2-tryptic':
-		print(hey)
-	print(f+'/allPeptides.txt')
-	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
-	print(df.iloc[0,0])
+#for f in files:
+#	if f == '/data/ProteomeToolsRaw/tryptic/TUM_first_pool_97_01_01_2xIT_2xHCD-1h-R2-tryptic':
+#		print('hey')
+#	print(f+'/allPeptides.txt')
+#	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
+#	print(df.iloc[0,0])
