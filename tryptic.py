@@ -36,7 +36,7 @@ for f in files:
 	else:
 		ss = '\t'
 	df = pd.read_csv(f+'/allPeptides.txt', sep = ss)
-	print(f+'/'+file, '/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
+	print('/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
 	try:
 		shutil.move(f+'/'+file, '/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
 	except:
