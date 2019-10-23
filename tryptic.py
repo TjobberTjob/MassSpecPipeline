@@ -23,8 +23,7 @@ files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
 files = np.unique(files)
 for f in files:
 	file = f[23:]+".raw"
-	print(f+"/"+file)
 	if os.path.exists(f+"/"+file):
-		print(f+"/"+file+" "+f+"file.raw")
+		os.system(f+"/"+file+" "+f+"file.raw")
 	else:
 		continue
