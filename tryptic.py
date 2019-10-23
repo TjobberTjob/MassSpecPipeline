@@ -1,9 +1,23 @@
 datapath = "/data/ProteomeToolsRaw/tryptic/"
-import os 
-import glob
-import re
-import pandas as pd
-import subprocess
+if __name__ == '__main__':
+	import shutil
+	import pandas as pd
+	import urllib3
+	import csv
+	import matplotlib.cm as cm
+	import matplotlib.pyplot as plt
+	import matplotlib as mpl
+	from ftplib import FTP
+	from datetime import datetime
+	from pyteomics import mzml,mzid,mgf
+	from pathlib import Path
+	import glob
+	import json
+	import math
+	import numpy as np
+	import subprocess
+	import os 
+	from os.path import join
 files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
 
 for f in files:
@@ -13,6 +27,7 @@ for f in files:
 	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
 
 for f in files:
+	print(f+'/allPeptides.txt')
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
 	df2 = df.loc[df['Sequence'] != ' ',]
 	pd.DataFrame.to_csv(df2,f+'/allPeptides.txt')
