@@ -27,5 +27,6 @@ for f in files:
 	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
 
 for f in files:
+	print(f+'/allPeptides.txt')
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
 	print(df.iloc[0,0])
