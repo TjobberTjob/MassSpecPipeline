@@ -1,4 +1,4 @@
-datapath = "/data/ProteomeToolsRaw/tryptic"
+datapath = "/data/ProteomeToolsRaw/"
 if __name__ == '__main__':
 	import shutil
 	import pandas as pd
@@ -18,15 +18,13 @@ if __name__ == '__main__':
 	import subprocess
 	import os 
 	from os.path import join
+zipfiles = os.system(find datapath -type f -name '*.zip')
+rawfiles = os.system(find datapath -type f -name '*.raw')
 
-files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
-files = np.unique(files)
-for f in files:
-	file = f[31:]+".zip"
-	if os.path.exists(f+'/*.zip'):
-		print(file)
-
-
+a = []
+if not zipfiles in rawfiles:
+	a.append(zipfiles[:-4])
+print(a)
 
 #files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
 #files = np.unique(files)
