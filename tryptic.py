@@ -1,4 +1,4 @@
-datapath = "/data/ProteomeToolsRaw/tryptic/"
+datapath = "/data/ProteomeToolsRaw/tryptic"
 if __name__ == '__main__':
 	import shutil
 	import pandas as pd
