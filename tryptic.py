@@ -13,6 +13,7 @@ for f in files:
 	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
 
 filess = files[1]
+print(filess)
 for f in filess:
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
 	df.head()
