@@ -18,6 +18,7 @@ if __name__ == '__main__':
 	import subprocess
 	import os 
 	from os.path import join
+
 files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
 
 for f in files:
@@ -31,7 +32,4 @@ files = np.unique(files)
 for f in files:
 	file = f[31:]+".zip"
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
-	try:
-		os.system('mv '+f+'/'+file+' '+'/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
-	except:
-		print("already moved")
+	shutil.move(f+'/'+file, '/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
