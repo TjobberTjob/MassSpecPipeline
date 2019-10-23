@@ -29,4 +29,4 @@ for f in files:
 for f in files:
 	print(f+'/allPeptides.txt')
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
-	print(df.iloc(0,0))
+	print(df.iloc[0,0])
