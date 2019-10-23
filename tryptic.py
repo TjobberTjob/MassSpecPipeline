@@ -18,8 +18,8 @@ if __name__ == '__main__':
 	import subprocess
 	import os 
 	from os.path import join
-zipfiles = os.system(find datapath -type f -name '*.zip')
-rawfiles = os.system(find datapath -type f -name '*.raw')
+zipfiles = os.system('find '+ datapath+ ' -type f -name \"*.zip\"')
+rawfiles = os.system('find '+ datapath+ ' -type f -name \"*.raw\"')
 
 a = []
 if not zipfiles in rawfiles:
