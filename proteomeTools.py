@@ -53,11 +53,12 @@ def download(url):
 		print('downloading txt file')
 		with http.request('GET', url+'.zip', preload_content=False) as r, open(datapath+filename+'/file.zip', 'wb') as out_file:		
 			shutil.copyfileobj(r, out_file)
+		
 		try:
 			subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
 		except:
 			subprocess.run('unzip -j '+datapath+filename+'/file.zip allPeptides.txt -d '+datapath+filename+'/',shell = True)
-			
+
 		os.remove(datapath+filename+'/file.zip')
 		#Fix the allpep.txt
 		df = pd.read_csv(datapath+filename+'/allPeptides.txt', sep = '\t')
@@ -394,6 +395,10 @@ if __name__ == '__main__':
 	for f in urls:
 		year = f[41:45]
 		filename = f[59:]
+
+		if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
+			continue
+
 		print('file: '+filename)
 
 		if not os.path.exists(datapath+filename):
