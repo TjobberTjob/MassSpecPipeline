@@ -32,4 +32,4 @@ for f in files:
 	file = f[31:]+".zip"
 	print(f+'/allPeptides.txt')
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
-	print('mv '+f+file+' '+'/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
+	os.system('mv '+f+'/'+file+' '+'/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
