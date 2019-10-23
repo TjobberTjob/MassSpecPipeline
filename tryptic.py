@@ -20,6 +20,7 @@ if __name__ == '__main__':
 	from os.path import join
 
 files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
+print(files)
 files = np.unique(files)
 for f in files:
 	file = f[31:]+".zip"
