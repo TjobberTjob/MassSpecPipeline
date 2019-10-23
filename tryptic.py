@@ -31,4 +31,5 @@ files = np.unique(files)
 for f in files:
 	file = f[31:]+".zip"
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
-	os.system('mv '+f+'/'+file+' '+'/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
+	try:
+		os.system('mv '+f+'/'+file+' '+'/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
