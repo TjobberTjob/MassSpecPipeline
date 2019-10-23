@@ -1,4 +1,4 @@
-datapath = "/data/ProteomeToolsRaw/tryptic/"
+datapath = "/data/ProteomeToolsRaw/"
 if __name__ == '__main__':
 	import shutil
 	import pandas as pd
@@ -20,24 +20,10 @@ if __name__ == '__main__':
 	from os.path import join
 
 files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
-
-for f in files:
-	file = f[31:]+".zip"
-	if os.path.exists(f+'/allPeptides.txt'):
-		continue
-	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
-
 files = np.unique(files)
-
 for f in files:
-	file = f[31:]+".zip"
-	if f+file == '/data/ProteomeToolsRaw/tryptic/TUM_first_pool_97_01_01_2xIT_2xHCD-1h-R2-tryptic':
-		ss = ','
+	file = f[31:]+".raw"
+	if os.path.exists(f+file):
+		print(f+file+" "+f+"file.raw")
 	else:
-		ss = '\t'
-	df = pd.read_csv(f+'/allPeptides.txt', sep = ss)
-	print('/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
-	try:
-		shutil.move(f+'/'+file, '/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
-	except:
-		print("moved")
+		continue
