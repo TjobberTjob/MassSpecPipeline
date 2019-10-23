@@ -26,6 +26,7 @@ for f in files:
 		continue
 	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
 
+files = np.unique(files)
 print(len(files))
 
 #for f in files:
