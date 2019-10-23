@@ -13,6 +13,6 @@ for f in files:
 	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
 
 for f in files:
-	df = pd.read_csv(f+'/allPeptides.txt', sep = ',')
+	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
 	df2 = df.loc[df['Sequence'] != ' ',]
 	pd.DataFrame.to_csv(df2,f+'/allPeptides.txt')
