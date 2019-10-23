@@ -15,4 +15,4 @@ for f in files:
 for f in files:
 	df = pd.read_csv(f+'/allPeptides.txt', sep = '\t')
 	df2 = df.loc[df['Sequence'] != ' ',]
-	pd.DataFrame.to_csv(df2,datapath+filename+'/allPeptides.txt')
+	pd.DataFrame.to_csv(df2,f+'/allPeptides.txt')
