@@ -331,8 +331,7 @@ def sub_images(wash_out,resolution,filename):
 		ax.imshow(image, aspect='equal',cmap = colMap)#,vmin = 5, vmax = 16)
 		plt.savefig(datapath+'Images/'+filename+'-'+str(i+1)+'.png')
 		plt.close(fig)
-		if i%%10 == 0:
-			print(str(i+1)+' of '+str(len(df['Sequence'])), end = ' ') #PRINT CREATED IMAGE
+		print(str(i+1)+' of '+str(len(df['Sequence'])), end = ' ') #PRINT CREATED IMAGE
  
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i+1)})
