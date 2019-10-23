@@ -26,7 +26,7 @@ for f in files:
 		continue
 	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
 
-print(files)
+len(files)
 
 for f in files:
 	if f == '/data/ProteomeToolsRaw/tryptic/TUM_first_pool_97_01_01_2xIT_2xHCD-1h-R2-tryptic':
