@@ -23,18 +23,9 @@ files = glob.glob(datapath+"*.zip")
 files = np.unique(files)
 for f in files:
 	subprocess.run('unzip -j '+f+' allPeptides.txt -d '+datapath,shell = True)
-	
-	#with ZipFile(f, 'r') as zipObj:
-	#	zipObj.extract(allPeptides.txt, 'allPeptides.txt')
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
-	#df2 = pd.read_csv(datapath+'allPeptides.txt', sep = ",")
-	if df.iloc[0,0] == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
-		print(f)
-		print(df.iloc[0,0])
-		quit()
-
-	#if not os.path.exists(datapath+df.iloc[0,0]+'/file.zip'):
-	#	print(os.path.exists(datapath+df.iloc[0,0]+'/file.zip')+ df.iloc[0,0])
-	#	#shutil.move(f, datapath+df.iloc[0,0]+'/file.zip')
+	if not os.path.exists(datapath+df.iloc[0,0]+'/file.zip'):
+		print(os.path.exists(datapath+df.iloc[0,0]+'/file.zip')+ df.iloc[0,0])
+		shutil.copyfile(f, datapath+df.iloc[0,0]+'/file.zip')
 	os.system('rm '+datapath+'allPeptides.txt')
 
