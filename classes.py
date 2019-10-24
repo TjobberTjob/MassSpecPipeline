@@ -29,8 +29,8 @@ if len(udirs) != 0:
 	if reset == "yes" or reset == "y":
 		for files in udirs:
 			os.system('find '+str(files)+' -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
-			os.system("rm -rf "+trainpath)
-			os.system("rm -rf "+valpath)
+		os.system("rm -rf "+trainpath)
+		os.system("rm -rf "+valpath)
 
 			##ALTERANTIVES###
 			#shutil.move(images,datapath)
