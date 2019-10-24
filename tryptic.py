@@ -27,9 +27,11 @@ for f in files:
 	with ZipFile(f, 'r') as zipObj:
 		zipObj.extract(allPeptides.txt, 'allPeptides.txt')
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
-
-	if not os.path.exists(datapath+df.iloc[0,0]+'/file.zip'):
-		print(os.path.exists(datapath+df.iloc[0,0]+'/file.zip')+ df.iloc[0,0])
-		#shutil.move(f, datapath+df.iloc[0,0]+'/file.zip')
-	os.system('rm '+datapath+'allPeptides.txt')
+	df2 = pd.read_csv(datapath+'allPeptides.txt', sep = ",")
+	print(df.iloc[0,0])
+	print(df2.iloc[0,0])
+	#if not os.path.exists(datapath+df.iloc[0,0]+'/file.zip'):
+	#	print(os.path.exists(datapath+df.iloc[0,0]+'/file.zip')+ df.iloc[0,0])
+	#	#shutil.move(f, datapath+df.iloc[0,0]+'/file.zip')
+	#os.system('rm '+datapath+'allPeptides.txt')
 
