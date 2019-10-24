@@ -1,4 +1,5 @@
 import json
+import os
 
 path = '/data/ProteomeToolsRaw/Images'
 os.system('rm '+path+"metadata_cleaned.json")
