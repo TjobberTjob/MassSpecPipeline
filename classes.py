@@ -31,7 +31,7 @@ if len(udirs) != 0:
 	reset = input()
 	if reset == "yes" or reset == "y":
 		for files in udirs:
-			print(os.system('find '+str(files)+' -name \"*.txt\" -maxdepth 1 -exec mv -t '+ str(datapath)+ ' {} +'))
+			print('find '+str(files)+' -name \"*.txt\" -maxdepth 1 -exec mv -t '+ str(datapath)+ ' {} +')
 			#shutil.rmtree(files) 
 			#shutil.move(images,datapath)
 			
