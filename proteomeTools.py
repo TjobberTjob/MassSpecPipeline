@@ -396,7 +396,7 @@ if __name__ == '__main__':
 		year = f[41:45]
 		filename = f[59:]
 
-		if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
+		if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1" or filename == '01625b_GA1-TUM_first_pool_1_01_01-3xHCD-1h-R1':
 			continue
 
 		print('file: '+filename)
