@@ -31,10 +31,10 @@ if len(udirs) != 0:
 	reset = input()
 	if reset == "yes" or reset == "y":
 		for files in udirs:
-			print(files)
 			os.system('find '+str(files)+' -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
-			#shutil.rmtree(files) 
-			
+			os.system("rm -rf "+trainpath)
+			os.system("rm -rf "+valpath)
+
 			##ALTERANTIVES###
 			#shutil.move(images,datapath)
 			
