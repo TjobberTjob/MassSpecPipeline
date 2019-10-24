@@ -25,7 +25,9 @@ for f in files:
 	subprocess.run('unzip -j '+f+' allPeptides.txt -d '+datapath,shell = True)
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
 	name = str(df.iloc[0,0])
-	if not os.path.exists(datapath+name+'/file.zip'):
-		shutil.copyfile(f, datapath+name+'/file.zip')
+	if name == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
+		print('mv '+f+' '+datapath+name+'/file.zip')
+	#if not os.path.exists(datapath+name+'/file.zip'):
+		#shutil.copyfile(f, datapath+name+'/file.zip')
 	os.system('rm '+datapath+'allPeptides.txt')
 
