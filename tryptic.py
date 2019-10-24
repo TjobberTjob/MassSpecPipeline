@@ -27,8 +27,10 @@ for f in files:
 	name = str(df.iloc[0,0])
 	if not os.path.exists(datapath+name+'/file.zip'):
 		print(f+'\n'+name)
+		quit()
 		os.system('cp '+f+' '+datapath+name+'/file.zip')
 	#if not os.path.exists(datapath+name+'/file.zip'):
 		#shutil.copyfile(f, datapath+name+'/file.zip')
 	os.system('rm '+datapath+'allPeptides.txt')
 
+cp /data/ProteomeToolsRaw/TUM_first_pool_1_01_01_2xIT_2xHCD-1h-R1-tryptic.zip /data/ProteomeToolsRaw/01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1/file.zip
