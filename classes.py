@@ -50,7 +50,7 @@ def classifyImages(classes):
 		imgdata = {}
 		#CREATING TRAINING DATA
 		print("Sorting into training data")
-		for line in open(datapath+'metadata.json'):
+		for line in open(datapath+'metadata_cleaned.json'):
 			data = json.loads(line)
 
 			names = data[imClass]+"/"+data['image']+".png"
@@ -74,7 +74,7 @@ def classifyImages(classes):
 				os.system("mv "+trainpath+elements+" "+valpath+elements)
 
 	elif split == "no" or split == "n":
-		for line in open(datapath+'metadata.json'):
+		for line in open(datapath+'metadata_cleaned.json'):
 			data = json.loads(line)
 			if not os.path.exists(datapath+data[imClass]):
 				os.mkdir(datapath+data[imClass])
