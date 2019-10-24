@@ -1,7 +1,7 @@
 if 'import' == 'import':
 	import json
 	import os
-	import glob
+	from glob import glob
 	import sys
 	import shutil
 	import random
@@ -18,7 +18,7 @@ if not os.path.exists(datapath):
 	os.mkdir(datapath)
 
 #Reset images
-dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/")]
+dirs = glob(datapath+"/*")#[os.path.dirname(p) for p in glob(datapath+"/")]
 udirs = np.unique(dirs)
 
 if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
