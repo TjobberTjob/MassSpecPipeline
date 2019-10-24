@@ -53,11 +53,9 @@ def download(url):
 		print('downloading txt file')
 		with http.request('GET', url+'.zip', preload_content=False) as r, open(datapath+filename+'/file.zip', 'wb') as out_file:		
 			shutil.copyfileobj(r, out_file)
-		
-		try:
-			subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
-		except:
-			subprocess.run('unzip -j '+datapath+filename+'/file.zip allPeptides.txt -d '+datapath+filename+'/',shell = True)
+
+		#subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
+		subprocess.run('unzip -j '+datapath+filename+'/file.zip allPeptides.txt -d '+datapath+filename+'/',shell = True)
 
 		os.remove(datapath+filename+'/file.zip')
 		#Fix the allpep.txt
