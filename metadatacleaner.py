@@ -1,6 +1,7 @@
 import json
 
-path = sys.argv[1]
+path = '/data/ProteomeToolsRaw/Images'
+os.system('rm '+path+"metadata_cleaned.json")
 
 lines_seen = set()
 outfile = open(path+"metadata_cleaned.json","w")
