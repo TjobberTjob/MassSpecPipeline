@@ -26,7 +26,7 @@ for f in files:
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
 	name = str(df.iloc[0,0])
 	if not os.path.exists(datapath+name+'/file.zip'):
-		print(f+'\n'+name)
+		print('cp '+f+' '+datapath+name+'/file.zip')
 		quit()
 		os.system('cp '+f+' '+datapath+name+'/file.zip')
 	#if not os.path.exists(datapath+name+'/file.zip'):
