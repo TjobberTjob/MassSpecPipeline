@@ -26,5 +26,5 @@ for f in files:
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
 	print(df.iloc[0,0])
 	if os.path.exists(datapath+df.iloc[0,0]+'/file.zip'):
-		shutil.move(f, datapath+df.iloc[0,0]+'/file.zip')
+		print(f, datapath+df.iloc[0,0]+'/file.zip')
 
