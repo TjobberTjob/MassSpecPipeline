@@ -18,33 +18,13 @@ if __name__ == '__main__':
 	import subprocess
 	import os 
 	from os.path import join
-zipfiles = os.system('find '+ datapath+ ' -type f -name \"*.zip\"')
-rawfiles = os.system('find '+ datapath+ ' -type f -name \"*.raw\"')
 
-a = []
-if not zipfiles[:-4] in rawfiles[:-4]:
-	a.append(zipfiles[:-4])
-print(a)
+files = glob.glob(datapath+"*.zip")
+files = np.unique(files)
+for f in files:
+	subprocess.run('unzip -j '+f+' allPeptides.txt -d '+datapath,shell = True)
+	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
+	print(df.iloc[0,0])
+	if os.path.exists(datapath+df.iloc[0,0]+'/file.zip'):
+		shutil.move(f, datapath+df.iloc[0,0]+'/file.zip')
 
-#files = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*")]
-#files = np.unique(files)
-#for f in files:
-#	file = f[31:]+".raw"
-#	if os.path.exists(f+file):
-#		os.system(f+file+" "+2)
-#	subprocess.run('unzip -j '+f+"/"+file+' allPeptides.txt -d '+f,shell = True)
-#
-#files = np.unique(files)
-#
-#for f in files:
-#	file = f[31:]+".zip"
-#	if f+file == '/data/ProteomeToolsRaw/tryptic/TUM_first_pool_97_01_01_2xIT_2xHCD-1h-R2-tryptic':
-#		ss = ','
-#	else:
-#		ss = '\t'
-#	df = pd.read_csv(f+'/allPeptides.txt', sep = ss)
-#	print('/data/ProteomeToolsRaw/01650b_BG7-TUM_first_pool_97_01_01-2xIT_2xHCD-1h-R2/file.zip')
-#	try:
-#		shutil.move(f+'/'+file, '/data/ProteomeToolsRaw/'+df.iloc[0,0]+'/file.zip')
-#	except:
-#		print("moved")
