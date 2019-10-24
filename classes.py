@@ -32,7 +32,7 @@ if len(udirs) != 0:
 	if reset == "yes" or reset == "y":
 		for files in udirs:
 			print(files)
-			os.system('find '+str(files)+' -name \"*.png\" -maxdepth 1 -type f -print0 | xargs -0 mv -t '+ str(datapath))
+			os.system('find '+str(files)+' -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
 			#shutil.rmtree(files) 
 			
 			##ALTERANTIVES###
