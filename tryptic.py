@@ -28,10 +28,8 @@ for f in files:
 	#	zipObj.extract(allPeptides.txt, 'allPeptides.txt')
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
 	#df2 = pd.read_csv(datapath+'allPeptides.txt', sep = ",")
-	try:
-		len(df)
-	except:
-		print(df.iloc[0,0])
+	print(len(df) + df.iloc[0,0])
+
 	#if not os.path.exists(datapath+df.iloc[0,0]+'/file.zip'):
 	#	print(os.path.exists(datapath+df.iloc[0,0]+'/file.zip')+ df.iloc[0,0])
 	#	#shutil.move(f, datapath+df.iloc[0,0]+'/file.zip')
