@@ -18,8 +18,8 @@ if not os.path.exists(datapath):
 	os.mkdir(datapath)
 
 #Reset images
-dirs = glob(datapath+"/")#[os.path.dirname(p) for p in glob(datapath+"/")]
-udirs = np.unique(dirs)
+dirs = glob(datapath+"/*")#[os.path.dirname(p) for p in glob(datapath+"/")]
+dirs = np.unique(dirs)
 
 if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 	dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
