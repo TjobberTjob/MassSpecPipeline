@@ -24,6 +24,8 @@ udirs = np.unique(dirs)
 if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 	dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
 	udirs = np.unique(dirs) 
+print(udirs)
+quit()
 
 if len(udirs) != 0:
 	print("Do you want to reset image folders? y/n")
@@ -31,7 +33,10 @@ if len(udirs) != 0:
 	if reset == "yes" or reset == "y":
 		for files in udirs:
 			images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
+			os.system('find '+ datapath + '-name "*.png -maxdepth 1 -exec mv -t'+ datapath +'{} +')
+			
 			shutil.move(images,datapath)
+			
 			#for imgs in images:
 			#	os.system("mv "+imgs+" "+datapath)
 			shutil.rmtree(files) 	 
