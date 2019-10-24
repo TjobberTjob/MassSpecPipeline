@@ -27,7 +27,8 @@ for f in files:
 	#with ZipFile(f, 'r') as zipObj:
 	#	zipObj.extract(allPeptides.txt, 'allPeptides.txt')
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
-	if df.loc[0,0] == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
+	#df2 = pd.read_csv(datapath+'allPeptides.txt', sep = ",")
+	if df.iloc[0,0] == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
 		print(f)
 
 	#if not os.path.exists(datapath+df.iloc[0,0]+'/file.zip'):
