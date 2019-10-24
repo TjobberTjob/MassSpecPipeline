@@ -23,9 +23,9 @@ dirs = np.unique(dirs)
 
 if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 	dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
-	udirs = np.unique(dirs) 
-print(udirs)
-quit()
+	dirs = np.unique(dirs) 
+print(dirs)
+quit() 
 
 if len(udirs) != 0:
 	print("Do you want to reset image folders? y/n")
