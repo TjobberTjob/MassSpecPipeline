@@ -16,7 +16,6 @@ if __name__ == '__main__':
 	import math
 	import numpy as np
 	import subprocess
-	import ZipFile
 	import os 
 	from os.path import join
 
