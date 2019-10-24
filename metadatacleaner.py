@@ -4,7 +4,7 @@ import os
 path = '/data/ProteomeToolsRaw/Images/'
 try:
 	os.system('rm '+path+"metadata_cleaned.json")
-except:
+except Exception:
 	print("no cleaned version exist")
 
 lines_seen = set()
