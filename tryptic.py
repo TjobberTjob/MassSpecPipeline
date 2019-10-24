@@ -22,7 +22,7 @@ zipfiles = os.system('find '+ datapath+ ' -type f -name \"*.zip\"')
 rawfiles = os.system('find '+ datapath+ ' -type f -name \"*.raw\"')
 
 a = []
-if not zipfiles in rawfiles:
+if not zipfiles[:-4] in rawfiles[:-4]:
 	a.append(zipfiles[:-4])
 print(a)
 
