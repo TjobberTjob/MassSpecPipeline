@@ -32,14 +32,6 @@ if len(udirs) != 0:
 		os.system("rm -rf "+trainpath)
 		os.system("rm -rf "+valpath)
 
-			##ALTERANTIVES###
-			#shutil.move(images,datapath)
-			
-			#images = [f for f in glob.glob(files + "**/*.png", recursive=True)]
-			#for imgs in images:
-			#	os.system("mv "+imgs+" "+datapath)
-			 
-
 
 #Move images
 def classifyImages(classes):
