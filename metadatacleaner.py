@@ -1,8 +1,11 @@
 import json
 import os
 
-path = '/data/ProteomeToolsRaw/Images'
-os.system('rm '+path+"metadata_cleaned.json")
+path = '/data/ProteomeToolsRaw/Images/'
+try:
+	os.system('rm '+path+"metadata_cleaned.json")
+except:
+	print("no cleaned version exist")
 
 lines_seen = set()
 outfile = open(path+"metadata_cleaned.json","w")
