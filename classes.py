@@ -17,8 +17,6 @@ valpath = datapath+'validation/'
 #Reset images
 dirs = glob(datapath+"/*/")
 udirs = np.unique(dirs)
-print(udirs)
-quit()
 
 if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 	dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
