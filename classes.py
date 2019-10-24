@@ -14,12 +14,11 @@ datapath = "/data/ProteomeToolsRaw/Images/"
 trainpath = datapath+'training/'
 valpath = datapath+'validation/'
 
-if not os.path.exists(datapath):
-	os.mkdir(datapath)
-
 #Reset images
-dirs = glob(datapath+"/*/")#[os.path.dirname(p) for p in glob(datapath+"/")]
+dirs = glob(datapath+"/*/")
 udirs = np.unique(dirs)
+print(udirs)
+quit()
 
 if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 	dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
