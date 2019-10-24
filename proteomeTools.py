@@ -41,7 +41,9 @@ def download(url):
 	if os.path.exists(datapath+filename+'/allPeptides.txt'):
 		print('txt file exists')
 	elif os.path.exists(datapath+filename+'/file.zip'):
-		subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
+		#subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
+		subprocess.run('unzip -j '+datapath+filename+'/file.zip allPeptides.txt -d '+datapath+filename+'/',shell = True)
+
 		os.remove(datapath+filename+'/file.zip')
 		df = pd.read_csv(datapath+filename+'/allPeptides.txt', sep = '\t')
 		df2 = df.loc[df['Sequence'] != ' ',]
