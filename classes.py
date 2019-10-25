@@ -68,7 +68,7 @@ def classifyImages(classes):
 		for k, v in imgdata.items():
 			imgadata[v].append(k)
 		for f in imgadata:
-			print("shutil.move("+datapath+str(imgadata[f])[1]+", "+trainpath+f+"/"+str(imgadata[f])[1]+")")
+			print("shutil.move("+datapath+str(imgadata[f])[2]+", "+trainpath+f+"/"+str(imgadata[f])[2]+")")
 		quit()
 
 		#CREATING VALIDATION DATA
