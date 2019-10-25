@@ -27,8 +27,7 @@ if len(udirs) != 0:
 	print("Do you want to reset image folders? y/n")
 	reset = input()
 	if reset == "yes" or reset == "y":
-		for files in udirs:
-			os.system('find '+str(files)+' -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
+		os.system('find '+str(files)+' -mindepth 2 -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
 		os.system("rm -rf "+trainpath)
 		os.system("rm -rf "+valpath)
 
