@@ -421,8 +421,6 @@ if __name__ == '__main__':
 		sub_images(wash_out,resolution,filename = filename)
 
 # python proteomeTools.py all-PT
-# python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
-# python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/01974c_BA1-TUM_missing_first_1_01_01-ETD-1h-R4
-# python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/02208a_GE7-TUM_second_addon_55_01_01-ETD-1h-R1
 # python3 proteomeTools.py all /pride/data/archive/2017/02/PXD004732
-
+# python3 proteomeTools.py all /pride/data/archive/2019/05/PXD010595
+# python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
