@@ -71,23 +71,22 @@ def classifyImages(classes):
 			imgadata[v].append(k)
 		for f in imgadata:
 			for g in imgadata[f]:
-				print(datapath+g, trainpath+f+"/"+g)
-		quit()
+				shutil.move(datapath+g, trainpath+f+"/"+g)
+		
 		#CREATING VALIDATION DATA
 		print("Sorting into Validation data")
-		
 		for f in imgadata:
 			splits = round(len(imgadata[f])*(int(splitratio)/100))
 			mlist = random.sample(imgadata[f],k=splits)
-			for elements in mlist:
-				os.system("mv "+trainpath+elements+" "+valpath+elements)
+			for g in mlist:
+				shutil.move(trainpath+f+"/"+g, valpath+f+"/"+g)
 
 	elif split == "no" or split == "n":
 		for line in open(datapath+'metadata_cleaned.json'):
 			data = json.loads(line)
 			if not os.path.exists(datapath+data[imClass]):
 				os.mkdir(datapath+data[imClass])
-			os.system("mv "+datapath+data['image']+".png "+datapath+data[imClass]+"/")	
+			shutil.move(datapath+data['image']+".png", datpath+data[imClass]+"/")
 	else: quit()
 
 
