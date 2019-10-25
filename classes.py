@@ -59,13 +59,16 @@ def classifyImages(classes):
 				os.mkdir(trainpath+data[imClass])
 			if not os.path.exists(valpath+data[imClass]):
 				os.mkdir(valpath+data[imClass])
-			os.system("mv "+datapath+data['image']+".png "+trainpath+data[imClass]+"/")
-
-		#CREATING VALIDATION DATA
-		print("Sorting into Validation data")
 		imgadata = defaultdict(list)
 		for k, v in imgdata.items():
 			imgadata[v].append(k)
+		for f in imgadata:
+			print("shutil.move("+datapath+f+", "+trainpath+f)
+		quit()
+
+		#CREATING VALIDATION DATA
+		print("Sorting into Validation data")
+		
 		for f in imgadata:
 			splits = round(len(imgadata[f])*(int(splitratio)/100))
 			mlist = random.sample(imgadata[f],k=splits)
