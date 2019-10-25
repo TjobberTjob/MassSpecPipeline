@@ -70,7 +70,7 @@ def classifyImages(classes):
 		for k, v in imgdata.items():
 			imgadata[v].append(k)
 		for f in imgadata:
-			for g in f:
+			for g in imgadata[f]:
 				print(datapath+g, trainpath+f+"/"+g)
 		quit()
 		#CREATING VALIDATION DATA
