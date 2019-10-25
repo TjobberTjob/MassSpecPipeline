@@ -51,7 +51,7 @@ def classifyImages(classes):
 		print("Sorting into training data")
 		for line in open(datapath+'metadata_cleaned.json'):
 			data = json.loads(line)
-
+			print(data)
 			names = data[imClass]+"/"+data['image']+".png"
 			imgdata[names] = data[imClass]
 
