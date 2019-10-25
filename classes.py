@@ -54,7 +54,7 @@ def classifyImages(classes):
 			try:
 				data = json.loads(line)
 			except Exception:
-				print("some stupid error")
+				print(" ")
 
 			names = data['image']+".png"
 			imgdata[names] = data[imClass]
