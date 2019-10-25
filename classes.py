@@ -49,8 +49,13 @@ def classifyImages(classes):
 		imgdata = {}
 		#CREATING TRAINING DATA
 		print("Sorting into training data")
+		i=i+1
 		for line in open(datapath+'metadata_cleaned.json'):
-			data = json.loads(line)
+			i=i+1
+			try:
+				data = json.loads(line)
+			except Exception:
+				print(i)
 
 			names = data['image']+".png"
 			imgdata[names] = data[imClass]
