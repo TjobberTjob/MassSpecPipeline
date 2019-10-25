@@ -47,15 +47,14 @@ def classifyImages(classes):
 			os.mkdir(valpath)
 
 		imgdata = {}
-		#CREATING TRAINING DATA
-		print("Sorting into training data")
-		i=0
+		
+		#Preparing metadata
+		print("Preparing Metadata")
 		for line in open(datapath+'metadata_cleaned.json'):
-			i=i+1
 			try:
 				data = json.loads(line)
 			except Exception:
-				print(i)
+				print("some stupid error")
 
 			names = data['image']+".png"
 			imgdata[names] = data[imClass]
@@ -64,13 +63,15 @@ def classifyImages(classes):
 				os.mkdir(trainpath+data[imClass])
 			if not os.path.exists(valpath+data[imClass]):
 				os.mkdir(valpath+data[imClass])
+
+		#CREATING TRAINING DATA
+		print("Sorting into training data")
 		imgadata = defaultdict(list)
 		for k, v in imgdata.items():
 			imgadata[v].append(k)
 		for f in imgadata:
-			print("shutil.move("+datapath+str(imgadata[f])[2]+", "+trainpath+f+"/"+str(imgadata[f])[2]+")")
-		quit()
-
+			shutil.move(datapath+str(imgadata[f]), trainpath+f+"/"+str(imgadata[f]))
+		
 		#CREATING VALIDATION DATA
 		print("Sorting into Validation data")
 		
