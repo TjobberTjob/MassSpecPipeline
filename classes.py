@@ -49,7 +49,7 @@ def classifyImages(classes):
 		imgdata = {}
 		#CREATING TRAINING DATA
 		print("Sorting into training data")
-		i=i+1
+		i=0
 		for line in open(datapath+'metadata_cleaned.json'):
 			i=i+1
 			try:
