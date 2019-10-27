@@ -25,7 +25,7 @@ i=0
 for f in files:
 	i+=1
 	if i%100 == 0:
-		print(i)
+		print(str(i)+"/"+str(len(files)))
 	subprocess.run('unzip -j -q '+f+' allPeptides.txt -d  '+datapath,shell = True)
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
 	name = str(df.iloc[0,0])
