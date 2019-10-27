@@ -22,7 +22,7 @@ if __name__ == '__main__':
 files = glob.glob(datapath+"*.zip")
 files = np.unique(files)
 for f in files:
-	subprocess.run('unzip -j '+f+' allPeptides.txt -d -qq '+datapath,shell = True)
+	subprocess.run('unzip -j -qq '+f+' allPeptides.txt -d  '+datapath,shell = True)
 	df = pd.read_csv(datapath+'allPeptides.txt', sep = "\t")
 	name = str(df.iloc[0,0])
 	if not os.path.exists(datapath+name+'/file.zip'):
