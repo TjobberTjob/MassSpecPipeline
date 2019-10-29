@@ -20,6 +20,7 @@ if __name__ == '__main__':
 def download(url):
 	#Start Process
 	Path(datapath+filename+'/'+year).touch()
+	start = datetime.now()
 
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json'):
