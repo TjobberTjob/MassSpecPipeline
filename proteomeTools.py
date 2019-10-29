@@ -1,7 +1,6 @@
 if __name__ == '__main__':
 	import shutil
 	import pandas as pd
-	import urllib3
 	import csv
 	import matplotlib.cm as cm
 	import matplotlib.pyplot as plt
@@ -21,19 +20,13 @@ if __name__ == '__main__':
 def download(url):
 	#Start Process
 	Path(datapath+filename+'/'+year).touch()
-	
-	#Download the files from the urls and inset into right folder
-	http = urllib3.PoolManager()
-	urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-	start = datetime.now()
 
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json'):
 		print('raw or parsed file exists')
 	else:
 		print('downloading raw file')
-		with http.request('GET', url+ '.raw', preload_content=False) as r, open(datapath+filename+'/file.raw', 'wb') as out_file:
-			shutil.copyfileobj(r, out_file)
+		os.system('wget -q --show-progess -O '+datapath+filename+'/file.raw'+' -c '+url+'.raw')
 		end1 = datetime.now()
 		diff1 = end1 - start
 		print('Rawfile downloaded \ntime: '+str(diff1))
@@ -51,10 +44,9 @@ def download(url):
 		end2 = datetime.now()
 		diff2 = end2 - start
 		print('Files downloaded and handled \ntime: '+str(diff2))
-	else:
+	else:  
 		print('downloading txt file')
-		with http.request('GET', url+'.zip', preload_content=False) as r, open(datapath+filename+'/file.zip', 'wb') as out_file:		
-			shutil.copyfileobj(r, out_file)
+		os.system('wget -q --show-progess -O '+datapath+filename+'/file.zip'+' -c '+url+'.zip')
 
 		#subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
 		subprocess.run('unzip -j '+datapath+filename+'/file.zip allPeptides.txt -d '+datapath+filename+'/',shell = True)
