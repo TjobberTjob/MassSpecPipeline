@@ -336,8 +336,9 @@ def sub_images(wash_out,resolution,filename):
 		ax.imshow(image, aspect='equal',cmap = colMap)#,vmin = 5, vmax = 16)
 		plt.savefig(datapath+'Images/'+filename+'-'+str(i+1)+'.png')
 		plt.close(fig)
-		print('{0}\r'.format(str(i+1)+' of '+str(len(df['Sequence']))),) #PRINT CREATED IMAGE
- 
+		#print('{0}\r'.format(str(i+1)+' of '+str(len(df['Sequence']))),) #PRINT CREATED IMAGE
+ 		print("Progress {:2.1%}".format(str(i+1)+' of '+str(len(df['Sequence']))), end="\r")
+
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i+1)})
 		for ele in df.columns[1:]:
