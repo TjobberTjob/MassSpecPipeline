@@ -113,9 +113,9 @@ def internalmzML(filename):
 		#Extract the necessary data from spectra
 		for spectrum in data:
 			
-			i+=1
-			if i%1000 == 0 :
-				print(i)
+			#i+=1
+			#if i%1000 == 0 :
+			#	print(i)
 		
 			if spectrum['ms level'] != 1:
 				continue
