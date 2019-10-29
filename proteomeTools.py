@@ -27,7 +27,8 @@ def download(url):
 		print('raw or parsed file exists')
 	else:
 		print('downloading raw file')
-		os.system('wget -q --show-progess -O '+datapath+filename+'/file.raw'+' -c '+url+'.raw')
+		print('wget -q --show-progess -O '+datapath+filename+'/file.raw'+' -c '+url+'.raw')
+		quit()
 		end1 = datetime.now()
 		diff1 = end1 - start
 		print('Rawfile downloaded \ntime: '+str(diff1))
