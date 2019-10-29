@@ -398,7 +398,7 @@ if __name__ == '__main__':
 		filename = f[59:]
 		if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
 			continue
-		print('file: '+filename)
+		print('\nfile: '+filename)
 
 		if not os.path.exists(datapath+filename):
 			os.mkdir(datapath+filename)
