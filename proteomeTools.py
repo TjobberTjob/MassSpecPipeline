@@ -337,7 +337,7 @@ def sub_images(wash_out,resolution,filename):
 		plt.savefig(datapath+'Images/'+filename+'-'+str(i+1)+'.png')
 		plt.close(fig)
 		#print('{0}\r'.format(str(i+1)+' of '+str(len(df['Sequence']))),) #PRINT CREATED IMAGE
- 		print("Progress {:2.1%}".format(str(i+1)+' of '+str(len(df['Sequence']))), end="\r")
+		print("Progress {:2.1%}".format(str(i+1)+' of '+str(len(df['Sequence']))), end="\r")
 
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i+1)})
