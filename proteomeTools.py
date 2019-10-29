@@ -27,7 +27,7 @@ def download(url):
 		print('raw or parsed file exists')
 	else:
 		print('downloading raw file')
-		os.system('wget -q --show-progess -O '+datapath+filename+'/file.raw'+' -c '+url[:-4]+'.raw')
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-4]+'.raw')
 		end1 = datetime.now()
 		diff1 = end1 - start
 		print('Rawfile downloaded \ntime: '+str(diff1))
@@ -47,7 +47,7 @@ def download(url):
 		print('Files downloaded and handled \ntime: '+str(diff2))
 	else:  
 		print('downloading txt file')
-		os.system('wget -q --show-progess -O '+datapath+filename+'/file.zip'+' -c '+url[:-4]+'.zip')
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.zip'+' -c '+url[:-4]+'.zip')
 
 		#subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
 		subprocess.run('unzip -j '+datapath+filename+'/file.zip allPeptides.txt -d '+datapath+filename+'/',shell = True)
