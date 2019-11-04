@@ -10,7 +10,7 @@ except Exception:
 lines_seen = set()
 outfile = open(path+"metadata_cleaned.json","w")
 for line in open(path+"metadata.json","r"):
-	if float(line['m/z']) > 424.95 and float(line['m/z']) < 425:
+	if float(line['m/z']) > int(424.95) and float(line['m/z']) < int(425):
 		if line not in lines_seen:
 			outfile.write(line)
 			lines_seen.add(line)
