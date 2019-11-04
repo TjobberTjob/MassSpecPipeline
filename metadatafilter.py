@@ -12,6 +12,8 @@ outfile = open(path+'metadata_filtered.json','w')
 for line in open(path+'metadata.json','r'):
 	data = json.loads(line)
 	if float(data['m/z']) > 429.5 and float(data['m/z']) < 425: #Add filter here
+		print("true")
+	if float(data['m/z']) > 429.5 and float(data['m/z']) < 425: #Add filter here
 		if line not in lines_seen:
 			outfile.write(line)
 			lines_seen.add(line)
