@@ -56,9 +56,12 @@ def classifyImages(classes):
 			except Exception:
 				print(" ")
 
+			if imgdata[imClass] > 365 and imgdata[imClass] < 370:
+				continue 
+
 			names = data['image']+".png"
 			imgdata[names] = data[imClass]
-	
+
 			if not os.path.exists(trainpath+data[imClass]):
 				os.mkdir(trainpath+data[imClass])
 			if not os.path.exists(valpath+data[imClass]):
