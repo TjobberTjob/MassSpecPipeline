@@ -350,8 +350,8 @@ if __name__ == '__main__':
 
 	import sys
 	inputs = sys.argv[1]
-	
-	datapath = 'data/' #Server datapath
+
+	datapath = '/data/ProteomsToolsRaw/' #Server datapath
 	if not os.path.exists(datapath+"Images"):
 		os.mkdir(datapath+'Images')
 	ftp = 'ftp://ftp.pride.ebi.ac.uk'
