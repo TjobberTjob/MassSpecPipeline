@@ -55,10 +55,6 @@ def classifyImages(classes):
 				data = json.loads(line)
 			except Exception:
 				print(" ")
-			
-			print(data['m/z'])
-			
-			print(float(data['m/z']) > 424 and float(data['m/z']) < 425)
 
 			if float(data['m/z']) > 424 and float(data['m/z']) < 425:
 				names = data['image']+".png"
