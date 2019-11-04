@@ -233,8 +233,8 @@ def sub_images(wash_out,resolution,filename):
 	for f in mzml['ms1']:
 		maxint = max(maxint,max(mzml['ms1'][str(f)]['intensity']))
 	
-	mz_interval = 50
-	rt_interval = 5
+	mz_interval = 50 #INTERVALS
+	rt_interval = 5  #INTERVALS
 	j=0
 	outpath = datapath+'Images'
 	if not os.path.exists(outpath):
@@ -352,8 +352,7 @@ if __name__ == '__main__':
 	inputs = sys.argv[1]
 
 	datapath = '/data/ProteomsToolsRaw/' #Server datapath
-	if not os.path.exists(datapath+"Images"):
-		os.mkdir(datapath+'Images')
+
 	ftp = 'ftp://ftp.pride.ebi.ac.uk'
 	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+inputs[0:37]+'/README.txt')
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
