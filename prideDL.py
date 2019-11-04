@@ -354,7 +354,7 @@ if __name__ == '__main__':
 	datapath = '/data/ProteomeToolsRaw/' #Server datapath
 
 	ftp = 'ftp://ftp.pride.ebi.ac.uk'
-	print('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+inputs[0:37]+'/README.txt')
+	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+inputs[0:37]+'/README.txt')
 	quit()
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
