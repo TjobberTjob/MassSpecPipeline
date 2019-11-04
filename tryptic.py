@@ -19,7 +19,7 @@ if __name__ == '__main__':
 	import os 
 	from os.path import join
 
-files = glob.glob(datapath+"tryptic/.*zip")
+files = glob.glob(datapath+"tryptic/*.zip")
 files = np.unique(files)
 i=0
 for f in files:
