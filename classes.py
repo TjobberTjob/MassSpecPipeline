@@ -56,7 +56,7 @@ def classifyImages(classes):
 			except Exception:
 				print(" ")
 
-			if imgdata[imClass] > 365 and imgdata[imClass] < 370:
+			if data['m/z'] > 365 and data['m/z'] < 370:
 				continue 
 
 			names = data['image']+".png"
