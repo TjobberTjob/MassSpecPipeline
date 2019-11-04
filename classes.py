@@ -55,7 +55,9 @@ def classifyImages(classes):
 				data = json.loads(line)
 			except Exception:
 				print(" ")
+			
 			print(data['m/z'])
+			
 			print(float(data['m/z']) > 424 and float(data['m/z']) < 425)
 
 			# if float(data['m/z']) > 424 and float(data['m/z']) < 425:
@@ -69,7 +71,7 @@ def classifyImages(classes):
 				
 			# 	if not os.path.exists(valpath+data[imClass]):
 			# 		os.mkdir(valpath+data[imClass])
-quit()
+		quit()
 		#CREATING TRAINING DATA
 		print("Sorting into training data")
 		imgadata = defaultdict(list)
