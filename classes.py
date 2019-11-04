@@ -53,7 +53,6 @@ def classifyImages(classes):
 		for line in open(datapath+'metadata_filtered.json'):
 			data = json.loads(line)
 
-			if float(data['m/z']) > 424.95 and float(data['m/z']) < 425:
 			names = data['image']+".png"
 			imgdata[names] = data[imClass]
 			
