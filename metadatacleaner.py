@@ -3,12 +3,12 @@ import os
 
 path = '/data/ProteomeToolsRaw/Images/'
 try:
-	os.system('rm '+path+'metadata_cleaned.json')
+	os.system('rm '+path+'metadata_filtered.json')
 except Exception:
 	print('no cleaned version exist')
 
 lines_seen = set()
-outfile = open(path+'metadata_cleaned.json','w')
+outfile = open(path+'metadata_filtered.json','w')
 for line in open(path+'metadata.json','r'):
 	data = json.loads(line)
 	if float(data['m/z']) > 429.5 and float(data['m/z']) < 425: #Add filter here

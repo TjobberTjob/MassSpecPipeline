@@ -50,12 +50,13 @@ def classifyImages(classes):
 		
 		#Preparing metadata
 		print("Preparing Metadata")
-		for line in open(datapath+'metadata_cleaned.json'):
+		for line in open(datapath+'metadata_filtered.json'):
 			try:
 				data = json.loads(line)
 			except Exception:
 				print(" ")
 
+			if float(data['m/z']) > 424.95 and float(data['m/z']) < 425:
 			names = data['image']+".png"
 			imgdata[names] = data[imClass]
 			
@@ -83,7 +84,7 @@ def classifyImages(classes):
 				shutil.move(trainpath+f+"/"+g, valpath+f+"/"+g)
 
 	elif split == "no" or split == "n":
-		for line in open(datapath+'metadata_cleaned.json'):
+		for line in open(datapath+'metadata_filtered.json'):
 			data = json.loads(line)
 			if not os.path.exists(datapath+data[imClass]):
 				os.mkdir(datapath+data[imClass])
