@@ -396,9 +396,8 @@ if __name__ == '__main__':
 
 			resolution = {'x':100,'y':100}
 			sub_images(wash_out,resolution,filename = filename)
-	else:
+	#else:
 		
-
 # python3 prideDL.py /pride/data/archive/2017/02/PXD004732
 # python3 prideDL.py /pride/data/archive/2019/05/PXD010595
 # python3 prideDL.py /pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
