@@ -57,19 +57,19 @@ def classifyImages(classes):
 				print(" ")
 			print(data['m/z'])
 			print(float(data['m/z']) > 424 and float(data['m/z']) < 425)
-			quit()
-			if float(data['m/z']) > 424 and float(data['m/z']) < 425:
-				continue
-			else:
-				names = data['image']+".png"
-				imgdata[names] = data[imClass]
-				
-				if not os.path.exists(trainpath+data[imClass]):
-					os.mkdir(trainpath+data[imClass])
-				
-				if not os.path.exists(valpath+data[imClass]):
-					os.mkdir(valpath+data[imClass])
 
+			# if float(data['m/z']) > 424 and float(data['m/z']) < 425:
+			# 	continue
+			# else:
+			# 	names = data['image']+".png"
+			# 	imgdata[names] = data[imClass]
+				
+			# 	if not os.path.exists(trainpath+data[imClass]):
+			# 		os.mkdir(trainpath+data[imClass])
+				
+			# 	if not os.path.exists(valpath+data[imClass]):
+			# 		os.mkdir(valpath+data[imClass])
+quit()
 		#CREATING TRAINING DATA
 		print("Sorting into training data")
 		imgadata = defaultdict(list)
