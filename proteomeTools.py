@@ -403,14 +403,11 @@ if __name__ == '__main__':
 		wash_out = 8
 		interval = {
 				'mz' : {'min':360,'max':1250},
-				'rt' : {'min':wash_out,'max':60} #~8 min washout
+				'rt' : {'min':wash_out,'max':60}
 			}
 		resolution = {'x':500,'y':300}
 		
 		# full_image(interval,resolution,filename = filename,show=False)
-		
-		# shutil.rmtree(datapath+'Images')	#For testing metadata
-		# os.mkdir(datapath+'Images')		#For testing metadata
 
 		resolution = {'x':100,'y':100}
 		sub_images(wash_out,resolution,filename = filename)
