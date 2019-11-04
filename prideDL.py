@@ -38,7 +38,7 @@ def download(url):
 	
 	elif os.path.exists(datapath+filename+'/file.zip'):
 		subprocess.run('unzip -j '+datapath+filename+'/file.zip '+peploc+pepfile+' -d '+datapath+filename+'/',shell = True)
-		os.remove(datapath+filename+'/file.zip')
+		#os.remove(datapath+filename+'/file.zip')
 		df = pd.read_csv(datapath+filename+'/'+pepfile, sep = '\t')
 		df2 = df.loc[df['Sequence'] != ' ',]
 		pd.DataFrame.to_csv(df2,datapath+filename+'/'+pepfile)
