@@ -354,7 +354,8 @@ if __name__ == '__main__':
 	datapath = '/data/ProteomsToolsRaw/' #Server datapath
 
 	ftp = 'ftp://ftp.pride.ebi.ac.uk'
-	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+inputs[0:37]+'/README.txt')
+	print('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+inputs[0:37]+'/README.txt')
+	quit()
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
 	rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
