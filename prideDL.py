@@ -33,31 +33,28 @@ def download(url):
 		print('Rawfile downloaded \ntime: '+str(diff1))
 	#Check if txt file exists
 
-	if os.path.exists(datapath+filename+'/allPeptides.txt'):
+	if os.path.exists(datapath+filename+'/'+pepfile):
 		print('txt file exists')
+	
 	elif os.path.exists(datapath+filename+'/file.zip'):
-		#subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
-		subprocess.run('unzip -j '+datapath+filename+'/file.zip allPeptides.txt -d '+datapath+filename+'/',shell = True)
-
+		subprocess.run('unzip -j '+datapath+filename+'/file.zip '+peploc+pepfile+' -d '+datapath+filename+'/',shell = True)
 		os.remove(datapath+filename+'/file.zip')
-		df = pd.read_csv(datapath+filename+'/allPeptides.txt', sep = '\t')
+		df = pd.read_csv(datapath+filename+'/'+pepfile, sep = '\t')
 		df2 = df.loc[df['Sequence'] != ' ',]
-		pd.DataFrame.to_csv(df2,datapath+filename+'/allPeptides.txt')
+		pd.DataFrame.to_csv(df2,datapath+filename+'/'+pepfile)
 		end2 = datetime.now()
 		diff2 = end2 - start
 		print('Files downloaded and handled \ntime: '+str(diff2))
+	
 	else:  
 		print('downloading txt file')
 		os.system('wget -q --show-progress -O '+datapath+filename+'/file.zip'+' -c '+url[:-4]+'.zip')
-
-		#subprocess.run('unzip -j '+datapath+filename+'/file.zip txt/allPeptides.txt -d '+datapath+filename+'/',shell = True)
-		subprocess.run('unzip -j '+datapath+filename+'/file.zip allPeptides.txt -d '+datapath+filename+'/',shell = True)
-
+		subprocess.run('unzip -j '+datapath+filename+'/file.zip '+peploc+pepfile+' -d '+datapath+filename+'/',shell = True)
 		os.remove(datapath+filename+'/file.zip')
 		#Fix the allpep.txt
-		df = pd.read_csv(datapath+filename+'/allPeptides.txt', sep = '\t')
+		df = pd.read_csv(datapath+filename+'/'+pepfile, sep = '\t')
 		df2 = df.loc[df['Sequence'] != ' ',]
-		pd.DataFrame.to_csv(df2,datapath+filename+'/allPeptides.txt')
+		pd.DataFrame.to_csv(df2,datapath+filename+'/'+pepfile)
 		#finish the DL
 		end2 = datetime.now()
 		diff2 = end2 - start
@@ -226,7 +223,7 @@ def full_image(interval,resolution,filename,show=False):
 def sub_images(wash_out,resolution,filename):
 	print('Creating subimages')
 
-	df = pd.read_csv(datapath+filename+'/allPeptides.txt')
+	df = pd.read_csv(datapath+filename+'/'+pepfile)
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	maxint = 0 #GLOBAL MAXIMA
@@ -346,15 +343,29 @@ def sub_images(wash_out,resolution,filename):
 	outfile.close()
 	print(str(j)+' Images were out of bounds')
 
+def validated_input(prompt, valid_values):
+    valid_input = False
+    while not valid_input:
+        value = input(prompt + ' ' + '/'.join(valid_values)+"\n")
+        valid_input = value.lower() in valid_values
+    return value
+
 if __name__ == '__main__':
 
 	import sys
-	inputs = sys.argv[1]
+	urlinput = sys.argv[1]
+	pepfile = input("What's the name of the peptides file?\n")
+	if pepfile[-4:] == ".zip":
+		underfolder = validated_input('is the peptide file in a subfolder?', ('y','n'))
+		if underfodler == "y"
+			peploc = input("Where in the .zip file is the peptide file located?\n")
+		else:
+			peploc = ""
 
 	datapath = '/data/ProteomeToolsRaw/' #Server datapath
 
 	ftp = 'ftp://ftp.pride.ebi.ac.uk'
-	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+inputs[0:37]+'/README.txt')
+	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+urlinput[0:37]+'/README.txt')
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
 	rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
@@ -385,6 +396,8 @@ if __name__ == '__main__':
 
 			resolution = {'x':100,'y':100}
 			sub_images(wash_out,resolution,filename = filename)
+	else:
+		
 
 # python3 prideDL.py /pride/data/archive/2017/02/PXD004732
 # python3 prideDL.py /pride/data/archive/2019/05/PXD010595

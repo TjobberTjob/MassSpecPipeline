@@ -24,8 +24,7 @@ if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 
 
 if len(udirs) != 0:
-	print("Do you want to reset image folders? y/n")
-	reset = input()
+	reset = input("Do you want to reset image folders? y/n")
 	if reset == "yes" or reset == "y":
 		os.system('find '+str(datapath)+' -mindepth 2 -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
 		os.system("rm -rf "+trainpath)
@@ -34,12 +33,9 @@ if len(udirs) != 0:
 
 #Move images
 def classifyImages(classes):
-	print("Do you wanna split the data into training and validation? y/n")
-	split = input()
+	split = input("Do you wanna split the data into training and validation? y/n")
 	if split == "yes" or split == "y":
-
-		print("What should the validation % be?")
-		splitratio = input()
+		splitratio = input("What should the validation % be?")
 
 		if not os.path.exists(trainpath):
 			os.mkdir(trainpath)
@@ -50,20 +46,22 @@ def classifyImages(classes):
 		
 		#Preparing metadata
 		print("Preparing Metadata")
-		for line in open(datapath+'metadata_filtered.json'):
-			data = json.loads(line)
+		for line in open(datapath+'metadata_cleaned.json'):
+			try:
+				data = json.loads(line)
+			except Exception:
+				print(" ")
 
 			names = data['image']+".png"
 			imgdata[names] = data[imClass]
-			
+	
 			if not os.path.exists(trainpath+data[imClass]):
 				os.mkdir(trainpath+data[imClass])
-			
 			if not os.path.exists(valpath+data[imClass]):
 				os.mkdir(valpath+data[imClass])
 
-		#CREATING TRAINING DATA
-		print("Sorting into training data")
+		#CREATING TRAINING DAT
+A		print("Sorting into training data")
 		imgadata = defaultdict(list)
 		for k, v in imgdata.items():
 			imgadata[v].append(k)
@@ -80,7 +78,7 @@ def classifyImages(classes):
 				shutil.move(trainpath+f+"/"+g, valpath+f+"/"+g)
 
 	elif split == "no" or split == "n":
-		for line in open(datapath+'metadata_filtered.json'):
+		for line in open(datapath+'metadata_cleaned.json'):
 			data = json.loads(line)
 			if not os.path.exists(datapath+data[imClass]):
 				os.mkdir(datapath+data[imClass])
