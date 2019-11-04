@@ -56,17 +56,14 @@ def classifyImages(classes):
 			except Exception:
 				print(" ")
 
-			if float(data['m/z']) > 424.95 and float(data['m/z']) < 425:
-				names = data['image']+".png"
-				imgdata[names] = data[imClass]
-				
-				if not os.path.exists(trainpath+data[imClass]):
-					os.mkdir(trainpath+data[imClass])
-				
-				if not os.path.exists(valpath+data[imClass]):
-					os.mkdir(valpath+data[imClass])
-			else:
-				continue
+			names = data['image']+".png"
+			imgdata[names] = data[imClass]
+			
+			if not os.path.exists(trainpath+data[imClass]):
+				os.mkdir(trainpath+data[imClass])
+			
+			if not os.path.exists(valpath+data[imClass]):
+				os.mkdir(valpath+data[imClass])
 
 		#CREATING TRAINING DATA
 		print("Sorting into training data")
