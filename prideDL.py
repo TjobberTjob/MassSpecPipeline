@@ -351,7 +351,7 @@ if __name__ == '__main__':
 	import sys
 	inputs = sys.argv[1]
 
-	datapath = '/data/ProteomsToolsRaw/' #Server datapath
+	datapath = '/data/ProteomeToolsRaw/' #Server datapath
 
 	ftp = 'ftp://ftp.pride.ebi.ac.uk'
 	print('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+inputs[0:37]+'/README.txt')
