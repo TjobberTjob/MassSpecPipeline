@@ -32,6 +32,7 @@ def download(url):
 		diff1 = end1 - start
 		print('Rawfile downloaded \ntime: '+str(diff1))
 	#Check if txt file exists
+
 	if os.path.exists(datapath+filename+'/allPeptides.txt'):
 		print('txt file exists')
 	elif os.path.exists(datapath+filename+'/file.zip'):
@@ -353,9 +354,8 @@ if __name__ == '__main__':
 	if not os.path.exists(datapath+"Images"):
 		os.mkdir(datapath+'Images')
 
-	if inputs == 'all':
-		URL = sys.argv[2]+"/"
-		ftp = FTP('ftp.pride.ebi.ac.uk')
+	if inputs[-9:-6] != 'PXD':
+		ftp = FTP('ftp.pride.ebi.ac.uk') #readme.txt download
 		ftp.login('anonymous')
 		ftp.retrbinary('RETR ' + URL + 'README.txt' ,open(datapath+'intermediary.txt', 'wb').write)
 		ftp.close()
@@ -364,25 +364,6 @@ if __name__ == '__main__':
 		os.remove(datapath+'intermediary.txt')
 		urls = []
 		for f in df.loc[df['TYPE'] == 'RAW',]['URI']:
-			urls.append('https://www' + f[15:-4])
-	elif inputs == 'all-PT':
-		URL2019 = '/pride/data/archive/2019/05/PXD010595/'
-		URL2017 = '/pride/data/archive/2017/02/PXD004732/'
-		ftp = FTP('ftp.pride.ebi.ac.uk')
-		ftp.login('anonymous')
-		ftp.retrbinary('RETR ' + URL2019 + 'README.txt' ,open(datapath+'intermediary2019.txt', 'wb').write)
-		ftp.retrbinary('RETR ' + URL2017 +  'README.txt' ,open(datapath+'intermediary2017.txt', 'wb').write)
-		ftp.close()
-		#extract the urls we need and remove the intermediary files
-		print('Downloading intermediary files')
-		df1 = pd.read_csv(datapath+'intermediary2019.txt',sep='\t')
-		df2 = pd.read_csv(datapath+'intermediary2017.txt',sep='\t') 
-		os.remove(datapath+'intermediary2019.txt')
-		os.remove(datapath+'intermediary2017.txt')
-		urls = []
-		for f in df1.loc[df1['TYPE'] == 'RAW',]['URI']:
-			urls.append('https://www' + f[15:-4])
-		for f in df2.loc[df2['TYPE'] == 'RAW',]['URI']:
 			urls.append('https://www' + f[15:-4])
 	else: urls = [inputs]
 
@@ -412,7 +393,6 @@ if __name__ == '__main__':
 		resolution = {'x':100,'y':100}
 		sub_images(wash_out,resolution,filename = filename)
 
-# python proteomeTools.py all-PT
-# python3 proteomeTools.py all /pride/data/archive/2017/02/PXD004732
-# python3 proteomeTools.py all /pride/data/archive/2019/05/PXD010595
-# python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
+# python3 prideDL.py /pride/data/archive/2017/02/PXD004732
+# python3 prideDL.py /pride/data/archive/2019/05/PXD010595
+# python3 prideDL.py /pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
