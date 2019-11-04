@@ -357,7 +357,7 @@ if __name__ == '__main__':
 	pepfile = input("What's the name of the peptides file?\n")
 	if pepfile[-4:] == ".zip":
 		underfolder = validated_input('is the peptide file in a subfolder?', ('y','n'))
-		if underfolder == "y"
+		if underfolder == "y":
 			peploc = input("Where in the .zip file is the peptide file located?\n")
 		else:
 			peploc = ""
