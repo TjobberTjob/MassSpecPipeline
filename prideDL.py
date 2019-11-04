@@ -6,6 +6,7 @@ if __name__ == '__main__':
 	import matplotlib.pyplot as plt
 	import matplotlib as mpl
 	from ftplib import FTP
+	import re
 	from datetime import datetime
 	from pyteomics import mzml,mzid,mgf
 	from pathlib import Path
@@ -19,7 +20,6 @@ if __name__ == '__main__':
 
 def download(url):
 	#Start Process
-	Path(datapath+filename+'/'+year).touch()
 	start = datetime.now()
 
 	#Check if Raw file exists
@@ -350,48 +350,42 @@ if __name__ == '__main__':
 
 	import sys
 	inputs = sys.argv[1]
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	
+	datapath = 'data/' #Server datapath
 	if not os.path.exists(datapath+"Images"):
 		os.mkdir(datapath+'Images')
+	ftp = 'ftp://ftp.pride.ebi.ac.uk'
+	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+inputs[0:37]+'/README.txt')
+	df = pd.read_csv(datapath+'readme.txt',sep='\t')
+	os.remove(datapath+'readme.txt')
+	rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
+	zipurls = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 
-	if inputs[-9:-6] != 'PXD':
-		ftp = FTP('ftp.pride.ebi.ac.uk') #readme.txt download
-		ftp.login('anonymous')
-		ftp.retrbinary('RETR ' + URL + 'README.txt' ,open(datapath+'intermediary.txt', 'wb').write)
-		ftp.close()
-		print('Downloading intermediary file(s)')
-		df = pd.read_csv(datapath+'intermediary.txt',sep='\t')
-		os.remove(datapath+'intermediary.txt')
-		urls = []
-		for f in df.loc[df['TYPE'] == 'RAW',]['URI']:
-			urls.append('https://www' + f[15:-4])
-	else: urls = [inputs]
 
-	for f in urls:
-		year = f[41:45]
-		filename = f[59:]
-		# if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
-		# 	continue
-		print('\nfile: '+filename)
+	if len(rawurls) == len(zipurls): 
+		for f in rawurls:
+			filename = f[63:]
+			# if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
+			# 	continue
+			print('\nfile: '+filename)
 
-		if not os.path.exists(datapath+filename):
-			os.mkdir(datapath+filename)
+			if not os.path.exists(datapath+filename):
+				os.mkdir(datapath+filename)
 
-		download(url = f)
-		formatFile(filename = filename)
-		internalmzML(filename = filename)
+			download(url = f)
+			formatFile(filename = filename)
+			internalmzML(filename = filename)
 
-		wash_out = 8
-		interval = {
-				'mz' : {'min':360,'max':1250},
-				'rt' : {'min':wash_out,'max':60}
-			}
-		resolution = {'x':500,'y':300}
-		
-		# full_image(interval,resolution,filename = filename,show=False)
+			wash_out = 8
+			interval = {
+					'mz' : {'min':360,'max':1250},
+					'rt' : {'min':wash_out,'max':60}
+				}
+			resolution = {'x':500,'y':300}
+			# full_image(interval,resolution,filename = filename,show=False)
 
-		resolution = {'x':100,'y':100}
-		sub_images(wash_out,resolution,filename = filename)
+			resolution = {'x':100,'y':100}
+			sub_images(wash_out,resolution,filename = filename)
 
 # python3 prideDL.py /pride/data/archive/2017/02/PXD004732
 # python3 prideDL.py /pride/data/archive/2019/05/PXD010595
