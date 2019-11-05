@@ -102,7 +102,6 @@ def classifyImages(classes):
 
 if __name__ == '__main__':
 
-	imClass = sys.argv[1]
 
 	i = 1
 	while i == 1:
@@ -110,13 +109,12 @@ if __name__ == '__main__':
 			data = json.loads(line)
 			i = i+1
 	distlist = list(data.keys())
+	imClass = validated_input('What do you want to classify based on? (type reset to reset data folders)',distlist)
+	# if str(imClass) not in distlist:
+	# 	print('Input not recognized')
+	# 	quit()
 
-	if str(imClass) not in distlist:
-		if str(imClass) != 'reset':
-			print('Input not recognized')
-			quit()
-
-	if imClass == "reset":
+	if imClass == 'reset':
 		quit()
 	else:
 		classifyImages(classes = imClass)
