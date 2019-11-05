@@ -20,7 +20,7 @@ def numbered_input(prompt, min, max):
 	valid_input = False
 	while valid_input != False:
 		value = input(prompt+'\n')
-		valid_input = int(value) > min and int(value) < max
+		valid_input = int(value) >= min and int(value) <= max
 	return value
 
 #Pathfinding
@@ -49,7 +49,7 @@ if len(udirs) != 0:
 def classifyImages(classes):
 	split = validated_input('Do you wanna split the data into training and validation?', ('y','n'))
 	if split == "yes" or split == "y":
-		splitratio = numbered_input("What should the validation % be?",0,101)
+		splitratio = numbered_input("What should the validation % be?",0,100)
 
 		if not os.path.exists(trainpath):
 			os.mkdir(trainpath)
