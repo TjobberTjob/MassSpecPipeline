@@ -109,7 +109,7 @@ if __name__ == '__main__':
 		for line in open(datapath+'metadata_filtered.json'):
 			data = json.loads(line)
 			i = i+1
-	distlist = list(newdict.keys())
+	distlist = list(data.keys())
 
 	if imClass not in distlist or imClass != 'reset':
 		print('Input not recognized')
