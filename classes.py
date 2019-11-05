@@ -60,7 +60,7 @@ def classifyImages(classes):
 		
 		#Preparing metadata
 		print("Preparing Metadata")
-		for line in open(datapath+'metadata_cleaned.json'):
+		for line in open(datapath+'metadata_filtered.json'):
 			try:
 				data = json.loads(line)
 			except Exception:
@@ -92,7 +92,7 @@ def classifyImages(classes):
 				shutil.move(trainpath+f+"/"+g, valpath+f+"/"+g)
 
 	elif split == "no" or split == "n":
-		for line in open(datapath+'metadata_cleaned.json'):
+		for line in open(datapath+'metadata_filtered.json'):
 			data = json.loads(line)
 			if not os.path.exists(datapath+data[imClass]):
 				os.mkdir(datapath+data[imClass])
@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
 	i = 1
 	while i == 1:
-		for line in open(datapath+'metadata_cleaned.json'):
+		for line in open(datapath+'metadata_filtered.json'):
 			data = json.loads(line)
 			i = i+1
 	print(data)
