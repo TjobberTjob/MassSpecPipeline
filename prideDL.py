@@ -373,8 +373,8 @@ if __name__ == '__main__':
 		rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
 		zipurls = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	else:
-		rawname = urlinput[63:]+'.raw'
-		zipname = urlinput[63:]+'.zip'
+		rawname = urlinput[38:]+'.raw'
+		zipname = urlinput[38:]+'.zip'
 		rawurls = df.loc[df['NAME'] == rawname,]['URI']
 		zipurls = df.loc[df['NAME'] == zipname,]['URI']
 		print(rawname)
@@ -384,7 +384,7 @@ if __name__ == '__main__':
 
 	if len(rawurls) == len(zipurls): 
 		for f in rawurls:
-			filename = f[38:-4]
+			filename = f[63:-4]
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
 				continue
 			print('\nfile: '+filename)
