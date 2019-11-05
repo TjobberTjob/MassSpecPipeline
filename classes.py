@@ -18,7 +18,7 @@ def validated_input(prompt, valid_values):
 
 def numbered_input(prompt, min, max):
 	valid_input = False
-	while valid_input != False:
+	while valid_input == False:
 		value = input(prompt+'\n')
 		valid_input = int(value) >= min and int(value) <= max
 	return value
