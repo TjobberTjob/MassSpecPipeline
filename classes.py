@@ -110,7 +110,7 @@ if __name__ == '__main__':
 			data = json.loads(line)
 			i = i+1
 	distlist = list(data.keys())
-
+	print(distlist)
 	if imClass not in distlist or imClass != 'reset':
 		print('Input not recognized')
 		quit()
