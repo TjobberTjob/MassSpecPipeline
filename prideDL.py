@@ -405,5 +405,5 @@ if __name__ == '__main__':
 	#else:
 		
 # python3 prideDL.py /pride/data/archive/2017/02/PXD004732
-# python3 prideDL.py ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/README.txt
+# python3 prideDL.py /pride/data/archive/2019/05/PXD010595
 # python3 prideDL.py /pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
