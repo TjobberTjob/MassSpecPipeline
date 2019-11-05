@@ -111,6 +111,7 @@ if __name__ == '__main__':
 			i = i+1
 	distlist = list(data.keys())
 	print(distlist)
+	print(imClass)
 	if str(imClass) not in distlist or imClass != 'reset':
 		print('Input not recognized')
 		quit()
