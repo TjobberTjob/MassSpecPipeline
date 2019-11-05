@@ -10,18 +10,18 @@ if 'import' == 'import':
 	from collections import defaultdict
 
 def validated_input(prompt, valid_values):
-    valid_input = False
-    while not valid_input:
-        value = input(prompt + ' ' + '/'.join(valid_values)+"\n")
-        valid_input = value.lower() in valid_values
-    return value
+	valid_input = False
+	while not valid_input:
+		value = input(prompt + ' ' + '/'.join(valid_values)+"\n")
+		valid_input = value.lower() in valid_values
+	return value
 
 def numbered_input(prompt, valid_values):
-    valid_input = False
-    while valid_input != false:
-        value = input(prompt+'\n')
-        valid_input = int(value) > 0 and int(value) < 101
-    return value
+	valid_input = False
+	while valid_input != false:
+		value = input(prompt+'\n')
+		valid_input = int(value) > 0 and int(value) < 101
+	return value
 
 #Pathfinding
 datapath = "/data/ProteomeToolsRaw/Images/"
@@ -104,9 +104,9 @@ if __name__ == '__main__':
 
 	imClass = sys.argv[1]
 
-    i=1
-    while i == 1:
-    	for line in open(datapath+'metadata_cleaned.json'):
+	i = 1
+	while i == 1:
+		for line in open(datapath+'metadata_cleaned.json'):
 			data = json.loads(line)
 			i = i+1
 	print(data)
