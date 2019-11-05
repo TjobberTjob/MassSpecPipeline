@@ -369,9 +369,12 @@ if __name__ == '__main__':
 	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+urlinput[0:37]+'/README.txt')
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
-	rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
-	zipurls = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-
+	if not urlinput[-9:-7] == "PXD":
+		rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
+		zipurls = df.loc[df['TYPE'] == 'SEARCH',]['URI']
+	else:
+		rawurls = df.loc[df['NAME'] == f[63:]+".raw",]['URI']
+		zipurls = df.loc[df['TYPE'] == f[63:]+".zip",]['URI']
 
 	if len(rawurls) == len(zipurls): 
 		for f in rawurls:
@@ -400,5 +403,5 @@ if __name__ == '__main__':
 	#else:
 		
 # python3 prideDL.py /pride/data/archive/2017/02/PXD004732
-# python3 prideDL.py /pride/data/archive/2019/05/PXD010595
+# python3 prideDL.py ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/README.txt
 # python3 prideDL.py /pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
