@@ -29,21 +29,20 @@ trainpath = datapath+'training/'
 valpath = datapath+'validation/'
 
 #Reset images
-def reset_folders:
-	dirs = glob(datapath+"/*/")
-	udirs = np.unique(dirs)
 
-	if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
-		dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
-		udirs = np.unique(dirs) 
+dirs = glob(datapath+"/*/")
+udirs = np.unique(dirs)
 
+if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
+	dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
+	udirs = np.unique(dirs) 
 
-	if len(udirs) != 0:
-		reset = validated_input('Do you want to reset image folders?', ('y','n'))
-		if reset == "y":
-			os.system('find '+str(datapath)+' -mindepth 2 -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
-			os.system("rm -rf "+trainpath)
-			os.system("rm -rf "+valpath)
+if len(udirs) != 0:
+	reset = validated_input('Do you want to reset image folders?', ('y','n'))
+	if reset == 'y':
+		os.system('find '+str(datapath)+' -mindepth 2 -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
+		os.system("rm -rf "+trainpath)
+		os.system("rm -rf "+valpath)
 
 
 #Move images
@@ -112,12 +111,9 @@ if __name__ == '__main__':
 	distlist = list(data.keys())
 	distlist.append('reset')
 	imClass = validated_input('What do you want to classify based on?',distlist)
-	# if str(imClass) not in distlist:
-	# 	print('Input not recognized')
-	# 	quit()
 
 	if imClass == 'reset':
-		reset_folders
+		quit()
 	else:
 		classifyImages(classes = imClass)
 
