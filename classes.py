@@ -75,7 +75,7 @@ def classifyImages(classes):
 				os.mkdir(valpath+data[imClass])
 
 		#CREATING TRAINING DAT
-A		print("Sorting into training data")
+		print("Sorting into training data")
 		imgadata = defaultdict(list)
 		for k, v in imgdata.items():
 			imgadata[v].append(k)
