@@ -373,8 +373,8 @@ if __name__ == '__main__':
 		rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
 		zipurls = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	else:
-		rawurls = df.loc[df['NAME'] == f[63:]+".raw",]['URI']
-		zipurls = df.loc[df['TYPE'] == f[63:]+".zip",]['URI']
+		rawurls = df.loc[df['NAME'] == urlinput[63:]+".raw",]['URI']
+		zipurls = df.loc[df['TYPE'] == urlinput[63:]+".zip",]['URI']
 
 	if len(rawurls) == len(zipurls): 
 		for f in rawurls:
