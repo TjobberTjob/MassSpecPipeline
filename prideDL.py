@@ -369,7 +369,7 @@ if __name__ == '__main__':
 	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+urlinput[0:37]+'/README.txt')
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
-	if urlinput[-9:-7] == "PXD":
+	if urlinput[-9:-7] == "PXD" or urlinput[-9:-7] == "PRD":
 		rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
 		zipurls = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	else:
