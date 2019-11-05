@@ -109,8 +109,8 @@ if __name__ == '__main__':
 		for line in open(datapath+'metadata_filtered.json'):
 			data = json.loads(line)
 			i = i+1
-
-	if imClass not in data or imClass != 'reset':
+	print(data)
+	if imClass not in str(data) or imClass != 'reset':
 		print('Input not recognized')
 		quit()
 
