@@ -61,10 +61,7 @@ def classifyImages(classes):
 		#Preparing metadata
 		print("Preparing Metadata")
 		for line in open(datapath+'metadata_filtered.json'):
-			try:
-				data = json.loads(line)
-			except Exception:
-				print(" ")
+			data = json.loads(line)
 
 			names = data['image']+".png"
 			imgdata[names] = data[imClass]
@@ -81,7 +78,10 @@ def classifyImages(classes):
 			imgadata[v].append(k)
 		for f in imgadata:
 			for g in imgadata[f]:
-				shutil.move(datapath+g, trainpath+f+"/"+g)
+				try:
+					shutil.move(datapath+g, trainpath+f+"/"+g)
+				except Exception:
+					pass
 		
 		#CREATING VALIDATION DATA
 		print("Sorting into Validation data")
@@ -89,14 +89,20 @@ def classifyImages(classes):
 			splits = round(len(imgadata[f])*(int(splitratio)/100))
 			mlist = random.sample(imgadata[f],k=splits)
 			for g in mlist:
-				shutil.move(trainpath+f+"/"+g, valpath+f+"/"+g)
+				try:
+					shutil.move(trainpath+f+"/"+g, valpath+f+"/"+g)
+				except Exception:
+					pass
 
 	elif split == "no" or split == "n":
 		for line in open(datapath+'metadata_filtered.json'):
 			data = json.loads(line)
 			if not os.path.exists(datapath+data[imClass]):
 				os.mkdir(datapath+data[imClass])
-			shutil.move(datapath+data['image']+".png", datapath+data[imClass]+"/")
+			try:
+				shutil.move(datapath+data['image']+".png", datapath+data[imClass]+"/")
+			except Exception:
+				pass
 	else: quit()
 
 
