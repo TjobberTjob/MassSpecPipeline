@@ -96,7 +96,7 @@ def classifyImages(classes):
 			data = json.loads(line)
 			if not os.path.exists(datapath+data[imClass]):
 				os.mkdir(datapath+data[imClass])
-			shutil.move(datapath+data['image']+".png", datpath+data[imClass]+"/")
+			shutil.move(datapath+data['image']+".png", datapath+data[imClass]+"/")
 	else: quit()
 
 
