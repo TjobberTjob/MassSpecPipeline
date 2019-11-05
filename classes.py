@@ -9,6 +9,20 @@ if 'import' == 'import':
 	import numpy as np
 	from collections import defaultdict
 
+def validated_input(prompt, valid_values):
+    valid_input = False
+    while not valid_input:
+        value = input(prompt + ' ' + '/'.join(valid_values)+"\n")
+        valid_input = value.lower() in valid_values
+    return value
+
+def numbered_input(prompt, valid_values):
+    valid_input = False
+    while valid_input != false:
+        value = input(prompt+'\n')
+        valid_input = int(value) > 0 and int(value) < 101
+    return value
+
 #Pathfinding
 datapath = "/data/ProteomeToolsRaw/Images/"
 trainpath = datapath+'training/'
@@ -24,8 +38,8 @@ if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
 
 
 if len(udirs) != 0:
-	reset = input("Do you want to reset image folders? y/n")
-	if reset == "yes" or reset == "y":
+	reset = validated_input('Do you want to reset image folders?', ('y','n'))
+	if reset == "y":
 		os.system('find '+str(datapath)+' -mindepth 2 -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
 		os.system("rm -rf "+trainpath)
 		os.system("rm -rf "+valpath)
@@ -33,9 +47,9 @@ if len(udirs) != 0:
 
 #Move images
 def classifyImages(classes):
-	split = input("Do you wanna split the data into training and validation? y/n")
+	split = validated_input('Do you wanna split the data into training and validation?', ('y','n'))
 	if split == "yes" or split == "y":
-		splitratio = input("What should the validation % be?")
+		splitratio = numbered_input("What should the validation % be?")
 
 		if not os.path.exists(trainpath):
 			os.mkdir(trainpath)
@@ -89,6 +103,13 @@ A		print("Sorting into training data")
 if __name__ == '__main__':
 
 	imClass = sys.argv[1]
+
+    i=1
+    while i == 1:
+    	for line in open(datapath+'metadata_cleaned.json'):
+			data = json.loads(line)
+			i = i+1
+	print(data)
 
 	if imClass == "reset":
 		quit()
