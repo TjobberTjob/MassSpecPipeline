@@ -384,7 +384,7 @@ if __name__ == '__main__':
 
 	if len(rawurls) == len(zipurls): 
 		for f in rawurls:
-			filename = f[63:-4]
+			filename = f[38:-4]
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
 				continue
 			print('\nfile: '+filename)
