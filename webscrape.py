@@ -2,9 +2,11 @@ import requests
 import json
 from os.path import join
 import time
+import re
 import random
 from bs4 import BeautifulSoup
 import os
+from urllib import parse
 import pickle
 import codecs
 import sys
@@ -49,6 +51,48 @@ def get_accessions():
 	with open(datapath+accessions, "wb") as pa:
 		pickle.dump(all_accessions, pa)
 
+def accessions_metadata():
+
+	metadata = 'accession_metadata.json'
+	if os.path.exists(datapath+metadata):
+		overwrite = validated_input('Metadata already exists, wanna overwrite?',('y','n'))
+		if overwrite == 'y':
+			os.system('rm '+datapath+metadata)
+		else:
+			quit()
+
+	with open(datapath+accessions, "rb") as pa:
+		pride_accessions = pickle.load(pa) #Loading the data
+	i = 0
+	outfile = open(join(datapath,metadata),'a')
+
+	for f in pride_accessions:
+		i += 1
+		url = 'https://www.ebi.ac.uk/pride/archive/projects/'+f
+		html = requests.get(url).text
+		soup = BeautifulSoup(html,'html.parser')
+		my_dict = {}
+		my_dict['accession'] = f
+		for div in soup.find_all('div', {'class': 'grid_7 right-column'}):
+			for div2 in div.find_all('div', {'class': 'grid_12'}): 
+				try:
+					name = div2.find('h5').text 
+				except Exception:
+					continue
+				try:
+					value = div2.find('a').text 
+				except Exception:
+					value = "Not available"
+				my_dict[name] = value 
+		url = 'https://www.ebi.ac.uk/pride/ws/archive/project/'+f
+		page = requests.get(url).text
+		my_dict['maxquant'] = 'maxquant' in page.lower()
+		print('Progress {:2.1%}'.format(i / len(pride_accessions), end='\r'))
+
+		outfile.write(json.dumps(my_dict)+'\n')
+	outfile.close()
+
+	
 def validated_input(prompt, valid_values):
 	valid_input = False
 	while not valid_input:
@@ -56,16 +100,27 @@ def validated_input(prompt, valid_values):
 		valid_input = value in valid_values
 	return value
 
+def locations_of_substring(string, substring):
+	substring_length = len(substring)	
+	def recurse(locations_found, start):
+		location = string.find_all(substring, start)
+		if location != -1:
+			return recurse(locations_found + [location], location+substring_length)
+		else:
+			return locations_found
+
+	return recurse([], 0)
+
  
 if __name__ == '__main__':
-	datapath = 'data/'
+	datapath = '/data/ProteomeToolsRaw/'
 
-	with open(datapath+accessions, "rb") as pa:
-		b = pickle.load(pa)
-	print(len(b))
 	
 	cmd = sys.argv[1]
 
 	#Download pride accession numbers.
 	if cmd == 'accession':
 		get_accessions()
+
+	if cmd == 'metadata':
+		accessions_metadata()
