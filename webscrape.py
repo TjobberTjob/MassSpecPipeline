@@ -96,7 +96,10 @@ def accessions_metadata():
 				my_dict[name] = value
 
 			for ta in  div.find_all('table'):
-				filetypes.append(ta.find('td').text.strip()[re.search('\.',ta.find('td').text.strip()).span()[1]:])
+				try:
+					filetypes.append(ta.find('td').text.strip()[re.search('\.',ta.find('td').text.strip()).span()[1]:])
+				except AttributeError:
+					print('f')
 			my_dict['filetypes'] = filetypes
 
 		url  = 'https://www.ebi.ac.uk/pride/ws/archive/project/'
