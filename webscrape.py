@@ -87,7 +87,7 @@ def accessions_metadata():
 		url = 'https://www.ebi.ac.uk/pride/ws/archive/project/'+f
 		page = requests.get(url).text
 		my_dict['maxquant'] = 'maxquant' in page.lower()
-		print('Progress {:2.1%}'.format(i / len(pride_accessions), end='\r'))
+		print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
 
 		outfile.write(json.dumps(my_dict)+'\n')
 	outfile.close()
