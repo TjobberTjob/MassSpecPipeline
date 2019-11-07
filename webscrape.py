@@ -33,7 +33,7 @@ def get_accessions():
 		for level2 in soup_2.find_all('a', href = True):
 			try:
 				int(level2['href'][0:2]) #Only look at numerics...
-			except Exception:
+			except AttributeError :
 				continue
 
 			print('Going into '+level1['href']+level2['href'])
@@ -77,13 +77,27 @@ def accessions_metadata():
 			for div2 in div.find_all('div', {'class': 'grid_12'}): 
 				try:
 					name = div2.find('h5').text 
-				except Exception:
+				except AttributeError :
 					continue
 				try:
 					value = div2.find('a').text 
-				except Exception:
+				except AttributeError :
 					value = "Not available"
 				my_dict[name] = value 
+
+		url = 'https://www.ebi.ac.uk/pride/archive/projects/'+f+'/files'
+		html = requests.get(url).text
+		soup = BeautifulSoup(html,'html.parser')
+		filetypes = []
+		for div in soup.find_all('div', {'class': 'grid_23 clearfix file-list'}):
+			for h5 in div.find_all('h5'):
+				name = h5.text[re.search(' ',h5.text).span()[1]:]
+				value = h5.text[:re.search(' ',h5.text).span()[0]]
+				my_dict[name] = value
+			for ta in  div.find_all('table'):
+				filetypes.append(ta.find('td').text.strip()[re.search('\.',ta.find('td').text.strip()).span()[1]:])
+			my_dict['filetypes'] = filetypes
+
 		url = 'https://www.ebi.ac.uk/pride/ws/archive/project/'+f
 		page = requests.get(url).text
 		my_dict['maxquant'] = 'maxquant' in page.lower()
@@ -92,7 +106,7 @@ def accessions_metadata():
 		outfile.write(json.dumps(my_dict)+'\n')
 	outfile.close()
 
-	
+
 def validated_input(prompt, valid_values):
 	valid_input = False
 	while not valid_input:
@@ -113,7 +127,7 @@ def locations_of_substring(string, substring):
 
  
 if __name__ == '__main__':
-	datapath = '/data/ProteomeToolsRaw/'
+	datapath = 'data/'
 
 	
 	cmd = sys.argv[1]
