@@ -127,7 +127,7 @@ def locations_of_substring(string, substring):
 
  
 if __name__ == '__main__':
-	datapath = 'data/'
+	datapath = '/data/ProteomeToolsRaw/'
 
 	
 	cmd = sys.argv[1]
