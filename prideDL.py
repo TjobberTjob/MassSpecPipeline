@@ -361,7 +361,7 @@ if __name__ == '__main__':
 			else:
 				os.system('rm '+datapath+'file.zip')
 			if not os.path.exists(datapath+filename+'/'+pepfile):
-				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pep´file)
+				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pepfile)
 			else:
 				os.system('rm '+datapath+pepfile)
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
