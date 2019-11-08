@@ -348,7 +348,7 @@ if __name__ == '__main__':
 			ziplist = zipped.namelist()
 		for a in ziplist:
 			print(a)
-			quit()
+		quit()
 			if pepfile in a:
 				subprocess.run('unzip -j '+datapath+'/file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
