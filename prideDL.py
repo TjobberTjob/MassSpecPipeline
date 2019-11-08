@@ -327,9 +327,9 @@ def validated_input(prompt, valid_values):
 if __name__ == '__main__':
 
 	accession = sys.argv[1]
-	pepfile = input("What's the name of the MaxQuant output file?\n")
+	#pepfile = input("What's the name of the MaxQuant output file?\n")
 
-	datapath = '/mnt/c/Users/TobiaGC/Dropbox/Universitet/MSc CompBiomed/Kandidat Speciale/Data/' #Server datapath
+	datapath = '/data/ProteomeToolsRaw/' #Server datapath
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'
 	html = requests.get(url).text
 	soup = BeautifulSoup(html,'html.parser')
@@ -337,7 +337,7 @@ if __name__ == '__main__':
 		url = div.find('a')['href']
 		break
 
-	os.system('wget --show-progress -O '+datapath+'readme.txt'+' -c '+url+'/README.txt')
+	os.system('wget --show-progress -O '+datapath+'readme2.txt '+url+'/README.txt')
 	quit()
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')

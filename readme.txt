@@ -11,5 +11,3 @@ After this youll be asked if you want to classify them into train and validation
 If you answer "yes" youll be asked to give the validation %. train will be 1-(val%) 
 
 If there is already folders existing with classifications, youll be prompted to reset folders. Not doing this will stop the code
-
-
