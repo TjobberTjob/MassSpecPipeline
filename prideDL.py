@@ -374,7 +374,7 @@ if __name__ == '__main__':
 				os.system('rm '+datapath+'file.zip')
 			
 			df = df.loc[df['Raw file'] == raws,]
-			pd.DataFrame.to_csv(df3,datapath+pepfile)
+			pd.DataFrame.to_csv(df,datapath+pepfile)
 			if not os.path.exists(datapath+filename+'/'+pepfile): #Move or rm txt.file
 				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pepfile)
 			else:
