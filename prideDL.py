@@ -356,9 +356,9 @@ if __name__ == '__main__':
 
 		septype = validated_input('csv or tab file?', ('csv','tab'))
 		if septype == 'csv':
-			df = pd.read_csv(	datapath+pepfile,sep=',')
+			df = pd.read_csv(datapath+pepfile,sep=',')
 		else:
-			df = pd.read_csv(	datapath+pepfile,sep='\t')
+			df = pd.read_csv(datapath+pepfile,sep='\t')
 		df = df.loc[df['Sequence'] != ' ',]
 		rawfiles = np.unique(df['Raw file'])
 		print(rawfiles)
