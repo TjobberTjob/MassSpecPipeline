@@ -15,7 +15,7 @@ if __name__ == '__main__':
 	import sys		
 	import math
 	import numpy as np
-	import ZipFile
+	from zipfile import ZipFile
 	from bs4 import BeautifulSoup
 	import subprocess
 	import os 
