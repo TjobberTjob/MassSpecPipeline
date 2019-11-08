@@ -344,7 +344,7 @@ if __name__ == '__main__':
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 
 	for zips in searchfiles:
-		zips.replace(' ','%20')
+		zips = zips.replace(' ','%20')
 		print(zips)
 		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
 		with ZipFile(datapath+'file.zip','r') as zipped:
