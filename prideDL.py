@@ -15,6 +15,7 @@ if __name__ == '__main__':
 	import sys		
 	import math
 	import numpy as np
+	from ZipFile import ZipFile
 	from bs4 import BeautifulSoup
 	import subprocess
 	import os 
@@ -327,7 +328,7 @@ def validated_input(prompt, valid_values):
 if __name__ == '__main__':
 
 	accession = sys.argv[1]
-	#pepfile = input("What's the name of the MaxQuant output file?\n")
+	pepfile = input("What's the name of the MaxQuant output file?\n")
 
 	datapath = '/data/ProteomeToolsRaw/' #Server datapath
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'
@@ -337,7 +338,7 @@ if __name__ == '__main__':
 		url = div.find('a')['href']
 		break
 
-	os.system('wget --show-progress -O '+datapath+'readme.txt '+url+'/README.txt')
+	os.system('wget -q --show-progress -O '+datapath+'readme.txt '+url+'/README.txt')
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
