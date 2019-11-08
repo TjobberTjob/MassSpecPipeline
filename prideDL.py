@@ -361,6 +361,8 @@ if __name__ == '__main__':
 
 		for raws in rawfiles:
 			filename = raws
+			is not os.path.exists(datapath+filename):
+				os.system('mkdir '+datapath+filename)
 			
 			if not os.path.exists(datapath+filename+'/file.zip'): #Move or rm zip.file
 				os.system('mv '+datapath+'file.zip '+datapath+filename+'/file.zip')
