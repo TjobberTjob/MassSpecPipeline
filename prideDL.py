@@ -30,7 +30,8 @@ def download(file):
 		print('raw or parsed file exists')
 	else:
 		print('downloading raw file')
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
+		print('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
+		quit()
 		end1 = datetime.now()
 		diff1 = end1 - start
 		print('Rawfile downloaded \ntime: '+str(diff1))
@@ -361,7 +362,6 @@ if __name__ == '__main__':
 			df = pd.read_csv(datapath+pepfile,sep='\t')
 		df = df.loc[df['Sequence'] != ' ',]
 		rawfiles = np.unique(df['Raw file'])
-		print(rawfiles)
 
 		for raws in rawfiles:
 			filename = raws
