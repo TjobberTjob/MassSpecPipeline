@@ -352,7 +352,7 @@ if __name__ == '__main__':
 				break
 		df2 = pd.read_csv(datapath+pepfile,sep='\t')
 		
-		rawfiles = df.iloc[1:1]
+		rawfiles = df2.iloc[1:1]
 		print(rawfiles)
 		quit()
 		for raws in rawfiles:
