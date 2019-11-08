@@ -337,8 +337,7 @@ if __name__ == '__main__':
 		url = div.find('a')['href']
 		break
 
-	os.system('wget --show-progress -O '+datapath+'readme2.txt '+url+'/README.txt')
-	quit()
+	os.system('wget --show-progress -O '+datapath+'readme.txt '+url+'/README.txt')
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
