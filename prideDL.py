@@ -345,7 +345,7 @@ if __name__ == '__main__':
 
 	for zips in searchfiles:
 		zips = zips.replace(' ','%20')
-		print(zips)
+
 		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
 		with ZipFile(datapath+'file.zip','r') as zipped:
 			ziplist = zipped.namelist()
@@ -355,6 +355,7 @@ if __name__ == '__main__':
 				break
 
 		df2 = pd.read_csv(datapath+pepfile,sep='\t')
+		print(df2)
 		rawfiles = np.unique(df2['Raw file'])
 
 		for raws in rawfiles:
