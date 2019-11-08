@@ -355,6 +355,7 @@ if __name__ == '__main__':
 				break
 
 		df = pd.read_csv(datapath+pepfile,sep='\t')
+		print(df)
 		df2 = df.loc[df['Sequence'] != ' ',]
 		print(df2)
 		rawfiles = np.unique(df2['Raw file'])
