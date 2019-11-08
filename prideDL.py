@@ -8,17 +8,19 @@ if __name__ == '__main__':
 	from ftplib import FTP
 	import re
 	from datetime import datetime
-	from pyteomics import mzml,mzid,mgf
 	from pathlib import Path
 	import glob
+	import requests
 	import json
+	import sys		
 	import math
 	import numpy as np
+	from bs4 import BeautifulSoup
 	import subprocess
 	import os 
 	from os.path import join
 
-def download(url):
+def download():
 	#Start Process
 	start = datetime.now()
 
@@ -27,40 +29,12 @@ def download(url):
 		print('raw or parsed file exists')
 	else:
 		print('downloading raw file')
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-4]+'.raw')
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+raws)
 		end1 = datetime.now()
 		diff1 = end1 - start
 		print('Rawfile downloaded \ntime: '+str(diff1))
-	#Check if txt file exists
-
-	if os.path.exists(datapath+filename+'/'+pepfile):
-		print('txt file exists')
-	
-	elif os.path.exists(datapath+filename+'/file.zip'):
-		subprocess.run('unzip -j '+datapath+filename+'/file.zip '+peploc+pepfile+' -d '+datapath+filename+'/',shell = True)
-		#os.remove(datapath+filename+'/file.zip')
-		df = pd.read_csv(datapath+filename+'/'+pepfile, sep = '\t')
-		df2 = df.loc[df['Sequence'] != ' ',]
-		pd.DataFrame.to_csv(df2,datapath+filename+'/'+pepfile)
-		end2 = datetime.now()
-		diff2 = end2 - start
-		print('Files downloaded and handled \ntime: '+str(diff2))
-	
-	else:  
-		print('downloading txt file')
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.zip'+' -c '+url[:-4]+'.zip')
-		subprocess.run('unzip -j '+datapath+filename+'/file.zip '+peploc+pepfile+' -d '+datapath+filename+'/',shell = True)
-		os.remove(datapath+filename+'/file.zip')
-		#Fix the allpep.txt
-		df = pd.read_csv(datapath+filename+'/'+pepfile, sep = '\t')
-		df2 = df.loc[df['Sequence'] != ' ',]
-		pd.DataFrame.to_csv(df2,datapath+filename+'/'+pepfile)
-		#finish the DL
-		end2 = datetime.now()
-		diff2 = end2 - start
-		print('Files downloaded and handled \ntime: '+str(diff2))
 		
-def formatFile(filename):
+def formatFile():
 	#Check whether the docker file is implemented or not
 	output = subprocess.check_output('docker image ls',shell = True)
 	if 'thermorawparser' not in str(output):
@@ -98,7 +72,7 @@ def process_ms1(spectrum):
 	intensity = spectrum['intensity array']
 	return {'scan_time':scan_time,'intensity':intensity.tolist(),'mz':mz.tolist()}
 
-def internalmzML(filename):
+def internalmzML():
 	if os.path.exists(datapath+filename+'/mzML.json'):
 		print('mzML data already extracted')
 	else:
@@ -129,7 +103,7 @@ def internalmzML(filename):
 		f.close()
 		# os.remove(datapath+filename+'/file.mzml')
 
-def full_image(interval,resolution,filename,show=False):
+def full_image(interval,resolution,show=False):
 	if os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 		print('Full image already exists')
 
@@ -220,7 +194,7 @@ def full_image(interval,resolution,filename,show=False):
 		elif show == False:
 			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
 
-def sub_images(wash_out,resolution,filename):
+def sub_images(resolution):
 	print('Creating subimages')
 
 	df = pd.read_csv(datapath+filename+'/'+pepfile)
@@ -352,45 +326,48 @@ def validated_input(prompt, valid_values):
 
 if __name__ == '__main__':
 
-	import sys
-	urlinput = sys.argv[1]
-	pepfile = input("What's the name of the peptides file?\n")
-	iszip = validated_input('is the peptide file zipped?', ('y','n'))
-	if iszip == "y":
-		underfolder = validated_input('is the peptide file in a subfolder?', ('y','n'))
-		if underfolder == "y":
-			peploc = input("Where in the .zip file is the peptide file located?\n")
-		else:
-			peploc = ""
+	accession = sys.argv[1]
+	pepfile = input("What's the name of the MaxQuant output file?\n")
 
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = '/mnt/c/Users/TobiaGC/Dropbox/Universitet/MSc CompBiomed/Kandidat Speciale/Data/' #Server datapath
+	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'
+	html = requests.get(url).text
+	soup = BeautifulSoup(html,'html.parser')
+	for div in soup.find_all('div', {'class': 'grid_6 omega'}):
+		url = div.find('a')['href']
+		break
 
-	ftp = 'ftp://ftp.pride.ebi.ac.uk'
-	os.system('wget -q --show-progress -O '+datapath+'readme.txt'+' -c '+ftp+urlinput[0:37]+'/README.txt')
+	os.system('wget --show-progress -O '+datapath+'readme.txt'+' -c '+url+'/README.txt')
+	quit()
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
-	if urlinput[-9:-7] == "PXD" or urlinput[-9:-7] == "PRD":
-		rawurls = df.loc[df['TYPE'] == 'RAW',]['URI']
-		zipurls = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-	else:
-		rawname = urlinput[38:]+'.raw'
-		zipname = urlinput[38:]+'.zip'
-		rawurls = df.loc[df['NAME'] == rawname,]['URI']
-		zipurls = df.loc[df['NAME'] == zipname,]['URI']
-
-	if len(rawurls) == len(zipurls): 
-		for f in rawurls:
-			filename = f[63:-4]
+	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
+	for zips in searchfiles:
+		os.system('wget -q --show-progress -O '+datapath+'/file.zip'+' -c '+zips)
+		with ZipFile.namelist('File.zip','r') as zipped:
+			ziplist = zipped.namelist() 
+		for a in ziplist:
+			if pepfile in a:
+				subprocess.run('unzip -j '+datapath+'/file.zip '+a+' -d '+datapath+'/',shell = True)
+				break
+		df2 = pd.read_csv(datapath+pepfile,sep='\t')
+		rawfiles = np.unique(df['Raw file'])
+		for raws in rawfiles:
+			filename = raws[:-4]
+			if not os.path.exists(datapath+filename+'/file.zip'):
+				os.system('mv '+file.zip+' datapath/'+file.zip)
+			else:
+				os.system('rm file.zip')
+			if not os.path.exists(datapath+filename+'/'+pepfile):
+				os.system('mv '+pepfile+' datapath/'+pepfile)
+				os.system('rm '+pepfile)
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
 				continue
 			print('\nfile: '+filename)
 
-			if not os.path.exists(datapath+filename):
-				os.mkdir(datapath+filename)
-
-			download(url = f)
-			formatFile(filename = filename)
-			internalmzML(filename = filename)
+			download()
+			formatFile()
+			internalmzML()
 
 			wash_out = 8
 			interval = {
@@ -398,12 +375,10 @@ if __name__ == '__main__':
 					'rt' : {'min':wash_out,'max':60}
 				}
 			resolution = {'x':500,'y':300}
-			# full_image(interval,resolution,filename = filename,show=False)
+			# full_image(interval,resolution,show=False)
 
 			resolution = {'x':100,'y':100}
-			sub_images(wash_out,resolution,filename = filename)
-	#else:
+			sub_images(resolution)
 		
-# python3 prideDL.py /pride/data/archive/2017/02/PXD004732
-# python3 prideDL.py /pride/data/archive/2019/05/PXD010595
-# python3 prideDL.py /pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4
+# python3 prideDL.py PXD004732
+# python3 prideDL.py PXD010595
