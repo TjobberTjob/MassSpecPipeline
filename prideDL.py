@@ -359,9 +359,8 @@ if __name__ == '__main__':
 			df = pd.read_csv(	datapath+pepfile,sep=',')
 		else:
 			df = pd.read_csv(	datapath+pepfile,sep='\t')
-		df2 = df.loc[df['Sequence'] != ' ',]
-		print(df2)
-		rawfiles = np.unique(df2['Raw file'])
+		df = df.loc[df['Sequence'] != ' ',]
+		rawfiles = np.unique(df['Raw file'])
 		print(rawfiles)
 
 		for raws in rawfiles:
@@ -374,7 +373,7 @@ if __name__ == '__main__':
 			else:
 				os.system('rm '+datapath+'file.zip')
 			
-			df4 = df3.loc[df3['Raw file'] == raws,]
+			df = df.loc[df['Raw file'] == raws,]
 			pd.DataFrame.to_csv(df3,datapath+pepfile)
 			if not os.path.exists(datapath+filename+'/'+pepfile): #Move or rm txt.file
 				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pepfile)
