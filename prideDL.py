@@ -359,6 +359,7 @@ if __name__ == '__main__':
 
 		for raws in rawfiles:
 			filename = raws
+			raws = raws.replace(' ','%20')
 			if not os.path.exists(datapath+filename+'/file.zip'):
 				os.system('mv '+datapath+'file.zip '+datapath+filename+'/file.zip')
 			else:
