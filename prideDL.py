@@ -30,7 +30,7 @@ def download():
 		print('raw or parsed file exists')
 	else:
 		print('downloading raw file')
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+raws)
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
 		end1 = datetime.now()
 		diff1 = end1 - start
 		print('Rawfile downloaded \ntime: '+str(diff1))
@@ -354,9 +354,8 @@ if __name__ == '__main__':
 		
 		rawfiles = np.unique(df2['Raw file'])
 		print(rawfiles)
-		quit()
 		for raws in rawfiles:
-			filename = raws[:-4]
+			filename = raws
 			if not os.path.exists(datapath+filename+'/file.zip'):
 				os.system('mv '+file.zip+' datapath/'+file.zip)
 			else:
