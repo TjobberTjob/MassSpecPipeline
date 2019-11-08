@@ -344,8 +344,7 @@ if __name__ == '__main__':
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	for zips in searchfiles:
 		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
-		with ZipFile(datapath+'file.zip','r') as zipped:
-			ziplist = zipped.namelist() 
+		ziplist = ZipFile.namelist(datapath+'file.zip','r')
 		for a in ziplist:
 			print(a)
 			quit()
