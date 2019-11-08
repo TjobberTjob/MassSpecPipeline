@@ -24,7 +24,7 @@ if __name__ == '__main__':
 def download():
 	#Start Process
 	start = datetime.now()
-
+	raws = raws.replace(' ','%20')
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('raw or parsed file exists')
@@ -356,16 +356,22 @@ if __name__ == '__main__':
 
 		df2 = pd.read_csv(datapath+pepfile,sep='\t')
 		print(df2)
-		rawfiles = np.unique(df2['Raw file'])
+		df2 = df2.loc[df2['Sequence'] != ' ',]
+		rawfiles = df2.loc[np.unique(df2['Raw file']),]
+
+		print(rawfiles)
 
 		for raws in rawfiles:
 			filename = raws
-			raws = raws.replace(' ','%20')
-			if not os.path.exists(datapath+filename+'/file.zip'):
+			
+			if not os.path.exists(datapath+filename+'/file.zip'): #Move or rm zip.file
 				os.system('mv '+datapath+'file.zip '+datapath+filename+'/file.zip')
 			else:
 				os.system('rm '+datapath+'file.zip')
-			if not os.path.exists(datapath+filename+'/'+pepfile):
+			
+			df3 = df2.loc[df2['Raw file'] == raws,]
+			pd.DataFrame.to_csv(df3,datapath+pepfile)
+			if not os.path.exists(datapath+filename+'/'+pepfile): #Move or rm txt.file
 				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pepfile)
 			else:
 				os.system('rm '+datapath+pepfile)
