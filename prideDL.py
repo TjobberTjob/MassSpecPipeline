@@ -351,7 +351,7 @@ if __name__ == '__main__':
 				subprocess.run('unzip -j '+datapath+'/file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
 		df2 = pd.read_csv(datapath+pepfile,sep='\t')
-		rawfiles = np.unique(df['Raw file'])
+		rawfiles = np.unique(df.iloc[:0])
 		for raws in rawfiles:
 			filename = raws[:-4]
 			if not os.path.exists(datapath+filename+'/file.zip'):
