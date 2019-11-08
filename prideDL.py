@@ -357,12 +357,13 @@ if __name__ == '__main__':
 		for raws in rawfiles:
 			filename = raws
 			if not os.path.exists(datapath+filename+'/file.zip'):
-				os.system('mv '+file.zip+' datapath/'+file.zip)
+				os.system('mv '+datapath+'file.zip '+datapath+filename+'/file.zip')
 			else:
-				os.system('rm file.zip')
+				os.system('rm '+datapath+'file.zip')
 			if not os.path.exists(datapath+filename+'/'+pepfile):
-				os.system('mv '+pepfile+' datapath/'+pepfile)
-				os.system('rm '+pepfile)
+				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pep´file)
+			else:
+				os.system('rm '+datapath+pepfile)
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
 				continue
 			print('\nfile: '+filename)
