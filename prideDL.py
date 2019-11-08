@@ -354,7 +354,7 @@ if __name__ == '__main__':
 				subprocess.run('unzip -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
 
-		septype = validated_input('csv or tab file?', ('csv','tab')):
+		septype = validated_input('csv or tab file?', ('csv','tab'))
 		if septype == 'csv':
 			df = pd.read_csv(	datapath+pepfile,sep=',')
 		else:
