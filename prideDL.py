@@ -347,12 +347,9 @@ if __name__ == '__main__':
 		with ZipFile(datapath+'file.zip','r') as zipped:
 			ziplist = zipped.namelist()
 		for a in ziplist:
-			print(a)
-		
-		quit()
-			# if pepfile in a:
-			# 	subprocess.run('unzip -j '+datapath+'/file.zip '+a+' -d '+datapath+'/',shell = True)
-			# 	break
+			if pepfile in str(a):
+				subprocess.run('unzip -j '+datapath+'/file.zip '+a+' -d '+datapath+'/',shell = True)
+			break
 		df2 = pd.read_csv(datapath+pepfile,sep='\t')
 		rawfiles = np.unique(df['Raw file'])
 		for raws in rawfiles:
