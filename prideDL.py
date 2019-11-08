@@ -343,7 +343,8 @@ if __name__ == '__main__':
 	os.remove(datapath+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	for zips in searchfiles:
-		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
+		print('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
+		quit()
 		with ZipFile.namelist('file.zip','r') as zipped:
 			ziplist = zipped.namelist() 
 		for a in ziplist:
