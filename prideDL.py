@@ -21,10 +21,10 @@ if __name__ == '__main__':
 	import os 
 	from os.path import join
 
-def download():
+def download(file):
 	#Start Process
 	start = datetime.now()
-	raws = raws.replace(' ','%20')
+	file = file.replace(' ','%20')
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('raw or parsed file exists')
@@ -383,7 +383,7 @@ if __name__ == '__main__':
 				continue
 			print('\nfile: '+filename)
 
-			download()
+			download(raws)
 			formatFile()
 			internalmzML()
 
