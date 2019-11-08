@@ -345,6 +345,7 @@ if __name__ == '__main__':
 
 	for zips in searchfiles:
 		zips.replace(' ','%20')
+		print(zips)
 		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
 		with ZipFile(datapath+'file.zip','r') as zipped:
 			ziplist = zipped.namelist()
