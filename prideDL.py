@@ -26,7 +26,7 @@ def download():
 	start = datetime.now()
 
 	#Check if Raw file exists
-	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json'):
+	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('raw or parsed file exists')
 	else:
 		print('downloading raw file')
@@ -342,6 +342,8 @@ if __name__ == '__main__':
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
+	print(searchfiles)
+
 	for zips in searchfiles:
 		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
 		with ZipFile(datapath+'file.zip','r') as zipped:
@@ -350,10 +352,10 @@ if __name__ == '__main__':
 			if pepfile in str(a):
 				subprocess.run('unzip -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
+
 		df2 = pd.read_csv(datapath+pepfile,sep='\t')
-		
 		rawfiles = np.unique(df2['Raw file'])
-		print(rawfiles)
+
 		for raws in rawfiles:
 			filename = raws
 			if not os.path.exists(datapath+filename+'/file.zip'):
