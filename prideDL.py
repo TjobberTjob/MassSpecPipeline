@@ -354,8 +354,11 @@ if __name__ == '__main__':
 				subprocess.run('unzip -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
 
-		df = pd.read_csv(datapath+pepfile,sep='\t')
-		print(df)
+		septype = validated_input('csv or tab file?', ('csv','tab')):
+		if septype == 'csv':
+			df = pd.read_csv(	datapath+pepfile,sep=',')
+		else:
+			df = pd.read_csv(	datapath+pepfile,sep='\t')
 		df2 = df.loc[df['Sequence'] != ' ',]
 		print(df2)
 		rawfiles = np.unique(df2['Raw file'])
