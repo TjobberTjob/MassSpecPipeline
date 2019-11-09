@@ -330,8 +330,8 @@ if __name__ == '__main__':
 	accession = sys.argv[1] #Get the accession number 
 	pepfile = input("What's the name of the MaxQuant output file?\n") #Know what file to look at
 
-	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	datapath = 'Data/' #Server datapath
+	datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	# datapath = 'Data/' #Server datapath
 	
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
 	html = requests.get(url).text			  #Webscraping the pride database
