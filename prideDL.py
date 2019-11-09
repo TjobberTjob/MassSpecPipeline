@@ -343,7 +343,7 @@ if __name__ == '__main__':
 			if pepfile in str(a): 		#Fine the peptide file and extract it
 				os.system('unzip -o -qq -j '+datapath+'file.zip '+a+' -d '+datapath)
 				break
-		quit()
+		
 		df = pd.read_csv(datapath+pepfile,sep='\t') #Read in file
 		df = df.loc[df['Sequence'] != ' ',] 		#Remove empty sequences
 		rawfiles = np.unique(df['Raw file'])		#A containing all the different raw files this search file has data on
