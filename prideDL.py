@@ -202,36 +202,36 @@ def sub_images(resolution):
 	
 	mz_interval = 50 #INTERVALS
 	rt_interval = 5  #INTERVALS
-	j=0
+	j=0 #Statistics about outlying images
+
 	imgpath = datapath+'Images'
 	if not os.path.exists(imgpath):
-		os.mkdir(imgpath)
+		os.mkdir(imgpath) #Check for imagepath and create it
 
-	outfile = open(imgpath+'metadata.json','a')
-	print(df2)
-	for i in range(len(df2['Sequence'])):
-		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
-			continue
-		# print(df2['Retention time'][i])
-		print(df2.iloc(df2['m/z'])[i])
-		if df2['Retention time'][i]-rt_interval < min(df2['Retention time'])+wash_out or df2['Retention time'][i]+rt_interval > max(df2['Retention time']) or df2['m/z'][i]-mz_interval < min(df2['m/z']) or df2['m/z'][i]+mz_interval > max(df2['m/z']):
-			j+=1
-			#print(str(i+1)+' of '+str(len(df['Sequence']))+' was out of bounds')
+	outfile = open(imgpath+'/metadata.json','a') #The metadata file
+	i = 1
+	for index, rows in df2.iterrows():
+		if os.path.exists(datapath+'Images/'+filename+'-'+str(i)+'.png'):
+			i += 1
+			continue #Check if this image exists or not
+
+		if rows['Retention time']-rt_interval < min(df2['Retention time'])+wash_out or rows['Retention time']+rt_interval > max(df2['Retention time']) or rows['m/z']-mz_interval < min(df2['m/z']) or rows['m/z']+mz_interval > max(df2['m/z']):
+			j+=1 #Check if this image can be created in our range or not
 			continue
 
 		interval = {
-				'mz' : {'min':df2['m/z'][i]-mz_interval,'max':df2['m/z'][i]+mz_interval},
-				'rt' : {'min':df2['Retention time'][i]-rt_interval,'max':df2['Retention time'][i]+rt_interval}
+				'mz' : {'min':rows['m/z']-mz_interval,'max':rows['m/z']+mz_interval},
+				'rt' : {'min':rows['Retention time']-rt_interval,'max':rows['Retention time']+rt_interval}
 			}
-		# print(interval)
 			
 		# Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
 		y_d = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
 		# Create the initial array.
 		# elements are given by (x,y)
+
 		ms1_array = {}
-		# print('Intervals',x_d,y_d)
+
 		# Collect inverval statistics.
 		stats = { 
 			'x' : {},#x-axis, m/z
@@ -284,10 +284,12 @@ def sub_images(resolution):
 					intensity = 0.0
 				row.append(intensity)
 			image.append(row)
+
 		image = image[::-1]
 		image = np.ma.masked_equal(image,0)
 		colMap = cm.jet
 		colMap.set_bad('black')
+
 		# Save image
 		fig = plt.figure()
 		fig.set_size_inches((2,2))
@@ -296,20 +298,20 @@ def sub_images(resolution):
 		fig.add_axes(ax)
 		plt.set_cmap('hot')
 		ax.imshow(image, aspect='equal',cmap = colMap)#,vmin = 5, vmax = 16)
-		plt.savefig(datapath+'Images/'+filename+'-'+str(i+1)+'.png')
+		plt.savefig(datapath+'Images/'+filename+'-'+str(i)+'.png')
 		plt.close(fig)
-		#print('{0}\r'.format(str(i+1)+' of '+str(len(df['Sequence']))),) #PRINT CREATED IMAGE
-		print("Progress {:2.1%}".format(i / len(df['Sequence'])), end="\r")
+
+		print("Progress {:2.1%}".format(i / len(df['Sequence'])), end="\r") #Print how far we are
 
 		new_metadata = {}
-		new_metadata.update({"image" : filename+'-'+str(i+1)})
-		for ele in df.columns[1:]:
-			if str(df[ele][i]) == 'nan' or str(df[ele][i]) == ' ' or ";" in str(df[ele][i]):
+		new_metadata.update({"image" : filename+'-'+str(i)})
+		for ele in df2.columns[1:]:
+			if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
 				continue
 			else:
-				new_metadata.update({str(ele) : str(df[ele][i])})
-
+				new_metadata.update({str(ele) : str(rows[ele])})
 		outfile.write(json.dumps(new_metadata)+'\n')
+		i += 1
 
 	outfile.close()
 	print(str(j)+' Images were out of bounds \n')
@@ -328,7 +330,8 @@ if __name__ == '__main__':
 	accession = sys.argv[1] #Get the accession number 
 	pepfile = input("What's the name of the MaxQuant output file?\n") #Know what file to look at
 
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' #Server datapath
 	
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
 	html = requests.get(url).text			  #Webscraping the pride database
@@ -383,8 +386,8 @@ if __name__ == '__main__':
 			print('\nfile: '+filename) #Print what file we're working on
 
 			download(raws)
-			formatFile()
-			internalmzML()
+			# formatFile()
+			# internalmzML()
 
 			wash_out = 8
 			interval = {
@@ -396,6 +399,7 @@ if __name__ == '__main__':
 
 			resolution = {'x':100,'y':100}
 			sub_images(resolution)
+			quit()
 		
 # python3 prideDL.py PXD004732
 # python3 prideDL.py PXD010595
