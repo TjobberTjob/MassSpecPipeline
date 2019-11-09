@@ -23,20 +23,15 @@ if __name__ == '__main__':
 
 def download(file):
 	#Start Process
-	start = datetime.now()
-	file = file.replace(' ','%20')
+	file = file.replace(' ','%20') #URL handling
+	
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('raw or parsed file exists')
 	else:
-		https://www.ebi.ac.uk/pride/data/archive/2017/10/PXD006064/RAW%20(3day_1).raw
 		print('downloading raw file')
-		print('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
-		quit()
-		end1 = datetime.now()
-		diff1 = end1 - start
-		print('Rawfile downloaded \ntime: '+str(diff1))
-		
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
+
 def formatFile():
 	#Check whether the docker file is implemented or not
 	output = subprocess.check_output('docker image ls',shell = True)
@@ -329,15 +324,17 @@ def validated_input(prompt, valid_values):
 
 if __name__ == '__main__':
 
-	accession = sys.argv[1]
-	pepfile = input("What's the name of the MaxQuant output file?\n")
+	accession = sys.argv[1] #Get the accession number 
+	pepfile = input("What's the name of the MaxQuant output file?\n") #Know what file to look at
 
 	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'
-	html = requests.get(url).text
-	soup = BeautifulSoup(html,'html.parser')
+	
+	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
+	html = requests.get(url).text			  #Webscraping the pride database
+	soup = BeautifulSoup(html,'html.parser')									
+
 	for div in soup.find_all('div', {'class': 'grid_6 omega'}):
-		url = div.find('a')['href']
+		url = div.find('a')['href'] #Get the FTP link! 
 		break
 
 	os.system('wget -q --show-progress -O '+datapath+'readme.txt '+url+'/README.txt')
@@ -345,39 +342,41 @@ if __name__ == '__main__':
 	os.remove(datapath+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 
-	for zips in searchfiles:
-		zips = zips.replace(' ','%20') #for dowloading 
+	for zips in searchfiles:			#For loop- for going through all the search files
+		zips = zips.replace(' ','%20') 	#URL handling
 
-		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
+		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips) #Get the Zip file
 		with ZipFile(datapath+'file.zip','r') as zipped:
-			ziplist = zipped.namelist()
+			ziplist = zipped.namelist() #Get a list of all contents of it
+
 		for a in ziplist:
-			if pepfile in str(a):
+			if pepfile in str(a): 		#Fine the peptide file and extract it
 				subprocess.run('unzip -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
 
-		df = pd.read_csv(datapath+pepfile,sep='\t')
-		df = df.loc[df['Sequence'] != ' ',]
-		rawfiles = np.unique(df['Raw file'])
+		df = pd.read_csv(datapath+pepfile,sep='\t') #Read in file
+		df = df.loc[df['Sequence'] != ' ',] 		#Remove empty sequences
+		rawfiles = np.unique(df['Raw file'])		#A containing all the different raw files this search file has data on
 
 		for raws in rawfiles:
-			filename = raws
-			if not os.path.exists(datapath+filename):
-				os.system('mkdir '+datapath+filename)
+			filename = raws 				
+			if not os.path.exists(datapath+filename):	#Make the file directory if it doesnt exist
+				os.system('mkdir '+datapath+filename)	
 
 			if not os.path.exists(datapath+filename+'/file.zip'): #Move or rm zip.file
 				os.system('mv '+datapath+'file.zip '+datapath+filename+'/file.zip')
 			else:
 				os.system('rm '+datapath+'file.zip')
 			
-			df2 = df.loc[df['Raw file'] == raws,]
-			pd.DataFrame.to_csv(df,datapath+pepfile)
+			df2 = df.loc[df['Raw file'] == raws,] 		#Take only the part of the data that we need for this raw file
+			pd.DataFrame.to_csv(df,datapath+pepfile)	#save this to file for moving
+
 			if not os.path.exists(datapath+filename+'/'+pepfile): #Move or rm txt.file
 				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pepfile)
 			else:
 				os.system('rm '+datapath+pepfile)
 
-			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": #This cannot be converted to mzml for some reason
+			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": #This cannot be converted to mzml for some reason. So we skip it
 				continue
 
 			print('\nfile: '+filename) #Print what file we're working on
