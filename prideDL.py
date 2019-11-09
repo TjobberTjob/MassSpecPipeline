@@ -316,11 +316,11 @@ def sub_images(resolution):
 
 
 def validated_input(prompt, valid_values):
-    valid_input = False
-    while not valid_input:
-        value = input(prompt + ' ' + '/'.join(valid_values)+"\n")
-        valid_input = value.lower() in valid_values
-    return value
+	valid_input = False
+	while not valid_input:
+		value = input(prompt + ' ' + '/'.join(valid_values)+"\n")
+		valid_input = value.lower() in valid_values
+	return value
 
 
 if __name__ == '__main__':
