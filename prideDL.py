@@ -26,11 +26,10 @@ def download(file):
 	file = file.replace(' ','%20') #URL handling
 	
 	#Check if Raw file exists
-	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
-		print('raw or parsed file exists', end = '\r')
-	else:
+	if not os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('downloading raw file', end = '\r')
 		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
+		
 
 def formatFile():
 	#Check whether the docker file is implemented or not
@@ -42,13 +41,12 @@ def formatFile():
 		os.chdir('..')
 		os.chdir('MassSpecPipeline/')
 
-	if os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json'):
-		print('mzML file exists', end = '\r')
-	else:
+	if not os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json'):
 		print('Formatting file to mzML', end = '\r')
 		subprocess.run('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
+		
 		
 def process_ms1(spectrum):
 	#Scan information
@@ -67,9 +65,7 @@ def process_ms1(spectrum):
 	return {'scan_time':scan_time,'intensity':intensity.tolist(),'mz':mz.tolist()}
 
 def internalmzML():
-	if os.path.exists(datapath+filename+'/mzML.json'):
-		print('mzML data already extracted', end = '\r')
-	else:
+	if not os.path.exists(datapath+filename+'/mzML.json'):
 		print('Extracting data from mzML', end = '\r')
 		data = mzml.MzML(datapath+filename+'/file.mzML')
 
@@ -94,10 +90,7 @@ def internalmzML():
 		# os.remove(datapath+filename+'/file.mzml')
 
 def full_image(interval,resolution,show=False):
-	if os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
-		print('Full image already exists', end = '\r')
-
-	else:
+	if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 
 		print('Creating full image', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
