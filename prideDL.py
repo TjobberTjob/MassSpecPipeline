@@ -300,7 +300,7 @@ def sub_images(resolution):
 
 
 	outfile.close()
-	print('\r \rSubimages created. '+str(j)+' Images were out of bounds \n')
+	print('Subimages created. '+str(j)+' Images were out of bounds \n')
 
 
 def validated_input(prompt, valid_values):
