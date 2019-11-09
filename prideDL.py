@@ -209,18 +209,17 @@ def sub_images(resolution):
 		os.mkdir(imgpath) #Check for imagepath and create it
 
 	outfile = open(imgpath+'/metadata.json','a') #The metadata file
-	i = 1
+	i = 0
 	for index, rows in df2.iterrows():
-		
+		i += 1		
 		print("Progress {:2.1%}".format(i / len(df2['Sequence'])), end="\r") #Print how far we are
 
+		if rows['Retention time']-rt_interval < min(df2['Retention time'])+wash_out or rows['Retention time']+rt_interval > max(df2['Retention time']) or rows['m/z']-mz_interval < min(df2['m/z']) or rows['m/z']+mz_interval > max(df2['m/z']):
+			j+=1 #Check if this image can be created in our range or not
+			continue
+
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i)+'.png'):
-			i += 1
-			if rows['Retention time']-rt_interval < min(df2['Retention time'])+wash_out or rows['Retention time']+rt_interval > max(df2['Retention time']) or rows['m/z']-mz_interval < min(df2['m/z']) or rows['m/z']+mz_interval > max(df2['m/z']):
-				j+=1 #Check if this image can be created in our range or not
 			continue #Check if this image exists or not
-
-
 
 		interval = {
 				'mz' : {'min':rows['m/z']-mz_interval,'max':rows['m/z']+mz_interval},
@@ -313,7 +312,7 @@ def sub_images(resolution):
 			else:
 				new_metadata.update({str(ele) : str(rows[ele])})
 		outfile.write(json.dumps(new_metadata)+'\n')
-		i += 1
+
 
 	outfile.close()
 	print(str(j)+' Images were out of bounds \n')
