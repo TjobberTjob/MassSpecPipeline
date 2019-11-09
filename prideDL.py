@@ -212,7 +212,7 @@ def sub_images(resolution):
 	for i in range(len(df2['Sequence'])):
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
 			continue
-		print(df2['Retention time'][i])
+		# print(df2['Retention time'][i])
 		print(df2['m/z'][i])
 		if df2['Retention time'][i]-rt_interval < min(df2['Retention time'])+wash_out or df2['Retention time'][i]+rt_interval > max(df2['Retention time']) or df2['m/z'][i]-mz_interval < min(df2['m/z']) or df2['m/z'][i]+mz_interval > max(df2['m/z']):
 			j+=1
