@@ -210,20 +210,19 @@ def sub_images(resolution):
 		os.mkdir(imgpath)
 
 	outfile = open(imgpath+'metadata.json','a')
-	print(df)
-	for i in range(len(df['Sequence'])):
+	print(df2)
+	for i in range(len(df2['Sequence'])):
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
-			#print(str(i+1)+' of '+str(len(df['Sequence']))+' was already created')
 			continue
   
-		if df['Retention time'][i]-rt_interval < min(df['Retention time'])+wash_out or df['Retention time'][i]+rt_interval > max(df['Retention time']) or df['m/z'][i]-mz_interval < min(df['m/z']) or df['m/z'][i]+mz_interval > max(df['m/z']):
+		if df2['Retention time'][i]-rt_interval < min(df2['Retention time'])+wash_out or df2['Retention time'][i]+rt_interval > max(df2['Retention time']) or df2['m/z'][i]-mz_interval < min(df2['m/z']) or df2['m/z'][i]+mz_interval > max(df2['m/z']):
 			j+=1
 			#print(str(i+1)+' of '+str(len(df['Sequence']))+' was out of bounds')
 			continue
   
 		interval = {
-				'mz' : {'min':df['m/z'][i]-mz_interval,'max':df['m/z'][i]+mz_interval},
-				'rt' : {'min':df['Retention time'][i]-rt_interval,'max':df['Retention time'][i]+rt_interval}
+				'mz' : {'min':df2['m/z'][i]-mz_interval,'max':df2['m/z'][i]+mz_interval},
+				'rt' : {'min':df2['Retention time'][i]-rt_interval,'max':df2['Retention time'][i]+rt_interval}
 			}
 		# print(interval)
 			  
