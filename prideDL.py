@@ -341,7 +341,7 @@ if __name__ == '__main__':
 
 		for a in ziplist:
 			if pepfile in str(a): 		#Fine the peptide file and extract it
-				subprocess.run('unzip -qq -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
+				subprocess.run('unzip -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
 
 		df = pd.read_csv(datapath+pepfile,sep='\t') #Read in file
