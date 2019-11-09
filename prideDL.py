@@ -194,8 +194,6 @@ def full_image(interval,resolution,show=False):
 
 def sub_images(resolution):
 	print('Creating subimages')
-
-	df = pd.read_csv(datapath+filename+'/'+pepfile)
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	maxint = 0 #GLOBAL MAXIMA
