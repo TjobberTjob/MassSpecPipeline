@@ -209,7 +209,7 @@ def sub_images(resolution):
 	if not os.path.exists(outpath):
 		os.mkdir(outpath)
 
-	outfile = open(join(outpath,'metadata.json'),'a')
+	outfile = open(outpath+'metadata.json','a')
 	for i in range(len(df['Sequence'])):
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
 			#print(str(i+1)+' of '+str(len(df['Sequence']))+' was already created')
@@ -313,7 +313,8 @@ def sub_images(resolution):
 		outfile.write(json.dumps(new_metadata)+'\n')
 
 	outfile.close()
-	print(str(j)+' Images were out of bounds')
+	print(str(j)+' Images were out of bounds \n')
+
 
 def validated_input(prompt, valid_values):
     valid_input = False
@@ -321,6 +322,7 @@ def validated_input(prompt, valid_values):
         value = input(prompt + ' ' + '/'.join(valid_values)+"\n")
         valid_input = value.lower() in valid_values
     return value
+
 
 if __name__ == '__main__':
 
