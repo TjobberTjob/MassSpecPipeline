@@ -27,9 +27,9 @@ def download(file):
 	
 	#Check if Raw file exists
 	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
-		print('raw or parsed file exists')
+		print('raw or parsed file exists', end = '\r')
 	else:
-		print('downloading raw file')
+		print('downloading raw file', end = '\r')
 		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
 
 def formatFile():
@@ -43,9 +43,9 @@ def formatFile():
 		os.chdir('MassSpecPipeline/')
 
 	if os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json'):
-		print('mzML file exists')
+		print('mzML file exists', end = '\r')
 	else:
-		print('Formatting file to mzML')
+		print('Formatting file to mzML', end = '\r')
 		subprocess.run('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
@@ -53,10 +53,6 @@ def formatFile():
 def process_ms1(spectrum):
 	#Scan information
 	scan_info = spectrum['scanList']
-	if scan_info['count'] !=1:
-		print('Scan with more than one value - not designed for this, please review data')
-		quit()
-			
 	#Time
 	scan_time = scan_info['scan'][0]['scan start time']
 	try:
@@ -72,9 +68,9 @@ def process_ms1(spectrum):
 
 def internalmzML():
 	if os.path.exists(datapath+filename+'/mzML.json'):
-		print('mzML data already extracted')
+		print('mzML data already extracted', end = '\r')
 	else:
-		print('Extracting data from mzML')
+		print('Extracting data from mzML', end = '\r')
 		data = mzml.MzML(datapath+filename+'/file.mzML')
 
 		#Extracted data
@@ -82,10 +78,6 @@ def internalmzML():
 		i= 0 
 		#Extract the necessary data from spectra
 		for spectrum in data:
-			
-			#i+=1
-			#if i%1000 == 0 :
-			#	print(i)
 		
 			if spectrum['ms level'] != 1:
 				continue
@@ -103,11 +95,11 @@ def internalmzML():
 
 def full_image(interval,resolution,show=False):
 	if os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
-		print('Full image already exists')
+		print('Full image already exists', end = '\r')
 
 	else:
 
-		print('Creating full image')		
+		print('Creating full image', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		# #Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
@@ -212,7 +204,7 @@ def sub_images(resolution):
 	i = 0
 	for index, rows in df2.iterrows():
 		i += 1		
-		print("Progress {:2.1%}".format(i / len(df2['Sequence'])), end="\r") #Print how far we are
+		print("Progress {:2.1%}".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-rt_interval < min(df2['Retention time'])+wash_out or rows['Retention time']+rt_interval > max(df2['Retention time']) or rows['m/z']-mz_interval < min(df2['m/z']) or rows['m/z']+mz_interval > max(df2['m/z']):
 			j+=1 #Check if this image can be created in our range or not
