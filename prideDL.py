@@ -335,13 +335,13 @@ if __name__ == '__main__':
 	for zips in searchfiles:			#For loop- for going through all the search files
 		zips = zips.replace(' ','%20') 	#URL handling
 
-		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips) #Get the Zip file
+		os.system('wget -q -O '+datapath+'file.zip'+' -c '+zips) #Get the Zip file
 		with ZipFile(datapath+'file.zip','r') as zipped:
 			ziplist = zipped.namelist() #Get a list of all contents of it
 
 		for a in ziplist:
 			if pepfile in str(a): 		#Fine the peptide file and extract it
-				subprocess.run('unzip -qq -o -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
+				subprocess.run('unzip -o -q -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
 
 		df = pd.read_csv(datapath+pepfile,sep='\t') #Read in file
