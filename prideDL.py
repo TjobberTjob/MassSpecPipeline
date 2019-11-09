@@ -92,7 +92,7 @@ def internalmzML():
 def full_image(interval,resolution,show=False):
 	if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 
-		print('Creating full image', end = '\r')		
+		print('\nCreating full image', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		# #Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
