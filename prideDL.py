@@ -211,13 +211,16 @@ def sub_images(resolution):
 	outfile = open(imgpath+'/metadata.json','a') #The metadata file
 	i = 1
 	for index, rows in df2.iterrows():
+		
+		print("Progress {:2.1%}".format(i / len(df2['Sequence'])), end="\r") #Print how far we are
+
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i)+'.png'):
 			i += 1
+			if rows['Retention time']-rt_interval < min(df2['Retention time'])+wash_out or rows['Retention time']+rt_interval > max(df2['Retention time']) or rows['m/z']-mz_interval < min(df2['m/z']) or rows['m/z']+mz_interval > max(df2['m/z']):
+				j+=1 #Check if this image can be created in our range or not
 			continue #Check if this image exists or not
 
-		if rows['Retention time']-rt_interval < min(df2['Retention time'])+wash_out or rows['Retention time']+rt_interval > max(df2['Retention time']) or rows['m/z']-mz_interval < min(df2['m/z']) or rows['m/z']+mz_interval > max(df2['m/z']):
-			j+=1 #Check if this image can be created in our range or not
-			continue
+
 
 		interval = {
 				'mz' : {'min':rows['m/z']-mz_interval,'max':rows['m/z']+mz_interval},
@@ -301,8 +304,7 @@ def sub_images(resolution):
 		plt.savefig(datapath+'Images/'+filename+'-'+str(i)+'.png')
 		plt.close(fig)
 
-		print("Progress {:2.1%}".format(i / len(df['Sequence'])), end="\r") #Print how far we are
-
+		#Handle metadata
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i)})
 		for ele in df2.columns[1:]:
