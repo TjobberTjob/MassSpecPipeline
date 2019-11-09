@@ -386,8 +386,8 @@ if __name__ == '__main__':
 			print('\nfile: '+filename) #Print what file we're working on
 
 			download(raws)
-			# formatFile()
-			# internalmzML()
+			formatFile()
+			internalmzML()
 
 			wash_out = 8
 			interval = {
@@ -399,7 +399,6 @@ if __name__ == '__main__':
 
 			resolution = {'x':100,'y':100}
 			sub_images(resolution)
-			quit()
 		
 # python3 prideDL.py PXD004732
 # python3 prideDL.py PXD010595
