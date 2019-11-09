@@ -29,6 +29,7 @@ def download(file):
 	if os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('raw or parsed file exists')
 	else:
+		https://www.ebi.ac.uk/pride/data/archive/2017/10/PXD006064/RAW%20(3day_1).raw
 		print('downloading raw file')
 		print('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
 		quit()
@@ -345,7 +346,7 @@ if __name__ == '__main__':
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 
 	for zips in searchfiles:
-		zips = zips.replace(' ','%20')
+		zips = zips.replace(' ','%20') #for dowloading 
 
 		os.system('wget -q --show-progress -O '+datapath+'file.zip'+' -c '+zips)
 		with ZipFile(datapath+'file.zip','r') as zipped:
@@ -355,11 +356,7 @@ if __name__ == '__main__':
 				subprocess.run('unzip -j '+datapath+'file.zip '+a+' -d '+datapath+'/',shell = True)
 				break
 
-		septype = validated_input('csv or tab file?', ('csv','tab'))
-		if septype == 'csv':
-			df = pd.read_csv(datapath+pepfile,sep=',')
-		else:
-			df = pd.read_csv(datapath+pepfile,sep='\t')
+		df = pd.read_csv(datapath+pepfile,sep='\t')
 		df = df.loc[df['Sequence'] != ' ',]
 		rawfiles = np.unique(df['Raw file'])
 
@@ -373,15 +370,17 @@ if __name__ == '__main__':
 			else:
 				os.system('rm '+datapath+'file.zip')
 			
-			df = df.loc[df['Raw file'] == raws,]
+			df2 = df.loc[df['Raw file'] == raws,]
 			pd.DataFrame.to_csv(df,datapath+pepfile)
 			if not os.path.exists(datapath+filename+'/'+pepfile): #Move or rm txt.file
 				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pepfile)
 			else:
 				os.system('rm '+datapath+pepfile)
-			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1":
+
+			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": #This cannot be converted to mzml for some reason
 				continue
-			print('\nfile: '+filename)
+
+			print('\nfile: '+filename) #Print what file we're working on
 
 			download(raws)
 			formatFile()
