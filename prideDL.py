@@ -28,7 +28,7 @@ def download(file):
 	#Check if Raw file exists
 	if not os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('downloading raw file', end = '\r')
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
+		print('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
 		
 
 def formatFile():
