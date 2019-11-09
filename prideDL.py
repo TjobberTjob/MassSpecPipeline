@@ -178,7 +178,7 @@ def full_image(interval,resolution,show=False):
 			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
 
 def sub_images(resolution):
-	print('Creating subimages')
+	print('### Creating subimages ###')
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	maxint = 0 #GLOBAL MAXIMA
@@ -300,7 +300,7 @@ def sub_images(resolution):
 
 
 	outfile.close()
-	print(str(j)+' Images were out of bounds \n')
+	print('\r \rSubimages created. 'str(j)+' Images were out of bounds \n')
 
 
 def validated_input(prompt, valid_values):
