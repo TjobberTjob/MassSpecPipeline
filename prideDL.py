@@ -92,7 +92,7 @@ def internalmzML():
 def full_image(interval,resolution,show=False):
 	if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 
-		print('\nCreating full image', end = '\r')		
+		print('Creating full image', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		# #Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
@@ -300,7 +300,7 @@ def sub_images(resolution):
 
 
 	outfile.close()
-	print('Subimages created. '+str(j)+' Images were out of bounds \n')
+	print('Subimages created. '+str(j)+' Images were out of bounds')
 
 
 def validated_input(prompt, valid_values):
