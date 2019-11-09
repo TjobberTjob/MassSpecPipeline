@@ -212,19 +212,19 @@ def sub_images(resolution):
 	for i in range(len(df2['Sequence'])):
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
 			continue
-  		print(df2['Retention time'][i])
-  		print(df2['m/z'][i])
+		print(df2['Retention time'][i])
+		print(df2['m/z'][i])
 		if df2['Retention time'][i]-rt_interval < min(df2['Retention time'])+wash_out or df2['Retention time'][i]+rt_interval > max(df2['Retention time']) or df2['m/z'][i]-mz_interval < min(df2['m/z']) or df2['m/z'][i]+mz_interval > max(df2['m/z']):
 			j+=1
 			#print(str(i+1)+' of '+str(len(df['Sequence']))+' was out of bounds')
 			continue
-  
+
 		interval = {
 				'mz' : {'min':df2['m/z'][i]-mz_interval,'max':df2['m/z'][i]+mz_interval},
 				'rt' : {'min':df2['Retention time'][i]-rt_interval,'max':df2['Retention time'][i]+rt_interval}
 			}
 		# print(interval)
-			  
+			
 		# Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
 		y_d = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
