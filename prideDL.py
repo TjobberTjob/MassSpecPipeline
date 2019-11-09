@@ -205,11 +205,12 @@ def sub_images(resolution):
 	mz_interval = 50 #INTERVALS
 	rt_interval = 5  #INTERVALS
 	j=0
-	outpath = datapath+'Images'
-	if not os.path.exists(outpath):
-		os.mkdir(outpath)
+	imgpath = datapath+'Images'
+	if not os.path.exists(imgpath):
+		os.mkdir(imgpath)
 
-	outfile = open(outpath+'metadata.json','a')
+	outfile = open(imgpath+'metadata.json','a')
+	print(df)
 	for i in range(len(df['Sequence'])):
 		if os.path.exists(datapath+'Images/'+filename+'-'+str(i+1)+'.png'):
 			#print(str(i+1)+' of '+str(len(df['Sequence']))+' was already created')
@@ -301,7 +302,7 @@ def sub_images(resolution):
 		plt.close(fig)
 		#print('{0}\r'.format(str(i+1)+' of '+str(len(df['Sequence']))),) #PRINT CREATED IMAGE
 		print("Progress {:2.1%}".format(i / len(df['Sequence'])), end="\r")
-		print("heeeeey")
+
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i+1)})
 		for ele in df.columns[1:]:
