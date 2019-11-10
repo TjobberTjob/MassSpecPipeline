@@ -28,7 +28,7 @@ def download(file):
 	#Check if Raw file exists
 	if not os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('downloading raw file', end = '\r')
-		print('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
 		
 
 def formatFile():
@@ -316,8 +316,8 @@ if __name__ == '__main__':
 	accession = sys.argv[1] #Get the accession number 
 	pepfile = input("What's the name of the MaxQuant output file?\n") #Know what file to look at
 
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' #Server datapath
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' #Server datapath
 	
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
 	html = requests.get(url).text			  #Webscraping the pride database
@@ -329,7 +329,7 @@ if __name__ == '__main__':
 
 	os.system('wget -q --show-progress -O '+datapath+'readme.txt '+url+'/README.txt')
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
-	os.remove(datapath+'readme.txt')
+	# os.remove(datapath+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 
 	for zips in searchfiles:			#For loop- for going through all the search files

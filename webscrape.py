@@ -110,6 +110,22 @@ def accessions_metadata():
 		outfile.write(json.dumps(my_dict)+'\n')
 	outfile.close()
 
+def filtering():
+
+	try:
+		os.system('rm '+path+'accession_filtered.json')
+	except Exception:
+		print('no filtered version exist')
+
+	outfile = open(path+'accession_filtered.json','w')
+	lines = set()
+	for line in open(path+'accession_metadata.json','r'):
+		data = json.loads(line)
+
+		if data['maxquant'] == True: #Add filter here
+			outfilewrite(line)
+			lines.add(line)
+	outfile.close
 
 def validated_input(prompt, valid_values):
 	valid_input = False
@@ -129,3 +145,6 @@ if __name__ == '__main__':
 
 	if cmd == 'metadata':
 		accessions_metadata()
+
+	if cmd == 'filter':
+		filtering()
