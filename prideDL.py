@@ -349,7 +349,8 @@ if __name__ == '__main__':
 		rawfiles = np.unique(df['Raw file'])		#A containing all the different raw files this search file has data on
 
 		for raws in rawfiles:
-			filename = raws 				
+			filename = raws 
+	
 			if not os.path.exists(datapath+filename):	#Make the file directory if it doesnt exist
 				os.system('mkdir '+datapath+filename)	
 
