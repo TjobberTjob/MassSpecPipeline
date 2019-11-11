@@ -120,8 +120,9 @@ def filtering():
 	lines = set()
 	for line in open(path+'accession_metadata.json','r'):
 		data = json.loads(line)
-
-		if data['maxquant'] == True and data['filetypes'] == ['zip','raw']: #Add filter here
+		##### ADD FILTER HERE #####
+		if data['maxquant'] == True and data['filetypes'] == ['zip','raw']:
+		###########################
 			outfilewrite(line)
 			lines.add(line)
 	outfile.close
