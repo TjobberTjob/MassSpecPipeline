@@ -314,7 +314,7 @@ def validated_input(prompt, valid_values):
 if __name__ == '__main__':
 
 	accession = sys.argv[1] #Get the accession number 
-	pepfile = input("What's the name of the MaxQuant output file?\n") #Know what file to look at
+	pepfile = sys.argv[2]	#Get the name of the maxquant file
 
 	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
 	datapath = 'Data/' #Server datapath

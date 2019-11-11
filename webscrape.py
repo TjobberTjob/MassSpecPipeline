@@ -33,10 +33,10 @@ def get_accessions():
 		for level2 in soup_2.find_all('a', href = True):
 			try:
 				int(level2['href'][0:2]) #Only look at numerics...
-			except AttributeError :
+			except Exception:
 				continue
 
-			print('Going into '+level1['href']+level2['href'])
+			print('Getting accessions from: Pride '+level1['href']+level2['href'], end = '\r')
 
 			
 			page_3 = requests.get(url+level1['href']+level2['href']).text
@@ -77,11 +77,11 @@ def accessions_metadata():
 			for div2 in div.find_all('div', {'class': 'grid_12'}): 
 				try:
 					name  = div2.find('h5').text 
-				except AttributeError :
+				except Exception:
 					continue
 				try:
 					value = div2.find('a').text 
-				except AttributeError :
+				except Exception:
 					value = "Not available"
 				my_dict[name] = value 
 
@@ -98,7 +98,7 @@ def accessions_metadata():
 			for ta in  div.find_all('table'):
 				try:
 					filetypes.append(ta.find('td').text.strip()[re.search('\.',ta.find('td').text.strip()).span()[1]:])
-				except AttributeError:
+				except Exception:
 					print('f')
 			my_dict['filetypes'] = filetypes
 
@@ -111,7 +111,6 @@ def accessions_metadata():
 	outfile.close()
 
 def filtering():
-
 	try:
 		os.system('rm '+path+'accession_filtered.json')
 	except Exception:
@@ -122,7 +121,7 @@ def filtering():
 	for line in open(path+'accession_metadata.json','r'):
 		data = json.loads(line)
 
-		if data['maxquant'] == True: #Add filter here
+		if data['maxquant'] == True and data['filetypes'] == ['zip','raw']: #Add filter here
 			outfilewrite(line)
 			lines.add(line)
 	outfile.close
@@ -135,8 +134,8 @@ def validated_input(prompt, valid_values):
 	return value
  
 if __name__ == '__main__':
-	# datapath = 'Data/'
-	datapath = '/data/ProteomeToolsRaw/'
+	datapath = 'Data/'
+	# datapath = '/data/ProteomeToolsRaw/'
 
 	cmd = sys.argv[1]
 
