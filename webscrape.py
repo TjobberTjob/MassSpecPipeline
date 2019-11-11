@@ -36,7 +36,7 @@ def get_accessions():
 			except Exception:
 				continue
 
-			print('Getting accessions from: Pride '+level1['href']+level2['href'], end = '\r')
+			print('Getting accessions from '+level1['href']+level2['href'], end = '\r')
 
 			
 			page_3 = requests.get(url+level1['href']+level2['href']).text
@@ -45,7 +45,7 @@ def get_accessions():
 			#Level 3- actual accession numbers.
 			for level3 in soup_3.find_all('a', href = True):
 				accession = level3['href'].replace('/','')
-				if len(accession) == len('PXD000000'):
+				if len(accession) == len('PRD000000'):
 					all_accessions.append(accession)
 
 	with open(datapath+accessions, "wb") as pa:
@@ -134,8 +134,8 @@ def validated_input(prompt, valid_values):
 	return value
  
 if __name__ == '__main__':
-	datapath = 'Data/'
-	# datapath = '/data/ProteomeToolsRaw/'
+	# datapath = 'Data/'
+	datapath = '/data/ProteomeToolsRaw/'
 
 	cmd = sys.argv[1]
 
