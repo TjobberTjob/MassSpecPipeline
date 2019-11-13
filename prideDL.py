@@ -100,7 +100,7 @@ def full_image(interval,resolution,show=False):
 		i=1
 		lists = []
 		for f in mzml['ms1']:
-			for g in mzml['ms1'][f]:
+			for g in mzml['ms1'][f]['mz']:
 				lists.append(g)
 			i += 1
 			print(str(i), end = '\r')
