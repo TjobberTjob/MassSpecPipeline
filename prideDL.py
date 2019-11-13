@@ -92,7 +92,7 @@ def internalmzML():
 
 
 def full_image(interval,resolution,show=False):
-	if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
+	# if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 
 		print('Creating full image', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
