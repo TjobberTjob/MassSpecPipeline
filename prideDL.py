@@ -96,68 +96,63 @@ def full_image(interval,brackets,show=False):
 
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
+		
+		# Define the intervals for the given resolution
+		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
+		y_d = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
+		# Create the initial array.
+		# elements are given by (x,y)
 
-		#Create the initial array.
-		#elements are given by (x,y)
 		ms1_array = {}
-			
-		#Collect inverval statistics.
+
+		# Collect inverval statistics.
 		stats = { 
 			'x' : {},#x-axis, m/z
 			'y' : [],#y-axis rt
 			'clashed_cells':0,#Number of pixels in which there are more than one value
 		}
-	
-		#Get list of scan ids.
+		  
+		# Get sorted list of scan ids.
 		scan_ids = []
-
 		for scan_id in mzml['ms1']:
 			scan_ids.append(int(scan_id))
-
-		i_1 = 1
-		j_1 = 0
+ 
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
-			#Get the intervals
+			# Get the intervals
 			scan_time = float(mzml['ms1'][scan_id]['scan_time'])
 			if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
-				continue #Discard data from outside of the interval
+				continue
 			stats['y'].append(scan_time)
-		
-		#Calculate the y axis.	
-			i_2 = 1
-			j_2 = 0
-			k = 0
+		# Calculate the y axis. 
+			y_n = int((scan_time - interval['rt']['min'])/y_d)
+			# print (scan_time,y_n)
+			l = 0
 			for mz_elem in mzml['ms1'][scan_id]['mz']:
 				if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
-					continue #Discard data outside of the interval
-
+					continue
 				stats['x'][mz_elem] = 0
-				_key = (j_2,j_1)
-				#Current strategy for collapsing the intensity values is taking their logs
-				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][k])
+				x_n = int((mz_elem - interval['mz']['min'])/x_d)
+				_key = (x_n,y_n)
+				# Current strategy for collapsing the intensity values is taking their logs
+				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][l] / maxint)
 				try:
 					ms1_array[_key].append(intensity_val)
 				except KeyError:
 					ms1_array[_key] = [intensity_val]
-				k += 1
-
-				i_2 += 1
-				if i_2 % brackets['mz'] == 0:
-					j_2 += 1
-			i_1 += 1
-			if i_1 % brackets['rt'] == 0:
-				j_1 += 1
-	
-		#Create the final image.
+				l+=1
+ 
+		# Create the final image.
 		image = []
-		for y_i in range(0,j_1):
+		for y_i in range(0,resolution['y']):
 			row = []
-			for x_i in range(0,j_2):
+			for x_i in range(0,resolution['x']):
 				_key = (x_i,y_i)
 				try:
-					#Current strategy for clashing cell intensity is mean.
+					# Current strategy for normalizing intensity is mean.
 					intensity = np.mean(ms1_array[_key])
+					if len(ms1_array[_key])>1:
+						stats['clashed_cells']+=1
 				except KeyError:
 					intensity = 0.0
 				row.append(intensity)
