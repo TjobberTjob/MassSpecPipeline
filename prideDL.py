@@ -119,7 +119,7 @@ def full_image(interval,resolution,show=False):
 		scan_ids = []
 		for scan_id in mzml['ms1']:
 			scan_ids.append(int(scan_id))
-		len(scan.ids)
+		len(scan_ids)
 
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
