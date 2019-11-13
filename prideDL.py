@@ -147,7 +147,8 @@ def full_image(interval,resolution,show=False):
 					ms1_array[_key] = [intensity_val]
 				i+=1
 				print(ms1_array)
-				quit()
+				if i == 10:
+					quit()
 	
 		#Create the final image.
 		image = []
