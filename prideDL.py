@@ -171,7 +171,7 @@ def full_image(interval,brackets,show=False):
 		colMap.set_bad('darkblue')
 		
 		#Save or show image
-		plt.imshow(image,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')#,vmax = 16,vmin = 6)
+		plt.imshow(image,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
 		plt.tight_layout()
 		plt.xlabel('m/z', fontsize=12)
 		plt.ylabel('Retention time - Minutes', fontsize=12)
