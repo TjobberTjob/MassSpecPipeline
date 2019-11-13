@@ -97,6 +97,105 @@ def full_image(interval,resolution,show=False):
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		
+		i=1
+		lists = []
+		for f in mzml['ms1']:
+			for g in mzml['ms1'][str(f)]
+			lists.append(g)
+			print(str(i), end = '\r')
+		lists = np.unique(lists)
+		print(len(lists))
+		quit()
+
+		# Define the intervals for the given resolution
+		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
+		y_d = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
+		# Create the initial array.
+		# elements are given by (x,y)
+
+		ms1_array = {}
+
+		# Collect inverval statistics.
+		stats = { 
+			'x' : {},#x-axis, m/z
+			'y' : [],#y-axis rt
+			'clashed_cells':0,#Number of pixels in which there are more than one value
+		}
+		  
+		# Get sorted list of scan ids.
+		scan_ids = []
+		for scan_id in mzml['ms1']:
+			scan_ids.append(int(scan_id))
+ 
+		for scan_id in sorted(scan_ids):
+			scan_id = str(scan_id)
+			# Get the intervals
+			scan_time = float(mzml['ms1'][scan_id]['scan_time'])
+			if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
+				continue
+			stats['y'].append(scan_time)
+		# Calculate the y axis. 
+			y_n = int((scan_time - interval['rt']['min'])/y_d)
+			# print (scan_time,y_n)
+			l = 0
+			for mz_elem in mzml['ms1'][scan_id]['mz']:
+				if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
+					continue
+				stats['x'][mz_elem] = 0
+				x_n = int((mz_elem - interval['mz']['min'])/x_d)
+				_key = (x_n,y_n)
+				# Current strategy for collapsing the intensity values is taking their logs
+				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][l])
+				try:
+					ms1_array[_key].append(intensity_val)
+				except KeyError:
+					ms1_array[_key] = [intensity_val]
+				l+=1
+ 
+		# Create the final image.
+		image = []
+		for y_i in range(0,resolution['y']):
+			row = []
+			for x_i in range(0,resolution['x']):
+				_key = (x_i,y_i)
+				try:
+					# Current strategy for normalizing intensity is mean.
+					intensity = np.mean(ms1_array[_key])
+					if len(ms1_array[_key])>1:
+						stats['clashed_cells']+=1
+				except KeyError:
+					intensity = 0.0
+				row.append(intensity)
+			image.append(row)
+		
+		image = image[::-1]
+		image = np.ma.masked_equal(image,0)
+		
+		#Setup colormap
+		colMap = cm.jet
+		colMap.set_bad('darkblue')
+		
+		#Save or show image
+		plt.imshow(image, cmap=colMap, extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']], aspect = 'auto', vmax = 16, vmin = 6)
+		plt.tight_layout()
+		plt.xlabel('m/z', fontsize=12)
+		plt.ylabel('Retention time - Minutes', fontsize=12)
+		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
+		plt.colorbar(extend = 'both')
+		plt.tight_layout()
+		print('Image created         ', end = '\r')
+		if show == True:
+			plt.show()
+		elif show == False:
+			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
+
+
+# def full_image(interval,resolution,show=False):
+	# if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
+
+		print('Creating full image         ', end = '\r')		
+		mzml = json.load(open(datapath+filename+'/mzML.json'))
+		
 		# Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
 		y_d = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
