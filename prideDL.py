@@ -97,6 +97,15 @@ def full_image(interval,brackets,show=False):
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 
+		seen = set()
+		for f in mzml['ms1']:
+			ints = mzml['ms1'][str(f)]
+			for g in ints:
+				if g not in seen:
+					seen.add(line)
+		print(len(seen))
+		quit()
+
 		#Create the initial array.
 		#elements are given by (x,y)
 		ms1_array = {}
@@ -191,19 +200,6 @@ def full_image(interval,brackets,show=False):
 def sub_images(resolution):
 	print('### Creating subimages ###')
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
-	
-	# maxint = 0 #GLOBAL MAXIMA
-	# for f in mzml['ms1']:
-	# 	maxint = max(maxint,max(mzml['ms1'][str(f)]['intensity']))
-	seen = set()
-	for f in mzml['ms1']:
-		ints = mzml['ms1'][str(f)]
-		for g in ints:
-			if g not in seen:
-				seen.add(line)
-	print(len(seen))
-	quit()
-
 	
 	mz_interval = 50 #INTERVALS
 	rt_interval = 5  #INTERVALS
