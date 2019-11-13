@@ -104,7 +104,7 @@ def full_image(interval,resolution,show=False):
 	mzlist = [item for sublist in mzlistlist for item in sublist]
 	mzlist = np.unique(sorted(mzlist))
 	print(len(mzlist))
-	print(len(scan_time))
+	print(len(rtlist))
 
 	rtlist = []
 	for f in mzml:
