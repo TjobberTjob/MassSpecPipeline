@@ -135,7 +135,7 @@ def full_image(interval,brackets,show=False):
 				x_n = int((mz_elem - interval['mz']['min'])/x_d)
 				_key = (x_n,y_n)
 				# Current strategy for collapsing the intensity values is taking their logs
-				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][l] / maxint)
+				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][l])
 				try:
 					ms1_array[_key].append(intensity_val)
 				except KeyError:
