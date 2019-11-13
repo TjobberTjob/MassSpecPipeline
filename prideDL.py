@@ -91,7 +91,7 @@ def internalmzML():
 		# os.remove(datapath+filename+'/file.mzml')
 
 
-def full_image(interval,resolution,show=False):
+def full_image(interval,brackets,show=False):
 	# if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 
 		print('Creating full image         ', end = '\r')		
@@ -150,10 +150,10 @@ def full_image(interval,resolution,show=False):
 				k += 1
 
 				i_2 += 1
-				if i_2 % 1 == 0: #m/z bracket size
+				if i_2 % brackets['mz'] == 0: #m/z bracket size
 					j_2 += 1
 			i_1 += 1
-			if i_1 % 1 == 0: #Scan_time bracket size
+			if i_1 % brackets['rt'] == 0: #Scan_time bracket size
 				j_1 += 1
 	
 		#Create the final image.
@@ -163,10 +163,8 @@ def full_image(interval,resolution,show=False):
 			for x_i in range(0,j_2):
 				_key = (x_i,y_i)
 				try:
-					#Current strategy for normalizing intensity is mean.
+					#Current strategy for clashing cell intensity is mean.
 					intensity = np.mean(ms1_array[_key])
-					# if len(ms1_array[_key])>1:
-					# 	stats['clashed_cells']+=1
 				except KeyError:
 					intensity = 0.0
 				row.append(intensity)
@@ -400,9 +398,11 @@ if __name__ == '__main__':
 					'rt' : {'min':wash_out,'max':60}
 				}
 			# resolution = {'x':500,'y':300}
-			mz_bracket
-			rt_bracket
-			full_image(interval,resolution,show=True)
+			brackets = {
+					'mz' : 10
+					'rt' : 10
+			}
+			full_image(interval,brackets,show=True)
 			quit()
 			resolution = {'x':100,'y':100}
 			sub_images(resolution)
