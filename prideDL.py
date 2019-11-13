@@ -147,7 +147,7 @@ def full_image(interval,resolution,show=False):
 					ms1_array[_key] = [intensity_val]
 				i+=1
 				print(ms1_array)
-				if i == 10:
+				if i == 30:
 					quit()
 	
 		#Create the final image.
@@ -165,11 +165,14 @@ def full_image(interval,resolution,show=False):
 					intensity = 0.0
 				row.append(intensity)
 			image.append(row)
+		
 		image = image[::-1]
-		image = np.ma.masked_less(image,0.01)
+		image = np.ma.masked_equal(image,0)
+		
 		#Setup colormap
 		colMap = cm.jet
 		colMap.set_bad('darkblue')
+		
 		#Save or show image
 		plt.imshow(image,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
 		plt.tight_layout()
