@@ -157,6 +157,8 @@ def full_image(interval,brackets,show=False):
 				_key = (x_i,y_i)
 				try:
 					#Current strategy for clashing cell intensity is mean.
+					print(ms1_array[_key])
+					quit()
 					intensity = np.mean(ms1_array[_key])
 				except KeyError:
 					intensity = 0.0
