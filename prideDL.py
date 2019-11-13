@@ -119,8 +119,6 @@ def full_image(interval,resolution,show=False):
 		scan_ids = []
 		for scan_id in mzml['ms1']:
 			scan_ids.append(int(scan_id))
-		print(len(scan_ids))
-		quit()
 
 
 		for scan_id in sorted(scan_ids):
@@ -130,6 +128,7 @@ def full_image(interval,resolution,show=False):
 			if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
 				continue #Discard data from outside of the interval
 			stats['y'].append(scan_time)
+		
 		#Calculate the y axis.	
 			y_n = int((scan_time - interval['rt']['min'])/y_d)
 			#print (scan_time,y_n)
@@ -147,6 +146,8 @@ def full_image(interval,resolution,show=False):
 				except KeyError:
 					ms1_array[_key] = [intensity_val]
 				i+=1
+				print(ms1_array)
+				quit()
 	
 		#Create the final image.
 		image = []
