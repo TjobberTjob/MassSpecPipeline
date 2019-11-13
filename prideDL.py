@@ -27,7 +27,7 @@ def download(file):
 	
 	#Check if Raw file exists
 	if not os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
-		print('downloading raw file', end = '\r')
+		print('downloading raw file         ', end = '\r')
 		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
 		
 
@@ -42,7 +42,7 @@ def formatFile():
 		os.chdir('MassSpecPipeline/')
 
 	if not (os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json')):
-		print('Formatting file to mzML', end = '\r')
+		print('Formatting file to mzML         ', end = '\r')
 		subprocess.run('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
@@ -67,7 +67,7 @@ def process_ms1(spectrum):
 
 def internalmzML():
 	if not os.path.exists(datapath+filename+'/mzML.json'):
-		print('Extracting data from mzML', end = '\r')
+		print('Extracting data from mzML         ', end = '\r')
 		data = mzml.MzML(datapath+filename+'/file.mzML')
 
 		#Extracted data
@@ -94,7 +94,7 @@ def internalmzML():
 def full_image(interval,resolution,show=False):
 	# if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 
-		print('Creating full image', end = '\r')		
+		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		# #Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
@@ -102,7 +102,7 @@ def full_image(interval,resolution,show=False):
 		#Create the initial array.
 		#elements are given by (x,y)
 		ms1_array = {}
-		#print('Intervals',x_d,y_d)
+
 		#Make sure the intervals can define actual bins
 		if x_d == 0 or y_d == 0:
 			print ('Nil interval spacing- please review resolution and interval of mz/rt')
@@ -117,10 +117,12 @@ def full_image(interval,resolution,show=False):
 	
 		#Get list of scan ids.
 		scan_ids = []
+
 		for scan_id in mzml['ms1']:
 			scan_ids.append(int(scan_id))
 
-
+		i_1 = 1
+		j_1 = 0
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
 			#Get the intervals
@@ -130,32 +132,32 @@ def full_image(interval,resolution,show=False):
 			stats['y'].append(scan_time)
 		
 		#Calculate the y axis.	
-			y_n = int((scan_time - interval['rt']['min'])/y_d)
-			print(scan_time)
-			print(interval['rt']['min'])
-			print(int(scan_time - interval['rt']['min']))
-			quit()
-			#print (scan_time,y_n)
-			i = 0
+			i_2 = 1
+			j_2 = 0
 			for mz_elem in mzml['ms1'][scan_id]['mz']:
 				if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
-					continue
+					continue #Discard data outside of the interval
+
 				stats['x'][mz_elem] = 0
-				x_n = int((mz_elem - interval['mz']['min'])/x_d)
-				_key = (x_n,y_n)
+				_key = (j_1,j_2)
 				#Current strategy for collapsing the intensity values is taking their logs
 				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][i])
 				try:
 					ms1_array[_key].append(intensity_val)
 				except KeyError:
 					ms1_array[_key] = [intensity_val]
-				i+=1
+				i_2 += 1
+				if i_2 % 100 == 0: #m/z bracket size
+					j_2 += 1
+			i_1 += 1
+			if i_1 % 100 == 0: #Scan_time bracket size
+				j_1 += 1
 	
 		#Create the final image.
 		image = []
-		for y_i in range(0,resolution['y']):
+		for y_i in range(0,j_1):
 			row = []
-			for x_i in range(0,resolution['x']):
+			for x_i in range(0,j_2):
 				_key = (x_i,y_i)
 				try:
 					#Current strategy for normalizing intensity is mean.
@@ -182,7 +184,7 @@ def full_image(interval,resolution,show=False):
 		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
 		plt.colorbar(extend = 'both')
 		plt.tight_layout()
-		print('Image created')
+		print('Image created         ', end = '\r')
 		if show == True:
 			plt.show()
 		elif show == False:
@@ -394,7 +396,7 @@ if __name__ == '__main__':
 					'rt' : {'min':wash_out,'max':60}
 				}
 			resolution = {'x':500,'y':300}
-			full_image(interval,resolution,show=False)
+			full_image(interval,resolution,show=True)
 
 			resolution = {'x':100,'y':100}
 			sub_images(resolution)
