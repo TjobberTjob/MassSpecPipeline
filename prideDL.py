@@ -97,18 +97,18 @@ def full_image(interval,resolution,show=False):
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		
-		# maxint = 0 #Max value for m/z
-		# minint = 1000 #Min value for m/z
-		# for f in mzml['ms1']:
-		# 	maxint = max(maxint,max(mzml['ms1'][str(f)]['mz']))
-		# 	minint = min(minint,min(mzml['ms1'][str(f)]['mz']))
-		# mzlistlist = []
-		# for f in mzml['ms1']:
-		# 	mzlistlist.append(mzml['ms1'][f]['mz'])
-		# mzlist = [item for sublist in mzlistlist for item in sublist]
-		# mzlist = np.unique(sorted(mzlist))
-		# print(len(mzlist))
-		# quit()
+		mzlistlist = []
+		for f in mzml['ms1']:
+			mzlistlist.append(mzml['ms1'][f]['mz'])
+		mzlist = [item for sublist in mzlistlist for item in sublist]
+		mzlist = np.unique(sorted(mzlist))
+		print(len(mzlist))
+
+		rtlist = []
+		for f in mzml['ms1']:
+			mzlist.append(mzml['ms1'][f])
+		print(rtlist)
+		quit()
 
 		# Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
