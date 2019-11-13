@@ -102,9 +102,12 @@ def full_image(interval,resolution,show=False):
 		for f in mzml['ms1']:
 			maxint = max(maxint,max(mzml['ms1'][str(f)]['mz']))
 			minint = min(minint,min(mzml['ms1'][str(f)]['mz']))
-		print(maxint)
-		print(minint)
-		quit()
+		print(maxint - minint)
+		mzlist = []
+		for f in mzml['ms1']:
+			mzlist.append(mzml['ms1'][str(f)]['mz'])
+		mzlist = np.unique(mzlist)
+		print(len(mzlist))
 
 
 		# Define the intervals for the given resolution
