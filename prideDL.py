@@ -104,7 +104,6 @@ def full_image(interval,resolution,show=False):
 			minint = min(minint,min(mzml['ms1'][str(f)]['mz']))
 		mzlist = []
 		for f in mzml['ms1']:
-			print(mzml['ms1'][f]['mz'])
 			mzlist.append(mzml['ms1'][f]['mz'])
 		print(len(mzlist))
 		mzlist = np.unique(mzlist)
