@@ -100,8 +100,7 @@ def full_image(interval,brackets,show=False):
 		seen = []
 		for f in mzml['ms1']:
 			ints = mzml['ms1'][str(f)]
-			print(ints)
-			for g in ints:
+			for g in ints['mz']:
 				if g not in seen:
 					seen.append(g)
 		print(len(seen))
