@@ -97,12 +97,13 @@ def full_image(interval,brackets,show=False):
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 
-		seen = set()
+		seen = []
 		for f in mzml['ms1']:
 			ints = mzml['ms1'][str(f)]
+
 			for g in ints:
 				if g not in seen:
-					seen.add(g)
+					seen.append(g)
 		print(len(seen))
 		quit()
 
