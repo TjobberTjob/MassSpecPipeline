@@ -102,7 +102,7 @@ def full_image(interval,brackets,show=False):
 			ints = mzml['ms1'][str(f)]
 			for g in ints:
 				if g not in seen:
-					seen.add(line)
+					seen.add(g)
 		print(len(seen))
 		quit()
 
