@@ -165,8 +165,8 @@ def full_image(interval,resolution,show=False):
 				try:
 					#Current strategy for normalizing intensity is mean.
 					intensity = np.mean(ms1_array[_key])
-					if len(ms1_array[_key])>1:
-						stats['clashed_cells']+=1
+					# if len(ms1_array[_key])>1:
+					# 	stats['clashed_cells']+=1
 				except KeyError:
 					intensity = 0.0
 				row.append(intensity)
