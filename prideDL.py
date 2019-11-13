@@ -170,8 +170,7 @@ def full_image(interval,resolution,show=False):
 					intensity = 0.0
 				row.append(intensity)
 			image.append(row)
-		print(image)
-		quit()
+
 
 		image = image[::-1]
 		image = np.ma.masked_equal(image,0)
@@ -181,13 +180,13 @@ def full_image(interval,resolution,show=False):
 		colMap.set_bad('darkblue')
 		
 		#Save or show image
-		plt.imshow(image, cmap=colMap, extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']], aspect = 'auto', vmax = 16, vmin = 6)
-		plt.tight_layout()
-		plt.xlabel('m/z', fontsize=12)
-		plt.ylabel('Retention time - Minutes', fontsize=12)
-		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-		plt.colorbar(extend = 'both')
-		plt.tight_layout()
+		fig = plt.figure()
+		# fig.set_size_inches(())
+		ax = plt.Axes(fig, [0., 0., 1., 1.])
+		ax.set_axis_off()
+		fig.add_axes(ax)
+		plt.set_cmap('hot')
+		ax.imshow(image, aspect='equal',cmap = colMap)#,vmin = 5, vmax = 16)
 		print('Image created         ', end = '\r')
 		if show == True:
 			plt.show()
