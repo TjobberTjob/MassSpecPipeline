@@ -106,12 +106,6 @@ def full_image(interval,resolution,show=False):
 	print(len(mzlist))
 	print(len(rtlist))
 
-	rtlist = []
-	for f in mzml:
-		rtlist.append(mzml[f])
-	print(rtlist)
-	quit()
-
 	# Define the intervals for the given resolution
 	x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
 	y_d = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
