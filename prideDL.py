@@ -143,10 +143,10 @@ def full_image(interval,brackets,show=False):
 				k += 1
 
 				i_2 += 1
-				if i_2 % brackets['mz'] == 0: #m/z bracket size
+				if i_2 % brackets['mz'] == 0:
 					j_2 += 1
 			i_1 += 1
-			if i_1 % brackets['rt'] == 0: #Scan_time bracket size
+			if i_1 % brackets['rt'] == 0:
 				j_1 += 1
 	
 		#Create the final image.
@@ -168,7 +168,7 @@ def full_image(interval,brackets,show=False):
 		
 		#Setup colormap
 		colMap = cm.jet
-		colMap.set_bad('black')
+		colMap.set_bad('darkblue')
 		
 		#Save or show image
 		plt.imshow(image,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
@@ -392,7 +392,7 @@ if __name__ == '__main__':
 				}
 			resolution = {'x':300,'y':175}
 			brackets = {
-					'mz' : 4,
+					'mz' : 2,
 					'rt' : 7
 				}
 			full_image(interval,brackets,show=True)
