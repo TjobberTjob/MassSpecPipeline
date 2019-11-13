@@ -100,8 +100,9 @@ def full_image(interval,resolution,show=False):
 		i=1
 		lists = []
 		for f in mzml['ms1']:
-			for g in mzml['ms1'][f]
-			lists.append(g)
+			for g in mzml['ms1'][f]:
+				lists.append(g)
+			i += 1
 			print(str(i), end = '\r')
 		lists = np.unique(lists)
 		print(len(lists))
