@@ -91,7 +91,7 @@ def internalmzML():
 		# os.remove(datapath+filename+'/file.mzml')
 
 
-def full_image(interval,brackets,show=False):
+def full_image(interval,resolution,show=False):
 	# if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 
 		print('Creating full image         ', end = '\r')		
@@ -382,7 +382,7 @@ if __name__ == '__main__':
 				}
 			resolution = {'x':500,'y':300}
 
-			full_image(interval,brackets,show=True)
+			full_image(interval,resolution,show=True)
 			quit()
 			resolution = {'x':100,'y':100}
 			sub_images(resolution)
