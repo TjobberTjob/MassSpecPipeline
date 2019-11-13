@@ -93,7 +93,6 @@ def internalmzML():
 
 def full_image(interval,resolution,show=False):
 
-
 	print('Creating full image         ', end = '\r')		
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
@@ -106,7 +105,7 @@ def full_image(interval,resolution,show=False):
 
 	rtlist = []
 	for f in mzml['ms1']:
-		mzlist.append(mzml['ms1'][f])
+		rtlist.append(mzml['ms1'][f])
 	print(rtlist)
 	quit()
 
