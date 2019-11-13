@@ -322,7 +322,7 @@ if __name__ == '__main__':
 	accession = sys.argv[1] #Get the accession number 
 	pepfile = sys.argv[2]	#Get the name of the maxquant file
 
-	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = '/data/ProteomeToolsRaw/' #Server datapath
 	datapath = 'Data/' #Server datapath
 	
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
@@ -388,7 +388,7 @@ if __name__ == '__main__':
 					'rt' : {'min':wash_out,'max':60}
 				}
 			resolution = {'x':500,'y':300}
-			# full_image(interval,resolution,show=False)
+			full_image(interval,resolution,show=False)
 
 			resolution = {'x':100,'y':100}
 			sub_images(resolution)
