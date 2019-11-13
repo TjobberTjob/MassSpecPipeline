@@ -175,7 +175,6 @@ def full_image(interval,brackets,show=False):
 		plt.tight_layout()
 		print('Image created         ', end = '\r')
 		if show == True:
-			print(str(j_2)+'x'+str(j_1))
 			plt.show()
 		elif show == False:
 			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
