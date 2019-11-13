@@ -119,16 +119,14 @@ def full_image(interval,resolution,show=False):
 		scan_ids = []
 		for scan_id in mzml['ms1']:
 			scan_ids.append(int(scan_id))
+		len(scan.ids)
 
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
 			#Get the intervals
 			scan_time = float(mzml['ms1'][scan_id]['scan_time'])
-			print(scan_time)
-			print(scan_id)
-			quit()
 			if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
-				continue
+				continue #Discard data from outside of the interval
 			stats['y'].append(scan_time)
 		#Calculate the y axis.	
 			y_n = int((scan_time - interval['rt']['min'])/y_d)
