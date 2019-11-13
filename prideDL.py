@@ -168,7 +168,7 @@ def full_image(interval,brackets,show=False):
 		
 		#Setup colormap
 		colMap = cm.jet
-		colMap.set_bad('darkblue')
+		colMap.set_bad('black')
 		
 		#Save or show image
 		plt.imshow(image,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
