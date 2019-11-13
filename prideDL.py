@@ -96,17 +96,10 @@ def full_image(interval,brackets,show=False):
 
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
-		# #Define the intervals for the given resolution
-		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
-		y_d = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
+
 		#Create the initial array.
 		#elements are given by (x,y)
 		ms1_array = {}
-
-		#Make sure the intervals can define actual bins
-		if x_d == 0 or y_d == 0:
-			print ('Nil interval spacing- please review resolution and interval of mz/rt')
-			quit()
 			
 		#Collect inverval statistics.
 		stats = { 
@@ -407,5 +400,5 @@ if __name__ == '__main__':
 			resolution = {'x':100,'y':100}
 			sub_images(resolution)
 		
-# python3 prideDL.py PXD004732
-# python3 prideDL.py PXD010595
+# python3 prideDL.py PXD004732 allPeptides.txt
+# python3 prideDL.py PXD010595 allPeptides.txt
