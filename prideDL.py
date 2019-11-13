@@ -181,10 +181,10 @@ def full_image(interval,resolution,show=False):
 		
 		#Save or show image
 		fig = plt.figure()
-		# fig.set_size_inches(())
 		ax = plt.Axes(fig, [0., 0., 1., 1.])
 		ax.set_axis_off()
 		fig.add_axes(ax)
+		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
 		plt.set_cmap('hot')
 		ax.imshow(image, aspect='equal', cmap = colMap, vmin = 5, vmax = 16)
 		print('Image created         ', end = '\r')
