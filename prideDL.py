@@ -397,7 +397,7 @@ if __name__ == '__main__':
 				}
 			resolution = {'x':500,'y':300}
 			full_image(interval,resolution,show=True)
-
+			quit()
 			resolution = {'x':100,'y':100}
 			sub_images(resolution)
 		
