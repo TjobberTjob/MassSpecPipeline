@@ -97,8 +97,8 @@ def full_image(interval,resolution,show=False):
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		
-		maxint = None #Max value for m/z
-		minint = None #Min value for m/z
+		maxint = 0 #Max value for m/z
+		minint = 1000 #Min value for m/z
 		for f in mzml['ms1']:
 			maxint = max(maxint,max(mzml['ms1'][str(f)]['mz']))
 			minint = min(minint,min(mzml['ms1'][str(f)]['mz']))
