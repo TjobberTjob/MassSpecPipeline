@@ -47,7 +47,7 @@ def formatFile():
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
 		
-		
+	
 def process_ms1(spectrum):
 	#Scan information
 	scan_info = spectrum['scanList']
@@ -63,6 +63,7 @@ def process_ms1(spectrum):
 	#ion intensity
 	intensity = spectrum['intensity array']
 	return {'scan_time':scan_time,'intensity':intensity.tolist(),'mz':mz.tolist()}
+
 
 def internalmzML():
 	if not os.path.exists(datapath+filename+'/mzML.json'):
@@ -89,6 +90,7 @@ def internalmzML():
 		f.close()
 		# os.remove(datapath+filename+'/file.mzml')
 
+
 def full_image(interval,resolution,show=False):
 	if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 
@@ -113,7 +115,7 @@ def full_image(interval,resolution,show=False):
 			'clashed_cells':0,#Number of pixels in which there are more than one value
 		}
 	
-		#Get sorted list of scan ids.
+		#Get list of scan ids.
 		scan_ids = []
 		for scan_id in mzml['ms1']:
 			scan_ids.append(int(scan_id))
@@ -122,6 +124,9 @@ def full_image(interval,resolution,show=False):
 			scan_id = str(scan_id)
 			#Get the intervals
 			scan_time = float(mzml['ms1'][scan_id]['scan_time'])
+			print(scan_time)
+			print(scan_id)
+			quit()
 			if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
 				continue
 			stats['y'].append(scan_time)
@@ -176,6 +181,7 @@ def full_image(interval,resolution,show=False):
 			plt.show()
 		elif show == False:
 			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
+
 
 def sub_images(resolution):
 	print('### Creating subimages ###')
