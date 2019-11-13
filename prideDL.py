@@ -189,6 +189,7 @@ def full_image(interval,resolution,show=False):
 		plt.tight_layout()
 		print('Image created         ', end = '\r')
 		if show == True:
+			print(str(j_2)+'x'+str(j_1))
 			plt.show()
 		elif show == False:
 			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
@@ -398,7 +399,9 @@ if __name__ == '__main__':
 					'mz' : {'min':360,'max':1250},
 					'rt' : {'min':wash_out,'max':60}
 				}
-			resolution = {'x':500,'y':300}
+			# resolution = {'x':500,'y':300}
+			mz_bracket
+			rt_bracket
 			full_image(interval,resolution,show=True)
 			quit()
 			resolution = {'x':100,'y':100}
