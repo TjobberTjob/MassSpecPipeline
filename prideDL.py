@@ -131,6 +131,10 @@ def full_image(interval,resolution,show=False):
 		
 		#Calculate the y axis.	
 			y_n = int((scan_time - interval['rt']['min'])/y_d)
+			print(scan_time)
+			print(interval['rt']['min'])
+			print(int(scan_time - interval['rt']['min']))
+			quit()
 			#print (scan_time,y_n)
 			i = 0
 			for mz_elem in mzml['ms1'][scan_id]['mz']:
@@ -146,9 +150,6 @@ def full_image(interval,resolution,show=False):
 				except KeyError:
 					ms1_array[_key] = [intensity_val]
 				i+=1
-				print(ms1_array)
-				if i == 30:
-					quit()
 	
 		#Create the final image.
 		image = []
