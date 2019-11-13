@@ -182,7 +182,7 @@ def full_image(interval,resolution,show=False):
 		#Save or show image
 		fig = plt.figure()
 		# fig.set_size_inches(())
-		ax = plt.Axes(fig, [0., 0., 1., 1.])
+		ax = plt.Axes(fig, [0., 0., 0., 0.])
 		ax.set_axis_off()
 		fig.add_axes(ax)
 		plt.set_cmap('hot')
@@ -195,7 +195,7 @@ def full_image(interval,resolution,show=False):
 
 
 def sub_images(resolution):
-	print('### Creating subimages ###')
+	print('Creating subimages           ')
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	mz_interval = 50 #INTERVALS
