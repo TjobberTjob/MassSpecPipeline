@@ -398,10 +398,10 @@ if __name__ == '__main__':
 					'rt' : {'min':wash_out,'max':60}
 				}
 			# resolution = {'x':500,'y':300}
-			brackets = {
-					'mz' : {10}
+			interval = {
+					'mz' : {10},
 					'rt' : {10}
-			}
+				}
 			full_image(interval,brackets,show=True)
 			quit()
 			resolution = {'x':100,'y':100}
