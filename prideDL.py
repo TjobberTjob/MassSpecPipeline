@@ -106,8 +106,9 @@ def full_image(interval,resolution,show=False):
 		for f in mzml['ms1']:
 			mzlist.append(mzml['ms1'][f]['mz'])
 		mzlist = np.unique(mzlist)
-		print(len(mzlist))
-		print(mzlist)
+		flat_list = [item for sublist in mzlist for item in sublist]
+		print(len(flat_list))
+		print(flat_list)
 		quit()
 
 
