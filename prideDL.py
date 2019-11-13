@@ -110,7 +110,6 @@ def full_image(interval,resolution,show=False):
 		# print(len(mzlist))
 		# quit()
 
-
 		# Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
 		y_d = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
@@ -171,7 +170,9 @@ def full_image(interval,resolution,show=False):
 					intensity = 0.0
 				row.append(intensity)
 			image.append(row)
-		
+		print(image)
+		quit()
+
 		image = image[::-1]
 		image = np.ma.masked_equal(image,0)
 		
