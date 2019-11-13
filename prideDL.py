@@ -164,14 +164,14 @@ def full_image(interval,brackets,show=False):
 			image.append(row)
 		
 		image = image[::-1]
-		image = np.ma.masked_less(image,0.01)
+		image = np.ma.masked_equal(image,0)
 		
 		#Setup colormap
 		colMap = cm.jet
 		colMap.set_bad('darkblue')
 		
 		#Save or show image
-		plt.imshow(image,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
+		plt.imshow(image,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')#,vmax = 16,vmin = 6)
 		plt.tight_layout()
 		plt.xlabel('m/z', fontsize=12)
 		plt.ylabel('Retention time - Minutes', fontsize=12)
@@ -390,9 +390,9 @@ if __name__ == '__main__':
 					'mz' : {'min':360,'max':1250},
 					'rt' : {'min':wash_out,'max':60}
 				}
-			# resolution = {'x':500,'y':300}
+			resolution = {'x':300,'y':175}
 			brackets = {
-					'mz' : 3,
+					'mz' : 4,
 					'rt' : 7
 				}
 			full_image(interval,brackets,show=True)
