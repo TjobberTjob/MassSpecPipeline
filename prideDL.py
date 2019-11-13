@@ -394,7 +394,7 @@ if __name__ == '__main__':
 				}
 			resolution = {'x':300,'y':175}
 			brackets = {
-					'mz' : 2,
+					'mz' : 3,
 					'rt' : 7
 				}
 			full_image(interval,brackets,show=True)
