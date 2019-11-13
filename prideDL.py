@@ -380,11 +380,8 @@ if __name__ == '__main__':
 					'mz' : {'min':360,'max':1250},
 					'rt' : {'min':wash_out,'max':60}
 				}
-			resolution = {'x':300,'y':175}
-			brackets = {
-					'mz' : 3,
-					'rt' : 7
-				}
+			resolution = {'x':500,'y':300}
+
 			full_image(interval,brackets,show=True)
 			quit()
 			resolution = {'x':100,'y':100}
