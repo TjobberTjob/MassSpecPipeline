@@ -134,6 +134,7 @@ def full_image(interval,resolution,show=False):
 		#Calculate the y axis.	
 			i_2 = 1
 			j_2 = 0
+			k = 0
 			for mz_elem in mzml['ms1'][scan_id]['mz']:
 				if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
 					continue #Discard data outside of the interval
@@ -141,11 +142,13 @@ def full_image(interval,resolution,show=False):
 				stats['x'][mz_elem] = 0
 				_key = (j_1,j_2)
 				#Current strategy for collapsing the intensity values is taking their logs
-				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][i])
+				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][k])
 				try:
 					ms1_array[_key].append(intensity_val)
 				except KeyError:
 					ms1_array[_key] = [intensity_val]
+				k += 1
+
 				i_2 += 1
 				if i_2 % 100 == 0: #m/z bracket size
 					j_2 += 1
