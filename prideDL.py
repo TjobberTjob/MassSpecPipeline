@@ -105,7 +105,7 @@ def full_image(interval,resolution,show=False):
 
 	rtlist = []
 	for f in mzml:
-		rtlist.append(mzml['ms1'][f])
+		rtlist.append(mzml[f])
 	print(rtlist)
 	quit()
 
