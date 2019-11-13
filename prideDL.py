@@ -164,7 +164,7 @@ def full_image(interval,brackets,show=False):
 			image.append(row)
 		
 		image = image[::-1]
-		image = np.ma.masked_equal(image,0)
+		image = np.ma.masked_less(image,0.01)
 		
 		#Setup colormap
 		colMap = cm.jet
