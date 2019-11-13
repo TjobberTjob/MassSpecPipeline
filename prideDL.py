@@ -192,9 +192,18 @@ def sub_images(resolution):
 	print('### Creating subimages ###')
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
-	maxint = 0 #GLOBAL MAXIMA
+	# maxint = 0 #GLOBAL MAXIMA
+	# for f in mzml['ms1']:
+	# 	maxint = max(maxint,max(mzml['ms1'][str(f)]['intensity']))
+	seen = set()
 	for f in mzml['ms1']:
-		maxint = max(maxint,max(mzml['ms1'][str(f)]['intensity']))
+		ints = mzml['ms1'][str(f)]
+		for g in ints:
+			if g not in seen:
+				seen.add(line)
+	print(len(seen))
+	quit()
+
 	
 	mz_interval = 50 #INTERVALS
 	rt_interval = 5  #INTERVALS
