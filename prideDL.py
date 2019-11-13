@@ -184,7 +184,6 @@ def full_image(interval,resolution,show=False):
 		plt.xlabel('m/z', fontsize=12)
 		plt.ylabel('Retention time - Minutes', fontsize=12)
 		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-		plt.set_axis_off()
 		plt.colorbar(extend = 'both')
 		plt.tight_layout()
 
