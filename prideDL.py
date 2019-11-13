@@ -97,11 +97,14 @@ def full_image(interval,resolution,show=False):
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	mzlistlist = []
+	rtlist = []
 	for f in mzml['ms1']:
 		mzlistlist.append(mzml['ms1'][f]['mz'])
+		rtlist.append(mzml['ms1'][f]['scan_time'])
 	mzlist = [item for sublist in mzlistlist for item in sublist]
 	mzlist = np.unique(sorted(mzlist))
 	print(len(mzlist))
+	print(len(scan_time))
 
 	rtlist = []
 	for f in mzml:
