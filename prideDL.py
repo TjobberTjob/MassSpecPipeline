@@ -140,7 +140,7 @@ def full_image(interval,resolution,show=False):
 					continue #Discard data outside of the interval
 
 				stats['x'][mz_elem] = 0
-				_key = (j_1,j_2)
+				_key = (j_2,j_1)
 				#Current strategy for collapsing the intensity values is taking their logs
 				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][k])
 				try:
