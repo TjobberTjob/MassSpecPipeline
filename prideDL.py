@@ -97,16 +97,15 @@ def full_image(interval,resolution,show=False):
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		
-		i=1
-		lists = []
+		maxint = None #Max value for m/z
+		minint = None #Min value for m/z
 		for f in mzml['ms1']:
-			for g in mzml['ms1'][f]['mz']:
-				lists.append(g)
-			i += 1
-			print(str(i), end = '\r')
-		lists = np.unique(lists)
-		print(len(lists))
+			maxint = max(maxint,max(mzml['ms1'][str(f)]['mz']))
+			minint = min(minint,min(mzml['ms1'][str(f)]['mz']))
+		print(maxint)
+		print(minint)
 		quit()
+
 
 		# Define the intervals for the given resolution
 		x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
@@ -127,7 +126,7 @@ def full_image(interval,resolution,show=False):
 		scan_ids = []
 		for scan_id in mzml['ms1']:
 			scan_ids.append(int(scan_id))
- 
+ 		
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
 			# Get the intervals
@@ -415,8 +414,8 @@ if __name__ == '__main__':
 	accession = sys.argv[1] #Get the accession number 
 	pepfile = sys.argv[2]	#Get the name of the maxquant file
 
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' #Server datapath
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' #Server datapath
 	
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
 	html = requests.get(url).text			  #Webscraping the pride database
