@@ -102,12 +102,12 @@ def full_image(interval,resolution,show=False):
 		for f in mzml['ms1']:
 			maxint = max(maxint,max(mzml['ms1'][str(f)]['mz']))
 			minint = min(minint,min(mzml['ms1'][str(f)]['mz']))
-		mzlist = []
+		mzlistlist = []
 		for f in mzml['ms1']:
-			mzlist.append(mzml['ms1'][f]['mz'])
+			mzlistlist.append(mzml['ms1'][f]['mz'])
+		mzlist = [item for sublist in mzlist for item in sublist]
 		mzlist = np.unique(mzlist)
-		flat_list = [item for sublist in mzlist for item in sublist]
-		print(len(flat_list))
+		print(len(mzlist))
 		quit()
 
 
