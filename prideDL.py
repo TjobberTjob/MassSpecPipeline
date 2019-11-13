@@ -97,18 +97,18 @@ def full_image(interval,resolution,show=False):
 		print('Creating full image         ', end = '\r')		
 		mzml = json.load(open(datapath+filename+'/mzML.json'))
 		
-		maxint = 0 #Max value for m/z
-		minint = 1000 #Min value for m/z
-		for f in mzml['ms1']:
-			maxint = max(maxint,max(mzml['ms1'][str(f)]['mz']))
-			minint = min(minint,min(mzml['ms1'][str(f)]['mz']))
-		mzlistlist = []
-		for f in mzml['ms1']:
-			mzlistlist.append(mzml['ms1'][f]['mz'])
-		mzlist = [item for sublist in mzlistlist for item in sublist]
-		mzlist = np.unique(sorted(mzlist))
-		print(len(mzlist))
-		quit()
+		# maxint = 0 #Max value for m/z
+		# minint = 1000 #Min value for m/z
+		# for f in mzml['ms1']:
+		# 	maxint = max(maxint,max(mzml['ms1'][str(f)]['mz']))
+		# 	minint = min(minint,min(mzml['ms1'][str(f)]['mz']))
+		# mzlistlist = []
+		# for f in mzml['ms1']:
+		# 	mzlistlist.append(mzml['ms1'][f]['mz'])
+		# mzlist = [item for sublist in mzlistlist for item in sublist]
+		# mzlist = np.unique(sorted(mzlist))
+		# print(len(mzlist))
+		# quit()
 
 
 		# Define the intervals for the given resolution
@@ -483,7 +483,7 @@ if __name__ == '__main__':
 					'mz' : {'min':360,'max':1250},
 					'rt' : {'min':wash_out,'max':60}
 				}
-			resolution = {'x':500,'y':300}
+			resolution = {'x':2000,'y':1000}
 
 			full_image(interval,resolution,show=True)
 			quit()
