@@ -150,10 +150,10 @@ def full_image(interval,resolution,show=False):
 				k += 1
 
 				i_2 += 1
-				if i_2 % 5 == 0: #m/z bracket size
+				if i_2 % 2 == 0: #m/z bracket size
 					j_2 += 1
 			i_1 += 1
-			if i_1 % 5 == 0: #Scan_time bracket size
+			if i_1 % 2 == 0: #Scan_time bracket size
 				j_1 += 1
 	
 		#Create the final image.
