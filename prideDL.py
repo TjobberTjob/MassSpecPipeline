@@ -23,13 +23,13 @@ if __name__ == '__main__':
 
 def download(file):
 	#Start Process
-	file = file.replace(' ','%20') #URL handling
+	# file = file.replace(' ','%20') #URL handling
 	
 	#Check if Raw file exists
 	if not os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('downloading raw file         ', end = '\r')
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url[:-10]+raws+'.raw')
-		
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url+'/'+raws+'.raw')
+		quit()
 
 def formatFile():
 	#Check whether the docker file is implemented or not
@@ -103,8 +103,7 @@ def full_image(interval,resolution,show=False):
 		rtlist.append(mzml['ms1'][f]['scan_time'])
 	mzlist = [item for sublist in mzlistlist for item in sublist]
 	mzlist = np.unique(sorted(mzlist))
-	print(len(mzlist))
-	print(len(rtlist))
+	rtlist = sorted(rtlist)
 
 	# Define the intervals for the given resolution
 	x_d = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
@@ -332,8 +331,8 @@ if __name__ == '__main__':
 	accession = sys.argv[1] #Get the accession number 
 	pepfile = sys.argv[2]	#Get the name of the maxquant file
 
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' #Server datapath
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' #Server datapath
 	
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
 	html = requests.get(url).text			  #Webscraping the pride database
