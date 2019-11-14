@@ -29,12 +29,11 @@ def download(file):
 	if not os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
 		print('downloading raw file         ', end = '\r')
 		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url+'/'+raws+'.raw')
-		quit()
 
 def formatFile():
 	#Check whether the docker file is implemented or not
-	output = subprocess.check_output('docker image ls',shell = True)
-	if not 'thermorawparser' in str(output):
+	dockerls = subprocess.check_output('docker image ls',shell = True)
+	if not 'thermorawparser' in str(dockerls):
 		os.chdir('..')
 		os.chdir('ThermoRawFileParser/')
 		subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
