@@ -239,7 +239,7 @@ def createImages(interval,full_resolution,subimage_interval):
 
 		# Save image
 		fig = plt.figure()
-		fig.set_size_inches((mzupper - mzlower)/100,(rtupper - rtlower)/100)
+		fig.set_size_inches((mzupper - mzlower)/200,(rtupper - rtlower)/200)
 		ax = plt.Axes(fig, [0., 0., 1, 1])
 		ax.set_axis_off()
 		fig.add_axes(ax)
