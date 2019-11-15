@@ -89,7 +89,7 @@ def internalmzML():
 
 def createImages(interval,full_resolution,subimage_interval):
 
-	print('Creating full image         ', end = '\r')		
+	print('Creating full image: Handling the data', end = '\r')		
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	# Define the intervals for the given resolution
@@ -139,8 +139,11 @@ def createImages(interval,full_resolution,subimage_interval):
 			l+=1
 
 	# Create the final image.
+	run_i = 0
 	image = []
 	for y_i in range(0,full_resolution['y']):
+		run_i+=1
+		print("Creating full image: {:2.1%}".format(run_i / full_resolution['y']), end = '\r') #Print how far we are	
 		row = []
 		for x_i in range(0,full_resolution['x']):
 			_key = (x_i,y_i)
@@ -173,9 +176,7 @@ def createImages(interval,full_resolution,subimage_interval):
 	if not os.path.exists(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.png'):
 		plt.savefig(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.png')		
 	
-	#Creating the subimages
-	print('Creating subimages         ')
-
+	#Create the sub-images
 	#figuring out all of the mz and rt intervals 
 	value = interval['mz']['min']
 	mzrangelist = [value]
@@ -198,7 +199,7 @@ def createImages(interval,full_resolution,subimage_interval):
 	i = 0
 	for index, rows in df2.iterrows():
 		i+=1
-		print("Progress {:2.1%}".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
+		print("Creating subimages: {:2.1%}".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			j+=1 #Check if this image can be created in our range or not
