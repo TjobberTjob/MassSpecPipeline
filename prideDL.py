@@ -11,6 +11,7 @@ if __name__ == '__main__':
 	from datetime import datetime
 	from pathlib import Path
 	import glob
+	import pickle
 	import requests
 	import json
 	import sys		
@@ -89,93 +90,103 @@ def internalmzML():
 
 def createImages(interval,full_resolution,subimage_interval):
 
-	print('Creating full image: Handling the data', end = '\r')		
+	
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	# Define the intervals for the given resolution
 	mz_bin = (float(interval['mz']['max']) - float(interval['mz']['min']))/full_resolution['x']
 	rt_bin = (float(interval['rt']['max']) - float(interval['rt']['min']))/full_resolution['y']
+	
+	if not os.path.exists(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.txt'):
+		print('Creating full image: Handling the data', end = '\r')		
+		# Create the initial array.
+		# elements are given by (x,y)
 
-	# Create the initial array.
-	# elements are given by (x,y)
+		ms1_array = {}
 
-	ms1_array = {}
-
-	# Collect inverval statistics.
-	stats = { 
-		'x' : {},#x-axis, m/z
-		'y' : [],#y-axis rt
-		'clashed_cells':0,#Number of pixels in which there are more than one value
-	}
-	  
-	# Get sorted list of scan ids.
-	scan_ids = []
-	for scan_id in mzml['ms1']:
-		scan_ids.append(int(scan_id))
-		
-	for scan_id in sorted(scan_ids):
-		scan_id = str(scan_id)
-		# Get the intervals
-		scan_time = float(mzml['ms1'][scan_id]['scan_time'])
-		if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
-			continue
-		stats['y'].append(scan_time)
-	# Calculate the y axis. 
-		y_n = int((scan_time - interval['rt']['min'])/rt_bin)
-		# print (scan_time,y_n)
-		l = 0
-		for mz_elem in mzml['ms1'][scan_id]['mz']:
-			if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
+		# Collect inverval statistics.
+		stats = { 
+			'x' : {},#x-axis, m/z
+			'y' : [],#y-axis rt
+			'clashed_cells':0,#Number of pixels in which there are more than one value
+		}
+		  
+		# Get sorted list of scan ids.
+		scan_ids = []
+		for scan_id in mzml['ms1']:
+			scan_ids.append(int(scan_id))
+			
+		for scan_id in sorted(scan_ids):
+			scan_id = str(scan_id)
+			# Get the intervals
+			scan_time = float(mzml['ms1'][scan_id]['scan_time'])
+			if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
 				continue
-			stats['x'][mz_elem] = 0
-			x_n = int((mz_elem - interval['mz']['min'])/mz_bin)
-			_key = (x_n,y_n)
-			# Current strategy for collapsing the intensity values is taking their logs
-			intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][l])
-			try:
-				ms1_array[_key].append(intensity_val)
-			except KeyError:
-				ms1_array[_key] = [intensity_val]
-			l+=1
+			stats['y'].append(scan_time)
+		# Calculate the y axis. 
+			y_n = int((scan_time - interval['rt']['min'])/rt_bin)
+			# print (scan_time,y_n)
+			l = 0
+			for mz_elem in mzml['ms1'][scan_id]['mz']:
+				if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
+					continue
+				stats['x'][mz_elem] = 0
+				x_n = int((mz_elem - interval['mz']['min'])/mz_bin)
+				_key = (x_n,y_n)
+				# Current strategy for collapsing the intensity values is taking their logs
+				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][l])
+				try:
+					ms1_array[_key].append(intensity_val)
+				except KeyError:
+					ms1_array[_key] = [intensity_val]
+				l+=1
 
-	# Create the final image.
-	run_i = 0
-	image = []
-	for y_i in range(0,full_resolution['y']):
-		run_i+=1
-		print("Creating full image: {:2.1%}".format(run_i / full_resolution['y']), end = '\r') #Print how far we are	
-		row = []
-		for x_i in range(0,full_resolution['x']):
-			_key = (x_i,y_i)
-			try:
-				# Current strategy for normalizing intensity is mean.
-				intensity = np.mean(ms1_array[_key])
-				if len(ms1_array[_key])>1:
-					stats['clashed_cells']+=1
-			except KeyError:
-				intensity = 0.0
-			row.append(intensity)
-		image.append(row)
+		# Create the final image.
+		run_i = 0
+		image = []
+		for y_i in range(0,full_resolution['y']):
+			run_i+=1
+			print("Creating full image: {:2.1%}                  ".format(run_i / full_resolution['y']), end = '\r') #Print how far we are	
+			row = []
+			for x_i in range(0,full_resolution['x']):
+				_key = (x_i,y_i)
+				try:
+					# Current strategy for normalizing intensity is mean.
+					intensity = np.mean(ms1_array[_key])
+					if len(ms1_array[_key])>1:
+						stats['clashed_cells']+=1
+				except KeyError:
+					intensity = 0.0
+				row.append(intensity)
+			image.append(row)
+		print('Saving image files          ', end = '\r')
+		#Save as txt file
+		with open(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.txt', "wb") as pa:
+			pickle.dump(image, pa)
 
-	#Creating the full image
-	fullimage = image[::-1]
-	fullimage = np.ma.masked_equal(fullimage,0)
-	
-	#Setup colormap
-	colMap = cm.jet
-	colMap.set_bad('darkblue')
-	
-	plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
-	plt.tight_layout()
-	plt.xlabel('m/z', fontsize=12)
-	plt.ylabel('Retention time - Minutes', fontsize=12)
-	plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-	plt.tight_layout()
+		#Creating the full image
+		fullimage = image[::-1]
+		fullimage = np.ma.masked_equal(fullimage,0)
+		
+		#Setup colormap
+		colMap = cm.jet
+		colMap.set_bad('darkblue')
+		
+		plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
+		plt.tight_layout()
+		plt.xlabel('m/z', fontsize=12)
+		plt.ylabel('Retention time - Minutes', fontsize=12)
+		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
+		plt.tight_layout()
 
-	print('Full image saved         ', end = '\r')
-	if not os.path.exists(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.png'):
-		plt.savefig(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.png')		
+		print('Full image saved         ', end = '\r')
+		if not os.path.exists(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.png'):
+			plt.savefig(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.png')		
 	
+	else: #If the image data exists, just recall it instead of making it
+		with open(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.txt', "rb") as pa:
+			image = pickle.load(pa)
+
 	#Create the sub-images
 	#figuring out all of the mz and rt intervals 
 	value = interval['mz']['min']
@@ -199,7 +210,7 @@ def createImages(interval,full_resolution,subimage_interval):
 	i = 0
 	for index, rows in df2.iterrows():
 		i+=1
-		print("Creating subimages: {:2.1%}".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
+		print("Creating subimages: {:2.1%}               ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			j+=1 #Check if this image can be created in our range or not
@@ -236,7 +247,6 @@ def createImages(interval,full_resolution,subimage_interval):
 		ax.imshow(subimage, aspect='equal',cmap = colMap,vmin = 5, vmax = 16)
 		plt.savefig(datapath+'Images/'+filename+'-'+str(i)+'.png')
 		plt.close(fig)
-		quit()
 
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i)})
