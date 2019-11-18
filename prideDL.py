@@ -360,7 +360,7 @@ if __name__ == '__main__':
 			print('\nfile: '+filename) #Print what file we're working on
 
 			download(raws)
-			# formatFile()
+			formatFile()
 			internalmzML()
 
 			resolution = {'x':1500,'y':1000}
