@@ -273,6 +273,7 @@ def createImages(resolution,subimage_interval):
 				new_metadata.update({str(ele) : str(rows[ele])})
 		outfile.write(json.dumps(new_metadata)+'\n')
 	outfile.close()
+	
 	print('Calculating end statistics:           ', end = '\r')
 	
 	mzlist_inrange = [i for i in mzlist if i > interval['mz']['min'] and i < interval['mz']['max']]
@@ -285,7 +286,7 @@ def createImages(resolution,subimage_interval):
 	end_stats['unique mz'] 			= len(mzlist_inrange)
 	end_stats['unique rt'] 			= len(rtlist_inrange)
 	end_stats['datapoints'] 		= total_datapoints
-	end_stats['data per pixel'] 	= nonzero_counter / clashed_values
+	end_stats['data per pixel'] 	= total_datapoints / nonzero_counter 
 	end_stats['Out of bounds']		= j
 	print(total_datapoints / nonzero_counter)
 	print(clashed_values)
