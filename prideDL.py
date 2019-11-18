@@ -366,7 +366,6 @@ if __name__ == '__main__':
 			resolution = {'x':1500,'y':1000}
 			subimage_interval  = {'mz':50,'rt':5}
 			createImages(resolution,subimage_interval)
-			quit()
 		
 # python3 prideDL.py PXD004732 allPeptides.txt
 # python3 prideDL.py PXD010595 allPeptides.txt
