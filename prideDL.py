@@ -171,25 +171,23 @@ def createImages(resolution,subimage_interval):
 		#Save as txt file
 		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
 			pickle.dump(imagedata, pa)
-
+		
 		#Creating the full image
-		fullimage = image[::-1]
-		fullimage = np.ma.masked_equal(fullimage,0)
-		
-		#Setup colormap
-		colMap = cm.jet
-		colMap.set_bad('darkblue')
-		
-		plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
-		plt.tight_layout()
-		plt.xlabel('m/z', fontsize=12)
-		plt.ylabel('Retention time - Minutes', fontsize=12)
-		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-		plt.tight_layout()
-
-		print('Full image saved         ', end = '\r')
-		if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
-			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
+		# if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
+		# 	fullimage = image[::-1]
+		# 	fullimage = np.ma.masked_equal(fullimage,0)
+			
+		# 	#Setup colormap
+		# 	colMap = cm.jet
+		# 	colMap.set_bad('darkblue')
+			
+		# 	plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
+		# 	plt.tight_layout()
+		# 	plt.xlabel('m/z', fontsize=12)
+		# 	plt.ylabel('Retention time - Minutes', fontsize=12)
+		# 	plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
+		# 	plt.tight_layout()
+		# 	plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
 	
 	else: #If the image data exists, just recall it instead of making it
 		print('Loading image data         ', end = '\r')
