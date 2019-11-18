@@ -29,7 +29,7 @@ def download(file):
 	# file = file.replace(' ','%20') #URL handling
 	
 	#Check if Raw file exists
-	if not os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML'):
+	if not (os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML')):
 		print('downloading raw file         ', end = '\r')
 		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url+'/'+raws+'.raw')
 
@@ -88,29 +88,32 @@ def internalmzML():
 		# os.remove(datapath+filename+'/file.mzml')
 
 
-def createImages(interval,full_resolution,subimage_interval):
+def createImages(resolution,subimage_interval):
 
-	
+	print('Preparing data for image creation', end = '\r')
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
-	# Define the intervals for the given resolution
-	mz_bin = (float(interval['mz']['max']) - float(interval['mz']['min']))/full_resolution['x']
-	rt_bin = (float(interval['rt']['max']) - float(interval['rt']['min']))/full_resolution['y']
+	mzlistlist = []
+	rtlist = []
+	for f in mzml['ms1']:
+		mzlistlist.append(mzml['ms1'][f]['mz'])
+		rtlist.append(mzml['ms1'][f]['scan_time'])
+	mzlist = np.unique(sorted([item for sublist in mzlistlist for item in sublist]))
 	
-	if not os.path.exists(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.txt'):
-		print('Creating full image: Handling the data', end = '\r')		
-		# Create the initial array.
-		# elements are given by (x,y)
-
+	wash_out = 8 #8 minutes of washout of the instrument (proetometools)
+	interval = {
+		'mz' : {'min':min(mzlist),'max':max(mzlist)},
+		'rt' : {'min':wash_out,'max':max(rtlist)}
+	}
+	
+	# Define the intervals for the given resolution
+	mz_bin = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
+	rt_bin = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
+	
+	if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
+		#Create an empty array for layer use
 		ms1_array = {}
-
-		# Collect inverval statistics.
-		stats = { 
-			'x' : {},#x-axis, m/z
-			'y' : [],#y-axis rt
-			'clashed_cells':0,#Number of pixels in which there are more than one value
-		}
-		  
+		
 		# Get sorted list of scan ids.
 		scan_ids = []
 		for scan_id in mzml['ms1']:
@@ -118,19 +121,20 @@ def createImages(interval,full_resolution,subimage_interval):
 			
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
+
 			# Get the intervals
 			scan_time = float(mzml['ms1'][scan_id]['scan_time'])
 			if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
 				continue
-			stats['y'].append(scan_time)
-		# Calculate the y axis. 
+
+			# Calculate the y axis. 
 			y_n = int((scan_time - interval['rt']['min'])/rt_bin)
 			# print (scan_time,y_n)
 			l = 0
+			
 			for mz_elem in mzml['ms1'][scan_id]['mz']:
 				if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
 					continue
-				stats['x'][mz_elem] = 0
 				x_n = int((mz_elem - interval['mz']['min'])/mz_bin)
 				_key = (x_n,y_n)
 				# Current strategy for collapsing the intensity values is taking their logs
@@ -139,30 +143,37 @@ def createImages(interval,full_resolution,subimage_interval):
 					ms1_array[_key].append(intensity_val)
 				except KeyError:
 					ms1_array[_key] = [intensity_val]
+
 				l+=1
 
 		# Create the final image.
-		run_i = 0
+		run_i = 0				#For printing purposes
+		nonzero_counter = 0		#How many pixels have non-zero values
+		total_datapoints = 0	#How many datapoints does the file contain.
+		clashed_values = 0 		#Number of pixels in which there are more than one value
 		image = []
-		for y_i in range(0,full_resolution['y']):
+		for y_i in range(0,resolution['y']):
 			run_i+=1
-			print("Creating full image: {:2.1%}                  ".format(run_i / full_resolution['y']), end = '\r') #Print how far we are	
+			print("Creating full image: {:2.1%}                  ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
 			row = []
-			for x_i in range(0,full_resolution['x']):
+			for x_i in range(0,resolution['x']):
 				_key = (x_i,y_i)
 				try:
-					# Current strategy for normalizing intensity is mean.
-					intensity = np.mean(ms1_array[_key])
+					intensity = np.mean(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
+					total_datapoints+=(len(ms1_array[_key]))
+					nonzero_counter+=1
 					if len(ms1_array[_key])>1:
-						stats['clashed_cells']+=1
+						clashed_values+=(len(ms1_array[_key])-1)
 				except KeyError:
 					intensity = 0.0
 				row.append(intensity)
 			image.append(row)
 		print('Saving image files          ', end = '\r')
+
+		imagedata = [image, clashed_values, nonzero_counter, total_datapoints]
 		#Save as txt file
-		with open(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.txt', "wb") as pa:
-			pickle.dump(image, pa)
+		# with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
+		# 	pickle.dump(imagedata, pa)
 
 		#Creating the full image
 		fullimage = image[::-1]
@@ -180,24 +191,29 @@ def createImages(interval,full_resolution,subimage_interval):
 		plt.tight_layout()
 
 		print('Full image saved         ', end = '\r')
-		if not os.path.exists(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.png'):
-			plt.savefig(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.png')		
+		if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
+			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
 	
 	else: #If the image data exists, just recall it instead of making it
-		with open(datapath+filename+'/'+str(full_resolution['x'])+'x'+str(full_resolution['y'])+'.txt', "rb") as pa:
-			image = pickle.load(pa)
+		print('Loading image data         ', end = '\r')
+		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
+			imagedata = pickle.load(pa)
+			image 			= imagedata[0]
+			clashed_values  = imagedata[1]
+			nonzero_counter = imagedata[2]
+			total_datapoints= imagedata[3]
 
 	#Create the sub-images
 	#figuring out all of the mz and rt intervals 
 	value = interval['mz']['min']
 	mzrangelist = [value]
-	for i in range(int(full_resolution['x'])):
+	for i in range(int(resolution['x'])):
 		value+=mz_bin
 		mzrangelist.append(value)
 
 	value = interval['rt']['min']
 	rtrangelist = [value]
-	for i in range(int(full_resolution['y'])):
+	for i in range(int(resolution['y'])):
 		value+=rt_bin
 		rtrangelist.append(value)
 	
@@ -256,9 +272,26 @@ def createImages(interval,full_resolution,subimage_interval):
 			else:
 				new_metadata.update({str(ele) : str(rows[ele])})
 		outfile.write(json.dumps(new_metadata)+'\n')
-	
 	outfile.close()
-	print(str(j)+' Images were out of bounds')
+	print('Calculating end statistics:           ', end = '\r')
+	
+	mzlist_inrange = [i for i in mzlist if i > interval['mz']['min'] and i < interval['mz']['max']]
+	rtlist_inrange = [i for i in rtlist if i > interval['rt']['min'] and i < interval['rt']['max']]
+
+	outfile = open(datapath+'end_statistics.json','a')
+	end_stats = {}
+	end_stats['accession']			= accession
+	end_stats['filename']			= filename	
+	end_stats['unique mz'] 			= len(mzlist_inrange)
+	end_stats['unique rt'] 			= len(rtlist_inrange)
+	end_stats['datapoints'] 		= total_datapoints
+	end_stats['data per pixel'] 	= nonzero_counter / clashed_values
+	end_stats['Out of bounds']		= j
+	print(total_datapoints / nonzero_counter)
+	print(clashed_values)
+	outfile.write(json.dumps(end_stats)+'\n')
+	outfile.close()
+	print('Done!                                 ')
 
 
 def get_lower_bound(haystack, needle):
@@ -335,14 +368,9 @@ if __name__ == '__main__':
 			# formatFile()
 			internalmzML()
 
-			wash_out = 8
-			interval = {
-					'mz' : {'min':360,'max':1250},
-					'rt' : {'min':wash_out,'max':60}
-				}
-			full_resolution = {'x':2000,'y':1000}
+			resolution = {'x':1500,'y':1000}
 			subimage_interval  = {'mz':50,'rt':5}
-			createImages(interval,full_resolution,subimage_interval)
+			createImages(resolution,subimage_interval)
 			quit()
 		
 # python3 prideDL.py PXD004732 allPeptides.txt
