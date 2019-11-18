@@ -150,7 +150,6 @@ def createImages(resolution,subimage_interval):
 		run_i = 0				#For printing purposes
 		nonzero_counter = 0		#How many pixels have non-zero values
 		total_datapoints = 0	#How many datapoints does the file contain.
-		clashed_values = 0 		#Number of pixels in which there are more than one value
 		image = []
 		for y_i in range(0,resolution['y']):
 			run_i+=1
@@ -162,18 +161,16 @@ def createImages(resolution,subimage_interval):
 					intensity = np.mean(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
 					total_datapoints+=(len(ms1_array[_key]))
 					nonzero_counter+=1
-					if len(ms1_array[_key])>1:
-						clashed_values+=(len(ms1_array[_key])-1)
 				except KeyError:
 					intensity = 0.0
 				row.append(intensity)
 			image.append(row)
 		print('Saving image files          ', end = '\r')
 
-		imagedata = [image, clashed_values, nonzero_counter, total_datapoints]
+		imagedata = [image, nonzero_counter, total_datapoints]
 		#Save as txt file
-		# with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
-		# 	pickle.dump(imagedata, pa)
+		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
+			pickle.dump(imagedata, pa)
 
 		#Creating the full image
 		fullimage = image[::-1]
@@ -199,9 +196,8 @@ def createImages(resolution,subimage_interval):
 		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
 			imagedata = pickle.load(pa)
 			image 			= imagedata[0]
-			clashed_values  = imagedata[1]
-			nonzero_counter = imagedata[2]
-			total_datapoints= imagedata[3]
+			nonzero_counter = imagedata[1]
+			total_datapoints= imagedata[2]
 
 	#Create the sub-images
 	#figuring out all of the mz and rt intervals 
@@ -288,8 +284,6 @@ def createImages(resolution,subimage_interval):
 	end_stats['datapoints'] 		= total_datapoints
 	end_stats['data per pixel'] 	= total_datapoints / nonzero_counter 
 	end_stats['Out of bounds']		= j
-	print(total_datapoints / nonzero_counter)
-	print(clashed_values)
 	outfile.write(json.dumps(end_stats)+'\n')
 	outfile.close()
 	print('Done!                                 ')
