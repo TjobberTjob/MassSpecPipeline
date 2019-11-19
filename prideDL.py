@@ -301,8 +301,8 @@ if __name__ == '__main__':
 	accession = sys.argv[1] #Get the accession number 
 	pepfile = sys.argv[2]	#Get the name of the maxquant file
 
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' #Server datapath
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' #Server datapath
 	
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
 	html = requests.get(url).text			  #Webscraping the pride database
@@ -358,7 +358,7 @@ if __name__ == '__main__':
 			print('\nfile: '+filename) #Print what file we're working on
 
 			download(raws)
-			formatFile()
+			# formatFile()
 			internalmzML()
 
 			resolution = {'x':1500,'y':1000}

@@ -11,14 +11,13 @@ import pickle
 import codecs
 import sys
 
-accessions     = 'pride_accessions.txt'
+accessions	 = 'pride_accessions.txt'
 all_accessions = []
 def get_accessions():
-
 	if os.path.exists(datapath+accessions):
 		rm = validated_input('File already exists, overwrite?',('y','n'))
 		if rm == 'y':
-			os.system('rm '+accessions)
+			os.system('rm '+datapath+accessions)
 
 	url  = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'
 	page = requests.get(url).text	
@@ -38,10 +37,9 @@ def get_accessions():
 
 			print('Getting accessions from '+level1['href']+level2['href'], end = '\r')
 
-			
 			page_3 = requests.get(url+level1['href']+level2['href']).text
 			soup_3 = BeautifulSoup(page_3, 'html.parser')
-			i = 0
+
 			#Level 3- actual accession numbers.
 			for level3 in soup_3.find_all('a', href = True):
 				accession = level3['href'].replace('/','')
@@ -84,6 +82,13 @@ def accessions_metadata():
 				except Exception:
 					value = "Not available"
 				my_dict[name] = value 
+
+		for div in soup.find_all('div', {'class': 'grid_16 left-column'}):
+			plist = []
+			for p in div.find_all('p'):
+				plist.append(p.text.strip())
+			my_dict['Submission Date'] = plist[-2]
+			my_dict['Publication Date'] = plist[-1]
 
 		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+f+'/files'
 		html = requests.get(url).text
@@ -130,13 +135,13 @@ def filtering():
 def validated_input(prompt, valid_values):
 	valid_input = False
 	while not valid_input:
-		value       = input(prompt + ' | ' + ' / '.join(valid_values)+"\n")
+		value	   = input(prompt + ' | ' + ' / '.join(valid_values)+"\n")
 		valid_input = value in valid_values
 	return value
  
 if __name__ == '__main__':
-	# datapath = 'Data/'
-	datapath = '/data/ProteomeToolsRaw/'
+	datapath = 'Data/'
+	# datapath = '/data/ProteomeToolsRaw/'
 
 	cmd = sys.argv[1]
 
