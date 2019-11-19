@@ -94,12 +94,17 @@ def createImages(resolution,subimage_interval):
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	mzlistlist = []
-	rtlist = []
+	rtlist  = []
+	intlist = []
 	for f in mzml['ms1']:
 		mzlistlist.append(mzml['ms1'][f]['mz'])
 		rtlist.append(mzml['ms1'][f]['scan_time'])
+		intlist.append(mzml['ms1'][f]['intensity'])
 	mzlist = np.unique(sorted([item for sublist in mzlistlist for item in sublist]))
-	
+	intlist = [item for sublist in intlist for item in sublist]
+	lowbound = math.log(np.percentile(intlist,0.5))
+	highbound = math.log(np.percentile(intlist,99.5))
+
 	wash_out = 8 #8 minutes of washout of the instrument (proetometools)
 	interval = {
 		'mz' : {'min':min(mzlist),'max':max(mzlist)},
@@ -173,24 +178,24 @@ def createImages(resolution,subimage_interval):
 			pickle.dump(imagedata, pa)
 		
 		#Creating the full image
-		# if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
-		# 	fullimage = image[::-1]
-		# 	fullimage = np.ma.masked_equal(fullimage,0)
+		if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
+			fullimage = image[::-1]
+			fullimage = np.ma.masked_equal(fullimage,0)
 			
-		# 	#Setup colormap
-		# 	colMap = cm.jet
-		# 	colMap.set_bad('darkblue')
+			#Setup colormap
+			colMap = cm.jet
+			colMap.set_bad('darkblue')
 			
-		# 	plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto',vmax = 16,vmin = 6)
-		# 	plt.tight_layout()
-		# 	plt.xlabel('m/z', fontsize=12)
-		# 	plt.ylabel('Retention time - Minutes', fontsize=12)
-		# 	plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-		# 	plt.tight_layout()
-		# 	plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
+			plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
+			plt.tight_layout()
+			plt.xlabel('m/z', fontsize=12)
+			plt.ylabel('Retention time - Minutes', fontsize=12)
+			plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
+			plt.tight_layout()
+			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
 	
 	else: #If the image data exists, just recall it instead of making it
-		print('Loading image data         ', end = '\r')
+		print('Loading image data                        ', end = '\r')
 		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
 			imagedata = pickle.load(pa)
 			image 			= imagedata[0]
@@ -249,12 +254,12 @@ def createImages(resolution,subimage_interval):
 
 		# Save image
 		fig = plt.figure()
-		fig.set_size_inches((mzupper - mzlower)/200,(rtupper - rtlower)/200)
+		fig.set_size_inches((mzupper - mzlower)/100,(rtupper - rtlower)/100)
 		ax = plt.Axes(fig, [0., 0., 1, 1])
 		ax.set_axis_off()
 		fig.add_axes(ax)
 		plt.set_cmap('hot')
-		ax.imshow(subimage, aspect='equal',cmap = colMap,vmin = 5, vmax = 16)
+		ax.imshow(subimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
 		plt.savefig(datapath+'Images/'+filename+'-'+str(i)+'.png')
 		plt.close(fig)
 
@@ -361,8 +366,8 @@ if __name__ == '__main__':
 			# formatFile()
 			internalmzML()
 
-			resolution = {'x':1500,'y':1000}
-			subimage_interval  = {'mz':50,'rt':5}
+			resolution = {'x':1000,'y':800}
+			subimage_interval  = {'mz':75,'rt':5}
 			createImages(resolution,subimage_interval)
 		
 # python3 prideDL.py PXD004732 allPeptides.txt
