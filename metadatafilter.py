@@ -1,7 +1,7 @@
 import json
 import os
-path = 'Data/Images/'
-# path = '/data/ProteomeToolsRaw/Images/'
+# path = 'Data/Images/'
+path = '/data/ProteomeToolsRaw/Images/'
 try:
 	os.remove(path+'metadata_filtered.json')
 except Exception:
