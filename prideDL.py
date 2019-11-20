@@ -7,6 +7,7 @@ if __name__ == '__main__':
 	import bisect
 	import matplotlib as mpl
 	from ftplib import FTP
+	import urllib3
 	import re
 	from datetime import datetime
 	from pathlib import Path
@@ -14,6 +15,7 @@ if __name__ == '__main__':
 	import pickle
 	import requests
 	import json
+	import wget
 	import sys		
 	import math
 	import numpy as np
@@ -30,8 +32,8 @@ def download(file):
 	
 	#Check if Raw file exists
 	if not (os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML')):
-		print('downloading raw file         ', end = '\r')
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw'+' -c '+url+'/'+raws+'.raw')
+		print('downloading raw file		 ', end = '\r')
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw -c '+url+'/'+raws+'.raw')
 
 
 def formatFile():
@@ -45,12 +47,13 @@ def formatFile():
 		os.chdir('MassSpecPipeline/')
 
 	if not (os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json')):
-		print('Formatting file to mzML         ', end = '\r')
-		subprocess.run('docker run -v \"'+datapath[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
+		print('Formatting file to mzML		 ', end = '\r')
+		#SERVER#
+		subprocess.run('docker run -v \"'+datapath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'file.raw -o=/data_input/'+filename+' -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
-		
-	
+
+
 def process_ms1(spectrum):
 	#Scan information
 	scan_info = spectrum['scanList']
@@ -64,7 +67,7 @@ def process_ms1(spectrum):
 
 def internalmzML():
 	if not os.path.exists(datapath+filename+'/mzML.json'):
-		print('Extracting data from mzML         ', end = '\r')
+		print('Extracting data from mzML		 ', end = '\r')
 		data = mzml.MzML(datapath+filename+'/file.mzML')
 
 		#Extracted data
@@ -158,7 +161,7 @@ def createImages(resolution,subimage_interval):
 		image = []
 		for y_i in range(0,resolution['y']):
 			run_i+=1
-			print("Creating full image: {:2.1%}                  ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
+			print("Creating full image: {:2.1%}				  ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
 			row = []
 			for x_i in range(0,resolution['x']):
 				_key = (x_i,y_i)
@@ -170,7 +173,7 @@ def createImages(resolution,subimage_interval):
 					intensity = 0.0
 				row.append(intensity)
 			image.append(row)
-		print('Saving image files          ', end = '\r')
+		print('Saving image files		  ', end = '\r')
 
 		imagedata = [image, nonzero_counter, total_datapoints]
 		#Save as txt file
@@ -195,7 +198,7 @@ def createImages(resolution,subimage_interval):
 			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
 	
 	else: #If the image data exists, just recall it instead of making it
-		print('Loading image data                        ', end = '\r')
+		print('Loading image data						', end = '\r')
 		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
 			imagedata = pickle.load(pa)
 			image 			= imagedata[0]
@@ -225,7 +228,7 @@ def createImages(resolution,subimage_interval):
 	i = 0
 	for index, rows in df2.iterrows():
 		i+=1
-		print("Creating subimages: {:2.1%}               ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
+		print("Creating subimages: {:2.1%}			   ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			j+=1 #Check if this image can be created in our range or not
@@ -273,12 +276,11 @@ def createImages(resolution,subimage_interval):
 		outfile.write(json.dumps(new_metadata)+'\n')
 	outfile.close()
 	
-	print('Calculating end statistics:           ', end = '\r')
+	print('Calculating end statistics:                  ', end = '\r')
 	
 	mzlist_inrange = [i for i in mzlist if i > interval['mz']['min'] and i < interval['mz']['max']]
 	rtlist_inrange = [i for i in rtlist if i > interval['rt']['min'] and i < interval['rt']['max']]
 
-	outfile = open(datapath+'end_statistics.json','a')
 	end_stats = {}
 	end_stats['accession']			= accession
 	end_stats['filename']			= filename	
@@ -287,18 +289,20 @@ def createImages(resolution,subimage_interval):
 	end_stats['datapoints'] 		= total_datapoints
 	end_stats['data per pixel'] 	= total_datapoints / nonzero_counter 
 	end_stats['Out of bounds']		= j
+
+	outfile = open(datapath+'end_statistics.json','a')
 	outfile.write(json.dumps(end_stats)+'\n')
 	outfile.close()
-	print('Done!                                 ')
+	print('Done!                               ')
 
 
 def get_lower_bound(haystack, needle):
 
-    idx = bisect.bisect(haystack, needle)
-    if idx > 0 and idx < len(haystack):
-        return idx
-    else:
-        raise ValueError(f"{needle} is out of bounds of {haystack}")
+	idx = bisect.bisect(haystack, needle)
+	if idx > 0 and idx < len(haystack):
+		return idx
+	else:
+		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
 if __name__ == '__main__':
@@ -318,6 +322,7 @@ if __name__ == '__main__':
 		break
 
 	os.system('wget -q --show-progress -O '+datapath+'readme.txt '+url+'/README.txt')
+
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
@@ -325,15 +330,20 @@ if __name__ == '__main__':
 	for zips in searchfiles:			#For loop- for going through all the search files
 		zips = zips.replace(' ','%20') 	#URL handling
 
-		os.system('wget -q -O '+datapath+'file.zip'+' -c '+zips) #Get the Zip file
+		os.system('wget -q --show-progress -O '+datapath+'file.zip '+zips)
+
 		with ZipFile(datapath+'file.zip','r') as zipped:
 			ziplist = zipped.namelist() #Get a list of all contents of it
 
 		for a in ziplist:
-			if pepfile in str(a): 		#Fine the peptide file and extract it
-				os.system('unzip -o -qq -j '+datapath+'file.zip '+a+' -d '+datapath)
-				break
-		
+			if pepfile in a:
+				with ZipFile(datapath+'file.zip') as z:
+					with z.open(a) as zf, open(datapath+pepfile, 'wb') as zfg:
+						shutil.copyfileobj(zf, zfg)
+						break
+			else:
+				continue
+
 		df = pd.read_csv(datapath+pepfile,sep='\t', low_memory=False) #Read in file
 		df = df.loc[df['Sequence'] != ' ',] 		#Remove empty sequences
 		rawfiles = np.unique(df['Raw file'])		#A list containing all the different raw files this search file has data on
@@ -342,20 +352,20 @@ if __name__ == '__main__':
 			filename = raws 
 	
 			if not os.path.exists(datapath+filename):	#Make the file directory if it doesnt exist
-				os.system('mkdir '+datapath+filename)	
+				os.mkdir(datapath+filename)
 
 			if not os.path.exists(datapath+filename+'/file.zip'): #Move or rm zip.file
-				os.system('mv '+datapath+'file.zip '+datapath+filename+'/file.zip')
+				shutil.move(datapath+'file.zip', datapath+filename+'/file.zip')
 			else:
-				os.system('rm '+datapath+'file.zip')
+				os.remove(datapath+'file.zip')
 			
 			df2 = df.loc[df['Raw file'] == raws,] 		#Take only the part of the data that we need for this raw file
 			pd.DataFrame.to_csv(df,datapath+pepfile)	#save this to file for moving
 
 			if not os.path.exists(datapath+filename+'/'+pepfile): #Move or rm txt.file
-				os.system('mv '+datapath+pepfile+' '+datapath+filename+'/'+pepfile)
+				shutil.move(datapath+pepfile, datapath+filename+'/'+pepfile)
 			else:
-				os.system('rm '+datapath+pepfile)
+				os.remove(datapath+pepfile)
 
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": #This cannot be converted to mzml for some reason. So we skip it
 				continue
@@ -363,7 +373,7 @@ if __name__ == '__main__':
 			print('\nfile: '+filename) #Print what file we're working on
 
 			download(raws)
-			# formatFile()
+			formatFile()
 			internalmzML()
 
 			resolution = {'x':1000,'y':800}
