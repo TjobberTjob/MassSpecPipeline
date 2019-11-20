@@ -6,37 +6,96 @@ if __name__ == '__main__':
 	import matplotlib.pyplot as plt
 	import bisect
 	import matplotlib as mpl
-	from ftplib import FTP
-	import urllib3
-	import re
-	from datetime import datetime
-	from pathlib import Path
-	import glob
 	import pickle
 	import requests
 	import json
-	import wget
 	import sys		
 	import math
 	import numpy as np
+	import subprocess
+	import os
 	from zipfile import ZipFile
 	from bs4 import BeautifulSoup
 	from pyteomics import mzml,mzid,mgf
-	import subprocess
-	import os 
-	from os.path import join
+ 
 
-def download(file):
-	#Start Process
-	# file = file.replace(' ','%20') #URL handling
+def zipfile_finder(accession, datapath):
+	#Webscraping the url for the pride database
+	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
+	html = requests.get(url).text
+	soup = BeautifulSoup(html,'html.parser')									
+
+	for div in soup.find_all('div', {'class': 'grid_6 omega'}):
+		url = div.find('a')['href'] #Update URL with FTP link
+		break
+
+	#Download readme file
+	os.system('wget -q -O '+datapath+'readme.txt '+url+'/README.txt')
+
+	#Handle and remove readme file
+	df = pd.read_csv(datapath+'readme.txt',sep='\t')
+	os.remove(datapath+'readme.txt')
+	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
+	return searchfiles, url
+
+
+def rawfile_finder(zipfile, datapath):
+	#Handle spaces in urls
+	zipfile = zipfile.replace(' ','%20')
+
+	#Download zip file
+	os.system('wget -q --show-progress -O '+datapath+'file.zip '+zipfile)
+
+	#Get a list of files with directories from zip file
+	with ZipFile(datapath+'file.zip','r') as zipped:
+		ziplist = zipped.namelist()
+
+	#Extract the peptide file from the zipfile
+	for a in ziplist:
+		if pepfile in a:
+			with ZipFile(datapath+'file.zip') as z:
+				with z.open(a) as zf, open(datapath+pepfile, 'wb') as zfg:
+					shutil.copyfileobj(zf, zfg)
+					break
+		else:
+			continue
+
+	#Go through the maxquant output file and get all the raw files
+	df = pd.read_csv(datapath+pepfile,sep='\t', low_memory=False)
+	df = df.loc[df['Sequence'] != ' ',] #Remove empty sequences 	
+	rawfiles = np.unique(df['Raw file'])
+	return rawfiles, df
+
+
+def filehandling(datapath, filename, pepfile):
+	#Make the file directory if it doesnt exist
+	if not os.path.exists(datapath+filename):	
+		os.mkdir(datapath+filename)
+
+	#Move or rm zip.file
+	if not os.path.exists(datapath+filename+'/file.zip'): 
+		shutil.move(datapath+'file.zip', datapath+filename+'/file.zip')
+	else:
+		os.remove(datapath+'file.zip')
 	
-	#Check if Raw file exists
-	if not (os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML')):
-		print('downloading raw file                  ', end = '\r')
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw -c '+url+'/'+raws+'.raw')
+	#Removing superfluous data and saving the file
+	df2 = df.loc[df['Raw file'] == raws,] 
+	pd.DataFrame.to_csv(df,datapath+pepfile)	
+
+	#Move or rm txt.file
+	if not os.path.exists(datapath+filename+'/'+pepfile): 
+		shutil.move(datapath+pepfile, datapath+filename+'/'+pepfile)
+	else:
+		os.remove(datapath+pepfile)
+
+	#Download the raw file
+	if not (os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json')):
+		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw -c '+url+'/'+filename+'.raw')
+	#os.remove(datapath+filename+'/file.raw')
+	return df2
 
 
-def formatFile():
+def formatFile(datapath, filename):
 	#Check whether the docker file is implemented or not
 	dockerls = subprocess.check_output('docker image ls',shell = True)
 	if not 'thermorawparser' in str(dockerls):
@@ -48,7 +107,7 @@ def formatFile():
 
 	if not (os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json')):
 		print('Formatting file to mzML            ', end = '\r')
-		subprocess.run('docker run -v \"'+datapath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'file.raw -o=/data_input/'+filename+' -f=1 -m=1', shell=True)
+		subprocess.run('docker run -v \"'+datapath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
 
@@ -64,7 +123,7 @@ def process_ms1(spectrum):
 	return {'scan_time':scan_time,'intensity':intensity.tolist(),'mz':mz.tolist()}
 
 
-def internalmzML():
+def internalmzML(datapath, filename):
 	#Extract the data from the mzml, if we havnt already
 	if not os.path.exists(datapath+filename+'/mzML.json'):
 		print('Extracting data from mzML                     ', end = '\r')
@@ -91,7 +150,15 @@ def internalmzML():
 		# os.remove(datapath+filename+'/file.mzml')
 
 
-def createImages(resolution,subimage_interval):
+def get_lower_bound(haystack, needle):
+	idx = bisect.bisect(haystack, needle)
+	if idx > 0 and idx < len(haystack):
+		return idx
+	else:
+		raise ValueError(f"{needle} is out of bounds of {haystack}")
+
+
+def createImages(datapath, filename, resolution, subimage_interval):
 
 	print('Preparing data for image creation              ', end = '\r')
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
@@ -161,7 +228,7 @@ def createImages(resolution,subimage_interval):
 		image = []
 		for y_i in range(0,resolution['y']):
 			run_i+=1
-			print("Creating full image: {:2.1%}	               ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
+			print("Creating full image: {:2.1%}                                     ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
 			row = []
 			for x_i in range(0,resolution['x']):
 				_key = (x_i,y_i)
@@ -228,7 +295,7 @@ def createImages(resolution,subimage_interval):
 	i = 0
 	for index, rows in df2.iterrows():
 		i+=1
-		print("Creating subimages: {:2.1%}                   ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
+		print("Creating subimages: {:2.1%}                                  ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			j+=1 #Check if this image can be created in our range or not
@@ -276,7 +343,7 @@ def createImages(resolution,subimage_interval):
 		outfile.write(json.dumps(new_metadata)+'\n')
 	outfile.close()
 	
-	print('Calculating end statistics:                  ', end = '\r')
+	print('Calculating end statistics:                            ', end = '\r')
 	
 	mzlist_inrange = [i for i in mzlist if i > interval['mz']['min'] and i < interval['mz']['max']]
 	rtlist_inrange = [i for i in rtlist if i > interval['rt']['min'] and i < interval['rt']['max']]
@@ -293,15 +360,7 @@ def createImages(resolution,subimage_interval):
 	outfile = open(datapath+'end_statistics.json','a')
 	outfile.write(json.dumps(end_stats)+'\n')
 	outfile.close()
-	print('Done!                               \n')
-
-
-def get_lower_bound(haystack, needle):
-	idx = bisect.bisect(haystack, needle)
-	if idx > 0 and idx < len(haystack):
-		return idx
-	else:
-		raise ValueError(f"{needle} is out of bounds of {haystack}")
+	print('Done!                                                \n')
 
 
 if __name__ == '__main__':
@@ -313,89 +372,36 @@ if __name__ == '__main__':
 	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
 	datapath = 'Data/' #Server datapath
 	
-	#Webscraping the url for the pride database
-	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
-	html = requests.get(url).text
-	soup = BeautifulSoup(html,'html.parser')									
+	#Find all zip files
+	output = zipfile_finder(accession, datapath)
+	searchfiles = output[0]
+	url 	    = output[1]
 
-	for div in soup.find_all('div', {'class': 'grid_6 omega'}):
-		url = div.find('a')['href'] #Update URL with FTP link
-		break
+	for zips in searchfiles:
+		#Find all raw files in the zip file
+		output = rawfile_finder(zips, datapath)
+		rawfiles = output[0]
+		df		 = output[1]
 
-	#Download readme file
-	os.system('wget -q -O '+datapath+'readme.txt '+url+'/README.txt')
-
-	#Handle and remove readme file
-	df = pd.read_csv(datapath+'readme.txt',sep='\t')
-	os.remove(datapath+'readme.txt')
-	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-
-	#For all unique zip files in the directory, do:
-	for zips in searchfiles:			
-		#Handle spaces in urls
-		zips = zips.replace(' ','%20')
-
-		#Download zip file
-		os.system('wget -q --show-progress -O '+datapath+'file.zip '+zips)
-
-		#Get a list of files with directories from zip file
-		with ZipFile(datapath+'file.zip','r') as zipped:
-			ziplist = zipped.namelist()
-
-		#Extract the peptide file from the zipfile
-		for a in ziplist:
-			if pepfile in a:
-				with ZipFile(datapath+'file.zip') as z:
-					with z.open(a) as zf, open(datapath+pepfile, 'wb') as zfg:
-						shutil.copyfileobj(zf, zfg)
-						break
-			else:
-				continue
-
-		#Go through the maxquant output file and get all the raw files
-		df = pd.read_csv(datapath+pepfile,sep='\t', low_memory=False)
-		df = df.loc[df['Sequence'] != ' ',] #Remove empty sequences 	
-		rawfiles = np.unique(df['Raw file'])
-
-		#for all raw files do:
 		for raws in rawfiles:
 			filename = raws 
-			
-			#Make the file directory if it doesnt exist
-			if not os.path.exists(datapath+filename):	
-				os.mkdir(datapath+filename)
-
-			#Move or rm zip.file
-			if not os.path.exists(datapath+filename+'/file.zip'): 
-				shutil.move(datapath+'file.zip', datapath+filename+'/file.zip')
-			else:
-				os.remove(datapath+'file.zip')
-			
-			#Removing superfluous data and saving the file
-			df2 = df.loc[df['Raw file'] == raws,] 
-			pd.DataFrame.to_csv(df,datapath+pepfile)	
-
-			#Move or rm txt.file
-			if not os.path.exists(datapath+filename+'/'+pepfile): 
-				shutil.move(datapath+pepfile, datapath+filename+'/'+pepfile)
-			else:
-				os.remove(datapath+pepfile)
 
 			#Skip this special case. Something wrong
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": 
 				continue
 
-			#Print what file we're working on
 			print('file: '+filename) 
+			print('downloading raw file                  ', end = '\r')
+			output = filehandling(datapath, filename, pepfile)
+			df2 = output
 
-			download(raws)
-			formatFile()
-			internalmzML()
+			formatFile(datapath, filename)
+			internalmzML(datapath, filename)
 
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			resolution = {'x':1000,'y':800}
 			subimage_interval  = {'mz':75,'rt':5}
-			createImages(resolution,subimage_interval)
+			createImages(datapath, filename, resolution, subimage_interval)
 		
 # python3 prideDL.py PXD004732 allPeptides.txt
 # python3 prideDL.py PXD010595 allPeptides.txt
