@@ -65,6 +65,7 @@ def process_ms1(spectrum):
 
 
 def internalmzML():
+	#Extract the data from the mzml, if we havnt already
 	if not os.path.exists(datapath+filename+'/mzML.json'):
 		print('Extracting data from mzML                     ', end = '\r')
 		data = mzml.MzML(datapath+filename+'/file.mzML')
@@ -292,11 +293,10 @@ def createImages(resolution,subimage_interval):
 	outfile = open(datapath+'end_statistics.json','a')
 	outfile.write(json.dumps(end_stats)+'\n')
 	outfile.close()
-	print('Done!                               ')
+	print('Done!                               \n')
 
 
 def get_lower_bound(haystack, needle):
-
 	idx = bisect.bisect(haystack, needle)
 	if idx > 0 and idx < len(haystack):
 		return idx
@@ -305,35 +305,44 @@ def get_lower_bound(haystack, needle):
 
 
 if __name__ == '__main__':
+	#Assigning accession number and maxquant output file name
+	accession = sys.argv[1] 
+	pepfile = sys.argv[2]
 
-	accession = sys.argv[1] #Get the accession number 
-	pepfile = sys.argv[2]	#Get the name of the maxquant file
-
+	#Path to data
 	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
 	datapath = 'Data/' #Server datapath
 	
+	#Webscraping the url for the pride database
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
-	html = requests.get(url).text			  #Webscraping the pride database
+	html = requests.get(url).text
 	soup = BeautifulSoup(html,'html.parser')									
 
 	for div in soup.find_all('div', {'class': 'grid_6 omega'}):
-		url = div.find('a')['href'] #Get the FTP link! 
+		url = div.find('a')['href'] #Update URL with FTP link
 		break
 
-	os.system('wget -q --show-progress -O '+datapath+'readme.txt '+url+'/README.txt')
+	#Download readme file
+	os.system('wget -q -O '+datapath+'readme.txt '+url+'/README.txt')
 
+	#Handle and remove readme file
 	df = pd.read_csv(datapath+'readme.txt',sep='\t')
 	os.remove(datapath+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 
-	for zips in searchfiles:			#For loop- for going through all the search files
-		zips = zips.replace(' ','%20') 	#URL handling
+	#For all unique zip files in the directory, do:
+	for zips in searchfiles:			
+		#Handle spaces in urls
+		zips = zips.replace(' ','%20')
 
+		#Download zip file
 		os.system('wget -q --show-progress -O '+datapath+'file.zip '+zips)
 
+		#Get a list of files with directories from zip file
 		with ZipFile(datapath+'file.zip','r') as zipped:
-			ziplist = zipped.namelist() #Get a list of all contents of it
+			ziplist = zipped.namelist()
 
+		#Extract the peptide file from the zipfile
 		for a in ziplist:
 			if pepfile in a:
 				with ZipFile(datapath+'file.zip') as z:
@@ -343,38 +352,47 @@ if __name__ == '__main__':
 			else:
 				continue
 
-		df = pd.read_csv(datapath+pepfile,sep='\t', low_memory=False) #Read in file
-		df = df.loc[df['Sequence'] != ' ',] 		#Remove empty sequences
-		rawfiles = np.unique(df['Raw file'])		#A list containing all the different raw files this search file has data on
+		#Go through the maxquant output file and get all the raw files
+		df = pd.read_csv(datapath+pepfile,sep='\t', low_memory=False)
+		df = df.loc[df['Sequence'] != ' ',] #Remove empty sequences 	
+		rawfiles = np.unique(df['Raw file'])
 
+		#for all raw files do:
 		for raws in rawfiles:
 			filename = raws 
-	
-			if not os.path.exists(datapath+filename):	#Make the file directory if it doesnt exist
+			
+			#Make the file directory if it doesnt exist
+			if not os.path.exists(datapath+filename):	
 				os.mkdir(datapath+filename)
 
-			if not os.path.exists(datapath+filename+'/file.zip'): #Move or rm zip.file
+			#Move or rm zip.file
+			if not os.path.exists(datapath+filename+'/file.zip'): 
 				shutil.move(datapath+'file.zip', datapath+filename+'/file.zip')
 			else:
 				os.remove(datapath+'file.zip')
 			
-			df2 = df.loc[df['Raw file'] == raws,] 		#Take only the part of the data that we need for this raw file
-			pd.DataFrame.to_csv(df,datapath+pepfile)	#save this to file for moving
+			#Removing superfluous data and saving the file
+			df2 = df.loc[df['Raw file'] == raws,] 
+			pd.DataFrame.to_csv(df,datapath+pepfile)	
 
-			if not os.path.exists(datapath+filename+'/'+pepfile): #Move or rm txt.file
+			#Move or rm txt.file
+			if not os.path.exists(datapath+filename+'/'+pepfile): 
 				shutil.move(datapath+pepfile, datapath+filename+'/'+pepfile)
 			else:
 				os.remove(datapath+pepfile)
 
-			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": #This cannot be converted to mzml for some reason. So we skip it
+			#Skip this special case. Something wrong
+			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": 
 				continue
 
-			print('\nfile: '+filename) #Print what file we're working on
+			#Print what file we're working on
+			print('file: '+filename) 
 
 			download(raws)
 			formatFile()
 			internalmzML()
 
+			#Set the resolution for the large image, and the intervals for the smaller ones
 			resolution = {'x':1000,'y':800}
 			subimage_interval  = {'mz':75,'rt':5}
 			createImages(resolution,subimage_interval)
