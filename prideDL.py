@@ -19,7 +19,7 @@ if __name__ == '__main__':
 	from pyteomics import mzml,mzid,mgf
  
 
-def zipfile_finder(accession, datapath):
+def zipfile_finder(accession, path):
 	#Webscraping the url for the pride database
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
 	html = requests.get(url).text
@@ -30,86 +30,91 @@ def zipfile_finder(accession, datapath):
 		break
 
 	#Download readme file
-	os.system('wget -q -O '+datapath+'readme.txt '+url+'/README.txt')
+	os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
-	df = pd.read_csv(datapath+'readme.txt',sep='\t')
-	os.remove(datapath+'readme.txt')
+	df = pd.read_csv(path+'readme.txt',sep='\t')
+	os.remove(path+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
 
 
-def rawfile_finder(zipfile, datapath):
+def rawfile_finder(zipfile, path, maxquant_file):
 	#Handle spaces in urls
 	zipfile = zipfile.replace(' ','%20')
 
 	#Download zip file
-	os.system('wget -q --show-progress -O '+datapath+'file.zip '+zipfile)
+	os.system('wget -q --show-progress -O '+path+'file.zip '+zipfile)
 
 	#Get a list of files with directories from zip file
-	with ZipFile(datapath+'file.zip','r') as zipped:
+	with ZipFile(path+'file.zip','r') as zipped:
 		ziplist = zipped.namelist()
 
 	#Extract the peptide file from the zipfile
 	for a in ziplist:
-		if pepfile in a:
-			with ZipFile(datapath+'file.zip') as z:
-				with z.open(a) as zf, open(datapath+pepfile, 'wb') as zfg:
+		if maxquant_file in a:
+			with ZipFile(path+'file.zip') as z:
+				with z.open(a) as zf, open(path+maxquant_file, 'wb') as zfg:
 					shutil.copyfileobj(zf, zfg)
 					break
 		else:
 			continue
 
 	#Go through the maxquant output file and get all the raw files
-	df = pd.read_csv(datapath+pepfile,sep='\t', low_memory=False)
+	df = pd.read_csv(path+maxquant_file,sep='\t', low_memory=False)
 	df = df.loc[df['Sequence'] != ' ',] #Remove empty sequences 	
 	rawfiles = np.unique(df['Raw file'])
 	return rawfiles, df
 
 
-def filehandling(datapath, filename, pepfile):
+def filehandling(filename, path, maxquant_file):
+	filepath = path+filename+'/'
 	#Make the file directory if it doesnt exist
-	if not os.path.exists(datapath+filename):	
-		os.mkdir(datapath+filename)
+	if not os.path.exists(filepath):	
+		os.mkdir(filepath)
 
 	#Move or rm zip.file
-	if not os.path.exists(datapath+filename+'/file.zip'): 
-		shutil.move(datapath+'file.zip', datapath+filename+'/file.zip')
+	if not os.path.exists(filepath+'file.zip'): 
+		shutil.move(path+'file.zip', filepath+'file.zip')
 	else:
-		os.remove(datapath+'file.zip')
+		os.remove(path+'file.zip')
 	
 	#Removing superfluous data and saving the file
 	df2 = df.loc[df['Raw file'] == raws,] 
-	pd.DataFrame.to_csv(df,datapath+pepfile)	
+	pd.DataFrame.to_csv(df,path+maxquant_file)	
 
 	#Move or rm txt.file
-	if not os.path.exists(datapath+filename+'/'+pepfile): 
-		shutil.move(datapath+pepfile, datapath+filename+'/'+pepfile)
+	if not os.path.exists(filepath+maxquant_file): 
+		shutil.move(path+maxquant_file, filepath+maxquant_file)
 	else:
-		os.remove(datapath+pepfile)
+		os.remove(path+maxquant_file)
 
 	#Download the raw file
-	if not (os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json')):
-		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw -c '+url+'/'+filename+'.raw')
-	#os.remove(datapath+filename+'/file.raw')
-	return df2
+	if not (os.path.exists(filepath+'/file.raw') or os.path.exists(filepath+'/file.mzML') or os.path.exists(filepath+'/mzML.json')):
+		os.system('wget -q --show-progress -O '+filepath+'/file.raw -c '+url+'/'+filename+'.raw')
+	#os.remove(path+filename+'/file.raw')
+	return df2, filepath
 
 
-def formatFile(datapath, filename):
+def formatFile(filename, path, filepath):
+	print('Formatting file to mzML               ', end = '\r')
 	#Check whether the docker file is implemented or not
 	dockerls = subprocess.check_output('docker image ls',shell = True)
 	if not 'thermorawparser' in str(dockerls):
 		os.chdir('..')
+		try:
+			os.system('git clone https://github.com/compomics/ThermoRawFileParser.git')
+		except Exception:
+			pass
 		os.chdir('ThermoRawFileParser/')
 		subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
 		os.chdir('..')
 		os.chdir('MassSpecPipeline/')
 
-	if not (os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json')):
-		print('Formatting file to mzML            ', end = '\r')
-		subprocess.run('docker run -v \"'+datapath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)
-		os.remove(datapath+filename+'/file-metadata.txt')
-		# os.remove(datapath+filename+'/file.raw')
+	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
+		subprocess.run('docker run -v \"'+path+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'file.raw -o=/data_input/'+filename+'/ -f=1 -m=1', shell=True)		
+		os.remove(filepath+'file-metadata.txt')
+		# os.remove(path+filename+'/file.raw')
 
 
 def process_ms1(spectrum):
@@ -123,11 +128,11 @@ def process_ms1(spectrum):
 	return {'scan_time':scan_time,'intensity':intensity.tolist(),'mz':mz.tolist()}
 
 
-def internalmzML(datapath, filename):
+def internalmzML(path):
 	#Extract the data from the mzml, if we havnt already
-	if not os.path.exists(datapath+filename+'/mzML.json'):
+	if not os.path.exists(filepath+'mzML.json'):
 		print('Extracting data from mzML                     ', end = '\r')
-		data = mzml.MzML(datapath+filename+'/file.mzML')
+		data = mzml.MzML(filepath+'file.mzML')
 
 		#Extracted data
 		extracted = {'ms1':{}}
@@ -144,10 +149,10 @@ def internalmzML(datapath, filename):
 			ms1_spectrum = process_ms1(spectrum)
 			extracted['ms1'][scan_id] = {'mz':ms1_spectrum['mz'],'intensity':ms1_spectrum['intensity'],'scan_time':ms1_spectrum['scan_time']}
 
-		f = open(datapath+filename+'/mzML.json','w')
+		f = open(filepath+'mzML.json','w')
 		f.write(json.dumps(extracted))
 		f.close()
-		# os.remove(datapath+filename+'/file.mzml')
+		# os.remove(filepath+'file.mzml')
 
 
 def get_lower_bound(haystack, needle):
@@ -158,10 +163,10 @@ def get_lower_bound(haystack, needle):
 		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def createImages(datapath, filename, resolution, subimage_interval):
+def createImages(filename, path, filepath, resolution, subimage_interval):
 
 	print('Preparing data for image creation              ', end = '\r')
-	mzml = json.load(open(datapath+filename+'/mzML.json'))
+	mzml = json.load(open(filepath+'/mzML.json'))
 	
 	mzlistlist = []
 	rtlist  = []
@@ -185,7 +190,7 @@ def createImages(datapath, filename, resolution, subimage_interval):
 	mz_bin = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
 	rt_bin = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
 	
-	if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
+	if not os.path.exists(filepath+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
 		#Create an empty array for layer use
 		ms1_array = {}
 		
@@ -244,11 +249,11 @@ def createImages(datapath, filename, resolution, subimage_interval):
 
 		imagedata = [image, nonzero_counter, total_datapoints]
 		#Save as txt file
-		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
+		with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
 			pickle.dump(imagedata, pa)
 		
 		#Creating the full image
-		if not os.path.exists(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
+		if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
 			fullimage = image[::-1]
 			fullimage = np.ma.masked_equal(fullimage,0)
 			
@@ -262,11 +267,11 @@ def createImages(datapath, filename, resolution, subimage_interval):
 			plt.ylabel('Retention time - Minutes', fontsize=12)
 			plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
 			plt.tight_layout()
-			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
+			plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
 	
 	else: #If the image data exists, just recall it instead of making it
 		print('Loading image data                              ', end = '\r')
-		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
+		with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
 			imagedata = pickle.load(pa)
 			image 			= imagedata[0]
 			nonzero_counter = imagedata[1]
@@ -288,10 +293,10 @@ def createImages(datapath, filename, resolution, subimage_interval):
 	
 	j=0 #Statistics about outlying images
 	
-	imgpath = datapath+'Images'
+	imgpath = path+'Images/'
 	if not os.path.exists(imgpath):
 		os.mkdir(imgpath)
-	outfile = open(imgpath+'/metadata.json','a') #The metadata file
+	outfile = open(imgpath+'metadata.json','a') #The metadata file
 	i = 0
 	for index, rows in df2.iterrows():
 		i+=1
@@ -301,7 +306,7 @@ def createImages(datapath, filename, resolution, subimage_interval):
 			j+=1 #Check if this image can be created in our range or not
 			continue
 
-		if os.path.exists(datapath+'Images/'+filename+'-'+str(i)+'.png'):
+		if os.path.exists(imgpath+filename+'-'+str(i)+'.png'):
 			continue
 
 		mzlower = get_lower_bound(mzrangelist,rows['m/z'] - subimage_interval['mz']) 
@@ -330,7 +335,7 @@ def createImages(datapath, filename, resolution, subimage_interval):
 		fig.add_axes(ax)
 		plt.set_cmap('hot')
 		ax.imshow(subimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
-		plt.savefig(datapath+'Images/'+filename+'-'+str(i)+'.png')
+		plt.savefig(imgpath+filename+'-'+str(i)+'.png')
 		plt.close(fig)
 
 		new_metadata = {}
@@ -357,7 +362,7 @@ def createImages(datapath, filename, resolution, subimage_interval):
 	end_stats['data per pixel'] 	= total_datapoints / nonzero_counter 
 	end_stats['Out of bounds']		= j
 
-	outfile = open(datapath+'end_statistics.json','a')
+	outfile = open(path+'end_statistics.json','a')
 	outfile.write(json.dumps(end_stats)+'\n')
 	outfile.close()
 	print('Done!                                                \n')
@@ -373,13 +378,13 @@ if __name__ == '__main__':
 	datapath = 'Data/' #Server datapath
 	
 	#Find all zip files
-	output = zipfile_finder(accession, datapath)
+	output      = zipfile_finder(accession = accession, path = datapath)
 	searchfiles = output[0]
 	url 	    = output[1]
 
 	for zips in searchfiles:
 		#Find all raw files in the zip file
-		output = rawfile_finder(zips, datapath)
+		output   = rawfile_finder(zipfile = zips, path = datapath, maxquant_file = pepfile)
 		rawfiles = output[0]
 		df		 = output[1]
 
@@ -392,16 +397,17 @@ if __name__ == '__main__':
 
 			print('file: '+filename) 
 			print('downloading raw file                  ', end = '\r')
-			output = filehandling(datapath, filename, pepfile)
-			df2 = output
+			output   = filehandling(filename = filename, path = datapath, maxquant_file = pepfile)
+			df2 	 = output[0]
+			filepath = output[1]
 
-			formatFile(datapath, filename)
-			internalmzML(datapath, filename)
+			formatFile(filename = filename, path = datapath, filepath = filepath)
+			internalmzML(path = filepath)
 
 			#Set the resolution for the large image, and the intervals for the smaller ones
-			resolution = {'x':1000,'y':800}
-			subimage_interval  = {'mz':75,'rt':5}
-			createImages(datapath, filename, resolution, subimage_interval)
+			reso = {'x':1000,'y':800}
+			interval  = {'mz':75,'rt':5}
+			createImages(filename = filename, path = datapath, filepath = filepath, resolution = reso, subimage_interval = interval)
 		
 # python3 prideDL.py PXD004732 allPeptides.txt
 # python3 prideDL.py PXD010595 allPeptides.txt
