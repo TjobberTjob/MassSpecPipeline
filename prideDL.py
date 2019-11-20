@@ -32,7 +32,7 @@ def download(file):
 	
 	#Check if Raw file exists
 	if not (os.path.exists(datapath+filename+'/file.raw') or os.path.exists(datapath+filename+'/mzML.json') or os.path.exists(datapath+filename+'/file.mzML')):
-		print('downloading raw file		 ', end = '\r')
+		print('downloading raw file                  ', end = '\r')
 		os.system('wget -q --show-progress -O '+datapath+filename+'/file.raw -c '+url+'/'+raws+'.raw')
 
 
@@ -47,8 +47,7 @@ def formatFile():
 		os.chdir('MassSpecPipeline/')
 
 	if not (os.path.exists(datapath+filename+'/file.mzML') or os.path.exists(datapath+filename+'/mzML.json')):
-		print('Formatting file to mzML		 ', end = '\r')
-		#SERVER#
+		print('Formatting file to mzML            ', end = '\r')
 		subprocess.run('docker run -v \"'+datapath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'file.raw -o=/data_input/'+filename+' -f=1 -m=1', shell=True)
 		os.remove(datapath+filename+'/file-metadata.txt')
 		# os.remove(datapath+filename+'/file.raw')
@@ -67,7 +66,7 @@ def process_ms1(spectrum):
 
 def internalmzML():
 	if not os.path.exists(datapath+filename+'/mzML.json'):
-		print('Extracting data from mzML		 ', end = '\r')
+		print('Extracting data from mzML                     ', end = '\r')
 		data = mzml.MzML(datapath+filename+'/file.mzML')
 
 		#Extracted data
@@ -93,7 +92,7 @@ def internalmzML():
 
 def createImages(resolution,subimage_interval):
 
-	print('Preparing data for image creation', end = '\r')
+	print('Preparing data for image creation              ', end = '\r')
 	mzml = json.load(open(datapath+filename+'/mzML.json'))
 	
 	mzlistlist = []
@@ -161,7 +160,7 @@ def createImages(resolution,subimage_interval):
 		image = []
 		for y_i in range(0,resolution['y']):
 			run_i+=1
-			print("Creating full image: {:2.1%}				  ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
+			print("Creating full image: {:2.1%}	               ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
 			row = []
 			for x_i in range(0,resolution['x']):
 				_key = (x_i,y_i)
@@ -173,7 +172,7 @@ def createImages(resolution,subimage_interval):
 					intensity = 0.0
 				row.append(intensity)
 			image.append(row)
-		print('Saving image files		  ', end = '\r')
+		print('Saving image files                            ', end = '\r')
 
 		imagedata = [image, nonzero_counter, total_datapoints]
 		#Save as txt file
@@ -198,7 +197,7 @@ def createImages(resolution,subimage_interval):
 			plt.savefig(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
 	
 	else: #If the image data exists, just recall it instead of making it
-		print('Loading image data						', end = '\r')
+		print('Loading image data                              ', end = '\r')
 		with open(datapath+filename+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
 			imagedata = pickle.load(pa)
 			image 			= imagedata[0]
@@ -228,7 +227,7 @@ def createImages(resolution,subimage_interval):
 	i = 0
 	for index, rows in df2.iterrows():
 		i+=1
-		print("Creating subimages: {:2.1%}			   ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
+		print("Creating subimages: {:2.1%}                   ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			j+=1 #Check if this image can be created in our range or not
