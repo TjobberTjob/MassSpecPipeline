@@ -16,6 +16,7 @@ def validated_input(prompt, valid_values):
 		valid_input = value in valid_values
 	return value
 
+
 def numbered_input(prompt, min, max):
 	valid_input = False
 	while valid_input == False:
@@ -23,30 +24,17 @@ def numbered_input(prompt, min, max):
 		valid_input = int(value) >= min and int(value) <= max
 	return value
 
-#Pathfinding
-datapath = "/data/ProteomeToolsRaw/Images/"
-trainpath = datapath+'training/'
-valpath = datapath+'validation/'
 
-#Reset images
-
-dirs = glob(datapath+"/*/")
-udirs = np.unique(dirs)
-
-if dirs != [] and (dirs[0] == trainpath[:-1] or dirs[0] == valpath[:-1]):
-	dirs = [os.path.dirname(p) for p in glob.glob(datapath+"/*/*/*")]
-	udirs = np.unique(dirs) 
-
-if len(udirs) != 0:
-	reset = validated_input('Do you want to reset image folders?', ('y','n'))
-	if reset == 'y':
-		os.system('find '+str(datapath)+' -mindepth 2 -name \"*.png\" -exec mv -t '+ str(datapath)+ ' {} +')
-		os.system("rm -rf "+trainpath)
-		os.system("rm -rf "+valpath)
+def resetImage(path, trainpath, valpath):
+	os.system('find '+str(path)+' -mindepth 2 -name \"*.png\" -exec mv -t '+ str(path)+ ' {} +')
+	try:
+		shutil.rmtree(trainpath)
+		shutil.rmtree(valpath)
+	except Exception:
+		pass
 
 
-#Move images
-def classifyImages(classes):
+def classifyImages(path, trainpath, valpath, imgClass):
 	split = validated_input('Do you wanna split the data into training and validation?', ('y','n'))
 	if split == "yes" or split == "y":
 		splitratio = numbered_input("What should the validation % be?",0,100)
@@ -60,16 +48,16 @@ def classifyImages(classes):
 		
 		#Preparing metadata
 		print("Preparing Metadata")
-		for line in open(datapath+'metadata_filtered.json'):
+		for line in open(path+'metadata_filtered.json'):
 			data = json.loads(line)
 
 			names = data['image']+".png"
-			imgdata[names] = data[imClass]
+			imgdata[names] = data[imgClass]
 	
-			if not os.path.exists(trainpath+data[imClass]):
-				os.mkdir(trainpath+data[imClass])
-			if not os.path.exists(valpath+data[imClass]):
-				os.mkdir(valpath+data[imClass])
+			if not os.path.exists(trainpath+data[imgClass]):
+				os.mkdir(trainpath+data[imgClass])
+			if not os.path.exists(valpath+data[imgClass]):
+				os.mkdir(valpath+data[imgClass])
 
 		#CREATING TRAINING DAT
 		print("Sorting into training data")
@@ -79,7 +67,7 @@ def classifyImages(classes):
 		for f in imgadata:
 			for g in imgadata[f]:
 				try:
-					shutil.move(datapath+g, trainpath+f+"/"+g)
+					shutil.move(path+g, trainpath+f+"/"+g)
 				except Exception:
 					pass
 		
@@ -95,12 +83,12 @@ def classifyImages(classes):
 					pass
 
 	elif split == "no" or split == "n":
-		for line in open(datapath+'metadata_filtered.json'):
+		for line in open(path+'metadata_filtered.json'):
 			data = json.loads(line)
-			if not os.path.exists(datapath+data[imClass]):
-				os.mkdir(datapath+data[imClass])
+			if not os.path.exists(path+data[imgClass]):
+				os.mkdir(path+data[imgClass])
 			try:
-				shutil.move(datapath+data['image']+".png", datapath+data[imClass]+"/")
+				shutil.move(path+data['image']+".png", path+data[imgClass]+"/")
 			except Exception:
 				pass
 	else: quit()
@@ -108,19 +96,21 @@ def classifyImages(classes):
 
 if __name__ == '__main__':
 
+	datapath = 'Data/Images/'
+	# datapath = "/data/ProteomeToolsRaw/Images/"
+	trainpath = datapath+'training/'
+	valpath = datapath+'validation/'
 
-	i = 1
-	while i == 1:
-		for line in open(datapath+'metadata_filtered.json'):
-			data = json.loads(line)
-			i = i+1
+	for line in open(datapath+'metadata_filtered.json'):
+		data = json.loads(line)
+		break
 	distlist = list(data.keys())
 	distlist.append('reset')
-	imClass = validated_input('What do you want to classify based on?',distlist)
+	Class = validated_input('What do you want to classify based on?',distlist)
 
-	if imClass == 'reset':
-		quit()
+	if Class == 'reset':
+		resetImage(path = datapath, trainpath = trainpath, valpath = valpath)
 	else:
-		classifyImages(classes = imClass)
+		classifyImages(path = datapath, trainpath = trainpath, valpath = valpath, imgClass = Class)
 
 

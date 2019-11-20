@@ -11,13 +11,13 @@ import pickle
 import codecs
 import sys
 
-accessions	 = 'pride_accessions.txt'
-all_accessions = []
-def get_accessions():
-	if os.path.exists(datapath+accessions):
+
+def get_accessions(path, accessions):
+	all_accessions = []
+	if os.path.exists(path+accessions):
 		rm = validated_input('File already exists, overwrite?',('y','n'))
 		if rm == 'y':
-			os.system('rm '+datapath+accessions)
+			os.system('rm '+path+accessions)
 
 	url  = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'
 	page = requests.get(url).text	
@@ -46,23 +46,23 @@ def get_accessions():
 				if len(accession) == len('PRD000000'):
 					all_accessions.append(accession)
 
-	with open(datapath+accessions, "wb") as pa:
+	with open(path+accessions, "wb") as pa:
 		pickle.dump(all_accessions, pa)
 
-def accessions_metadata():
+def accessions_metadata(path):
 
 	metadata = 'accession_metadata.json'
-	if os.path.exists(datapath+metadata):
+	if os.path.exists(path+metadata):
 		overwrite = validated_input('Metadata already exists, wanna overwrite?',('y','n'))
 		if overwrite == 'y':
-			os.system('rm '+datapath+metadata)
+			os.system('rm '+path+metadata)
 		else:
 			quit()
 
-	with open(datapath+accessions, "rb") as pa:
+	with open(path+accessions, "rb") as pa:
 		pride_accessions = pickle.load(pa) #Loading the data
 	i = 0
-	outfile = open(join(datapath,metadata),'a')
+	outfile = open(join(path,metadata),'a')
 
 	for f in pride_accessions:
 		i   += 1
@@ -115,7 +115,7 @@ def accessions_metadata():
 		outfile.write(json.dumps(my_dict)+'\n')
 	outfile.close()
 
-def filtering():
+def filtering(path):
 	try:
 		os.system('rm '+path+'accession_filtered.json')
 	except Exception:
@@ -144,13 +144,16 @@ if __name__ == '__main__':
 	datapath = '/data/ProteomeToolsRaw/'
 
 	cmd = sys.argv[1]
+	accessions	 = 'pride_accessions.txt'
 
 	#Download pride accession numbers.
 	if cmd == 'accession':
-		get_accessions()
+		get_accessions(path = datapath, accessions = accessions)
 
+	#Get Metadata for all accession numbers
 	if cmd == 'metadata':
-		accessions_metadata()
+		accessions_metadata(path = datapath)
 
+	#Filter metadata to get only certain accession numbers
 	if cmd == 'filter':
-		filtering()
+		filtering(path = datapath)
