@@ -34,7 +34,7 @@ def resetImage(path, trainpath, valpath):
 		pass
 
 
-def classifyImages(path, trainpath, valpath, imgClass):
+def classifyImages(path, trainpath, valpath, metapath, imgClass):
 	split = validated_input('Do you wanna split the data into training and validation?', ('y','n'))
 	if split == "yes" or split == "y":
 		splitratio = numbered_input("What should the validation % be?",0,100)
@@ -48,7 +48,7 @@ def classifyImages(path, trainpath, valpath, imgClass):
 		
 		#Preparing metadata
 		print("Preparing Metadata")
-		for line in open(path+'metadata_filtered.json'):
+		for line in open(metapath+'subimage_filtered.json'):
 			data = json.loads(line)
 
 			names = data['image']+".png"
@@ -83,7 +83,7 @@ def classifyImages(path, trainpath, valpath, imgClass):
 					pass
 
 	elif split == "no" or split == "n":
-		for line in open(path+'metadata_filtered.json'):
+		for line in open(metapath+'subimage_filtered.json'):
 			data = json.loads(line)
 			if not os.path.exists(path+data[imgClass]):
 				os.mkdir(path+data[imgClass])
@@ -96,12 +96,13 @@ def classifyImages(path, trainpath, valpath, imgClass):
 
 if __name__ == '__main__':
 
-	datapath = 'Data/Images/'
-	# datapath = "/data/ProteomeToolsRaw/Images/"
+	datapath  = 'Data/Images/'
+	# datapath  = "/data/ProteomeToolsRaw/Images/"
 	trainpath = datapath+'training/'
-	valpath = datapath+'validation/'
+	valpath   = datapath+'validation/'
+	metapath  = datapath+'metadata/'
 
-	for line in open(datapath+'metadata_filtered.json'):
+	for line in open(metapath+'subimage_filtered.json'):
 		data = json.loads(line)
 		break
 	distlist = list(data.keys())
@@ -111,6 +112,6 @@ if __name__ == '__main__':
 	if Class == 'reset':
 		resetImage(path = datapath, trainpath = trainpath, valpath = valpath)
 	else:
-		classifyImages(path = datapath, trainpath = trainpath, valpath = valpath, imgClass = Class)
+		classifyImages(path = datapath, trainpath = trainpath, valpath = valpath,  metapath = metapath, imgClass = Class)
 
 

@@ -75,19 +75,15 @@ def filehandling(filename, path, maxquant_file):
 
 	#Move or rm zip.file
 	if not os.path.exists(filepath+'file.zip'): 
-		shutil.move(path+'file.zip', filepath+'file.zip')
-	else:
-		os.remove(path+'file.zip')
-	
+		shutil.copyfile(path+'file.zip', filepath+'file.zip')
+		
 	#Removing superfluous data and saving the file
 	df2 = df.loc[df['Raw file'] == raws,] 
 	pd.DataFrame.to_csv(df,path+maxquant_file)	
 
 	#Move or rm txt.file
 	if not os.path.exists(filepath+maxquant_file): 
-		shutil.move(path+maxquant_file, filepath+maxquant_file)
-	else:
-		os.remove(path+maxquant_file)
+		shutil.copyfile(path+maxquant_file, filepath+maxquant_file)
 
 	#Download the raw file
 	if not (os.path.exists(filepath+'/file.raw') or os.path.exists(filepath+'/file.mzML') or os.path.exists(filepath+'/mzML.json')):
@@ -293,10 +289,13 @@ def createImages(filename, path, filepath, resolution, subimage_interval):
 	
 	j=0 #Statistics about outlying images
 	
-	imgpath = path+'Images/'
+	imgpath = path+'images/'
 	if not os.path.exists(imgpath):
 		os.mkdir(imgpath)
-	outfile = open(imgpath+'metadata.json','a') #The metadata file
+	metapath = path+'metadata/'
+	if not os.path.exists(metapath):
+		os.mkdir(metapath)	
+	outfile = open(metapath+'subimage.json','a') #The metadata file
 	i = 0
 	for index, rows in df2.iterrows():
 		i+=1
@@ -362,7 +361,7 @@ def createImages(filename, path, filepath, resolution, subimage_interval):
 	end_stats['data per pixel'] 	= total_datapoints / nonzero_counter 
 	end_stats['Out of bounds']		= j
 
-	outfile = open(path+'end_statistics.json','a')
+	outfile = open(metapath+'sub_statistics.json','a')
 	outfile.write(json.dumps(end_stats)+'\n')
 	outfile.close()
 	print('Done!                                                \n')
@@ -405,9 +404,12 @@ if __name__ == '__main__':
 			internalmzML(path = filepath)
 
 			#Set the resolution for the large image, and the intervals for the smaller ones
-			reso = {'x':1000,'y':800}
-			interval  = {'mz':75,'rt':5}
+			reso   	 = {'x':1000,'y':800}
+			interval = {'mz':75,'rt':5}
 			createImages(filename = filename, path = datapath, filepath = filepath, resolution = reso, subimage_interval = interval)
+
+			os.remove(datapath+'file.zip')
+			os.remove(datapath+pepfile)
 		
 # python3 prideDL.py PXD004732 allPeptides.txt
 # python3 prideDL.py PXD010595 allPeptides.txt

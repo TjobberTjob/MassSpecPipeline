@@ -1,23 +1,25 @@
-import requests
-import json
-from os.path import join
-import time
-import re
-import random
-from bs4 import BeautifulSoup
-import os
-from urllib import parse
-import pickle
-import codecs
-import sys
+if __name__ == '__main__':
+	import requests
+	import json
+	from os.path import join
+	import time
+	import re
+	import random
+	from bs4 import BeautifulSoup
+	import os
+	from urllib import parse
+	import pickle
+	import codecs
+	import sys
 
 
-def get_accessions(path, accessions):
+def get_accessions(path):
 	all_accessions = []
+	accessions	 = 'accessions.txt'
 	if os.path.exists(path+accessions):
 		rm = validated_input('File already exists, overwrite?',('y','n'))
 		if rm == 'y':
-			os.system('rm '+path+accessions)
+			os.remove(path+accessions)
 
 	url  = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'
 	page = requests.get(url).text	
@@ -49,9 +51,9 @@ def get_accessions(path, accessions):
 	with open(path+accessions, "wb") as pa:
 		pickle.dump(all_accessions, pa)
 
-def accessions_metadata(path):
 
-	metadata = 'accession_metadata.json'
+def accessions_metadata(path):
+	metadata = 'accessions.json'
 	if os.path.exists(path+metadata):
 		overwrite = validated_input('Metadata already exists, wanna overwrite?',('y','n'))
 		if overwrite == 'y':
@@ -93,6 +95,7 @@ def accessions_metadata(path):
 		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+f+'/files'
 		html = requests.get(url).text
 		soup = BeautifulSoup(html,'html.parser')
+
 		filetypes = []
 		for div in soup.find_all('div', {'class': 'grid_23 clearfix file-list'}):
 			for h5 in div.find_all('h5'):
@@ -115,22 +118,6 @@ def accessions_metadata(path):
 		outfile.write(json.dumps(my_dict)+'\n')
 	outfile.close()
 
-def filtering(path):
-	try:
-		os.system('rm '+path+'accession_filtered.json')
-	except Exception:
-		print('no filtered version exist')
-
-	outfile = open(path+'accession_filtered.json','w')
-	lines = set()
-	for line in open(path+'accession_metadata.json','r'):
-		data = json.loads(line)
-		##### ADD FILTER HERE #####
-		if data['maxquant'] == True and data['filetypes'] == ['zip','raw']:
-		###########################
-			outfilewrite(line)
-			lines.add(line)
-	outfile.close
 
 def validated_input(prompt, valid_values):
 	valid_input = False
@@ -138,22 +125,19 @@ def validated_input(prompt, valid_values):
 		value	   = input(prompt + ' | ' + ' / '.join(valid_values)+"\n")
 		valid_input = value in valid_values
 	return value
- 
+
+
 if __name__ == '__main__':
-	# datapath = 'Data/'
-	datapath = '/data/ProteomeToolsRaw/'
+	datapath = 'Data/'
+	# datapath = '/data/ProteomeToolsRaw/'
+	metapath = datapath+'metadata/'
 
 	cmd = sys.argv[1]
-	accessions	 = 'pride_accessions.txt'
-
+	
 	#Download pride accession numbers.
-	if cmd == 'accession':
-		get_accessions(path = datapath, accessions = accessions)
+	if cmd == 'accessions':
+		get_accessions(path = metapath)
 
 	#Get Metadata for all accession numbers
 	if cmd == 'metadata':
-		accessions_metadata(path = datapath)
-
-	#Filter metadata to get only certain accession numbers
-	if cmd == 'filter':
-		filtering(path = datapath)
+		accessions_metadata(path = metapath)
