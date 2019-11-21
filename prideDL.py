@@ -287,8 +287,6 @@ def createImages(filename, path, filepath, resolution, subimage_interval):
 		value+=rt_bin
 		rtrangelist.append(value)
 	
-	j=0 #Statistics about outlying images
-	
 	imgpath = path+'images/'
 	if not os.path.exists(imgpath):
 		os.mkdir(imgpath)
@@ -297,14 +295,16 @@ def createImages(filename, path, filepath, resolution, subimage_interval):
 		os.mkdir(metapath)	
 	outfile = open(metapath+'subimage.json','a') #The metadata file
 	i = 0
+	outbound = 0
+	inbound  = 0
 	for index, rows in df2.iterrows():
 		i+=1
 		print("Creating subimages: {:2.1%}                                  ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
-			j+=1 #Check if this image can be created in our range or not
+			outbound+=1 #Check if this image can be created in our range or not
 			continue
-
+		inbound+=1
 		if os.path.exists(imgpath+filename+'-'+str(i)+'.png'):
 			continue
 
@@ -359,7 +359,8 @@ def createImages(filename, path, filepath, resolution, subimage_interval):
 	end_stats['unique rt'] 			= len(rtlist_inrange)
 	end_stats['datapoints'] 		= total_datapoints
 	end_stats['data per pixel'] 	= total_datapoints / nonzero_counter 
-	end_stats['Out of bounds']		= j
+	end_stats['In bounds']			= inbound	
+	end_stats['Out of bounds']		= outbound
 
 	outfile = open(metapath+'sub_statistics.json','a')
 	outfile.write(json.dumps(end_stats)+'\n')
@@ -404,7 +405,7 @@ if __name__ == '__main__':
 			internalmzML(path = filepath)
 
 			#Set the resolution for the large image, and the intervals for the smaller ones
-			reso   	 = {'x':1000,'y':800}
+			reso   	 = {'x':1250,'y':1000}
 			interval = {'mz':75,'rt':5}
 			createImages(filename = filename, path = datapath, filepath = filepath, resolution = reso, subimage_interval = interval)
 
