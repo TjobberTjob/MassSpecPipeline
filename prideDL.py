@@ -67,7 +67,7 @@ def rawfile_finder(zipfile, path, maxquant_file):
 	return rawfiles, df
 
 
-def filehandling(filename, path, maxquant_file):
+def filehandling(filename, path, maxquant_file, df):
 	filepath = path+filename+'/'
 	#Make the file directory if it doesnt exist
 	if not os.path.exists(filepath):	
@@ -78,7 +78,7 @@ def filehandling(filename, path, maxquant_file):
 		shutil.copyfile(path+'file.zip', filepath+'file.zip')
 		
 	#Removing superfluous data and saving the file
-	df2 = df.loc[df['Raw file'] == raws,] 
+	df2 = df.loc[df['Raw file'] == filename,] 
 	pd.DataFrame.to_csv(df,path+maxquant_file)	
 
 	#Move or rm txt.file
@@ -159,7 +159,7 @@ def get_lower_bound(haystack, needle):
 		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def createImages(filename, path, filepath, resolution, subimage_interval):
+def createImages(filename, path, filepath, metapath,resolution, subimage_interval):
 
 	print('Preparing data for image creation              ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
@@ -290,7 +290,7 @@ def createImages(filename, path, filepath, resolution, subimage_interval):
 	imgpath = path+'images/'
 	if not os.path.exists(imgpath):
 		os.mkdir(imgpath)
-	metapath = path+'metadata/'
+
 	if not os.path.exists(metapath):
 		os.mkdir(metapath)	
 	outfile = open(metapath+'subimage.json','a') #The metadata file
@@ -368,15 +368,7 @@ def createImages(filename, path, filepath, resolution, subimage_interval):
 	print('Done!                                                \n')
 
 
-if __name__ == '__main__':
-	#Assigning accession number and maxquant output file name
-	accession = sys.argv[1] 
-	pepfile = sys.argv[2]
-
-	#Path to data
-	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	datapath = 'Data/' #Server datapath
-	
+def combined(accession, maxquant_file, path, metapath):
 	#Find all zip files
 	output      = zipfile_finder(accession = accession, path = datapath)
 	searchfiles = output[0]
@@ -397,7 +389,7 @@ if __name__ == '__main__':
 
 			print('file: '+filename) 
 			print('downloading raw file                  ', end = '\r')
-			output   = filehandling(filename = filename, path = datapath, maxquant_file = pepfile)
+			output   = filehandling(filename = filename, path = datapath, maxquant_file = pepfile, df = df)
 			df2 	 = output[0]
 			filepath = output[1]
 
@@ -407,10 +399,34 @@ if __name__ == '__main__':
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			reso   	 = {'x':1250,'y':1000}
 			interval = {'mz':75,'rt':5}
-			createImages(filename = filename, path = datapath, filepath = filepath, resolution = reso, subimage_interval = interval)
+			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval)
 
 			os.remove(datapath+'file.zip')
 			os.remove(datapath+pepfile)
+
+
+if __name__ == '__main__':
+	#Path to data
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' #Server datapath
+	metapath = datapath+'metadata/'
+
+	#Assigning accession number and maxquant output file name
+	pepfile = sys.argv[2]
+	if sys.argv[1] == 'accessions.json':
+		for line in open(metapath+'accessions.json'):
+			accession = str(line[15:24])
+			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+	else:
+		accession = sys.argv[1] 
+		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+	
+
+	
+
+
+	
+	
 		
 # python3 prideDL.py PXD004732 allPeptides.txt
 # python3 prideDL.py PXD010595 allPeptides.txt

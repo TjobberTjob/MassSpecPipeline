@@ -54,6 +54,7 @@ def get_accessions(path):
 
 def accessions_metadata(path):
 	metadata = 'accessions.json'
+	accessions	 = 'accessions.txt'
 	if os.path.exists(path+metadata):
 		overwrite = validated_input('Metadata already exists, wanna overwrite?',('y','n'))
 		if overwrite == 'y':
