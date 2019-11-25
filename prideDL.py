@@ -67,7 +67,7 @@ def rawfile_finder(zipfile, path, maxquant_file):
 	return rawfiles, df
 
 
-def filehandling(filename, path, maxquant_file, df):
+def filehandling(filename, path, maxquant_file, df, url):
 	filepath = path+filename+'/'
 	#Make the file directory if it doesnt exist
 	if not os.path.exists(filepath):	
@@ -108,7 +108,7 @@ def formatFile(filename, path, filepath):
 		os.chdir('MassSpecPipeline/')
 
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
-		print('docker run -v \"'+path[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
+		os.system('docker run -v \"'+os.getcwd()+'/'+path[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
 		# os.remove(path+filename+'/file.raw')
 
@@ -126,9 +126,9 @@ def process_ms1(spectrum):
 
 def internalmzML(path):
 	#Extract the data from the mzml, if we havnt already
-	if not os.path.exists(filepath+'mzML.json'):
+	if not os.path.exists(path+'mzML.json'):
 		print('Extracting data from mzML                     ', end = '\r')
-		data = mzml.MzML(filepath+'file.mzML')
+		data = mzml.MzML(path+'file.mzML')
 
 		#Extracted data
 		extracted = {'ms1':{}}
@@ -145,10 +145,10 @@ def internalmzML(path):
 			ms1_spectrum = process_ms1(spectrum)
 			extracted['ms1'][scan_id] = {'mz':ms1_spectrum['mz'],'intensity':ms1_spectrum['intensity'],'scan_time':ms1_spectrum['scan_time']}
 
-		f = open(filepath+'mzML.json','w')
+		f = open(path+'mzML.json','w')
 		f.write(json.dumps(extracted))
 		f.close()
-		# os.remove(filepath+'file.mzml')
+		# os.remove(path+'file.mzml')
 
 
 def get_lower_bound(haystack, needle):
@@ -159,7 +159,7 @@ def get_lower_bound(haystack, needle):
 		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def createImages(filename, path, filepath, metapath,resolution, subimage_interval):
+def createImages(filename, path, filepath, metapath,resolution, subimage_interval, df):
 
 	print('Preparing data for image creation              ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
@@ -297,9 +297,9 @@ def createImages(filename, path, filepath, metapath,resolution, subimage_interva
 	i = 0
 	outbound = 0
 	inbound  = 0
-	for index, rows in df2.iterrows():
+	for index, rows in df.iterrows():
 		i+=1
-		print("Creating subimages: {:2.1%}                                  ".format(i / len(df2['Sequence'])), end = '\r') #Print how far we are
+		print("Creating subimages: {:2.1%}                                  ".format(i / len(df['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			outbound+=1 #Check if this image can be created in our range or not
@@ -339,7 +339,7 @@ def createImages(filename, path, filepath, metapath,resolution, subimage_interva
 
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i)})
-		for ele in df2.columns[1:]:
+		for ele in df.columns[1:]:
 			if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
 				continue
 			else:
@@ -389,7 +389,7 @@ def combined(accession, maxquant_file, path, metapath):
 
 			print('file: '+filename) 
 			print('downloading raw file                  ', end = '\r')
-			output   = filehandling(filename = filename, path = datapath, maxquant_file = pepfile, df = df)
+			output   = filehandling(filename = filename, path = datapath, maxquant_file = pepfile, df = df, url = url)
 			df2 	 = output[0]
 			filepath = output[1]
 
@@ -399,7 +399,7 @@ def combined(accession, maxquant_file, path, metapath):
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			reso   	 = {'x':1250,'y':1000}
 			interval = {'mz':75,'rt':5}
-			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval)
+			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2)
 
 			os.remove(datapath+'file.zip')
 			os.remove(datapath+pepfile)
