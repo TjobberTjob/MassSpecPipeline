@@ -159,7 +159,7 @@ def get_lower_bound(haystack, needle):
 		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def createImages(filename, path, filepath, metapath,resolution, subimage_interval, df):
+def createImages(filename, path, filepath, metapath, resolution, subimage_interval, df):
 
 	print('Preparing data for image creation              ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
