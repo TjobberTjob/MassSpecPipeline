@@ -97,17 +97,31 @@ def classifyImages(path, trainpath, valpath, metapath, imgClass):
 		random.shuffle(imgdata)
 		trainlist   = imgdata[0:splits]
 		vallist 	= imgdata[splits:]
+		
+
+		print('Moving training files')
+		a = []
 		for f in trainlist:
+			a.append(f[0])
+
+		for f in a:
 			try:
-				shutil.move(path+f[0], trainpath+f[0])
+				# os.system('mv '+path+f+' '+trainpath+f)
+				shutil.move(path+f, trainpath+f)
 			except Exception:
 				pass
 			df = pd.DataFrame(trainlist, columns = ['image','class'])
 			with open(trainpath+'data.txt', "wb") as pa:
 				pickle.dump(df, pa)
+		
+		print('Moving validation files')
+		a = []
 		for f in vallist:
+			a.append(f[0])
+		for f in a:
 			try:
-				shutil.move(path+f[0], valpath+f[0])
+				# os.system('mv '+path+f' '+valpath+f)
+				shutil.move(path+f, valpath+f)
 			except Exception:
 				pass
 			df = pd.DataFrame(vallist, columns = ['image','class'])
@@ -119,10 +133,10 @@ def classifyImages(path, trainpath, valpath, metapath, imgClass):
 if __name__ == '__main__':
 	classorreg = sys.argv[1]
 
-	# datapath  = 'Data/'
-	# imagepath = 'Data/Images/'
-	datapath  = "/data/ProteomeToolsRaw/"
-	imagepath  = "/data/ProteomeToolsRaw/Images/"
+	datapath  = 'Data/'
+	imagepath = 'Data/Images/'
+	# datapath  = "/data/ProteomeToolsRaw/"
+	# imagepath  = "/data/ProteomeToolsRaw/Images/"
 	trainpath = imagepath+'training/'
 	valpath   = imagepath+'validation/'
 	metapath  = datapath+'metadata/'
