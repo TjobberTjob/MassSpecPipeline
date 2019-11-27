@@ -133,10 +133,10 @@ def classifyImages(path, trainpath, valpath, metapath, imgClass):
 if __name__ == '__main__':
 	classorreg = sys.argv[1]
 
-	# datapath  = 'Data/'
-	# imagepath = 'Data/Images/'
-	datapath  = "/data/ProteomeToolsRaw/"
-	imagepath  = "/data/ProteomeToolsRaw/Images/"
+	datapath  = 'Data/'
+	imagepath = 'Data/images/'
+	# datapath  = "/data/ProteomeToolsRaw/"
+	# imagepath  = "/data/ProteomeToolsRaw/images/"
 	trainpath = imagepath+'training/'
 	valpath   = imagepath+'validation/'
 	metapath  = datapath+'metadata/'
