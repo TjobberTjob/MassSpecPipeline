@@ -18,7 +18,7 @@ classorreg = sys.argv[1]
 
 #Pre-information and folderhandling
 datapath = '/data/ProteomeToolsRaw/Images/'
-#datapath = "Data/Images"
+# datapath = "Data/Images"
 trainpath = datapath+'training/'
 valpath = datapath+'validation/'
 
