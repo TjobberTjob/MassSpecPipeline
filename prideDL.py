@@ -407,8 +407,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	datapath = 'Data/' 
+	datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	# datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
