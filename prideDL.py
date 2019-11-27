@@ -408,7 +408,7 @@ def combined(accession, maxquant_file, path, metapath):
 if __name__ == '__main__':
 	#Path to data
 	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	datapath = 'Data/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
@@ -421,12 +421,5 @@ if __name__ == '__main__':
 		accession = sys.argv[1] 
 		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 	
-
-	
-
-
-	
-	
-		
 # python3 prideDL.py PXD004732 allPeptides.txt
 # python3 prideDL.py PXD010595 allPeptides.txt

@@ -6,8 +6,10 @@ if 'import' == 'import':
 	import shutil
 	import random
 	import re
+	import pickle
 	import numpy as np
 	from collections import defaultdict
+	import pandas as pd
 
 def validated_input(prompt, valid_values):
 	valid_input = False
@@ -35,17 +37,16 @@ def resetImage(path, trainpath, valpath):
 
 
 def classifyImages(path, trainpath, valpath, metapath, imgClass):
-	split = validated_input('Do you wanna split the data into training and validation?', ('y','n'))
-	if split == "yes" or split == "y":
-		splitratio = numbered_input("What should the validation % be?",0,100)
+	splitratio = numbered_input("What should the training % be?",0,100)
+	
+	if not os.path.exists(trainpath):
+		os.mkdir(trainpath)
+	if not os.path.exists(valpath):
+		os.mkdir(valpath)
 
-		if not os.path.exists(trainpath):
-			os.mkdir(trainpath)
-		if not os.path.exists(valpath):
-			os.mkdir(valpath)
-
+	
+	if classorreg == 'classification':
 		imgdata = {}
-		
 		#Preparing metadata
 		print("Preparing Metadata")
 		for line in open(metapath+'subimage_filtered.json'):
@@ -53,12 +54,12 @@ def classifyImages(path, trainpath, valpath, metapath, imgClass):
 
 			names = data['image']+".png"
 			imgdata[names] = data[imgClass]
-	
+
 			if not os.path.exists(trainpath+data[imgClass]):
 				os.mkdir(trainpath+data[imgClass])
 			if not os.path.exists(valpath+data[imgClass]):
 				os.mkdir(valpath+data[imgClass])
-
+		
 		#CREATING TRAINING DAT
 		print("Sorting into training data")
 		imgadata = defaultdict(list)
@@ -82,24 +83,48 @@ def classifyImages(path, trainpath, valpath, metapath, imgClass):
 				except Exception:
 					pass
 
-	elif split == "no" or split == "n":
+	elif classorreg == 'regression':
+		imgdata = []
+		#Preparing metadata
+		print("Preparing Metadata")
 		for line in open(metapath+'subimage_filtered.json'):
 			data = json.loads(line)
-			if not os.path.exists(path+data[imgClass]):
-				os.mkdir(path+data[imgClass])
+
+			name = data['image']+".png"
+			Class = data[imgClass]
+			imgdata.append([name,Class])
+		splits = round(len(imgdata)*(int(splitratio)/100))
+		random.shuffle(imgdata)
+		trainlist   = imgdata[0:splits]
+		vallist 	= imgdata[splits:]
+		for f in trainlist:
 			try:
-				shutil.move(path+data['image']+".png", path+data[imgClass]+"/")
+				shutil.move(path+f[0], trainpath+f[0])
 			except Exception:
 				pass
+			df = pd.DataFrame(trainlist, columns = ['image','class'])
+			with open(trainpath+'data.txt', "wb") as pa:
+				pickle.dump(df, pa)
+		for f in vallist:
+			try:
+				shutil.move(path+f[0], valpath+f[0])
+			except Exception:
+				pass
+			df = pd.DataFrame(vallist, columns = ['image','class'])
+			with open(valpath+'data.txt', "wb") as pa:
+				pickle.dump(df, pa)
 	else: quit()
 
 
 if __name__ == '__main__':
+	classorreg = sys.argv[1]
 
-	datapath  = 'Data/Images/'
-	# datapath  = "/data/ProteomeToolsRaw/Images/"
-	trainpath = datapath+'training/'
-	valpath   = datapath+'validation/'
+	datapath  = 'Data/'
+	imagepath = 'Data/Images/'
+	# datapath  = "/data/ProteomeToolsRaw/"
+	# imagepath  = "/data/ProteomeToolsRaw/Images/"
+	trainpath = imagepath+'training/'
+	valpath   = imagepath+'validation/'
 	metapath  = datapath+'metadata/'
 
 	for line in open(metapath+'subimage_filtered.json'):
@@ -110,8 +135,8 @@ if __name__ == '__main__':
 	Class = validated_input('What do you want to classify based on?',distlist)
 
 	if Class == 'reset':
-		resetImage(path = datapath, trainpath = trainpath, valpath = valpath)
+		resetImage(path = imagepath, trainpath = trainpath, valpath = valpath)
 	else:
-		classifyImages(path = datapath, trainpath = trainpath, valpath = valpath,  metapath = metapath, imgClass = Class)
+		classifyImages(path = imagepath, trainpath = trainpath, valpath = valpath,  metapath = metapath, imgClass = Class)
 
 

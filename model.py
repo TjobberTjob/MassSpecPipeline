@@ -14,36 +14,51 @@ if 'import' == 'import':
 	import os
 	import operator
 
+classorreg = sys.argv[1]
+
 #Pre-information and folderhandling
-datapath = "/data/ProteomeToolsRaw/Images/"
+datapath = '/data/ProteomeToolsRaw/Images/'
 #datapath = "Data/Images"
 trainpath = datapath+'training/'
 valpath = datapath+'validation/'
 
-files = [f for f in glob.glob(trainpath + "*", recursive=True)]
+files = [f for f in glob.glob(trainpath + '*', recursive=True)]
 classnum = {}
 for f in files:
 	folderclass = f[[m.start() for m in re.finditer('/', f)][-1]+1:]
-	classnum.update({"class: "+str(folderclass) : len([f for f in glob.glob(trainpath+folderclass + "/*.png", recursive=True)])})
-print("classes are distributed thusly: \n"+str(classnum))
-print("Guessing only the most abundant would result in "+str((round(max(classnum.items(), key=operator.itemgetter(1))[1] / sum(classnum.values())*100)))+"% accuracy")
+	classnum.update({"class: "+str(folderclass) : len([f for f in glob.glob(trainpath+folderclass + '/*.png', recursive=True)])})
+print('classes are distributed thusly: \n'+str(classnum))
+print('Guessing only the most abundant would result in '+str((round(max(classnum.items(), key=operator.itemgetter(1))[1] / sum(classnum.values())*100)))+"% accuracy")
 
-dirs = [os.path.dirname(p) for p in glob.glob(trainpath+"/*/*")]
+dirs = [os.path.dirname(p) for p in glob.glob(trainpath+'/*/*')]
 classes = len(np.unique(dirs))
 
 #Developing the imagegenerator
 trainImageDataGen = ImageDataGenerator(rescale=1/255.)
 validationImageDataGen = ImageDataGenerator(rescale=1/255.)
-datapath = "Data/Images/"
-trainGen = trainImageDataGen.flow_from_directory(trainpath,
+datapath = 'Data/Images/'
+if 	classorreg == 'classify':
+	trainGen = trainImageDataGen.flow_from_directory(trainpath,
 	target_size=(200,200),
 	batch_size=128,
-	class_mode="categorical")
+	class_mode='categorical')
 
-valGen = validationImageDataGen.flow_from_directory(valpath,
+	valGen = validationImageDataGen.flow_from_directory(valpath,
 	target_size=(200,200),
 	batch_size=64,
-	class_mode="categorical")	
+	class_mode='categorical')
+
+elif classorreg == 'regression':
+	traindata = panda.read_pickle(trainpath+'data.txt')
+	trainGen = trainImageDataGen.flow_from_directory(dataframe=traindata, directory = trainpath,
+	x_col='image', y_col='class', has_ext=True, class_mode="other",
+	target_size=(200,200), batch_size=128)
+
+	valdata = panda.read_pickle(valpath+'data.txt')
+	valGen = validationImageDataGen.flow_from_directory(dataframe=valdata, directory = trainpath,
+	x_col='image', y_col='class', has_ext=True, class_mode="other",
+	target_size=(200,200), batch_size=128)
+	
 
 #Create model
 inputs = Input(shape = (200,200,3))
@@ -56,18 +71,25 @@ x  = Concatenate()([x, x1, x2])
 x  = Flatten()(x)
 x  = Dropout(rate = 0.25)(x)
 outputs = Dense(64, activation = 'relu')(x)
-outputs = Dense(classes, activation = 'softmax')(x)
+if 	classorreg == 'classify':
+	outputs = Dense(classes, activation = 'softmax')(x)
+elif classorreg == 'regression':
+	outputs = Dense(1, activation = 'linear')(x)
 model   = keras.Model(inputs,outputs)
 
-model.compile(loss = 'categorical_crossentropy', metrics=['accuracy'], optimizer = 'adam') 
+if 	classorreg == 'classify':
+	model.compile(loss = 'categorical_crossentropy', metrics=['accuracy'], optimizer = 'adam') 
+elif classorreg == 'regression':
+	model.compile(loss = 'mean_absolute_percentage_error', metrics=['accuracy'], optimizer = 'adam') 
+
+
 #Create callbacks
-checkpoint  = keras.callbacks.ModelCheckpoint("bestweight.h5", monitor='val_acc', save_best_only=True)
+checkpoint  = keras.callbacks.ModelCheckpoint('bestweight.h5', monitor='val_acc', save_best_only=True)
 early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 callbacks_list = [checkpoint, early_stopping]
 
 
-trainfiles = [f for f in glob.glob(trainpath + "/*/*", recursive=True)]
-valfiles = [f for f in glob.glob(valpath + "/*/*", recursive=True)]
-print(len(trainfiles))
+trainfiles = [f for f in glob.glob(trainpath + '/*/*', recursive=True)]
+valfiles = [f for f in glob.glob(valpath + '/*/*', recursive=True)]
 #Run model
 model.fit_generator(generator = trainGen, steps_per_epoch = len(trainfiles)//128, epochs = 50, callbacks = callbacks_list, validation_data = valGen, validation_steps = len(valfiles)//64)
