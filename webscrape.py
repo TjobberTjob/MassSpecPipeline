@@ -137,7 +137,7 @@ def accessions_metadata(path):
 					if 'allPeptides.txt' in xx:
 						my_dict['allpeptides'] = True
 						break
-			else Exception:
+			except Exception:
 				my_dict['allpeptides'] = 'Error'
 		else:
 			my_dict['allpeptides'] = False
