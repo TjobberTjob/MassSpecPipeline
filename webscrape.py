@@ -70,7 +70,6 @@ def accessions_metadata(path):
 	outfile = open(join(path,metadata),'a')
 
 	for f in pride_accessions:
-		f = 'PXD010595'
 		i   += 1
 		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+f
 		html = requests.get(url).text
