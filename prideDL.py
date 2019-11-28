@@ -104,8 +104,7 @@ def formatFile(filename, path, filepath):
 			pass
 		os.chdir('ThermoRawFileParser/')
 		subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
-		os.chdir('..')
-		os.chdir('MassSpecPipeline/')
+		os.chdir('../MassSpecPipeline/')
 
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
 		os.system('docker run -v \"'+os.getcwd()+'/'+path[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
@@ -234,12 +233,16 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 			for x_i in range(0,resolution['x']):
 				_key = (x_i,y_i)
 				try:
-					intensity = np.mean(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
+					meanintensity = np.mean(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
+					minintensity  = min(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
+					maxintensity  = max(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
+					inputpoints   = len(ms1_array[_key]) #Amount of inputs into this array
+					pixelpoint 	  = [meanintensity,minintensity,maxintensity,inputpoints]
 					total_datapoints+=(len(ms1_array[_key]))
 					nonzero_counter+=1
 				except KeyError:
-					intensity = 0.0
-				row.append(intensity)
+					pixelpoint = [0,0,0,0]
+				row.append(pixelpoint)
 			image.append(row)
 		print('Saving image files                            ', end = '\r')
 
@@ -248,27 +251,43 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
 			pickle.dump(imagedata, pa)
 		
-		#Creating the full image
-		if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.png'):
-			fullimage = image[::-1]
-			fullimage = np.ma.masked_equal(fullimage,0)
-			
-			#Setup colormap
-			colMap = cm.jet
-			colMap.set_bad('darkblue')
-			
-			plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
-			plt.tight_layout()
-			plt.xlabel('m/z', fontsize=12)
-			plt.ylabel('Retention time - Minutes', fontsize=12)
-			plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-			plt.tight_layout()
-			plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.png')		
-	
+		#######Creating the full image (.png)#######
+		# for ll in ra nge(4):
+		# 	fullimage = [[y[ll] for y in x] for x in image]
+		# 	if ll == 0:
+		# 		titleofplot = 'Mean'
+		# 	elif ll == 1:
+		# 		titleofplot = 'Min'
+		# 	elif ll == 2:
+		# 		titleofplot = 'Max'
+		# 	elif ll == 3:
+		# 		titleofplot = 'Collapsed'
+
+		# 	if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
+		# 		#Set color of missing data
+		# 		fullimage = np.ma.masked_equal(fullimage,0)
+		# 		#Setup colormap
+		# 		colMap = cm.jet
+		# 		colMap.set_bad('darkblue')
+		# 		if titleofplot != 'Collapsed':
+		# 			plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
+		# 		else:
+		# 			plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')
+		# 		plt.tight_layout()
+		# 		plt.title(titleofplot)
+		# 		plt.xlabel('m/z', fontsize=12)
+		# 		plt.ylabel('Retention time - Minutes', fontsize=12)
+		# 		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
+		# 		# plt.colorbar(extend = 'both')
+		# 		plt.tight_layout()
+		# 		plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png')
+		# 		plt.close()
+		#############################################
+
 	else: #If the image data exists, just recall it instead of making it
 		print('Loading image data                              ', end = '\r')
 		with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
-			imagedata = pickle.load(pa)
+			imagedata 		= pickle.load(pa)
 			image 			= imagedata[0]
 			nonzero_counter = imagedata[1]
 			total_datapoints= imagedata[2]
@@ -316,26 +335,35 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		subimage = []
 		k = 0
 		for lines in image:
-			if k < rtupper and k > rtlower:
+			if rtlower < k < rtupper:
 				subimage.append(lines[mzlower:mzupper])
 			k+=1
+			if k > rtupper:
+				break
 
-		subimage = subimage[::-1]
-		subimage = np.ma.masked_equal(subimage,0)
+		#Save image as txt file
+		with open(imgpath+filename+'-'+str(i)+'.txt', 'wb') as pa:
+			pickle.dump(subimage, pa)
 
-		colMap = cm.jet
-		colMap.set_bad('darkblue')
+		# ########Create image########
+		# #get the mean values from the imagedata
+		# newimage = [[y[0] for y in x] for x in subimage]
+		# #set color of missing data
+		# newimage = np.ma.masked_equal(newimage,0)
 
-		# Save image
-		fig = plt.figure()
-		fig.set_size_inches((mzupper - mzlower)/100,(rtupper - rtlower)/100)
-		ax = plt.Axes(fig, [0., 0., 1, 1])
-		ax.set_axis_off()
-		fig.add_axes(ax)
-		plt.set_cmap('hot')
-		ax.imshow(subimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
-		plt.savefig(imgpath+filename+'-'+str(i)+'.png')
-		plt.close(fig)
+		# colMap = cm.jet
+		# colMap.set_bad('darkblue')
+
+		# fig = plt.figure()
+		# fig.set_size_inches(2,2)#(mzupper - mzlower)/100,(rtupper - rtlower)/100)
+		# ax = plt.Axes(fig, [0., 0., 1, 1])
+		# ax.set_axis_off()
+		# fig.add_axes(ax)
+		# plt.set_cmap('hot')
+		# ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
+		# plt.savefig(imgpath+filename+'-'+str(i)+'.png')
+		# plt.close()
+		# ###########################
 
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i)})
@@ -398,7 +426,7 @@ def combined(accession, maxquant_file, path, metapath):
 
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			reso   	 = {'x':1250,'y':1000}
-			interval = {'mz':75,'rt':5}
+			interval = {'mz':10,'rt':2}
 			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2)
 
 			os.remove(datapath+'file.zip')
@@ -407,12 +435,12 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
-	pepfile = sys.argv[2]
+	pepfile = 'allPeptides.txt'
 	if sys.argv[1] == 'accessions.json':
 		for line in open(metapath+'accessions.json'):
 			accession = str(line[15:24])
@@ -422,4 +450,4 @@ if __name__ == '__main__':
 		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 	
 # python3 prideDL.py PXD004732 allPeptides.txt
-# python3 prideDL.py PXD010595 allPeptides.txt
+# python3 prideDL.py PXD010595

@@ -10,15 +10,17 @@ if 'import' == 'import':
 	from keras import regularizers
 	import glob
 	import re
+	import pandas as pd
 	import numpy as np
+	import sys
 	import os
 	import operator
 
 classorreg = sys.argv[1]
 
 #Pre-information and folderhandling
-datapath = '/data/ProteomeToolsRaw/Images/'
-# datapath = "Data/Images"
+# datapath = '/data/ProteomeToolsRaw/images/'
+datapath = "Data/images/"
 trainpath = datapath+'training/'
 valpath = datapath+'validation/'
 
@@ -27,8 +29,8 @@ classnum = {}
 for f in files:
 	folderclass = f[[m.start() for m in re.finditer('/', f)][-1]+1:]
 	classnum.update({"class: "+str(folderclass) : len([f for f in glob.glob(trainpath+folderclass + '/*.png', recursive=True)])})
-print('classes are distributed thusly: \n'+str(classnum))
-print('Guessing only the most abundant would result in '+str((round(max(classnum.items(), key=operator.itemgetter(1))[1] / sum(classnum.values())*100)))+"% accuracy")
+# print('classes are distributed thusly: \n'+str(classnum))
+# print('Guessing only the most abundant would result in '+str((round(max(classnum.items(), key=operator.itemgetter(1))[1] / sum(classnum.values())*100)))+"% accuracy")
 
 dirs = [os.path.dirname(p) for p in glob.glob(trainpath+'/*/*')]
 classes = len(np.unique(dirs))
@@ -49,14 +51,14 @@ if 	classorreg == 'classify':
 	class_mode='categorical')
 
 elif classorreg == 'regression':
-	traindata = panda.read_pickle(trainpath+'data.txt')
-	trainGen = trainImageDataGen.flow_from_directory(dataframe=traindata, directory = trainpath,
-	x_col='image', y_col='class', has_ext=True, class_mode="other",
+	traindata = pd.read_pickle(trainpath+'data.txt')
+	trainGen = trainImageDataGen.flow_from_dataframe(dataframe=traindata, directory = trainpath,
+	x_col='image', y_col='class', class_mode="None",
 	target_size=(200,200), batch_size=128)
 
-	valdata = panda.read_pickle(valpath+'data.txt')
-	valGen = validationImageDataGen.flow_from_directory(dataframe=valdata, directory = trainpath,
-	x_col='image', y_col='class', has_ext=True, class_mode="other",
+	valdata = pd.read_pickle(valpath+'data.txt')
+	valGen = validationImageDataGen.flow_from_dataframe(dataframe=valdata, directory = trainpath,
+	x_col='image', y_col='class', class_mode="None",
 	target_size=(200,200), batch_size=128)
 	
 
