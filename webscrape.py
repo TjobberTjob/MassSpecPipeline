@@ -1,6 +1,7 @@
 if __name__ == '__main__':
 	import requests
 	import json
+	from zipfile import ZipFile
 	from os.path import join
 	import time
 	import re
@@ -111,9 +112,31 @@ def accessions_metadata(path):
 					print('f')
 			my_dict['filetypes'] = filetypes
 
-		url  = 'https://www.ebi.ac.uk/pride/ws/archive/project/'
-		page = requests.get(url).text
+		for div in soup.find_all('div', {'class': 'grid_6 omega'}):
+			url = div.find('a')['href'] #Update URL with FTP link
+			break
 		my_dict['maxquant'] = 'maxquant' in page.lower()
+
+		#Check for allpeptides.txt		
+		if my_dict['maxquant'] == True and '.zip' in my_dict['filetypes']:
+			url = 'https://www.ebi.ac.uk/pride/archive/projects/'+f+'/files'
+			if my_dict['maxquant'] == True and '.zip' in my_dict['filetypes']:
+				os.system('wget -q -O '+metapath+'readme.txt '+url+'/README.txt')
+			df = pd.read_csv(metapath+'readme.txt',sep='\t')
+			os.remove(metapath+'readme.txt')
+			searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
+			os.system('wget -q -O '+metapath+'file.zip '+searchfiles[0])
+
+			with ZipFile(path+'file.zip','r') as zipped:
+				ziplist = zipped.namelist()
+
+			for xx in ziplist:
+				if 'allPeptides.txt' in xx:
+					my_dict['allpeptides'] == True
+					break
+		else:
+			my_dict['allpeptides'] == False
+
 		print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
 
 		outfile.write(json.dumps(my_dict)+'\n')
@@ -142,3 +165,6 @@ if __name__ == '__main__':
 	#Get Metadata for all accession numbers
 	if cmd == 'metadata':
 		accessions_metadata(path = metapath)
+
+	#python3 webscrape.py accessions
+	#python3 webscrape.py metadata
