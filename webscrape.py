@@ -134,10 +134,10 @@ def accessions_metadata(path):
 
 			for xx in ziplist:
 				if 'allPeptides.txt' in xx:
-					my_dict['allpeptides'] == True
+					my_dict['allpeptides'] = True
 					break
 		else:
-			my_dict['allpeptides'] == False
+			my_dict['allpeptides'] = False
 
 		print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
 
@@ -154,8 +154,8 @@ def validated_input(prompt, valid_values):
 
 
 if __name__ == '__main__':
-	datapath = 'Data/'
-	# datapath = '/data/ProteomeToolsRaw/'
+	# datapath = 'Data/'
+	datapath = '/data/ProteomeToolsRaw/'
 	metapath = datapath+'metadata/'
 
 	cmd = sys.argv[1]
