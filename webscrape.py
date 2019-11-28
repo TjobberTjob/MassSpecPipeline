@@ -120,22 +120,25 @@ def accessions_metadata(path):
 
 		#Check for allpeptides.txt		
 		if my_dict['maxquant'] == True and 'zip' in my_dict['filetypes']:
-			for div in soup.find_all('div', {'class': 'grid_6 omega'}):
-				url = div.find('a')['href'] #Update URL with FTP link
-				break
-			os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
-			df = pd.read_csv(path+'readme.txt',sep='\t')
-			os.remove(path+'readme.txt')
-			searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI'].tolist()
-			os.system('wget -q -O '+path+'file.zip '+searchfiles[0])
-
-			with ZipFile(path+'file.zip','r') as zipped:
-				ziplist = zipped.namelist()
-
-			for xx in ziplist:
-				if 'allPeptides.txt' in xx:
-					my_dict['allpeptides'] = True
+			try:
+				for div in soup.find_all('div', {'class': 'grid_6 omega'}):
+					url = div.find('a')['href'] #Update URL with FTP link
 					break
+				os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
+				df = pd.read_csv(path+'readme.txt',sep='\t')
+				os.remove(path+'readme.txt')
+				searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI'].tolist()
+				os.system('wget -q -O '+path+'file.zip '+searchfiles[0])
+
+				with ZipFile(path+'file.zip','r') as zipped:
+					ziplist = zipped.namelist()
+
+				for xx in ziplist:
+					if 'allPeptides.txt' in xx:
+						my_dict['allpeptides'] = True
+						break
+			else Exception:
+				my_dict['allpeptides'] = 'Error'
 		else:
 			my_dict['allpeptides'] = False
 
