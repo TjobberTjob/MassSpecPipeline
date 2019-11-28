@@ -112,14 +112,16 @@ def accessions_metadata(path):
 					print('f')
 			my_dict['filetypes'] = filetypes
 
-		for div in soup.find_all('div', {'class': 'grid_6 omega'}):
-			url = div.find('a')['href'] #Update URL with FTP link
-			break
+		
+		url = 'https://www.ebi.ac.uk/pride/archive/projects/'+f+'/files'
+		page = requests.get(url).text
 		my_dict['maxquant'] = 'maxquant' in page.lower()
 
 		#Check for allpeptides.txt		
 		if my_dict['maxquant'] == True and '.zip' in my_dict['filetypes']:
-			url = 'https://www.ebi.ac.uk/pride/archive/projects/'+f+'/files'
+			for div in soup.find_all('div', {'class': 'grid_6 omega'}):
+				url = div.find('a')['href'] #Update URL with FTP link
+				break
 			if my_dict['maxquant'] == True and '.zip' in my_dict['filetypes']:
 				os.system('wget -q -O '+metapath+'readme.txt '+url+'/README.txt')
 			df = pd.read_csv(metapath+'readme.txt',sep='\t')
