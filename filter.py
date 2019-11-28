@@ -23,8 +23,8 @@ def filter(path, file):
 
 
 if __name__ == '__main__':
-	# path = 'Data/metadata/'
-	path = '/data/ProteomeToolsRaw/metadata/'
+	path = 'Data/metadata/'
+	# path = '/data/ProteomeToolsRaw/metadata/'
 	
 	filetofilter = sys.argv[1]
 

@@ -10,6 +10,7 @@ if __name__ == '__main__':
 	import os
 	from urllib import parse
 	import pickle
+	import pandas as pd
 	import codecs
 	import sys
 
@@ -59,7 +60,7 @@ def accessions_metadata(path):
 	if os.path.exists(path+metadata):
 		overwrite = validated_input('Metadata already exists, wanna overwrite?',('y','n'))
 		if overwrite == 'y':
-			os.system('rm '+path+metadata)
+			os.remove(path+metadata)	
 		else:
 			quit()
 
@@ -69,6 +70,7 @@ def accessions_metadata(path):
 	outfile = open(join(path,metadata),'a')
 
 	for f in pride_accessions:
+		f = 'PXD010595'
 		i   += 1
 		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+f
 		html = requests.get(url).text
@@ -113,21 +115,20 @@ def accessions_metadata(path):
 			my_dict['filetypes'] = filetypes
 
 		
-		url = 'https://www.ebi.ac.uk/pride/archive/projects/'+f+'/files'
+		url = 'https://www.ebi.ac.uk/pride/archive/projects/'+f
 		page = requests.get(url).text
 		my_dict['maxquant'] = 'maxquant' in page.lower()
 
 		#Check for allpeptides.txt		
-		if my_dict['maxquant'] == True and '.zip' in my_dict['filetypes']:
+		if my_dict['maxquant'] == True and 'zip' in my_dict['filetypes']:
 			for div in soup.find_all('div', {'class': 'grid_6 omega'}):
 				url = div.find('a')['href'] #Update URL with FTP link
 				break
-			if my_dict['maxquant'] == True and '.zip' in my_dict['filetypes']:
-				os.system('wget -q -O '+metapath+'readme.txt '+url+'/README.txt')
-			df = pd.read_csv(metapath+'readme.txt',sep='\t')
-			os.remove(metapath+'readme.txt')
-			searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-			os.system('wget -q -O '+metapath+'file.zip '+searchfiles[0])
+			os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
+			df = pd.read_csv(path+'readme.txt',sep='\t')
+			os.remove(path+'readme.txt')
+			searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI'].tolist()
+			os.system('wget -q -O '+path+'file.zip '+searchfiles[0])
 
 			with ZipFile(path+'file.zip','r') as zipped:
 				ziplist = zipped.namelist()

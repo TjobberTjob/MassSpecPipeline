@@ -8,7 +8,6 @@ if 'import' == 'import':
 	import re
 	import pickle
 	import numpy as np
-	import sys
 	from collections import defaultdict
 	import pandas as pd
 
@@ -29,7 +28,7 @@ def numbered_input(prompt, min, max):
 
 
 def resetImage(path, trainpath, valpath):
-	os.system('find '+str(path)+' -mindepth 2 -name \"*.png\" -exec mv -t '+ str(path)+ ' {} +')
+	os.system('find '+str(path)+' -mindepth 2 -name \"*.txt\" -exec mv -t '+ str(path)+ ' {} +')
 	try:
 		shutil.rmtree(trainpath)
 		shutil.rmtree(valpath)
@@ -53,7 +52,7 @@ def classifyImages(path, trainpath, valpath, metapath, imgClass):
 		for line in open(metapath+'subimage_filtered.json'):
 			data = json.loads(line)
 
-			names = data['image']+".png"
+			names = data['image']+".txt"
 			imgdata[names] = data[imgClass]
 
 			if not os.path.exists(trainpath+data[imgClass]):
@@ -84,6 +83,7 @@ def classifyImages(path, trainpath, valpath, metapath, imgClass):
 				except Exception:
 					pass
 
+	#Regression: train and validation but no class folders.
 	elif classorreg == 'regression':
 		imgdata = []
 		#Preparing metadata
@@ -91,7 +91,7 @@ def classifyImages(path, trainpath, valpath, metapath, imgClass):
 		for line in open(metapath+'subimage_filtered.json'):
 			data = json.loads(line)
 
-			name = data['image']+".png"
+			name = data['image']+".txt"
 			Class = data[imgClass]
 			imgdata.append([name,Class])
 		splits = round(len(imgdata)*(int(splitratio)/100))
