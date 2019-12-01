@@ -88,7 +88,6 @@ def filehandling(filename, path, maxquant_file, df, url):
 	#Download the raw file
 	if not (os.path.exists(filepath+'/file.raw') or os.path.exists(filepath+'/file.mzML') or os.path.exists(filepath+'/mzML.json')):
 		os.system('wget -q --show-progress -O '+filepath+'/file.raw -c '+url+'/'+filename+'.raw')
-	#os.remove(path+filename+'/file.raw')
 	return df2, filepath
 
 
@@ -109,7 +108,7 @@ def formatFile(filename, path, filepath):
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
 		os.system('docker run -v \"'+os.getcwd()+'/'+path[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
-		# os.remove(path+filename+'/file.raw')
+		os.remove(path+filename+'/file.raw')
 
 
 def process_ms1(spectrum):
@@ -435,8 +434,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
