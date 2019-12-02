@@ -332,7 +332,6 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		mzupper = int(get_lower_bound(mzrangelist,rows['m/z']) + onemzlength*subimage_interval['mz']) 
 		rtlower = int(get_lower_bound(rtrangelist,rows['Retention time']) - onertlength*subimage_interval['rt']) 
 		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + onertlength*subimage_interval['rt'])
-		print(mzupper-mzlower,rtupper-rtlower)
 		subimage = []
 		k = 0
 		for lines in image:
