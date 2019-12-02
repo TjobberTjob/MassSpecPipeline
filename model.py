@@ -20,30 +20,27 @@ if 'import' == 'import':
 	import os
 	import operator
 
-def datafetcher(path, impath,classorreg, imageclass, splitratio):
+def datafetcher(path, impath,classification, imageclass, splitratio):
 	imgfiles = glob.glob(impath+'/*')
 	with open(imgfiles[0], "rb") as pa:
 		image = pickle.load(pa)
 	imagelen = len(image)
+	pixellen = len(image[0])
 
-	if classorreg == 'regression':
+	if not classification:
 		names = []
 		labels = {}
 		for line in open(path+'subimage_filtered.json'):
-			data   = json.loads(line)
+			data  = json.loads(line)
 			name  = data['image']+".txt"
 			names.append(name)
 			labels[name] = data[imageclass]
-
-		random.shuffle(names)
-		print(len(names))
-		print(splitratio)
 		splits = round(len(names) * float(splitratio))
 		trainlist   = names[0:splits]
 		vallist 	= names[splits:]
 		partition = {'train': trainlist, 'validation': vallist}
 	
-	elif classorreg == 'classification':
+	else:
 		labels = {}
 		for line in open(path+'subimage_filtered.txt'):
 			data   = json.loads(line)
@@ -59,14 +56,15 @@ def datafetcher(path, impath,classorreg, imageclass, splitratio):
 			partition[train.append(trainlist)]
 			partition[validation.append(vallist)]
 
-	return partition, labels, imagelen
+	return partition, labels, imagelen, pixellen
 
 # Developing the data generator
 class DataGenerator(keras.utils.Sequence):
 	'Generates data for Keras'
-	def __init__(self, list_IDs, labels, batch_size, dim, n_channels, n_classes, shuffle):
+	def __init__(self, path, list_IDs, labels, batch_size, size, n_channels, n_classes, shuffle):
 		'Initialization'
-		self.dim = dim
+		self.size = size
+		self.path = path
 		self.batch_size = batch_size
 		self.labels = labels
 		self.list_IDs = list_IDs
@@ -86,97 +84,101 @@ class DataGenerator(keras.utils.Sequence):
 
 		# Find list of IDs
 		list_IDs_temp = [self.list_IDs[k] for k in indexes]
-
 		# Generate data
 		X, y = self.__data_generation(list_IDs_temp)
-
 		return X, y
 
 	def on_epoch_end(self):
 		'Updates indexes after each epoch'
 		self.indexes = np.arange(len(self.list_IDs))
-		if self.shuffle == True:
+		if self.shuffle:
 			np.random.shuffle(self.indexes)
 
 	def __data_generation(self, list_IDs_temp):
-		'Generates data containing batch_size samples' # X : (n_samples, *dim, n_channels)
+		'Generates data containing batch_size samples'
 		# Initialization
-		X = np.empty((self.batch_size, *self.dim, self.n_channels))
-		y = np.empty((self.batch_size), dtype=int)
+		X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
+		y = np.empty((self.batch_size), dtype = float)
 
 		# Generate data
 		for i, ID in enumerate(list_IDs_temp):
 			# Store sample
-			X[i,] = np.load('data/' + ID + '.npy')
+			with open(imagepath+ID, "rb") as pa:
+				image = pickle.load(pa)
+			image = np.array(image)
+			image = image[:,:,0:self.n_channels]
+			X[i,] = image
 
-			# Store class
 			y[i] = self.labels[ID]
+		if not classification:
+			return X, y
+		else:
+			return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
 
-		return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
 
+def nnmodel(imglen, pixellen, classification, n_channels, n_classes):
+	input = Input(shape=(imglen, pixellen, n_channels,))
+	x  = Dense(128, activation = 'relu')(input)
+	x  = Dense(128, activation = 'relu')(x)
+	x  = Dense(128, activation = 'relu')(x)
+	x  = Flatten()(x)
+	x  = Dropout(rate = 0.25)(x)		
+	if 	not classification:
+		output = Dense(1, activation = 'linear')(x)
+	else:
+		output = Dense(n_classes, activation = 'softmax')(x)
+	model   = keras.Model(input, output)
 
-# def nnmodel():
-# 	inputs = Input(shape = (200,200,3))
-# 	x  = Conv2D(16, kernel_size=(1,1), activation = 'relu')(inputs)
-# 	x1 = Conv2D(16, kernel_size=(1,1), activation = 'relu')(inputs)
-# 	x1 = Conv2D(8, kernel_size=(3,3), activation = 'relu', padding = "same")(x1)
-# 	x2 = Conv2D(8, kernel_size=(1,1), activation = 'relu')(inputs)
-# 	x2 = Conv2D(4, kernel_size=(5,5), activation = 'relu', padding = "same")(x2)
-# 	x  = Concatenate()([x, x1, x2])
-# 	x  = Flatten()(x)
-# 	x  = Dropout(rate = 0.25)(x)
-# 	outputs = Dense(64, activation = 'relu')(x)
-# 	if 	classorreg == 'classify':
-# 		outputs = Dense(classes, activation = 'softmax')(x)
-# 	elif classorreg == 'regression':
-# 		outputs = Dense(1, activation = 'linear')(x)
-# 	model   = keras.Model(inputs,outputs)
-
-# 	if 	classorreg == 'classify':
-# 		model.compile(loss = 'categorical_crossentropy', metrics=['accuracy'], optimizer = 'adam') 
-# 	elif classorreg == 'regression':
-# 		model.compile(loss = 'mean_absolute_percentage_error', metrics=['accuracy'], optimizer = 'adam') 
+	if classification:
+		model.compile(loss = 'categorical_crossentropy', metrics=['accuracy'], optimizer = 'adam') 
+	else:
+		model.compile(loss="mse", metrics=["mse"], optimizer="rmsprop") 
 
 
 	#Create callbacks
-	# checkpoint  = keras.callbacks.ModelCheckpoint('bestweight.h5', monitor='val_acc', save_best_only=True)
-	# early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
-	# callbacks_list = [checkpoint, early_stopping]
-	# return model, callbacks_list
+	checkpoint  = keras.callbacks.ModelCheckpoint('bestweight.h5', monitor='val_acc', save_best_only=True)
+	early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+	callbacks_list = [checkpoint, early_stopping]
+	return model, callbacks_list
 
 
-if 'run' == 'run':
+if __name__ == '__main__':
 
-	classorreg = sys.argv[1]
-	imageclass = sys.argv[2]
-	splitratio = sys.argv[3]
-
+	classification 	= sys.argv[1] == 'T'
+	imageclass 		= sys.argv[2]
+	splitratio		= sys.argv[3]
 	#Pre-information and folderhandling
 	# datapath = '/data/ProteomeToolsRaw/images/'
-	datapath = 'Data/'
-	metapath = datapath+'metadata/'
-	imagepath = datapath+'images/'
+	datapath 	= 'Data/'
+	metapath 	= datapath+'metadata/'
+	imagepath 	= datapath+'images/'
 
-	output = datafetcher(metapath, imagepath, classorreg, imageclass, splitratio)
+	output = datafetcher(metapath, imagepath, classification, imageclass, splitratio)
 	partition = output[0]
-	labels = output[1] 
-	imglen = output[2]
+	labels   = output[1]
+	imglen   = output[2]
+	pixellen = output[3]
 
-	params = {'dim': imglen,
-			  'batch_size': 16,
-			  'n_classes': 1,
-			  'n_channels': 4,
+	if classification:
+		n_classes = len(labels)
+	else:
+		n_classes = 1
+
+	n_channels = 4
+
+	params = {'size': (pixellen,imglen),
+			  'batch_size': 32,
+			  'n_classes' : n_classes,
+			  'n_channels': n_channels,
 			  'shuffle': True}
 
-	training_generator = DataGenerator(partition['train'], labels, **params)
-	validation_generator = DataGenerator(partition['validation'], labels, **params)
+	training_generator = DataGenerator(imagepath,partition['train'], labels, **params)
+	validation_generator = DataGenerator(imagepath,partition['validation'], labels, **params)
 
-	output = nnmodel()
-	model = output[0]
+	output 	= nnmodel(imglen, pixellen, classification, n_channels, n_classes)
+	model 	= output[0]
 	callbacks_list = [output[1]]
-	model.fit_generator(generator=training_generator,
-						validation_data=validation_generator,
-						use_multiprocessing=True,
-						workers=6)
+	model.fit_generator(generator=training_generator,validation_data=validation_generator)#, callbacks = callbacks_list)
 
-#python3 model.py regression m/z 0.8
+#python3 model.py F m/z 0.8
+

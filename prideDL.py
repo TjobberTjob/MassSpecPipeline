@@ -24,19 +24,16 @@ def zipfile_finder(accession, path):
 	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
 	html = requests.get(url).text
 	soup = BeautifulSoup(html,'html.parser')									
-
-	for div in soup.find_all('div', {'class': 'grid_6 omega'}):
-		url = div.find('a')['href'] #Update URL with FTP link
-		break
-
+	url = [div.find('a')['href'] for div in soup.find_all('div', {'class': 'grid_6 omega'})]
+	
 	#Download readme file
-	os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
+	os.system('wget -q -O '+path+'readme.txt '+url[0]+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+'readme.txt',sep='\t')
 	os.remove(path+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-	return searchfiles, url
+	return searchfiles, url[0]
 
 
 def rawfile_finder(zipfile, path, maxquant_file):
@@ -157,7 +154,7 @@ def get_lower_bound(haystack, needle):
 		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def createImages(filename, path, filepath, metapath, resolution, subimage_interval, df):
+def createImages(filename, path, filepath, metapath, resolution, subimage_interval, df, savepng):
 
 	print('Preparing data for image creation              ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
@@ -189,10 +186,8 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		ms1_array = {}
 		
 		# Get sorted list of scan ids.
-		scan_ids = []
-		for scan_id in mzml['ms1']:
-			scan_ids.append(int(scan_id))
-			
+		scan_ids = [int(scan_id) for scan_id in mzml['ms1']]
+
 		for scan_id in sorted(scan_ids):
 			scan_id = str(scan_id)
 
@@ -236,6 +231,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 					minintensity  = min(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
 					maxintensity  = max(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
 					inputpoints   = len(ms1_array[_key]) #Amount of inputs into this array
+					pixelpoint2   = np.array(meanintensity,minintensity,maxintensity,inputpoints)
 					pixelpoint 	  = [meanintensity,minintensity,maxintensity,inputpoints]
 					total_datapoints+=(len(ms1_array[_key]))
 					nonzero_counter+=1
@@ -251,36 +247,37 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 			pickle.dump(imagedata, pa)
 		
 		#######Creating the full image (.png)#######
-		# for ll in ra nge(4):
-		# 	fullimage = [[y[ll] for y in x] for x in image]
-		# 	if ll == 0:
-		# 		titleofplot = 'Mean'
-		# 	elif ll == 1:
-		# 		titleofplot = 'Min'
-		# 	elif ll == 2:
-		# 		titleofplot = 'Max'
-		# 	elif ll == 3:
-		# 		titleofplot = 'Collapsed'
+		if savepng:
+			for ll in range(4):
+				fullimage = [[y[ll] for y in x] for x in image]
+				if ll == 0:
+					titleofplot = 'Mean'
+				elif ll == 1:
+					titleofplot = 'Min'
+				elif ll == 2:
+					titleofplot = 'Max'
+				elif ll == 3:
+					titleofplot = 'Collapsed'
 
-		# 	if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
-		# 		#Set color of missing data
-		# 		fullimage = np.ma.masked_equal(fullimage,0)
-		# 		#Setup colormap
-		# 		colMap = cm.jet
-		# 		colMap.set_bad('darkblue')
-		# 		if titleofplot != 'Collapsed':
-		# 			plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
-		# 		else:
-		# 			plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')
-		# 		plt.tight_layout()
-		# 		plt.title(titleofplot)
-		# 		plt.xlabel('m/z', fontsize=12)
-		# 		plt.ylabel('Retention time - Minutes', fontsize=12)
-		# 		plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-		# 		# plt.colorbar(extend = 'both')
-		# 		plt.tight_layout()
-		# 		plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png')
-		# 		plt.close()
+				if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
+					#Set color of missing data
+					fullimage = np.ma.masked_equal(fullimage,0)
+					#Setup colormap
+					colMap = cm.jet
+					colMap.set_bad('darkblue')
+					if titleofplot != 'Collapsed':
+						plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
+					else:
+						plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')
+					plt.tight_layout()
+					plt.title(titleofplot)
+					plt.xlabel('m/z', fontsize=12)
+					plt.ylabel('Retention time - Minutes', fontsize=12)
+					plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
+					# plt.colorbar(extend = 'both')
+					plt.tight_layout()
+					plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png')
+					plt.close()
 		#############################################
 
 	else: #If the image data exists, just recall it instead of making it
@@ -304,7 +301,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	for i in range(int(resolution['y'])):
 		value+=rt_bin
 		rtrangelist.append(value)
-	
+
 	imgpath = path+'images/'
 	if not os.path.exists(imgpath):
 		os.mkdir(imgpath)
@@ -312,12 +309,14 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	if not os.path.exists(metapath):
 		os.mkdir(metapath)	
 	outfile = open(metapath+'subimage.json','a') #The metadata file
+	
 	i = 0
 	outbound = 0
 	inbound  = 0
 	for index, rows in df.iterrows():
 		i+=1
-		print("Creating subimages: {:2.1%}                                  ".format(i / len(df['Sequence'])), end = '\r') #Print how far we are
+		if i % 10 == 0:
+			print("Creating subimages: {:2.1%}                                  ".format(i / len(df['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			outbound+=1 #Check if this image can be created in our range or not
@@ -325,12 +324,15 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		inbound+=1
 		if os.path.exists(imgpath+filename+'-'+str(i)+'.png'):
 			continue
-
-		mzlower = get_lower_bound(mzrangelist,rows['m/z'] - subimage_interval['mz']) 
-		mzupper = get_lower_bound(mzrangelist,rows['m/z'] + subimage_interval['mz'])
-		rtlower = get_lower_bound(rtrangelist,rows['Retention time'] - subimage_interval['rt'])
-		rtupper = get_lower_bound(rtrangelist,rows['Retention time'] + subimage_interval['rt'])
 		
+		onemzlength = len(mzrangelist)/(max(mzrangelist)-min(mzrangelist))
+		onertlength = len(rtrangelist)/(max(rtrangelist)-min(rtrangelist))
+
+		mzlower = int(get_lower_bound(mzrangelist,rows['m/z']) - onemzlength*subimage_interval['mz'])
+		mzupper = int(get_lower_bound(mzrangelist,rows['m/z']) + onemzlength*subimage_interval['mz']) 
+		rtlower = int(get_lower_bound(rtrangelist,rows['Retention time']) - onertlength*subimage_interval['rt']) 
+		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + onertlength*subimage_interval['rt'])
+		print(mzupper-mzlower,rtupper-rtlower)
 		subimage = []
 		k = 0
 		for lines in image:
@@ -344,25 +346,26 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		with open(imgpath+filename+'-'+str(i)+'.txt', 'wb') as pa:
 			pickle.dump(subimage, pa)
 
-		# ########Create image########
-		# #get the mean values from the imagedata
-		# newimage = [[y[0] for y in x] for x in subimage]
-		# #set color of missing data
-		# newimage = np.ma.masked_equal(newimage,0)
+		########Create image########
+		if savepng:
+			#get the mean values from the imagedata
+			newimage = [[y[0] for y in x] for x in subimage]
+			#set color of missing data
+			newimage = np.ma.masked_equal(newimage,0)
 
-		# colMap = cm.jet
-		# colMap.set_bad('darkblue')
+			colMap = cm.jet
+			colMap.set_bad('darkblue')
 
-		# fig = plt.figure()
-		# fig.set_size_inches(2,2)#(mzupper - mzlower)/100,(rtupper - rtlower)/100)
-		# ax = plt.Axes(fig, [0., 0., 1, 1])
-		# ax.set_axis_off()
-		# fig.add_axes(ax)
-		# plt.set_cmap('hot')
-		# ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
-		# plt.savefig(imgpath+filename+'-'+str(i)+'.png')
-		# plt.close()
-		# ###########################
+			fig = plt.figure()
+			fig.set_size_inches(2,2)#(mzupper - mzlower)/100,(rtupper - rtlower)/100)
+			ax = plt.Axes(fig, [0., 0., 1, 1])
+			ax.set_axis_off()
+			fig.add_axes(ax)
+			plt.set_cmap('hot')
+			ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
+			plt.savefig(imgpath+filename+'-'+str(i)+'.png')
+			plt.close()
+		###########################
 
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i)})
@@ -426,7 +429,7 @@ def combined(accession, maxquant_file, path, metapath):
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			reso   	 = {'x':1250,'y':1000}
 			interval = {'mz':10,'rt':2}
-			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2)
+			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
 
 			os.remove(datapath+'file.zip')
 			os.remove(datapath+pepfile)
