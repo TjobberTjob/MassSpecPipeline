@@ -157,8 +157,8 @@ if __name__ == '__main__':
 	imageclass 		= sys.argv[2]
 	splitratio		= sys.argv[3]
 	#Pre-information and folderhandling
-	# datapath = '/data/ProteomeToolsRaw/images/'
-	datapath 	= 'Data/'
+	datapath = '/data/ProteomeToolsRaw/images/'
+	# datapath 	= 'Data/'
 	metapath 	= datapath+'metadata/'
 	imagepath 	= datapath+'images/'
 
