@@ -114,11 +114,7 @@ class DataGenerator(keras.utils.Sequence):
 			# Store sample
 			with open(imagepath+ID, "rb") as pa:
 				image = pickle.load(pa)
-			print(image[0])
 			image = np.array(image)
-			print(image[0])
-
-			quit()
 			# image = image[:,:,0:self.n_channels]
 			X[i,] = image
 
