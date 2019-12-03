@@ -162,7 +162,7 @@ if __name__ == '__main__':
 	metapath 	= datapath+'metadata/'
 	imagepath 	= datapath+'images/'
 
-	output = datafetcher(metapath, impath = imagepath, classification, imageclass, splitratio)
+	output = datafetcher(metapath, imagepath, classification, imageclass, splitratio)
 	partition = output[0]
 	labels   = output[1]
 	imglen   = output[2]
