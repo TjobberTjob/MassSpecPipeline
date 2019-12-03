@@ -450,5 +450,5 @@ if __name__ == '__main__':
 		accession = sys.argv[1] 
 		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 	
-# python3 prideDL.py PXD004732 allPeptides.txt
+# python3 prideDL.py PXD004732
 # python3 prideDL.py PXD010595

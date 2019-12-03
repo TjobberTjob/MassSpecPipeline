@@ -30,11 +30,20 @@ def datafetcher(path, impath,classification, imageclass, splitratio):
 	if not classification:
 		names = []
 		labels = {}
-		for line in open(path+'subimage_filtered.json'):
-			data  = json.loads(line)
-			name  = data['image']+".txt"
-			names.append(name)
-			labels[name] = data[imageclass]
+		if os.path.exists(path+'subimage_filtered.json'):
+			for line in open(path+'subimage_filtered.json'):
+				data  = json.loads(line)
+				name  = data['image']+".txt"
+				names.append(name)
+				labels[name] = data[imageclass]
+		elif os.path.exists(path+'subimage.json'):
+			for line in open(path+'subimage.json'):
+				data  = json.loads(line)
+				name  = data['image']+".txt"
+				names.append(name)
+				labels[name] = data[imageclass]
+		else:
+			print('No metadata for images exists')
 		splits = round(len(names) * float(splitratio))
 		trainlist   = names[0:splits]
 		vallist 	= names[splits:]
