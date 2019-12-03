@@ -157,12 +157,12 @@ if __name__ == '__main__':
 	imageclass 		= sys.argv[2]
 	splitratio		= sys.argv[3]
 	#Pre-information and folderhandling
-	datapath = '/data/ProteomeToolsRaw/images/'
+	datapath = '/data/ProteomeToolsRaw/'
 	# datapath 	= 'Data/'
 	metapath 	= datapath+'metadata/'
 	imagepath 	= datapath+'images/'
 
-	output = datafetcher(metapath, imagepath, classification, imageclass, splitratio)
+	output = datafetcher(metapath, impath = imagepath, classification, imageclass, splitratio)
 	partition = output[0]
 	labels   = output[1]
 	imglen   = output[2]
