@@ -231,7 +231,6 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 					minintensity  = min(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
 					maxintensity  = max(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
 					inputpoints   = len(ms1_array[_key]) #Amount of inputs into this array
-					pixelpoint2   = np.array(meanintensity,minintensity,maxintensity,inputpoints)
 					pixelpoint 	  = [meanintensity,minintensity,maxintensity,inputpoints]
 					total_datapoints+=(len(ms1_array[_key]))
 					nonzero_counter+=1
