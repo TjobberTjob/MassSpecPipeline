@@ -315,7 +315,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	inbound  = 0
 	for index, rows in df.iterrows():
 		i+=1
-		if i % 10 == 0:
+		if i % 25 == 0:
 			print("Creating subimages: {:2.1%}                                  ".format(i / len(df['Sequence'])), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
