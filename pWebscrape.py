@@ -106,7 +106,7 @@ def accessions_metadata(path):
 				value = h5.text[:re.search(' ',h5.text).span()[0]]
 				my_dict[name] = value
 
-			for ta in  div.find_all('table'):
+			for ta in div.find_all('table'):
 				try:
 					filetypes.append(ta.find('td').text.strip()[re.search('\.',ta.find('td').text.strip()).span()[1]:])
 				except Exception:
