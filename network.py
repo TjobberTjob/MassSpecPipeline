@@ -62,6 +62,8 @@ def datafetcher(path, impath,classification, imageclass, splitratio):
 				data   = json.loads(line)
 				name  = data['image']+".txt"
 				labels[name] = data[imageclass]
+		else:
+			print('No metadata for images exists')
 
 		partition = {'train': [], 'validation': []}
 		labels2 = defaultdict(list)
@@ -207,5 +209,5 @@ if __name__ == '__main__':
 	callbacks_list = output[1]
 	model.fit_generator(generator=training_generator,validation_data=validation_generator, epochs = 50, callbacks = callbacks_list)
 
-#python3 model.py F m/z 0.8
-#python3 model.py T Charge 0.8
+#python3 network.py F m/z 0.8
+#python3 network.py T Charge 0.8
