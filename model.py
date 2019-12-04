@@ -12,6 +12,7 @@ if 'import' == 'import':
 	import glob
 	import re
 	import pandas as pd
+	from collections import defaultdict
 	import numpy as np
 	import json
 	import sys
@@ -51,19 +52,30 @@ def datafetcher(path, impath,classification, imageclass, splitratio):
 	
 	else:
 		labels = {}
-		for line in open(path+'subimage_filtered.txt'):
-			data   = json.loads(line)
-			name  = data['image']+".txt"
-			labels[name] = data[imageclass]
+		if os.path.exists(path+'subimage_filtered.json'):
+			for line in open(path+'subimage_filtered.json'):
+				data   = json.loads(line)
+				name  = data['image']+".txt"
+				labels[name] = data[imageclass]
+		elif os.path.exists(path+'subimage.json'):
+			for line in open(path+'subimage.json'):
+				data   = json.loads(line)
+				name  = data['image']+".txt"
+				labels[name] = data[imageclass]
 
-		partition = {'train': '', 'validation': ''}
-		for f in labels:
-			random.shuffle(labels[f])
-			splits = round(len(labels[f])*(int(splitratio)/100))
-			trainlist   = labels[0:splits]
-			vallist 	= labels[splits:]
-			partition[train.append(trainlist)]
-			partition[validation.append(vallist)]
+		partition = {'train': [], 'validation': []}
+		labels2 = defaultdict(list)
+		for k, v in labels.items():
+			labels2[v].append(k)
+		for f in labels2:
+			random.shuffle(labels2[f])
+			splits = round(len(labels2[f]) * float(splitratio))
+			trainlist   = (labels2[f][0:splits])
+			vallist 	= (labels2[f][splits:])
+			for x in trainlist:
+				partition['train'].append(x)
+			for x in vallist:
+				partition['validation'].append(x)
 
 	return partition, labels, imagelen, pixellen
 
@@ -125,7 +137,7 @@ class DataGenerator(keras.utils.Sequence):
 			return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
 
 
-def nnmodel(imglen, pixellen, classification, n_channels, n_classes):
+def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass):
 	input = Input(shape=(imglen, pixellen, n_channels,))
 	x  = Dense(128, activation = 'relu')(input)
 	x  = Dense(128, activation = 'relu')(x)
@@ -141,13 +153,17 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes):
 	if classification:
 		model.compile(loss = 'categorical_crossentropy', metrics=['accuracy'], optimizer = 'adam') 
 	else:
-		model.compile(loss="mse", metrics=["mse"], optimizer="rmsprop") 
+		model.compile(loss='mse', metrics=['mse'], optimizer='rmsprop') 
 
 
 	#Create callbacks
-	checkpoint  = keras.callbacks.ModelCheckpoint('bestweight.h5', monitor='val_acc', save_best_only=True)
-	early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+	if classification:
+		checkpoint  = keras.callbacks.ModelCheckpoint('Best-'+imageclass+'.h5', monitor='val_accuracy', save_best_only=True)
+	else:
+		checkpoint  = keras.callbacks.ModelCheckpoint('Best-'+imageclass+'.h5', monitor='val_mse', save_best_only=True)
+	early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=4)
 	callbacks_list = [checkpoint, early_stopping]
+	
 	return model, callbacks_list
 
 
@@ -157,10 +173,12 @@ if __name__ == '__main__':
 	imageclass 		= sys.argv[2]
 	splitratio		= sys.argv[3]
 	#Pre-information and folderhandling
-	datapath = '/data/ProteomeToolsRaw/'
-	# datapath 	= 'Data/'
+	# datapath = '/data/ProteomeToolsRaw/'
+	datapath 	= 'Data/'
 	metapath 	= datapath+'metadata/'
 	imagepath 	= datapath+'images/'
+
+	nameofclass = imageclass.replace('/','')
 
 	output = datafetcher(metapath, imagepath, classification, imageclass, splitratio)
 	partition = output[0]
@@ -184,10 +202,10 @@ if __name__ == '__main__':
 	training_generator = DataGenerator(imagepath,partition['train'], labels, **params)
 	validation_generator = DataGenerator(imagepath,partition['validation'], labels, **params)
 
-	output 	= nnmodel(imglen, pixellen, classification, n_channels, n_classes)
+	output 	= nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass)
 	model 	= output[0]
-	callbacks_list = [output[1]]
-	model.fit_generator(generator=training_generator,validation_data=validation_generator)#, callbacks = callbacks_list)
+	callbacks_list = output[1]
+	model.fit_generator(generator=training_generator,validation_data=validation_generator, epochs = 50, callbacks = callbacks_list)
 
 #python3 model.py F m/z 0.8
-
+#python3 model.py T Charge 0.8
