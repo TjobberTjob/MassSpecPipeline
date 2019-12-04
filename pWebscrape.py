@@ -171,5 +171,5 @@ if __name__ == '__main__':
 	if cmd == 'metadata':
 		accessions_metadata(path = metapath)
 
-	#python3 pWebscrape.py accessions
-	#python3 pWebscrape.py metadata
+	#python3 pwebscrape.py accessions
+	#python3 pwebscrape.py metadata

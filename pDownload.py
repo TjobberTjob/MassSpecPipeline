@@ -449,5 +449,5 @@ if __name__ == '__main__':
 		accession = sys.argv[1] 
 		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 	
-# python3 pDownload.py PXD004732
-# python3 pDownload.py PXD010595
+# python3 pdownload.py PXD004732
+# python3 pdownload.py PXD010595
