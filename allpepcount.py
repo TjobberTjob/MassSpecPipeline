@@ -1,7 +1,8 @@
 import json
+path = '/data/ProteomeToolsRaw/metadata/'
 accessions = []
 i=0
-for line in open('accessions.json'):
+for line in open(path+'accessions.json'):
 	try:
 		data = json.loads(line)
 	except Exception:
