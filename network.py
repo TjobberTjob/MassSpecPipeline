@@ -130,6 +130,8 @@ class DataGenerator(keras.utils.Sequence):
 				image = pickle.load(pa)
 			image = np.array(image)
 			image = image[:,:,0:self.n_channels]
+			print(image)
+			quit()
 			X[i,] = image
 
 			y[i] = self.labels[ID]
@@ -175,8 +177,8 @@ if __name__ == '__main__':
 	imageclass 		= sys.argv[2]
 	splitratio		= sys.argv[3]
 	#Pre-information and folderhandling
-	datapath = '/data/ProteomeToolsRaw/'
-	# datapath 	= 'Data/'
+	# datapath = '/data/ProteomeToolsRaw/'
+	datapath 	= 'Data/'
 	metapath 	= datapath+'metadata/'
 	imagepath 	= datapath+'images/'
 
