@@ -130,8 +130,6 @@ class DataGenerator(keras.utils.Sequence):
 				image = pickle.load(pa)
 			image = np.array(image)
 			image = image[:,:,0:self.n_channels]
-			print(image)
-			quit()
 			X[i,] = image
 
 			y[i] = self.labels[ID]
