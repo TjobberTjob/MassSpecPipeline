@@ -447,7 +447,7 @@ if __name__ == '__main__':
 				try:
 					combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 				except Exception:
-					print('Problems with: '+accession)
+					print('There seems to be a problem with : '+accession+' unable to proceed at this time')
 					pass
 	else:
 		accession = sys.argv[1] 
