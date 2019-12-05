@@ -441,7 +441,7 @@ if __name__ == '__main__':
 
 	#Assigning accession number and maxquant output file name
 	pepfile = 'allPeptides.txt'
-	if sys.argv[1] != 'accessions' or sys.argv[1] != 'accessions_filtered':
+	if sys.argv[1] == 'accessions' or sys.argv[1] == 'accessions_filtered':
 			for line in open(metapath+sys.argv[1]+'.json'):
 				accession = str(line[15:24])
 				try:
