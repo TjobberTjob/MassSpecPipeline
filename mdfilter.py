@@ -15,7 +15,7 @@ def filter(path, file):
 		data = json.loads(line)
 		##### ADD FILTER HERE #####
 		try:
-			if data['allpeptides']:
+			if data['allpeptides'] != 'Error' and data['allpeptides']:
 		###########################
 				if line not in lines_seen:
 					outfile.write(line)
