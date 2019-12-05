@@ -14,7 +14,7 @@ def filter(path, file):
 	for line in open(path+str(filetofilter)+'.json','r'):
 		data = json.loads(line)
 		##### ADD FILTER HERE #####
-		if data["allpeptides"]:
+		if data['allpeptides'] == True:
 		###########################
 			if line not in lines_seen:
 				outfile.write(line)
