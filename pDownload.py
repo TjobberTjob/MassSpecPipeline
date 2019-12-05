@@ -451,7 +451,11 @@ if __name__ == '__main__':
 					pass
 	else:
 		accession = sys.argv[1] 
-		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+		try:
+			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+		except Exception:
+			print('Problems with: '+accession)
+			pass
 	
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
