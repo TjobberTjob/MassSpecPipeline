@@ -440,7 +440,7 @@ if __name__ == '__main__':
 	pepfile = 'allPeptides.txt'
 	input = sys.argv[1]
 	if str(input) == 'accessions' or str(input) == 'accessions_filtered':
-		for line in open(metapath+sys.argv[1]+'.json'):
+		for line in reversed(list(open(metapath+sys.argv[1]+'.json'))):
 			data  = json.loads(line)
 			print(data)
 			quit()
