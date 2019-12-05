@@ -209,5 +209,5 @@ if __name__ == '__main__':
 	callbacks_list = output[1]
 	model.fit_generator(generator=training_generator,validation_data=validation_generator, epochs = 50, callbacks = callbacks_list)
 
-#python3 network.py F m/z 0.8
-#python3 network.py T Charge 0.8
+# python3 network.py F m/z 0.8
+# python3 network.py T Charge 0.8
