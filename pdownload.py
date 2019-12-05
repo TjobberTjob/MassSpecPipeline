@@ -445,16 +445,19 @@ if __name__ == '__main__':
 
 	#Assigning accession number and maxquant output file name
 	pepfile = 'allPeptides.txt'
-	if sys.argv[1] == 'accessions' or sys.argv[1] == 'accessions_filtered':
+	input = sys.argv[1]
+	print(str(input))
+	quit()
+	if str(input) == 'accessions' or str(input) == 'accessions_filtered':
 			for line in open(metapath+sys.argv[1]+'.json'):
-				accession = str(line[15:24])
+				accession = str(line[15:34])
 				try:
 					combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 				except Exception:
 					print('Problem occured with: '+accession+'. unable to proceed at this time')
 					pass
 	else:
-		accession = sys.argv[1] 
+		accession = input
 		try:
 			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 		except Exception:
