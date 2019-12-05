@@ -442,8 +442,6 @@ if __name__ == '__main__':
 	if str(input) == 'accessions' or str(input) == 'accessions_filtered':
 		for line in reversed(list(open(metapath+sys.argv[1]+'.json'))):
 			data  = json.loads(line)
-			print(data)
-			quit()
 			accession = data['accession']
 			try:
 				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
