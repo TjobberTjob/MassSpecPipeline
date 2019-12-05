@@ -19,21 +19,25 @@ if __name__ == '__main__':
 	from pyteomics import mzml,mzid,mgf
  
 
-def zipfile_finder(accession, path):
-	#Webscraping the url for the pride database
-	url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'	
-	html = requests.get(url).text
-	soup = BeautifulSoup(html,'html.parser')									
-	url = [div.find('a')['href'] for div in soup.find_all('div', {'class': 'grid_6 omega'})]
+def zipfile_finder(accession, path, metapath):
+	with open(metapath+'accessions.txt', "rb") as pa:
+		pride_accessions = pickle.load(pa)
+	for a in pride_accessions:
+		if accession in a:
+			accession = a
+			break
+
+	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+a
 
 	#Download readme file
-	os.system('wget -q -O '+path+'readme.txt '+url[0]+'/README.txt')
+	os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+'readme.txt',sep='\t')
 	os.remove(path+'readme.txt')
+
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-	return searchfiles, url[0]
+	return searchfiles, url
 
 
 def rawfile_finder(zipfile, path, maxquant_file):
@@ -398,7 +402,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 
 def combined(accession, maxquant_file, path, metapath):
 	#Find all zip files
-	output      = zipfile_finder(accession = accession, path = datapath)
+	output      = zipfile_finder(accession = accession, path = datapath, metapath = metapath)
 	searchfiles = output[0]
 	url 	    = output[1]
 
@@ -435,8 +439,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name

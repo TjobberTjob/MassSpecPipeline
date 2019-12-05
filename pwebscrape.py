@@ -38,9 +38,7 @@ def get_accessions(path):
 				int(level2['href'][0:2]) #Only look at numerics...
 			except Exception:
 				continue
-
-			print('Getting accessions from '+level1['href']+level2['href'], end = '\r')
-
+			print('Getting accessions from '+level1.text+level2.text, end = '\r')
 			page_3 = requests.get(url+level1['href']+level2['href']).text
 			soup_3 = BeautifulSoup(page_3, 'html.parser')
 
@@ -48,7 +46,7 @@ def get_accessions(path):
 			for level3 in soup_3.find_all('a', href = True):
 				accession = level3['href'].replace('/','')
 				if len(accession) == len('PRD000000'):
-					all_accessions.append(accession)
+					all_accessions.append(level1.text+level2.text+accession)
 
 	with open(path+accessions, "wb") as pa:
 		pickle.dump(all_accessions, pa)
@@ -70,23 +68,34 @@ def accessions_metadata(path):
 	outfile = open(join(path,metadata),'a')
 
 	for f in pride_accessions:
+		accession = f[-9:]
 		i   += 1
-		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+f
+		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession
 		html = requests.get(url).text
+		print(html)
 		soup = BeautifulSoup(html,'html.parser')
 		my_dict = {}
-		my_dict['accession'] = f
-		for div in soup.find_all('div', {'class': 'grid_7 right-column'}):
-			for div2 in div.find_all('div', {'class': 'grid_12'}): 
-				try:
-					name  = div2.find('h5').text 
-				except Exception:
-					continue
-				try:
-					value = div2.find('a').text 
-				except Exception:
-					value = "Not available"
-				my_dict[name] = value 
+		my_dict['accession'] = accession
+		my_dict['database path'] = f
+		try:
+			for div in soup.find_all('div', {'class': 'ivu-card-body'}):
+				for div2 in div.find_all('div', {'class': 'property-row'}):
+					print(div2.find('a').text)
+		except Exception:
+			print('no bueno')
+			quit()
+	
+
+			# for div2 in div.find_all('div', {'class': 'grid_12'}): 
+			# 	try:
+			# 		name  = div2.find('h5').text 
+			# 	except Exception:
+			# 		continue
+			# 	try:
+			# 		value = div2.find('a').text 
+			# 	except Exception:
+			# 		value = "Not available"
+			# 	my_dict[name] = value 
 
 		for div in soup.find_all('div', {'class': 'grid_16 left-column'}):
 			plist = []
@@ -95,13 +104,13 @@ def accessions_metadata(path):
 			my_dict['Submission Date'] = plist[-2]
 			my_dict['Publication Date'] = plist[-1]
 
-		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+f+'/files'
+		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'
 		html = requests.get(url).text
 		soup = BeautifulSoup(html,'html.parser')
 
 		filetypes = []
 		for div in soup.find_all('div', {'class': 'grid_23 clearfix file-list'}):
-			for h5 in div.find_all('h5')
+			for h5 in div.find_all('h5'):
 				name  = h5.text[re.search(' ',h5.text).span()[1]:]
 				value = h5.text[:re.search(' ',h5.text).span()[0]]
 				my_dict[name] = value
@@ -114,7 +123,7 @@ def accessions_metadata(path):
 			my_dict['filetypes'] = filetypes
 
 		
-		url = 'https://www.ebi.ac.uk/pride/archive/projects/'+f
+		url = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession
 		page = requests.get(url).text
 		my_dict['maxquant'] = 'maxquant' in page.lower()
 
@@ -148,6 +157,18 @@ def accessions_metadata(path):
 	outfile.close()
 
 
+def replace_accessions():
+	outfile = open(metapath+'accessions2.json','a')
+	for line in open(metapath+'accessions.json','r'):
+		data = json.loads(line)
+		with open(metapath+'accessions.txt', "rb") as pa:
+			pride_accessions = pickle.load(pa)
+		for f in pride_accessions:
+			if data['accession'] in f:
+				data['accession'] = f
+				outfile.write(json.dumps(data)+'\n')
+
+
 def validated_input(prompt, valid_values):
 	valid_input = False
 	while not valid_input:
@@ -157,8 +178,8 @@ def validated_input(prompt, valid_values):
 
 
 if __name__ == '__main__':
-	# datapath = 'Data/'
-	datapath = '/data/ProteomeToolsRaw/'
+	datapath = 'Data/'
+	# datapath = '/data/ProteomeToolsRaw/'
 	metapath = datapath+'metadata/'
 
 	cmd = sys.argv[1]
@@ -171,5 +192,9 @@ if __name__ == '__main__':
 	if cmd == 'metadata':
 		accessions_metadata(path = metapath)
 
-	#python3 pwebscrape.py accessions
-	#python3 pwebscrape.py metadata
+	if cmd == 'replace':
+		replace_accessions()
+
+# python3 pwebscrape.py accessions
+# python3 pwebscrape.py metadata
+# python3 pwebscrape.py replace
