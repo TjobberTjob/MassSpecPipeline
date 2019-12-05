@@ -444,7 +444,11 @@ if __name__ == '__main__':
 	if len(sys.argv[1] != 9):
 			for line in open(metapath+sys.argv[1]):
 				accession = str(line[15:24])
-				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+				try:
+					combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+				except Exception:
+					print('Problems with: '+accession)
+					pass
 	else:
 		accession = sys.argv[1] 
 		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
