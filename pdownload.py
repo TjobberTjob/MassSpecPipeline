@@ -448,7 +448,7 @@ if __name__ == '__main__':
 	input = sys.argv[1]
 	if str(input) == 'accessions' or str(input) == 'accessions_filtered':
 			for line in open(metapath+sys.argv[1]+'.json'):
-				accession = str(line[15:34])
+				accession = str(line[15:32])
 				try:
 					combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 				except Exception:
