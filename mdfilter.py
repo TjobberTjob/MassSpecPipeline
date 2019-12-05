@@ -15,7 +15,7 @@ def filter(path, file):
 		data = json.loads(line)
 		##### ADD FILTER HERE #####
 		try:
-			if data['allpeptides'] == 'True' and data['Modification'] != 'No PTMs are included in the dataset':
+			if data['allpeptides'] == 'True':# and data['Modification'] != 'No PTMs are included in the dataset':
 		###########################
 				if line not in lines_seen:
 					outfile.write(line)
