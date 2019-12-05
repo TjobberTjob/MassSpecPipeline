@@ -20,14 +20,7 @@ if __name__ == '__main__':
  
 
 def zipfile_finder(accession, path, metapath):
-	with open(metapath+'accessions.txt', "rb") as pa:
-		pride_accessions = pickle.load(pa)
-	for a in pride_accessions:
-		if accession in a:
-			accession = a
-			break
-
-	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+a
+	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
 	os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
@@ -457,6 +450,12 @@ if __name__ == '__main__':
 					pass
 	else:
 		accession = input
+		with open(metapath+'accessions.txt', "rb") as pa:
+			pride_accessions = pickle.load(pa)
+		for a in pride_accessions:
+			if accession in a:
+				accession = a
+				break
 		try:
 			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 		except Exception:
