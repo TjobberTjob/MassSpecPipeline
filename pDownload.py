@@ -28,13 +28,13 @@ def zipfile_finder(accession, path):
 	print(url)
 	quit()
 	#Download readme file
-	os.system('wget -q -O '+path+'readme.txt '+url[0]+'/README.txt')
+	os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+'readme.txt',sep='\t')
 	os.remove(path+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-	return searchfiles, url[0]
+	return searchfiles, url
 
 
 def rawfile_finder(zipfile, path, maxquant_file):
