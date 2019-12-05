@@ -25,16 +25,15 @@ def zipfile_finder(accession, path):
 	html = requests.get(url).text
 	soup = BeautifulSoup(html,'html.parser')									
 	url = [div.find('a')['href'] for div in soup.find_all('div', {'class': 'grid_6 omega'})]
-	print(url)
-	quit()
+
 	#Download readme file
-	os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
+	os.system('wget -q -O '+path+'readme.txt '+url[0]+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+'readme.txt',sep='\t')
 	os.remove(path+'readme.txt')
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-	return searchfiles, url
+	return searchfiles, url[0]
 
 
 def rawfile_finder(zipfile, path, maxquant_file):
@@ -443,7 +442,6 @@ if __name__ == '__main__':
 	#Assigning accession number and maxquant output file name
 	pepfile = 'allPeptides.txt'
 	if sys.argv[1] != 'accessions' or sys.argv[1] != 'accessions_filtered':
-			print('list')	
 			for line in open(metapath+sys.argv[1]+'.json'):
 				accession = str(line[15:24])
 				try:
@@ -452,7 +450,6 @@ if __name__ == '__main__':
 					print('Problems with: '+accession)
 					pass
 	else:
-		print('single')
 		accession = sys.argv[1] 
 		try:
 			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
