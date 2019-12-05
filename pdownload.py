@@ -440,14 +440,16 @@ if __name__ == '__main__':
 	pepfile = 'allPeptides.txt'
 	input = sys.argv[1]
 	if str(input) == 'accessions' or str(input) == 'accessions_filtered':
-			for line in open(metapath+sys.argv[1]+'.json'):
-				data  = json.loads(line)
-				accession = data['accession']
-				try:
-					combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
-				except Keyerror:
-					print('Problem occured with: '+accession+'. unable to proceed at this time')
-					pass
+		for line in open(metapath+sys.argv[1]+'.json'):
+			data  = json.loads(line)
+			print(data)
+			quit()
+			accession = data['accession']
+			try:
+				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+			except Keyerror:
+				print('Problem occured with: '+accession+'. unable to proceed at this time')
+				pass
 	else:
 		accession = input
 		with open(metapath+'accessions.txt', "rb") as pa:
