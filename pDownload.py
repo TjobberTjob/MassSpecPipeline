@@ -25,7 +25,8 @@ def zipfile_finder(accession, path):
 	html = requests.get(url).text
 	soup = BeautifulSoup(html,'html.parser')									
 	url = [div.find('a')['href'] for div in soup.find_all('div', {'class': 'grid_6 omega'})]
-	
+	print(url)
+	quit()
 	#Download readme file
 	os.system('wget -q -O '+path+'readme.txt '+url[0]+'/README.txt')
 
