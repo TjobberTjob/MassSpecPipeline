@@ -390,7 +390,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	outfile = open(metapath+'sub_statistics.json','a')
 	outfile.write(json.dumps(end_stats)+'\n')
 	outfile.close()
-	print('Done!                                                \n')
+	print('Done!                                               ')
 
 
 def combined(accession, maxquant_file, path, metapath):
@@ -412,7 +412,7 @@ def combined(accession, maxquant_file, path, metapath):
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": 
 				continue
 
-			print('file: '+filename) 
+			print('\nfile: 'accession+'/'+filename) 
 			print('downloading raw file                  ', end = '\r')
 			output   = filehandling(filename = filename, path = datapath, maxquant_file = pepfile, df = df, url = url)
 			df2 	 = output[0]
