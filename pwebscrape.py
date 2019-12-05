@@ -101,7 +101,7 @@ def accessions_metadata(path):
 
 		filetypes = []
 		for div in soup.find_all('div', {'class': 'grid_23 clearfix file-list'}):
-			for h5 in div.find_all('h5'):
+			for h5 in div.find_all('h5')
 				name  = h5.text[re.search(' ',h5.text).span()[1]:]
 				value = h5.text[:re.search(' ',h5.text).span()[0]]
 				my_dict[name] = value

@@ -442,6 +442,7 @@ if __name__ == '__main__':
 
 	#Assigning accession number and maxquant output file name
 	pepfile = 'allPeptides.txt'
+	print(sys.argv[1])
 	if len(sys.argv[1] != 9):
 			for line in open(metapath+sys.argv[1]+'.json'):
 				accession = str(line[15:24])
@@ -460,3 +461,4 @@ if __name__ == '__main__':
 	
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
+# python3 pdownload.py accessions_filtered
