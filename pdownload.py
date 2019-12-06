@@ -39,6 +39,10 @@ def rawfile_finder(zipfile, path, maxquant_file):
 	zipfilename = zipfile[63:]
 
 	#Download zip file
+	try:
+		shutil.remove(path+zipfilename)
+	except Exception:
+		pass
 	os.system('wget -q --show-progress -O '+path+zipfilename+' '+zipfile)
 
 	#Get a list of files with directories from zip file
@@ -99,7 +103,7 @@ def formatFile(filename, path, filepath):
 			relpath = path[:-1]
 		else:
 			relpath =os.getcwd()+path[:-1] 
-		os.system('cd /data/ProteomeToolsRaw/ && chmod -R a+rwx * && cd /home/tochr/MassSpecPipeline')
+		os.system('cd '+path+' && chmod -R a+rwx * && cd /home/tochr/MassSpecPipeline')
 		os.system('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
 		os.remove(path+filename+'/file.raw')
