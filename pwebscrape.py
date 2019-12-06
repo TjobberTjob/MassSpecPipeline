@@ -77,6 +77,7 @@ def accessions_metadata(path):
 		my_dict = {}
 		my_dict['accession'] = accession
 		my_dict['database path'] = f
+		quit()
 		try:
 			for div in soup.find_all('div', {'class': 'ivu-card-body'}):
 				for div2 in div.find_all('div', {'class': 'property-row'}):
