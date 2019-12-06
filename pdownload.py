@@ -96,11 +96,11 @@ def formatFile(filename, path, filepath):
 		except Exception:
 			pass
 		os.chdir('ThermoRawFileParser/')
-		subprocess.run('docker build --no-cache -t thermorawparser .', shell= True)
+		os.system('docker build --no-cache -t thermorawparser .')
 		os.chdir('../MassSpecPipeline/')
 
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
-		print('docker run -v \"'+os.getcwd()+'/'+path[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
+		os.system('docker run -v \"'+os.getcwd()+path[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
 		os.remove(path+filename+'/file.raw')
 
