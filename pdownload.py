@@ -53,7 +53,7 @@ def rawfile_finder(zipfile, path, maxquant_file):
 	for a in ziplist:
 		if maxquant_file in a:
 			with ZipFile(path+zipfilename) as z:
-				with z.open(a) as zf, open(path+zipfilename+'-'+maxquant_file, 'wb') as zfg:
+				with z.open(a) as zf, open(path+zipfilename[:-4]+'-'+maxquant_file, 'wb') as zfg:
 					shutil.copyfileobj(zf, zfg)
 					break
 		else:
@@ -78,7 +78,7 @@ def filehandling(filename, zipfilename, path, maxquant_file, df, url):
 		shutil.copyfile(path+zipfilename, filepath+'file.zip')
 
 	#Move or rm txt.file
-	if not os.path.exists(filepath+zipfilename+'-'+maxquant_file): 
+	if not os.path.exists(filepath+zipfilename[:-4]+'-'+maxquant_file): 
 		df2 = df.loc[df['Raw file'] == filename,]
 		pd.DataFrame.to_csv(df,filepath+maxquant_file)
 
@@ -435,7 +435,7 @@ def combined(accession, maxquant_file, path, metapath):
 			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
 
 		os.remove(datapath+zipfilename)
-		os.remove(datapath+zipfilename+'-'+pepfile)
+		os.remove(datapath+zipfilename[:-4]+'-'+pepfile)
 
 
 if __name__ == '__main__':
