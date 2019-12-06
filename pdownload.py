@@ -98,8 +98,11 @@ def formatFile(filename, path, filepath):
 			os.chdir('ThermoRawFileParser/')
 			os.system('docker build --no-cache -t thermorawparser .')
 			os.chdir('../MassSpecPipeline/')
-
-		print('docker run -v \"'+os.getcwd()+path[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
+		if path[0] == '/':
+			relpath = path
+		else:
+			relpath =os.getcwd()+path[:-1] 
+		print('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		quit()
 		os.remove(filepath+'file-metadata.txt')
 		os.remove(path+filename+'/file.raw')
