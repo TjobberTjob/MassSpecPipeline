@@ -99,7 +99,7 @@ def formatFile(filename, path, filepath):
 			os.system('docker build --no-cache -t thermorawparser .')
 			os.chdir('../MassSpecPipeline/')
 		if path[0] == '/':
-			relpath = path
+			relpath = path[:-1]
 		else:
 			relpath =os.getcwd()+path[:-1] 
 		print('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
