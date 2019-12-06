@@ -445,7 +445,7 @@ if __name__ == '__main__':
 			accession = data['accession']
 			try:
 				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
-			except KeyError:
+			except KeyboardInterrupt:
 				print('Problem occured with: '+accession+'. unable to proceed at this time')
 				pass
 	else:
