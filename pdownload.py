@@ -23,7 +23,7 @@ def zipfile_finder(accession, path, metapath):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
+	print('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
@@ -404,6 +404,9 @@ def combined(accession, maxquant_file, path, metapath):
 	url 	    = output[1]
 
 	for zips in searchfiles:
+		if zips[-4:] != '.zip':
+			continue
+
 		#Find all raw files in the zip file
 		output   = rawfile_finder(zipfile = zips, path = datapath, maxquant_file = pepfile)
 		rawfiles = output[0]
@@ -437,8 +440,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
