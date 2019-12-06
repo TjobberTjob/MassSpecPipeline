@@ -90,19 +90,17 @@ def formatFile(filename, path, filepath):
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
 		dockerls = subprocess.check_output('docker image ls',shell = True)
 		if not 'thermorawparser' in str(dockerls):
-			os.chdir('..')
 			try:
-				os.system('git clone https://github.com/compomics/ThermoRawFileParser.git')
+				os.system('cd .. && git clone https://github.com/compomics/ThermoRawFileParser.git && cd MassSpecPipeline/')
 			except Exception:
 				pass
-			os.chdir('ThermoRawFileParser/')
-			os.system('docker build --no-cache -t thermorawparser .')
-			os.chdir('../MassSpecPipeline/')
+			os.system('cd .. & cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd ../MassSpecPipeline/')
 		if path[0] == '/':
 			relpath = path[:-1]
 		else:
 			relpath =os.getcwd()+path[:-1] 
-		print('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
+		os.system('cd /data/ProteomeToolsRaw/ && chmod -R a+rwx * && cd /home/tochr/MassSpecPipeline')
+		os.system('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
 		os.remove(path+filename+'/file.raw')
 
