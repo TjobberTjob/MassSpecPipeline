@@ -60,7 +60,7 @@ def rawfile_finder(zipfile, path, maxquant_file):
 			continue
 
 	#Go through the maxquant output file and get all the raw files
-	df = pd.read_csv(path+zipfilename+'-'+maxquant_file,sep='\t', low_memory=False)
+	df = pd.read_csv(path+zipfilename[:-4]+'-'+maxquant_file,sep='\t', low_memory=False)
 	df = df.loc[df['Sequence'] != ' ',] #Remove empty sequences 	
 	rawfiles = np.unique(df['Raw file'])
 	
