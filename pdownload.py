@@ -23,11 +23,11 @@ def zipfile_finder(accession, path, metapath):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
+	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
-	df = pd.read_csv(path+'readme.txt',sep='\t')
-	os.remove(path+'readme.txt')
+	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
+	os.remove(path+accession[-9:]+'-readme.txt')
 
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
@@ -36,48 +36,47 @@ def zipfile_finder(accession, path, metapath):
 def rawfile_finder(zipfile, path, maxquant_file):
 	#Handle spaces in urls
 	zipfile = zipfile.replace(' ','%20')
+	zipfilename = zipfile[63:]
 
 	#Download zip file
-	os.system('wget -q --show-progress -O '+path+'file.zip '+zipfile)
+	os.system('wget -q --show-progress -O '+path+zipfilename+' '+zipfile)
 
 	#Get a list of files with directories from zip file
-	with ZipFile(path+'file.zip','r') as zipped:
+	with ZipFile(path+zipfilename,'r') as zipped:
 		ziplist = zipped.namelist()
 
 	#Extract the peptide file from the zipfile
 	for a in ziplist:
 		if maxquant_file in a:
-			with ZipFile(path+'file.zip') as z:
-				with z.open(a) as zf, open(path+maxquant_file, 'wb') as zfg:
+			with ZipFile(path+zipfilename) as z:
+				with z.open(a) as zf, open(path+zipfilename+'-'+maxquant_file, 'wb') as zfg:
 					shutil.copyfileobj(zf, zfg)
 					break
 		else:
 			continue
 
 	#Go through the maxquant output file and get all the raw files
-	df = pd.read_csv(path+maxquant_file,sep='\t', low_memory=False)
+	df = pd.read_csv(path+zipfilename+'-'+maxquant_file,sep='\t', low_memory=False)
 	df = df.loc[df['Sequence'] != ' ',] #Remove empty sequences 	
 	rawfiles = np.unique(df['Raw file'])
-	return rawfiles, df
+	
+	return rawfiles, df, zipfilename
 
 
-def filehandling(filename, path, maxquant_file, df, url):
+def filehandling(filename, zipfilename, path, maxquant_file, df, url):
 	filepath = path+filename+'/'
 	#Make the file directory if it doesnt exist
 	if not os.path.exists(filepath):	
 		os.mkdir(filepath)
 
 	#Move or rm zip.file
-	if not os.path.exists(filepath+'file.zip'): 
-		shutil.copyfile(path+'file.zip', filepath+'file.zip')
-		
-	#Removing superfluous data and saving the file
-	df2 = df.loc[df['Raw file'] == filename,] 
-	pd.DataFrame.to_csv(df,path+maxquant_file)	
+	if not os.path.exists(filepath+zipfilename): 
+		shutil.copyfile(path+zipfilename, filepath+'file.zip')
 
 	#Move or rm txt.file
-	if not os.path.exists(filepath+maxquant_file): 
-		shutil.copyfile(path+maxquant_file, filepath+maxquant_file)
+	if not os.path.exists(filepath+zipfilename+'-'+maxquant_file): 
+		df2 = df.loc[df['Raw file'] == filename,]
+		pd.DataFrame.to_csv(df,filepath+maxquant_file)
 
 	#Download the raw file
 	if not (os.path.exists(filepath+'/file.raw') or os.path.exists(filepath+'/file.mzML') or os.path.exists(filepath+'/mzML.json')):
@@ -88,18 +87,18 @@ def filehandling(filename, path, maxquant_file, df, url):
 def formatFile(filename, path, filepath):
 	print('Formatting file to mzML               ', end = '\r')
 	#Check whether the docker file is implemented or not
-	dockerls = subprocess.check_output('docker image ls',shell = True)
-	if not 'thermorawparser' in str(dockerls):
-		os.chdir('..')
-		try:
-			os.system('git clone https://github.com/compomics/ThermoRawFileParser.git')
-		except Exception:
-			pass
-		os.chdir('ThermoRawFileParser/')
-		os.system('docker build --no-cache -t thermorawparser .')
-		os.chdir('../MassSpecPipeline/')
-
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
+		dockerls = subprocess.check_output('docker image ls',shell = True)
+		if not 'thermorawparser' in str(dockerls):
+			os.chdir('..')
+			try:
+				os.system('git clone https://github.com/compomics/ThermoRawFileParser.git')
+			except Exception:
+				pass
+			os.chdir('ThermoRawFileParser/')
+			os.system('docker build --no-cache -t thermorawparser .')
+			os.chdir('../MassSpecPipeline/')
+
 		os.system('docker run -v \"'+os.getcwd()+path[:-1]+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
 		os.remove(path+filename+'/file.raw')
@@ -311,8 +310,8 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	inbound  = 0
 	for index, rows in df.iterrows():
 		i+=1
-		if i % 25 == 0:
-			print("Creating subimages: {:2.1%}                                  ".format(i / len(df['Sequence'])), end = '\r') #Print how far we are
+		if i % int(df.shape[0]/40) == 0:
+			print("Creating subimages: {:2.1%}                                  ".format(i / df.shape[0]), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			outbound+=1 #Check if this image can be created in our range or not
@@ -404,6 +403,7 @@ def combined(accession, maxquant_file, path, metapath):
 		output   = rawfile_finder(zipfile = zips, path = datapath, maxquant_file = pepfile)
 		rawfiles = output[0]
 		df		 = output[1]
+		zipfilename = output[2]
 
 		for raws in rawfiles:
 			filename = raws 
@@ -414,7 +414,7 @@ def combined(accession, maxquant_file, path, metapath):
 
 			print('\nfile: '+accession+'/'+filename) 
 			print('downloading raw file                  ', end = '\r')
-			output   = filehandling(filename = filename, path = datapath, maxquant_file = pepfile, df = df, url = url)
+			output   = filehandling(filename = filename, zipfilename = zipfilename, path = datapath, maxquant_file = pepfile, df = df, url = url)
 			df2 	 = output[0]
 			filepath = output[1]
 
@@ -426,14 +426,14 @@ def combined(accession, maxquant_file, path, metapath):
 			interval = {'mz':10,'rt':2}
 			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
 
-			os.remove(datapath+'file.zip')
-			os.remove(datapath+pepfile)
+		os.remove(datapath+zipfilename)
+		os.remove(datapath+zipfilename+'-'+pepfile)
 
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
@@ -458,7 +458,7 @@ if __name__ == '__main__':
 				break
 		try:
 			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
-		except Exception:
+		except KeyboardInterrupt:
 			print('Problem occured with: '+accession+'. unable to proceed at this time')
 			pass
 	
