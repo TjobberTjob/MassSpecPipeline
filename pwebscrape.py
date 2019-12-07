@@ -15,7 +15,7 @@ if __name__ == '__main__':
 	import sys
 
 
-def get_accessions(path):
+def get_accessions(path, i):
 	all_accessions = []
 	accessions	 = 'accessions.txt'
 	if os.path.exists(path+accessions):
@@ -190,7 +190,7 @@ if __name__ == '__main__':
 	if cmd == 'accessions':
 		i = 0
 		while i == 0:
-			get_accessions(path = metapath)
+			get_accessions(path = metapath, i)
 
 	#Get Metadata for all accession numbers
 	if cmd == 'metadata':
