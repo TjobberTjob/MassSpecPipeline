@@ -468,7 +468,7 @@ if __name__ == '__main__':
 			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
 		except KeyboardInterrupt:
 			print('Problem occured with: '+accession+'. unable to proceed at this time')
-			pass
+			continue
 	
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
