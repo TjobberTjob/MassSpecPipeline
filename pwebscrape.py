@@ -15,7 +15,7 @@ if __name__ == '__main__':
 	import sys
 
 
-def get_accessions(path, i):
+def get_accessions(path):
 	all_accessions = []
 	accessions	 = 'accessions.txt'
 	if os.path.exists(path+accessions):
@@ -187,7 +187,7 @@ if __name__ == '__main__':
 	
 	#Download pride accession numbers.
 	if cmd == 'accessions':
-		get_accessions(path = metapath, i)
+		get_accessions(path = metapath)
 
 	#Get Metadata for all accession numbers
 	if cmd == 'metadata':
