@@ -104,7 +104,7 @@ def formatFile(filename, path, filepath):
 		else:
 			relpath =os.getcwd()+path[:-1] 
 		os.system('cd '+path+' && chmod -R a+rwx * && cd /home/tochr/MassSpecPipeline')
-		os.system('docker run --user tochr -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
+		os.system('docker run -v \"'+relpath+':/data_input\" -it --user tochr thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
 		os.remove(path+filename+'/file.raw')
 
