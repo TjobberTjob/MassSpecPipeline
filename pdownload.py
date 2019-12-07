@@ -473,5 +473,4 @@ if __name__ == '__main__':
 	
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
-python3 pdownload.py PXD015848
 # python3 pdownload.py accessions_filtered
