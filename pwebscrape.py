@@ -50,6 +50,7 @@ def get_accessions(path):
 
 	with open(path+accessions, "wb") as pa:
 		pickle.dump(all_accessions, pa)
+	i+=1
 
 
 def accessions_metadata(path):
@@ -187,7 +188,9 @@ if __name__ == '__main__':
 	
 	#Download pride accession numbers.
 	if cmd == 'accessions':
-		get_accessions(path = metapath)
+		i = 0
+		while i == 0:
+			get_accessions(path = metapath)
 
 	#Get Metadata for all accession numbers
 	if cmd == 'metadata':
