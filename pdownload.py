@@ -223,7 +223,8 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		image = []
 		for y_i in range(0,resolution['y']):
 			run_i+=1
-			print("Creating full image: {:2.1%}                                     ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
+			if i % 25 == 0:
+				print("Creating full image: {:2.1%}                                     ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
 			row = []
 			for x_i in range(0,resolution['x']):
 				_key = (x_i,y_i)
