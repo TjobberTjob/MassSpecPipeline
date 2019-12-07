@@ -144,7 +144,7 @@ def internalmzML(path):
 		f = open(path+'mzML.json','w')
 		f.write(json.dumps(extracted))
 		f.close()
-		# os.remove(path+'file.mzml')
+		os.system('rm -f'+filepath+' file.mzML')
 
 
 def get_lower_bound(haystack, needle):
