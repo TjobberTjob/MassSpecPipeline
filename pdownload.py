@@ -465,11 +465,11 @@ if __name__ == '__main__':
 			if input in a:
 				accession = a
 				break
-		try: 	
-			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
-		except Exception:
-			print('Problem occured with: '+accession+'. unable to proceed at this time')
-			pass
+		# try: 	
+		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+		# except Exception:
+		# 	print('Problem occured with: '+accession+'. unable to proceed at this time')
+		# 	pass
 	
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
