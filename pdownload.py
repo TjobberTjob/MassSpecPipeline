@@ -21,6 +21,8 @@ if __name__ == '__main__':
 
 def zipfile_finder(accession, path, metapath):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
+	print(url)
+	quit()
 
 	#Download readme file
 	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
