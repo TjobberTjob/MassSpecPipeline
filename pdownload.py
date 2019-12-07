@@ -460,11 +460,11 @@ if __name__ == '__main__':
 				print('Problem occured with: '+accession+'. unable to proceed at this time')
 				pass
 	else:
-		accession = input
 		with open(metapath+'accessions.txt', "rb") as pa:
 			pride_accessions = pickle.load(pa)
+		
 		for a in pride_accessions:
-			if accession in a:
+			if input in a:
 				accession = a
 				break
 		try: 	
