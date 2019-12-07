@@ -83,8 +83,8 @@ def filehandling(filename, zipfilename, path, maxquant_file, df, url):
 		pd.DataFrame.to_csv(df,filepath+maxquant_file)
 
 	#Download the raw file
-	# if not (os.path.exists(filepath+'/file.raw') or os.path.exists(filepath+'/file.mzML') or os.path.exists(filepath+'/mzML.json')):
-	os.system('wget -q --show-progress -O '+filepath+'/file.raw -c '+url+'/'+filename+'.raw')
+	if not (os.path.exists(filepath+'/file.mzML') or os.path.exists(filepath+'/mzML.json')):
+		os.system('wget -q --show-progress -O '+filepath+'/file.raw -c '+url+'/'+filename+'.raw')
 	return df2, filepath
 
 
