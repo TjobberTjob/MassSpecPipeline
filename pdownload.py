@@ -465,6 +465,7 @@ if __name__ == '__main__':
 		
 		for a in pride_accessions:
 			if input in a:
+				print(a)
 				accession = a
 				break
 		try: 	
