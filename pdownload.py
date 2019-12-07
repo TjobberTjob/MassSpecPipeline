@@ -453,7 +453,7 @@ if __name__ == '__main__':
 			accession = data['accession']
 			try:
 				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
-			except KeyboardInterrupt:
+			except Exception:
 				print('Problem occured with: '+accession+'. unable to proceed at this time')
 				pass
 	else:
@@ -464,11 +464,11 @@ if __name__ == '__main__':
 			if accession in a:
 				accession = a
 				break
-		try:
-			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
-		except KeyboardInterrupt:
-			print('Problem occured with: '+accession+'. unable to proceed at this time')
-			continue
+			try:
+				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+			except Exception:
+				print('Problem occured with: '+accession+'. unable to proceed at this time')
+				pass
 	
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
