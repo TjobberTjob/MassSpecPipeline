@@ -104,7 +104,7 @@ def formatFile(filename, path, filepath):
 		else:
 			relpath =os.getcwd()+path[:-1] 
 		os.system('cd '+path+' && chmod -R a+rwx * && cd /home/tochr/MassSpecPipeline')
-		os.system('docker run -v \"'+relpath+':/data_input\" -it thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
+		os.system('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.dtxt')
 		os.remove(path+filename+'/file.raw')
 
@@ -144,7 +144,7 @@ def internalmzML(path):
 		f = open(path+'mzML.json','w')
 		f.write(json.dumps(extracted))
 		f.close()
-		os.system('rm -f'+filepath+' file.mzML')
+		# os.system('rm -f'+filepath+' file.mzML')
 
 
 def get_lower_bound(haystack, needle):
@@ -442,7 +442,7 @@ def combined(accession, maxquant_file, path, metapath):
 if __name__ == '__main__':
 	#Path to data
 	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
@@ -465,11 +465,11 @@ if __name__ == '__main__':
 			if accession in a:
 				accession = a
 				break
-			try:
-				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
-			except Exception:
-				print('Problem occured with: '+accession+'. unable to proceed at this time')
-				pass
+		try: 	
+			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+		except Exception:
+			print('Problem occured with: '+accession+'. unable to proceed at this time')
+			pass
 	
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
