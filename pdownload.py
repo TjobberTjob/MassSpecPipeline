@@ -452,11 +452,11 @@ if __name__ == '__main__':
 		for line in reversed(list(open(metapath+sys.argv[1]+'.json'))):
 			data  = json.loads(line)
 			accession = data['accession']
-			try:
-				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
-			except Exception:
-				print('Problem occured with: '+accession+'. unable to proceed at this time')
-				pass
+			# try:
+			combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+			# except Exception:
+			# 	print('Problem occured with: '+accession+'. unable to proceed at this time')
+			# 	pass
 	else:
 		accession = input
 		with open(metapath+'accessions.txt', "rb") as pa:
@@ -473,4 +473,5 @@ if __name__ == '__main__':
 	
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
+python3 pdownload.py PXD015848
 # python3 pdownload.py accessions_filtered
