@@ -24,11 +24,11 @@ def zipfile_finder(accession, path, metapath):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
+	# os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
-	os.remove(path+accession[-9:]+'-readme.txt')
+	# os.remove(path+accession[-9:]+'-readme.txt')
 
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
@@ -276,11 +276,8 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 
 	#Create the sub-images
 	#figuring out all of the mz and rt intervals 
-	value = interval['mz']['min']
-	rtrangelist = [value+i*mz_bin for i in range(int(resolution['x']))]
-
-	value = interval['rt']['min']
-	rtrangelist = [value+i*rt_bin for i in range(int(resolution['y']))]
+	mzrangelist = [interval['mz']['min']+i*mz_bin for i in range(int(resolution['x']))]
+	rtrangelist = [interval['rt']['min']+i*rt_bin for i in range(int(resolution['y']))]
 
 	imgpath = path+'images/'
 	if not os.path.exists(imgpath):
@@ -405,7 +402,7 @@ def combined(accession, maxquant_file, path, metapath):
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			reso   	 = {'x':1250,'y':1000}
 			interval = {'mz':10,'rt':2}
-			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = True)
+			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
 
 		os.remove(datapath+zipfilename)
 		os.remove(datapath+zipfilename[:-4]+'-'+pepfile)
