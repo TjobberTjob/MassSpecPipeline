@@ -24,11 +24,11 @@ def zipfile_finder(accession, path, metapath):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
+	# os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
-	os.remove(path+accession[-9:]+'-readme.txt')
+	# os.remove(path+accession[-9:]+'-readme.txt')
 
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
@@ -87,7 +87,7 @@ def filehandling(filename, zipfilename, path, maxquant_file, df, url):
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
 		if os.path.exists(filepath+'file.raw'):
 			if os.path.getsize(filepath+'file.raw') == 0: #If this is an empty file with nothing in it, remove it (causes problems with download)
-				os.remove(filepath+file.raw)
+				os.remove(filepath+'file.raw')
 		os.system('wget -q --show-progress -O '+filepath+'/file.raw -c '+url+'/'+filename+'.raw')
 	return df2, filepath
 
@@ -110,7 +110,7 @@ def formatFile(filename, path, filepath):
 		# os.system('sudo chmod -R a+rwx '+filepath+'*')
 		os.system('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
-		os.remove(path+filename+'/file.raw')
+		os.remove(path+filename+'file.raw')
 
 
 def process_ms1(spectrum):
@@ -159,8 +159,53 @@ def get_lower_bound(haystack, needle):
 		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def createImages(filename, path, filepath, metapath, resolution, subimage_interval, df, savepng):
+def fullpng(image, filepath, resolution, interval, lowbound, highbound):
+	listnames = ['Mean','Min','Max','Collapsed']
+	for ll in range(4):
+		fullimage = [[y[ll] for y in x] for x in image]
+		titleofplot = listnames[ll]
 
+		if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
+			#Set color of missing data
+			fullimage = np.ma.masked_equal(fullimage,0)
+			#Setup colormap
+			colMap = cm.jet
+			colMap.set_bad('darkblue')
+			if titleofplot != 'Collapsed':
+				plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
+			else:
+				plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')
+			plt.tight_layout()
+			plt.title(titleofplot)
+			plt.xlabel('m/z', fontsize=12)
+			plt.ylabel('Retention time - Minutes', fontsize=12)
+			plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
+			if titleofplot == 'Collapsed':
+				plt.colorbar(extend = 'both')
+			plt.tight_layout()
+			plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png')
+			plt.close()
+
+
+def subpng(subimage, imgpath, filename, index, lowbound, highbound):
+	newimage = [[y[0] for y in x] for x in subimage]
+	newimage = np.ma.masked_equal(newimage,0)
+
+	colMap = cm.jet
+	colMap.set_bad('darkblue')
+
+	fig = plt.figure()
+	fig.set_size_inches(2,2)#(mzupper - mzlower)/100,(rtupper - rtlower)/100)
+	ax = plt.Axes(fig, [0., 0., 1., 1.])
+	ax.set_axis_off()
+	fig.add_axes(ax)
+	plt.set_cmap('hot')
+	ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
+	plt.savefig(imgpath+filename+'-'+str(index+1)+'.png')
+	plt.close()
+
+
+def createImages(filename, path, filepath, metapath, resolution, subimage_interval, df, savepng):
 	print('Preparing data for image creation              ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
 	
@@ -238,34 +283,8 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
 			pickle.dump(imagedata, pa)
 		
-		#######Creating the full image (.png)#######
-		listnames = ['Mean','Min','Max','Collapsed']
-		if savepng:
-			for ll in range(4):
-				fullimage = [[y[ll] for y in x] for x in image]
-				titleofplot = listnames[ll]
-
-				if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
-					#Set color of missing data
-					fullimage = np.ma.masked_equal(fullimage,0)
-					#Setup colormap
-					colMap = cm.jet
-					colMap.set_bad('darkblue')
-					if titleofplot != 'Collapsed':
-						plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
-					else:
-						plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')
-					plt.tight_layout()
-					plt.title(titleofplot)
-					plt.xlabel('m/z', fontsize=12)
-					plt.ylabel('Retention time - Minutes', fontsize=12)
-					plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-					if titleofplot == 'Collapsed':
-						plt.colorbar(extend = 'both')
-					plt.tight_layout()
-					plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png')
-					plt.close()
-		#############################################
+		if savepng: #save full image to png
+			fullpng(image, filepath, resolution, interval, lowbound, highbound)
 
 	else: #If the image data exists, just recall it instead of making it
 		print('Loading image data                              ', end = '\r')
@@ -275,7 +294,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 			nonzero_counter = imagedata[1]
 			total_datapoints= imagedata[2]
 
-	#Create the sub-images
+	#CREATE SUBIMAGE FILES
 	#figuring out all of the mz and rt intervals 
 	mzrangelist = [interval['mz']['min']+i*mz_bin for i in range(int(resolution['x']))]
 	rtrangelist = [interval['rt']['min']+i*rt_bin for i in range(int(resolution['y']))]
@@ -309,33 +328,15 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		mzupper = int(get_lower_bound(mzrangelist,rows['m/z']) + onemzlength*subimage_interval['mz']) 
 		rtlower = int(get_lower_bound(rtrangelist,rows['Retention time']) - onertlength*subimage_interval['rt']) 
 		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + onertlength*subimage_interval['rt'])
-		start = time.time()
+
 		subimage = [lines[mzlower:mzupper] for lines in image[rtlower+1:rtupper]]
 
 		#Save image as txt file
 		with open(imgpath+filename+'-'+str(index+1)+'.txt', 'wb') as pa:
 			pickle.dump(subimage, pa)
 
-		########Create image (.png)########
-		if savepng:
-			#get the mean values from the imagedata
-			newimage = [[y[0] for y in x] for x in subimage]
-			#set color of missing data
-			newimage = np.ma.masked_equal(newimage,0)
-
-			colMap = cm.jet
-			colMap.set_bad('darkblue')
-
-			fig = plt.figure()
-			fig.set_size_inches(2,2)#(mzupper - mzlower)/100,(rtupper - rtlower)/100)
-			ax = plt.Axes(fig, [0., 0., 1., 1.])
-			ax.set_axis_off()
-			fig.add_axes(ax)
-			plt.set_cmap('hot')
-			ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
-			plt.savefig(imgpath+filename+'-'+str(index+1)+'.png')
-			plt.close()
-		###################################
+		if savepng: #save subimages to png
+			subpng(subimage, imgpath, filename, index, lowbound, highbound)
 
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(index+1)})
@@ -411,8 +412,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
