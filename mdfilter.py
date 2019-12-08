@@ -22,7 +22,7 @@ def filter(path, file):
 					lines_seen.add(line)
 		except Exception:
 			pass
-	outfile.close
+	outfile.close()
 
 
 if __name__ == '__main__':
