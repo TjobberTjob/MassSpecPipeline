@@ -403,7 +403,7 @@ def combined(accession, maxquant_file, path, metapath):
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			reso   	 = {'x':1250,'y':1000}
 			interval = {'mz':10,'rt':2}
-			createImages(filename = str(filename), path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
+			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
 
 		os.remove(datapath+zipfilename)
 		os.remove(datapath+zipfilename[:-4]+'-'+pepfile)
