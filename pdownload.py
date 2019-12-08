@@ -250,17 +250,11 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 			pickle.dump(imagedata, pa)
 		
 		#######Creating the full image (.png)#######
+		listnames = ['Mean','Min','Max','Collapsed']
 		if savepng:
 			for ll in range(4):
 				fullimage = [[y[ll] for y in x] for x in image]
-				if ll == 0:
-					titleofplot = 'Mean'
-				elif ll == 1:
-					titleofplot = 'Min'
-				elif ll == 2:
-					titleofplot = 'Max'
-				elif ll == 3:
-					titleofplot = 'Collapsed'
+				titleofplot = listnames[ll]
 
 				if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
 					#Set color of missing data
@@ -277,7 +271,8 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 					plt.xlabel('m/z', fontsize=12)
 					plt.ylabel('Retention time - Minutes', fontsize=12)
 					plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-					# plt.colorbar(extend = 'both')
+					if titleofplot == 'Collapsed':
+						plt.colorbar(extend = 'both')
 					plt.tight_layout()
 					plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png')
 					plt.close()
