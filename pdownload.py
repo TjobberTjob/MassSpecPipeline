@@ -391,7 +391,7 @@ def combined(accession, maxquant_file, path, metapath):
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": 
 				continue
 
-			print('\nfile: '+str(accession)+'/'+str(filename)) 
+			print('\nfile: '+accession+'/'+filename) 
 			print('downloading raw file                  ', end = '\r')
 			output   = filehandling(filename = filename, zipfilename = zipfilename, path = datapath, maxquant_file = pepfile, df = df, url = url)
 			df2 	 = output[0]
@@ -403,7 +403,7 @@ def combined(accession, maxquant_file, path, metapath):
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			reso   	 = {'x':1250,'y':1000}
 			interval = {'mz':10,'rt':2}
-			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
+			createImages(filename = str(filename), path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
 
 		os.remove(datapath+zipfilename)
 		os.remove(datapath+zipfilename[:-4]+'-'+pepfile)
@@ -423,7 +423,7 @@ if __name__ == '__main__':
 			data  = json.loads(line)
 			accession = data['accession']
 			try:
-				combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+				combined(str(accession), maxquant_file = pepfile, path = datapath, metapath = metapath)
 			except Exception:
 				print('Problem occured with: '+accession+'. unable to proceed at this time')
 				pass
@@ -436,7 +436,7 @@ if __name__ == '__main__':
 				accession = a
 				break
 		# try: 	
-		combined(accession, maxquant_file = pepfile, path = datapath, metapath = metapath)
+		combined(str(accession), maxquant_file = pepfile, path = datapath, metapath = metapath)
 		# except Exception:
 		# 	print('Problem occured with: '+accession+'. unable to proceed at this time')
 		# 	pass
