@@ -1,4 +1,4 @@
-if __name__ == '__main__':
+if 'import' == 'import':
 	import shutil
 	import pandas as pd
 	import csv
@@ -18,7 +18,15 @@ if __name__ == '__main__':
 	from zipfile import ZipFile
 	from bs4 import BeautifulSoup
 	from pyteomics import mzml,mzid,mgf
- 
+
+
+def get_lower_bound(haystack, needle):
+	idx = bisect.bisect(haystack, needle)
+	if idx > 0 and idx < len(haystack):
+		return idx
+	else:
+		raise ValueError(f"{needle} is out of bounds of {haystack}")
+
 
 def zipfile_finder(accession, path):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
@@ -149,14 +157,6 @@ def internalmzML(path):
 		f.write(json.dumps(extracted))
 		f.close()
 		os.remove(filepath+'file.mzML')
-
-
-def get_lower_bound(haystack, needle):
-	idx = bisect.bisect(haystack, needle)
-	if idx > 0 and idx < len(haystack):
-		return idx
-	else:
-		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
 def preparameters(filepath, resolution):
