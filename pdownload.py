@@ -159,52 +159,6 @@ def get_lower_bound(haystack, needle):
 		raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def fullpng(image, filepath, resolution, interval, lowbound, highbound):
-	listnames = ['Mean','Min','Max','Collapsed']
-	for ll in range(4):
-		fullimage = [[y[ll] for y in x] for x in image]
-		titleofplot = listnames[ll]
-
-		if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
-			#Set color of missing data
-			fullimage = np.ma.masked_equal(fullimage,0)
-			#Setup colormap
-			colMap = cm.jet
-			colMap.set_bad('darkblue')
-			if titleofplot != 'Collapsed':
-				plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
-			else:
-				plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')
-			plt.tight_layout()
-			plt.title(titleofplot)
-			plt.xlabel('m/z', fontsize=12)
-			plt.ylabel('Retention time - Minutes', fontsize=12)
-			plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
-			if titleofplot == 'Collapsed':
-				plt.colorbar(extend = 'both')
-			plt.tight_layout()
-			plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png')
-			plt.close()
-
-
-def subpng(subimage, imgpath, filename, index, lowbound, highbound):
-	newimage = [[y[0] for y in x] for x in subimage]
-	newimage = np.ma.masked_equal(newimage,0)
-
-	colMap = cm.jet
-	colMap.set_bad('darkblue')
-
-	fig = plt.figure()
-	fig.set_size_inches(2,2)#(mzupper - mzlower)/100,(rtupper - rtlower)/100)
-	ax = plt.Axes(fig, [0., 0., 1., 1.])
-	ax.set_axis_off()
-	fig.add_axes(ax)
-	plt.set_cmap('hot')
-	ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
-	plt.savefig(imgpath+filename+'-'+str(index+1)+'.png')
-	plt.close()
-
-
 def preparameters(filepath, resolution):
 	print('Preparing parameter for image creation                ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
@@ -227,6 +181,33 @@ def preparameters(filepath, resolution):
 
 	return mzml, [mzlist, rtlist, intlist], [lowbound, highbound], interval, [mz_bin, rt_bin]
 
+
+def fullpng(image, filepath, resolution, interval, lowbound, highbound):
+	listnames = ['Mean','Min','Max','Collapsed']
+	for ll in range(4):
+		fullimage = [[y[ll] for y in x] for x in image]
+		titleofplot = listnames[ll]
+		
+		if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
+			#Set color of missing data
+			fullimage = np.ma.masked_equal(fullimage,0)
+			#Setup colormap
+			colMap = cm.jet
+			colMap.set_bad('darkblue')
+			if titleofplot != 'Collapsed':
+				plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto', vmin = lowbound, vmax = highbound)
+			else:
+				plt.imshow(fullimage,cmap=colMap,extent = [interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']],aspect = 'auto')
+			plt.tight_layout()
+			plt.title(titleofplot)
+			plt.xlabel('m/z', fontsize=12)
+			plt.ylabel('Retention time - Minutes', fontsize=12)
+			plt.axis([interval['mz']['min'], interval['mz']['max'], interval['rt']['min'], interval['rt']['max']])
+			if titleofplot == 'Collapsed':
+				plt.colorbar(extend = 'both')
+			plt.tight_layout()
+			plt.savefig(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png')
+			plt.close()
 
 def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
 	mz_bin = bins[0]
@@ -271,10 +252,10 @@ def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
 			_key = (x_i,y_i)
 			try:
 				meanintensity = np.mean(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
-				minintensity  = min(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
-				maxintensity  = max(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
-				inputpoints   = len(ms1_array[_key]) #Amount of inputs into this array
-				pixelpoint 	  = [meanintensity,minintensity,maxintensity,inputpoints]
+				minintensity  = min(ms1_array[_key])
+				maxintensity  = max(ms1_array[_key])
+				inputpoints   = len(ms1_array[_key]) #Amount of inputs into this point
+				pixelpoint 	  = [meanintensity, minintensity, maxintensity, inputpoints]
 				total_datapoints+=(len(ms1_array[_key]))
 				nonzero_counter+=1
 			except KeyError:
@@ -282,7 +263,7 @@ def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
 			row.append(pixelpoint)
 		image.append(row)
 	print('Saving image files                            ', end = '\r')
-
+	image.reverse()
 	imagedata = [image, nonzero_counter, total_datapoints]
 	#Save as txt file
 	with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
@@ -295,6 +276,23 @@ def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
 	
 	return imagedata
 
+
+def subpng(subimage, imgpath, filename, index, lowbound, highbound):
+	newimage = [[y[0] for y in x] for x in subimage]
+	newimage = np.ma.masked_equal(newimage,0)
+
+	colMap = cm.jet
+	colMap.set_bad('darkblue')
+
+	fig = plt.figure()
+	fig.set_size_inches(2,2)#(mzupper - mzlower)/100,(rtupper - rtlower)/100)
+	ax = plt.Axes(fig, [0., 0., 1., 1.])
+	ax.set_axis_off()
+	fig.add_axes(ax)
+	plt.set_cmap('hot')
+	ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
+	plt.savefig(imgpath+filename+'-'+str(index+1)+'.png')
+	plt.close()
 
 def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, image, bounds, savepng):
 	mz_bin = bins[0]
@@ -429,8 +427,7 @@ def combined(accession, maxquant_file, path, metapath):
 			bins 		= output[4]
 
 			#Make the image
-			if not os.path.exists(filepath+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
-				print('Creating full image                              ', end = '\r')
+			if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
 				output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng = True)
 				image = output[0]
 				nonzero_counter  = output[1]
