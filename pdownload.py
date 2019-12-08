@@ -86,7 +86,7 @@ def filehandling(filename, zipfilename, path, maxquant_file, df, url):
 	#Download the raw file
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
 		if os.path.exists(filepath+'file.raw'):
-			if os.path.getsize(filepath+'file.raw') == 0:
+			if os.path.getsize(filepath+'file.raw') == 0: #If this is an empty file with nothing in it, remove it (causes problems with download)
 				os.remove(filepath+file.raw)
 		os.system('wget -q --show-progress -O '+filepath+'/file.raw -c '+url+'/'+filename+'.raw')
 	return df2, filepath
