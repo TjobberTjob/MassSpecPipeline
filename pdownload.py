@@ -346,7 +346,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		with open(imgpath+filename+'-'+str(i)+'.txt', 'wb') as pa:
 			pickle.dump(subimage, pa)
 
-		########Create image########
+		########Create image (.png)########
 		if savepng:
 			#get the mean values from the imagedata
 			newimage = [[y[0] for y in x] for x in subimage]
@@ -358,14 +358,14 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 
 			fig = plt.figure()
 			fig.set_size_inches(2,2)#(mzupper - mzlower)/100,(rtupper - rtlower)/100)
-			ax = plt.Axes(fig, [0., 0., 1, 1])
+			ax = plt.Axes(fig, [0., 0., 1., 1.])
 			ax.set_axis_off()
 			fig.add_axes(ax)
 			plt.set_cmap('hot')
 			ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
 			plt.savefig(imgpath+filename+'-'+str(i)+'.png')
 			plt.close()
-		###########################
+		###################################
 
 		new_metadata = {}
 		new_metadata.update({"image" : filename+'-'+str(i)})
