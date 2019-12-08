@@ -391,7 +391,7 @@ def combined(accession, maxquant_file, path, metapath):
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": 
 				continue
 
-			print('\nfile: '+accession+'/'+filename) 
+			print('\nfile: '+str(accession)+'/'+str(filename)) 
 			print('downloading raw file                  ', end = '\r')
 			output   = filehandling(filename = filename, zipfilename = zipfilename, path = datapath, maxquant_file = pepfile, df = df, url = url)
 			df2 	 = output[0]
