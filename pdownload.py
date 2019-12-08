@@ -41,7 +41,7 @@ def rawfile_finder(zipfile, path, maxquant_file):
 
 	#Download zip file
 	try:
-		shutil.remove(path+zipfilename)
+		os.remove(path+zipfilename)
 	except Exception:
 		pass
 	os.system('wget -q --show-progress -O '+path+zipfilename+' '+zipfile)
@@ -116,7 +116,7 @@ def process_ms1(spectrum):
 	#Scan information
 	scan_info = spectrum['scanList']
 	#Time
-	scan_time = scan_info['scan'][0]['scan start time']
+	scan_time = scan_info['scan'][0]['scan start time'] 
 	mz = spectrum['m/z array'] 
 	#ion intensity
 	intensity = spectrum['intensity array']
@@ -147,7 +147,7 @@ def internalmzML(path):
 		f = open(path+'mzML.json','w')
 		f.write(json.dumps(extracted))
 		f.close()
-		# os.system('rm -f'+filepath+' file.mzML')
+		os.remove(filepath+'file.mzML')
 
 
 def get_lower_bound(haystack, needle):
