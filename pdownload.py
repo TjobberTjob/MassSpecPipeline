@@ -20,15 +20,15 @@ if __name__ == '__main__':
 	from pyteomics import mzml,mzid,mgf
  
 
-def zipfile_finder(accession, path, metapath):
+def zipfile_finder(accession, path):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
+	# os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
-	os.remove(path+accession[-9:]+'-readme.txt')
+	# os.remove(path+accession[-9:]+'-readme.txt')
 
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
@@ -205,8 +205,8 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
 	plt.close()
 
 
-def createImages(filename, path, filepath, metapath, resolution, subimage_interval, df, savepng):
-	print('Preparing data for image creation              ', end = '\r')
+def preparameters(filepath, resolution):
+	print('Preparing parameter for image creation                ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
 	
 	mzlist  = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))# for item in sublist]))
@@ -224,87 +224,95 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	# Define the intervals for the given resolution
 	mz_bin = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
 	rt_bin = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
+
+	return mzml, [mzlist, rtlist, intlist], [lowbound, highbound], interval, [mz_bin, rt_bin]
+
+
+def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
+	mz_bin = bins[0]
+	rt_bin = bins[1]
+	#Create an empty array for layer use
+	ms1_array = {}
 	
-	if not os.path.exists(filepath+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
-		#Create an empty array for layer use
-		ms1_array = {}
-		
-		# Get sorted list of scan ids.
-		scan_ids = [int(scan_id) for scan_id in mzml['ms1']]
+	# Get sorted list of scan ids.
+	scan_ids = [int(scan_id) for scan_id in mzml['ms1']]
 
-		for scan_id in sorted(scan_ids):
-			scan_id = str(scan_id)
+	for scan_id in sorted(scan_ids):
+		scan_id = str(scan_id)
 
-			# Get the intervals
-			scan_time = float(mzml['ms1'][scan_id]['scan_time'])
-			if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
+		# Get the intervals
+		scan_time = float(mzml['ms1'][scan_id]['scan_time'])
+		if scan_time < interval['rt']['min'] or scan_time > interval['rt']['max']:
+			continue
+
+		# Calculate the y axis. 
+		y_n = int((scan_time - interval['rt']['min'])/rt_bin)
+		for index, mz_elem in enumerate(mzml['ms1'][scan_id]['mz']):
+			if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
 				continue
+			x_n = int((mz_elem - interval['mz']['min'])/mz_bin)
+			_key = (x_n,y_n)
+			# Current strategy for collapsing the intensity values is taking their logs
+			intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][index])
+			try:
+				ms1_array[_key].append(intensity_val)
+			except KeyError:
+				ms1_array[_key] = [intensity_val]
+	
+	# Create the final image.
+	nonzero_counter = 0		#How many pixels have non-zero values
+	total_datapoints = 0	#How many datapoints does the file contain.
+	image = []
+	for y_i in range(0,resolution['y']):
+		if y_i % 25 == 0:
+			print("Creating full image: {:2.1%}                                     ".format(y_i / resolution['y']), end = '\r') #Print how far we are	
+		row = []
+		for x_i in range(0,resolution['x']):
+			_key = (x_i,y_i)
+			try:
+				meanintensity = np.mean(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
+				minintensity  = min(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
+				maxintensity  = max(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
+				inputpoints   = len(ms1_array[_key]) #Amount of inputs into this array
+				pixelpoint 	  = [meanintensity,minintensity,maxintensity,inputpoints]
+				total_datapoints+=(len(ms1_array[_key]))
+				nonzero_counter+=1
+			except KeyError:
+				pixelpoint = [0,0,0,0]
+			row.append(pixelpoint)
+		image.append(row)
+	print('Saving image files                            ', end = '\r')
 
-			# Calculate the y axis. 
-			y_n = int((scan_time - interval['rt']['min'])/rt_bin)
-			for index, mz_elem in enumerate(mzml['ms1'][scan_id]['mz']):
-				if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
-					continue
-				x_n = int((mz_elem - interval['mz']['min'])/mz_bin)
-				_key = (x_n,y_n)
-				# Current strategy for collapsing the intensity values is taking their logs
-				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][index])
-				try:
-					ms1_array[_key].append(intensity_val)
-				except KeyError:
-					ms1_array[_key] = [intensity_val]
+	imagedata = [image, nonzero_counter, total_datapoints]
+	#Save as txt file
+	with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
+		pickle.dump(imagedata, pa)
+	lowbound  = bounds[0]
+	highbound = bounds[1]
 
-		# Create the final image.
-		nonzero_counter = 0		#How many pixels have non-zero values
-		total_datapoints = 0	#How many datapoints does the file contain.
-		image = []
-		for y_i in range(0,resolution['y']):
-			if y_i % 25 == 0:
-				print("Creating full image: {:2.1%}                                     ".format(y_i / resolution['y']), end = '\r') #Print how far we are	
-			row = []
-			for x_i in range(0,resolution['x']):
-				_key = (x_i,y_i)
-				try:
-					meanintensity = np.mean(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
-					minintensity  = min(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
-					maxintensity  = max(ms1_array[_key]) #Current strategy for normalizing intensity is mean.
-					inputpoints   = len(ms1_array[_key]) #Amount of inputs into this array
-					pixelpoint 	  = [meanintensity,minintensity,maxintensity,inputpoints]
-					total_datapoints+=(len(ms1_array[_key]))
-					nonzero_counter+=1
-				except KeyError:
-					pixelpoint = [0,0,0,0]
-				row.append(pixelpoint)
-			image.append(row)
-		print('Saving image files                            ', end = '\r')
+	if savepng: #save full image to png
+		fullpng(image, filepath, resolution, interval, lowbound, highbound)
+	
+	return imagedata
 
-		imagedata = [image, nonzero_counter, total_datapoints]
-		#Save as txt file
-		with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
-			pickle.dump(imagedata, pa)
-		
-		if savepng: #save full image to png
-			fullpng(image, filepath, resolution, interval, lowbound, highbound)
 
-	else: #If the image data exists, just recall it instead of making it
-		print('Loading image data                              ', end = '\r')
-		with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
-			imagedata 		= pickle.load(pa)
-			image 			= imagedata[0]
-			nonzero_counter = imagedata[1]
-			total_datapoints= imagedata[2]
-
-	#CREATE SUBIMAGE FILES
-	#figuring out all of the mz and rt intervals 
+def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, image, bounds, savepng):
+	mz_bin = bins[0]
+	rt_bin = bins[1]
 	mzrangelist = [interval['mz']['min']+i*mz_bin for i in range(int(resolution['x']))]
 	rtrangelist = [interval['rt']['min']+i*rt_bin for i in range(int(resolution['y']))]
 
 	imgpath = path+'images/'
 	if not os.path.exists(imgpath):
 		os.mkdir(imgpath)
-
+	
+	metapath = path+'metadata/'
 	if not os.path.exists(metapath):
-		os.mkdir(metapath)	
+		os.mkdir(metapath)
+
+	lowbound  = bounds[0]
+	highbound = bounds[1]
+
 	outfile = open(metapath+'subimage.json','a') #The metadata file
 	
 	outbound = 0
@@ -334,6 +342,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		#Save image as txt file
 		with open(imgpath+filename+'-'+str(index+1)+'.txt', 'wb') as pa:
 			pickle.dump(subimage, pa)
+		
 
 		if savepng: #save subimages to png
 			subpng(subimage, imgpath, filename, index, lowbound, highbound)
@@ -348,10 +357,19 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		outfile.write(json.dumps(new_metadata)+'\n')
 	outfile.close()
 	
+	return [inbound, outbound], metapath
+
+
+def endstats(inputlists, interval, accession, filename, total_datapoints, nonzero_counter, inorout, metapath):
 	print('Calculating end statistics:                            ', end = '\r')
-	
+	mzlist = inputlists[0]
+	rtlist = inputlists[1]
+
 	mzlist_inrange = [i for i in mzlist if i > interval['mz']['min'] and i < interval['mz']['max']]
 	rtlist_inrange = [i for i in rtlist if i > interval['rt']['min'] and i < interval['rt']['max']]
+
+	inbound  = inorout[0]
+	outbound = inorout[1]
 
 	end_stats = {}
 	end_stats['accession']			= accession
@@ -371,16 +389,17 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 
 def combined(accession, maxquant_file, path, metapath):
 	#Find all zip files
-	output      = zipfile_finder(accession = accession, path = datapath, metapath = metapath)
+	output      = zipfile_finder(accession = accession, path = path)
 	searchfiles = output[0]
 	url 	    = output[1]
 
 	for zips in searchfiles:
+		#only continue if its a zip file
 		if zips[-4:] != '.zip':
 			continue
 
-		#Find all raw files in the zip file
-		output   = rawfile_finder(zipfile = zips, path = datapath, maxquant_file = pepfile)
+		#finds raw files for this zip file
+		output   = rawfile_finder(zipfile = zips, path = path, maxquant_file = pepfile)
 		rawfiles = output[0]
 		df		 = output[1]
 		zipfilename = output[2]
@@ -394,18 +413,44 @@ def combined(accession, maxquant_file, path, metapath):
 
 			print('\nfile: '+accession+'/'+filename) 
 			print('downloading raw file                  ', end = '\r')
-			output   = filehandling(filename = filename, zipfilename = zipfilename, path = datapath, maxquant_file = pepfile, df = df, url = url)
+			output   = filehandling(filename = filename, zipfilename = zipfilename, path = path, maxquant_file = pepfile, df = df, url = url)
 			df2 	 = output[0]
 			filepath = output[1]
 
-			formatFile(filename = filename, path = datapath, filepath = filepath)
+			formatFile(filename = filename, path = path, filepath = filepath)
 			internalmzML(path = filepath)
+			
+			resolution   	 = {'x':1250,'y':1000}
+			output 	= preparameters(filepath, resolution)
+			mzml 		= output[0]
+			inputlists 	= output[1]
+			bounds 		= output[2]
+			interval 	= output[3]
+			bins 		= output[4]
 
-			#Set the resolution for the large image, and the intervals for the smaller ones
-			reso   	 = {'x':1250,'y':1000}
-			interval = {'mz':10,'rt':2}
-			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
+			#Make the image
+			if not os.path.exists(filepath+'/'+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
+				print('Creating full image                              ', end = '\r')
+				output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng = True)
+				image = output[0]
+				nonzero_counter  = output[1]
+				total_datapoints = output[2]
+			#Retrieve if exist already
+			else:
+				print('Loading image data                              ', end = '\r')
+				with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
+					output = pickle.load(pa)
+				image = output[0]
+				nonzero_counter  = output[1]
+				total_datapoints = output[2]
 
+			subimage_interval = {'mz':10,'rt':2}
+			output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds, savepng = False)
+			inorout  = output[0]
+			metapath = output[1]
+
+			endstats(inputlists, interval, accession, filename, total_datapoints, nonzero_counter, inorout, metapath)
+	
 		os.remove(datapath+zipfilename)
 		os.remove(datapath+zipfilename[:-4]+'-'+pepfile)
 
