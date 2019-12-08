@@ -184,9 +184,10 @@ def preparameters(filepath, resolution):
 
 def fullpng(image, filepath, resolution, interval, lowbound, highbound):
 	listnames = ['Mean','Min','Max','Collapsed']
-	for ll in range(4):
-		fullimage = [[y[ll] for y in x] for x in image]
-		titleofplot = listnames[ll]
+	for i in range(4):
+		fullimage = [[y[i] for y in x] for x in image]
+		fullimage.reverse()
+		titleofplot = listnames[i]
 		
 		if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'-'+titleofplot+'.png'):
 			#Set color of missing data
@@ -263,7 +264,7 @@ def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
 			row.append(pixelpoint)
 		image.append(row)
 	print('Saving image files                            ', end = '\r')
-	image.reverse()
+	# image.reverse()
 	imagedata = [image, nonzero_counter, total_datapoints]
 	#Save as txt file
 	with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "wb") as pa:
@@ -279,6 +280,7 @@ def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
 
 def subpng(subimage, imgpath, filename, index, lowbound, highbound):
 	newimage = [[y[0] for y in x] for x in subimage]
+	newimage.reverse()
 	newimage = np.ma.masked_equal(newimage,0)
 
 	colMap = cm.jet
