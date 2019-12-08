@@ -277,17 +277,10 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	#Create the sub-images
 	#figuring out all of the mz and rt intervals 
 	value = interval['mz']['min']
-	mzrangelist = [value]
-	for i in range(int(resolution['x'])):
-		value+=mz_bin
-		mzrangelist.append(value)
-	# mzrangelist2 = [(value+=mz_bin) for i in range(int(resolution['x']))]
+	rtrangelist = [value+i*mz_bin for i in range(int(resolution['x']))]
 
 	value = interval['rt']['min']
-	rtrangelist = [value]
-	for i in range(int(resolution['y'])):
-		value+=rt_bin
-		rtrangelist.append(value)
+	rtrangelist = [value+i*rt_bin for i in range(int(resolution['y']))]
 
 	imgpath = path+'images/'
 	if not os.path.exists(imgpath):
