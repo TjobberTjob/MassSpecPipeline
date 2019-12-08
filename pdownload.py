@@ -24,12 +24,11 @@ def zipfile_finder(accession, path, metapath):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	# os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
-	print(url)
+	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
-	# os.remove(path+accession[-9:]+'-readme.txt')
+	os.remove(path+accession[-9:]+'-readme.txt')
 
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
@@ -164,22 +163,16 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	print('Preparing data for image creation              ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
 	
-	mzlistlist = []
-	rtlist  = []
-	intlist = []
-	for f in mzml['ms1']:
-		mzlistlist.append(mzml['ms1'][f]['mz'])
-		rtlist.append(mzml['ms1'][f]['scan_time'])
-		intlist.append(mzml['ms1'][f]['intensity'])
-	mzlist = np.unique(sorted([item for sublist in mzlistlist for item in sublist]))
-	intlist = [item for sublist in intlist for item in sublist]
+	mzlist  = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))# for item in sublist]))
+	rtlist  = [mzml['ms1'][f]['scan_time'] for f in mzml['ms1']]
+	intlist = [item for f in mzml['ms1'] for item in mzml['ms1'][f]['intensity']]
+
 	lowbound = math.log(np.percentile(intlist,0.5))
 	highbound = math.log(np.percentile(intlist,99.5))
 
-	wash_out = 8 #8 minutes of washout of the instrument (proetometools)
 	interval = {
 		'mz' : {'min':min(mzlist),'max':max(mzlist)},
-		'rt' : {'min':wash_out,'max':max(rtlist)}
+		'rt' : {'min':min(rtlist),'max':max(rtlist)}
 	}
 	
 	# Define the intervals for the given resolution
@@ -203,32 +196,25 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 
 			# Calculate the y axis. 
 			y_n = int((scan_time - interval['rt']['min'])/rt_bin)
-			# print (scan_time,y_n)
-			l = 0
-			
-			for mz_elem in mzml['ms1'][scan_id]['mz']:
+			for index, mz_elem in enumerate(mzml['ms1'][scan_id]['mz']):
 				if mz_elem < interval['mz']['min'] or mz_elem > interval['mz']['max']:
 					continue
 				x_n = int((mz_elem - interval['mz']['min'])/mz_bin)
 				_key = (x_n,y_n)
 				# Current strategy for collapsing the intensity values is taking their logs
-				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][l])
+				intensity_val = math.log(mzml['ms1'][scan_id]['intensity'][index])
 				try:
 					ms1_array[_key].append(intensity_val)
 				except KeyError:
 					ms1_array[_key] = [intensity_val]
 
-				l+=1
-
 		# Create the final image.
-		run_i = 0				#For printing purposes
 		nonzero_counter = 0		#How many pixels have non-zero values
 		total_datapoints = 0	#How many datapoints does the file contain.
 		image = []
 		for y_i in range(0,resolution['y']):
-			run_i+=1
-			if run_i % 25 == 0:
-				print("Creating full image: {:2.1%}                                     ".format(run_i / resolution['y']), end = '\r') #Print how far we are	
+			if y_i % 25 == 0:
+				print("Creating full image: {:2.1%}                                     ".format(y_i / resolution['y']), end = '\r') #Print how far we are	
 			row = []
 			for x_i in range(0,resolution['x']):
 				_key = (x_i,y_i)
@@ -332,27 +318,8 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		mzupper = int(get_lower_bound(mzrangelist,rows['m/z']) + onemzlength*subimage_interval['mz']) 
 		rtlower = int(get_lower_bound(rtrangelist,rows['Retention time']) - onertlength*subimage_interval['rt']) 
 		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + onertlength*subimage_interval['rt'])
-		subimage = []
 		start = time.time()
-		for k, lines in enumerate(image):
-			if k < rtlower:
-				continue
-			if rtlower < k < rtupper:
-				subimage.append(lines[mzlower:mzupper])
-			if k > rtupper:
-				break
-		stop = time.time()
-		diff1 = stop-start
-		print(diff1)
-		
-		# start = time.time()
-		# subimage = [lines[mzlower:mzupper] for k, lines in enumerate(image) if rtlower < k < rtupper if k >]
-		# stop = time.time()
-		# diff2 = stop-start
-		# print(diff2)
-		# print(min(diff1,diff2))
-		quit()
-		
+		subimage = [lines[mzlower:mzupper] for lines in image[rtlower+1:rtupper]]
 
 		#Save image as txt file
 		with open(imgpath+filename+'-'+str(index+1)+'.txt', 'wb') as pa:
@@ -445,7 +412,7 @@ def combined(accession, maxquant_file, path, metapath):
 			#Set the resolution for the large image, and the intervals for the smaller ones
 			reso   	 = {'x':1250,'y':1000}
 			interval = {'mz':10,'rt':2}
-			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = False)
+			createImages(filename = filename, path = datapath, filepath = filepath, metapath = metapath,resolution = reso, subimage_interval = interval, df = df2, savepng = True)
 
 		os.remove(datapath+zipfilename)
 		os.remove(datapath+zipfilename[:-4]+'-'+pepfile)
