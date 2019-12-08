@@ -32,11 +32,11 @@ def zipfile_finder(accession, path):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	# os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
+	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
-	# os.remove(path+accession[-9:]+'-readme.txt')
+	os.remove(path+accession[-9:]+'-readme.txt')
 
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
