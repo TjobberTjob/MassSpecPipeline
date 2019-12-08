@@ -7,6 +7,7 @@ if __name__ == '__main__':
 	import bisect
 	import matplotlib as mpl
 	import pickle
+	import time
 	import requests
 	import json
 	import sys		
@@ -23,11 +24,12 @@ def zipfile_finder(accession, path, metapath):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
+	# os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
+	print(url)
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
-	os.remove(path+accession[-9:]+'-readme.txt')
+	# os.remove(path+accession[-9:]+'-readme.txt')
 
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
@@ -293,6 +295,7 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 	for i in range(int(resolution['x'])):
 		value+=mz_bin
 		mzrangelist.append(value)
+	# mzrangelist2 = [(value+=mz_bin) for i in range(int(resolution['x']))]
 
 	value = interval['rt']['min']
 	rtrangelist = [value]
@@ -308,19 +311,18 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		os.mkdir(metapath)	
 	outfile = open(metapath+'subimage.json','a') #The metadata file
 	
-	i = 0
 	outbound = 0
 	inbound  = 0
+	df.reset_index(drop=True, inplace=True)
 	for index, rows in df.iterrows():
-		i+=1
-		if i % int(df.shape[0]/40) == 0:
-			print("Creating subimages: {:2.1%}                                  ".format(i / df.shape[0]), end = '\r') #Print how far we are
+		if (index+1) % int(df.shape[0]/40) == 0:
+			print("Creating subimages: {:2.1%}                                  ".format((index+1) / df.shape[0]), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			outbound+=1 #Check if this image can be created in our range or not
 			continue
 		inbound+=1
-		if os.path.exists(imgpath+filename+'-'+str(i)+'.png'):
+		if os.path.exists(imgpath+filename+'-'+str(index+1)+'.png'):
 			continue
 		
 		onemzlength = len(mzrangelist)/(max(mzrangelist)-min(mzrangelist))
@@ -331,16 +333,29 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 		rtlower = int(get_lower_bound(rtrangelist,rows['Retention time']) - onertlength*subimage_interval['rt']) 
 		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + onertlength*subimage_interval['rt'])
 		subimage = []
-		k = 0
-		for lines in image:
+		start = time.time()
+		for k, lines in enumerate(image):
+			if k < rtlower:
+				continue
 			if rtlower < k < rtupper:
 				subimage.append(lines[mzlower:mzupper])
-			k+=1
 			if k > rtupper:
 				break
+		stop = time.time()
+		diff1 = stop-start
+		print(diff1)
+		
+		# start = time.time()
+		# subimage = [lines[mzlower:mzupper] for k, lines in enumerate(image) if rtlower < k < rtupper if k >]
+		# stop = time.time()
+		# diff2 = stop-start
+		# print(diff2)
+		# print(min(diff1,diff2))
+		quit()
+		
 
 		#Save image as txt file
-		with open(imgpath+filename+'-'+str(i)+'.txt', 'wb') as pa:
+		with open(imgpath+filename+'-'+str(index+1)+'.txt', 'wb') as pa:
 			pickle.dump(subimage, pa)
 
 		########Create image (.png)########
@@ -360,12 +375,12 @@ def createImages(filename, path, filepath, metapath, resolution, subimage_interv
 			fig.add_axes(ax)
 			plt.set_cmap('hot')
 			ax.imshow(newimage, aspect='equal',cmap = colMap, vmin = lowbound, vmax = highbound)
-			plt.savefig(imgpath+filename+'-'+str(i)+'.png')
+			plt.savefig(imgpath+filename+'-'+str(index+1)+'.png')
 			plt.close()
 		###################################
 
 		new_metadata = {}
-		new_metadata.update({"image" : filename+'-'+str(i)})
+		new_metadata.update({"image" : filename+'-'+str(index+1)})
 		for ele in df.columns[1:]:
 			if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
 				continue
@@ -438,8 +453,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
