@@ -385,7 +385,7 @@ def combined(accession, maxquant_file, path, metapath):
 		zipfilename = output[2]
 
 		for raws in rawfiles:
-			filename = raws 
+			filename = str(raws)
 
 			#Skip this special case. Something wrong
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": 
