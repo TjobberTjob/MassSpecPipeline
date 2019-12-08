@@ -24,11 +24,11 @@ def zipfile_finder(accession, path, metapath):
 	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
 
 	#Download readme file
-	# os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
+	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
 	#Handle and remove readme file
 	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
-	# os.remove(path+accession[-9:]+'-readme.txt')
+	os.remove(path+accession[-9:]+'-readme.txt')
 
 	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
 	return searchfiles, url
@@ -116,7 +116,7 @@ def process_ms1(spectrum):
 	#Scan information
 	scan_info = spectrum['scanList']
 	#Time
-	scan_time = scan_info['scan'][0]['scan start time']
+	scan_time = scan_info['scan'][0]['scan start time'] 
 	mz = spectrum['m/z array'] 
 	#ion intensity
 	intensity = spectrum['intensity array']
@@ -410,8 +410,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	datapath = 'Data/' 
+	datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	# datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
