@@ -116,7 +116,7 @@ def process_ms1(spectrum):
 	#Scan information
 	scan_info = spectrum['scanList']
 	#Time
-	scan_time = scan_info['scan'][0]['scan start time'] 
+	scan_time = scan_info['scan'][0]['scan start time']
 	mz = spectrum['m/z array'] 
 	#ion intensity
 	intensity = spectrum['intensity array']
