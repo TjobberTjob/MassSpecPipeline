@@ -156,7 +156,7 @@ def internalmzML(path):
 		f = open(path+'mzML.json','w')
 		f.write(json.dumps(extracted))
 		f.close()
-		os.remove(filepath+'file.mzML')
+		os.remove(path+'file.mzML')
 
 
 def preparameters(filepath, resolution):
