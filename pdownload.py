@@ -118,7 +118,7 @@ def formatFile(filename, path, filepath):
 		os.system('chmod -R a+rwx '+path+'*')
 		os.system('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
-		os.remove(path+filename+'file.raw')
+		os.remove(filepath+'file.raw')
 
 
 def process_ms1(spectrum):
