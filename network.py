@@ -132,7 +132,7 @@ class DataGenerator(keras.utils.Sequence):
 			image = image[:,:,0:self.n_channels]
 			try:
 				X[i,] = image
-			except Exception
+			except Exception:
 				print(ID)
 
 			y[i] = self.labels[ID]
