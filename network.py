@@ -134,6 +134,7 @@ class DataGenerator(keras.utils.Sequence):
 				X[i,] = image
 			except Exception:
 				print(ID)
+				print(image.shape)
 
 			y[i] = self.labels[ID]
 		if not classification:
