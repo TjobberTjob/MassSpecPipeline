@@ -159,11 +159,11 @@ def internalmzML(path):
 		os.remove(path+'file.mzML')
 
 
-def preparameters(filepath, resolution):
+def preparameters(filepath):
 	print('Preparing parameter for image creation                ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
 	
-	mzlist  = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))# for item in sublist]))
+	mzlist  = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
 	rtlist  = [mzml['ms1'][f]['scan_time'] for f in mzml['ms1']]
 	intlist = [item for f in mzml['ms1'] for item in mzml['ms1'][f]['intensity']]
 
@@ -176,10 +176,13 @@ def preparameters(filepath, resolution):
 	}
 	
 	# Define the intervals for the given resolution
-	mz_bin = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
-	rt_bin = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
+	# mz_bin = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
+	mz_bin = 0.75
+	# rt_bin = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
+	rt_bin = 0.06
+	resolution = {'x': int((max(mzlist)-min(mzlist))/mz_bin), 'y': int((max(rtlist)-min(rtlist))/rt_bin)}
 
-	return mzml, [mzlist, rtlist, intlist], [lowbound, highbound], interval, [mz_bin, rt_bin]
+	return mzml, [mzlist, rtlist, intlist], [lowbound, highbound], interval, [mz_bin, rt_bin], resolution
 
 
 def fullpng(image, filepath, resolution, interval, lowbound, highbound):
@@ -329,16 +332,19 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 		if os.path.exists(imgpath+filename+'-'+str(index+1)+'.png'):
 			continue
 		
-		onemzlength = len(mzrangelist)/(max(mzrangelist)-min(mzrangelist))
-		onertlength = len(rtrangelist)/(max(rtrangelist)-min(rtrangelist))
+		print(int(subimage_interval['mz']/mz_bin))
+		mzlen = int(subimage_interval['mz']/mz_bin)
+		rtlen = int(subimage_interval['rt']/rt_bin)
 
-		mzlower = int(get_lower_bound(mzrangelist,rows['m/z']) - onemzlength*subimage_interval['mz'])
-		mzupper = int(get_lower_bound(mzrangelist,rows['m/z']) + onemzlength*subimage_interval['mz']) 
-		rtlower = int(get_lower_bound(rtrangelist,rows['Retention time']) - onertlength*subimage_interval['rt']) 
-		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + onertlength*subimage_interval['rt'])
+		mzlower = int(get_lower_bound(mzrangelist,rows['m/z']) - mzlen)
+		mzupper = int(get_lower_bound(mzrangelist,rows['m/z']) + mzlen) 
+		rtlower = int(get_lower_bound(rtrangelist,rows['Retention time']) - rtlen) 
+		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + rtlen)
 
 		subimage = [lines[mzlower:mzupper] for lines in image[rtlower+1:rtupper]]
-
+		subimage = np.array(subimage)
+		print(subimage.shape)
+		quit()
 		#Save image as txt file
 		with open(imgpath+filename+'-'+str(index+1)+'.txt', 'wb') as pa:
 			pickle.dump(subimage, pa)
@@ -358,6 +364,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 	outfile.close()
 	
 	return [inbound, outbound], metapath
+
 
 
 def endstats(inputlists, interval, accession, filename, total_datapoints, nonzero_counter, inorout, metapath):
@@ -420,18 +427,21 @@ def combined(accession, maxquant_file, path, metapath):
 			formatFile(filename = filename, path = path, filepath = filepath)
 			internalmzML(path = filepath)
 			
-			resolution   	 = {'x':1250,'y':1000}
-			output 	= preparameters(filepath, resolution)
+			# resolution   	 = {'x':1250,'y':1000}
+			output 	= preparameters(filepath)
 			mzml 		= output[0]
 			inputlists 	= output[1]
 			bounds 		= output[2]
 			interval 	= output[3]
 			bins 		= output[4]
+			resolution  = output[5]
 
 			#Make the image
 			if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
 				output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng = True)
 				image = output[0]
+				image = np.array(image)
+				print(image.shape)
 				nonzero_counter  = output[1]
 				total_datapoints = output[2]
 			#Retrieve if exist already
@@ -443,7 +453,7 @@ def combined(accession, maxquant_file, path, metapath):
 				nonzero_counter  = output[1]
 				total_datapoints = output[2]
 
-			subimage_interval = {'mz':10,'rt':2}
+			subimage_interval = {'mz':25,'rt':5}
 			output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds, savepng = False)
 			inorout  = output[0]
 			metapath = output[1]
@@ -456,8 +466,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name
