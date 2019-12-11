@@ -130,11 +130,7 @@ class DataGenerator(keras.utils.Sequence):
 				image = pickle.load(pa)
 			image = np.array(image)
 			image = image[:,:,0:self.n_channels]
-			try:
-				X[i,] = image
-			except Exception:
-				print(ID)
-				print(image.shape)
+			X[i,] = image
 
 			y[i] = self.labels[ID]
 		if not classification:
