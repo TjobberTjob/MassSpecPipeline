@@ -332,7 +332,6 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 		if os.path.exists(imgpath+filename+'-'+str(index+1)+'.png'):
 			continue
 		
-		print(int(subimage_interval['mz']/mz_bin))
 		mzlen = int(subimage_interval['mz']/mz_bin)
 		rtlen = int(subimage_interval['rt']/rt_bin)
 
@@ -342,9 +341,8 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + rtlen)
 
 		subimage = [lines[mzlower:mzupper] for lines in image[rtlower+1:rtupper]]
-		subimage = np.array(subimage)
-		print(subimage.shape)
-		quit()
+		subimage2 = np.array(subimage)
+		
 		#Save image as txt file
 		with open(imgpath+filename+'-'+str(index+1)+'.txt', 'wb') as pa:
 			pickle.dump(subimage, pa)
@@ -440,8 +438,6 @@ def combined(accession, maxquant_file, path, metapath):
 			if not os.path.exists(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt'):
 				output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng = True)
 				image = output[0]
-				image = np.array(image)
-				print(image.shape)
 				nonzero_counter  = output[1]
 				total_datapoints = output[2]
 			#Retrieve if exist already
