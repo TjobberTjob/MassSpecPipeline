@@ -104,6 +104,7 @@ def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawf
 		pd.DataFrame.to_csv(df,filepath+maxquant_file)
 
 	#Download the raw file
+	print((os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')))
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
 		if os.path.exists(filepath+'file.raw'):
 			if os.path.getsize(filepath+'file.raw') == 0: #If this is an empty file with nothing in it, remove it (causes problems with download)
