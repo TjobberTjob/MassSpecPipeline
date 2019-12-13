@@ -40,7 +40,9 @@ def filefinder(accession, path):
 			zipfiles.append(f['downloadLink'])
 		if f['fileType'] == ',RAW' and filetype == 'raw':
 			rawfiles.append(f['downloadLink'])
-	
+	print(zipfiles)
+	print(rawfiles)
+	quit()
 	return zipfiles, rawfiles
 
 
@@ -102,8 +104,7 @@ def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawf
 	if not os.path.exists(filepath+zipfilename[:-4]+'-'+maxquant_file): 
 		df2 = df.loc[df['Raw file'] == filename,]
 		pd.DataFrame.to_csv(df,filepath+maxquant_file)
-	print(rawfiles)
-	quit()
+
 	#Download the raw file
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
 		if os.path.exists(filepath+'file.raw'):
