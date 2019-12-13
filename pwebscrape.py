@@ -114,18 +114,6 @@ def accessions_metadata(path):
 		outfile.write(json.dumps(metadata)+'\n')
 
 
-def replace_accessions():
-	outfile = open(metapath+'accessions2.json','a')
-	for line in open(metapath+'accessions.json','r'):
-		data = json.loads(line)
-		with open(metapath+'accessions.txt', "rb") as pa:
-			pride_accessions = pickle.load(pa)
-		for f in pride_accessions:
-			if data['accession'] in f:
-				data['accession'] = f
-				outfile.write(json.dumps(data)+'\n')
-
-
 def validated_input(prompt, valid_values):
 	valid_input = False
 	while not valid_input:
@@ -135,8 +123,11 @@ def validated_input(prompt, valid_values):
 
 
 if __name__ == '__main__':
-	# datapath = 'Data/'
-	datapath = '/data/ProteomeToolsRaw/'
+	#Read datapath from config file
+	with open('config.json') as json_file:
+   		data = json.load(json_file)
+   	
+	datapath = data['path']
 	metapath = datapath+'metadata/'
 
 	cmd = sys.argv[1]

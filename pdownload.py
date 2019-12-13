@@ -92,6 +92,7 @@ def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawf
 		for files in os.listdir(path+filename+'/'):
 			if not os.path.exists(filepath+files):
 				shutil.move(path+filename+'/'+files, filepath+files)
+		os.remove(path+filename+'/')
 
 	#Move or rm zip.file
 	if not os.path.exists(filepath+zipfilename): 
@@ -375,7 +376,6 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 	outfile.close()
 	
 	return [inbound, outbound], metapath
-
 
 
 def endstats(inputlists, interval, accession, filename, total_datapoints, nonzero_counter, inorout, metapath):

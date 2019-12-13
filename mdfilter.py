@@ -25,8 +25,11 @@ def filter(path, file):
 
 
 if __name__ == '__main__':
-	# path = 'Data/metadata/'
-	path = '/data/ProteomeToolsRaw/metadata/'
+	#Read datapath from config file
+	with open('config.json') as json_file:
+   		data = json.load(json_file)
+   	
+	datapath = data['path']
 	
 	filetofilter = sys.argv[1]
 
