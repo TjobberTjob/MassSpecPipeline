@@ -38,11 +38,9 @@ def filefinder(accession, path):
 		filetype = f['fileName'][re.search('\.',f['fileName']).span()[1]:]
 		if f['fileType'] == 'SEARCH' and filetype == 'zip':
 			zipfiles.append(f['downloadLink'])
-		if f['fileType'] == ',RAW' and filetype == 'raw':
+		if f['fileType'] == 'RAW' and filetype == 'raw':
 			rawfiles.append(f['downloadLink'])
-	print(zipfiles)
-	print(rawfiles)
-	quit()
+
 	return zipfiles, rawfiles
 
 
