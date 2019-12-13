@@ -149,7 +149,7 @@ def process_ms1(spectrum):
 def internalmzML(path):
 	#Extract the data from the mzml, if we havnt already
 	if not os.path.exists(path+'mzML.json'):
-		print('Extracting data from mzML										', end = '\r')
+		print('Extracting data from mzML                                                    ', end = '\r')
 		data = mzml.MzML(path+'file.mzML')
 
 		#Extracted data
@@ -174,7 +174,7 @@ def internalmzML(path):
 
 
 def preparameters(filepath):
-	print('Preparing parameter for image creation										', end = '\r')
+	print('Preparing parameter for image creation                                                    ', end = '\r')
 	mzml = json.load(open(filepath+'/mzML.json'))
 	
 	mzlist  = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
@@ -264,7 +264,7 @@ def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
 	image = []
 	for y_i in range(0,resolution['y']):
 		if y_i % 25 == 0:
-			print('Creating full image: {:2.1%}										'.format(y_i / resolution['y']), end = '\r') #Print how far we are	
+			print('Creating full image: {:2.1%}                                                    '.format(y_i / resolution['y']), end = '\r') #Print how far we are	
 		row = []
 		for x_i in range(0,resolution['x']):
 			_key = (x_i,y_i)
@@ -280,7 +280,7 @@ def fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng):
 				pixelpoint = [0,0,0,0]
 			row.append(pixelpoint)
 		image.append(row)
-	print('Saving image files										', end = '\r')
+	print('Saving image files                                                    ', end = '\r')
 	# image.reverse()
 	imagedata = [image, nonzero_counter, total_datapoints]
 	#Save as txt file
@@ -337,7 +337,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 	df.reset_index(drop=True, inplace=True)
 	for index, rows in df.iterrows():
 		if (index+1) % int(df.shape[0]/40) == 0:
-			print('Creating subimages: {:2.1%}										'.format((index+1) / df.shape[0]), end = '\r') #Print how far we are
+			print('Creating subimages: {:2.1%}                                                    '.format((index+1) / df.shape[0]), end = '\r') #Print how far we are
 
 		if rows['Retention time']-subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time']+subimage_interval['rt'] > interval['rt']['max'] or rows['m/z']-subimage_interval['mz'] < interval['mz']['min'] or rows['m/z']+subimage_interval['mz']> interval['mz']['max']:
 			outbound+=1 #Check if this image can be created in our range or not
@@ -379,7 +379,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 
 
 def endstats(inputlists, interval, accession, filename, total_datapoints, nonzero_counter, inorout, metapath):
-	print('Calculating end statistics:									', end = '\r')
+	print('Calculating end statistics:                                                    ', end = '\r')
 	mzlist = inputlists[0]		
 	rtlist = inputlists[1]
 
@@ -402,7 +402,7 @@ def endstats(inputlists, interval, accession, filename, total_datapoints, nonzer
 	outfile = open(metapath+'sub_statistics.json','a')
 	outfile.write(json.dumps(end_stats)+'\n')
 	outfile.close()
-	print('Done!												')
+	print('Done!                                                    ')
 
 
 def combined(accession, maxquant_file, path, metapath):
@@ -426,7 +426,7 @@ def combined(accession, maxquant_file, path, metapath):
 				continue
 
 			print('\nfile: '+accession+'/'+filename) 
-			print('Downloading raw file										', end = '\r')
+			print('Downloading raw file                                                    ', end = '\r')
 			output   = filehandling(accession, filename = filename, zipfilename = zipfilename, path = path, maxquant_file = pepfile, df = df, rawfiles = allRaw)
 			df2 	 = output[0]
 			filepath = output[1]
@@ -450,7 +450,7 @@ def combined(accession, maxquant_file, path, metapath):
 				total_datapoints = output[2]
 			#Retrieve if exist already
 			else:
-				print('Loading image data										', end = '\r')
+				print('Loading image data                                                    ', end = '\r')
 				with open(filepath+str(resolution['x'])+'x'+str(resolution['y'])+'.txt', "rb") as pa:
 					output = pickle.load(pa)
 				image = output[0]
