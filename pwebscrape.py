@@ -114,8 +114,7 @@ def accessions_metadata(path):
 			
 			outfile.write(json.dumps(metadata)+'\n')
 		except Exception:
-			print(f)
-			quit()
+			pass
 
 
 def validated_input(prompt, valid_values):
