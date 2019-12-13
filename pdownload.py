@@ -431,7 +431,7 @@ def combined(accession, maxquant_file, path, metapath):
 			df2 	 = output[0]
 			filepath = output[1]
 
-			formatFile(filename = filename, path = path, filepath = filepath)
+			formatFile(accession ,filename = filename, path = path, filepath = filepath)
 			internalmzML(path = filepath)
 			
 			output 	= preparameters(filepath)
