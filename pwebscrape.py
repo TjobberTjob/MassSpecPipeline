@@ -68,50 +68,54 @@ def accessions_metadata(path):
 	outfile = open(join(path,metadata),'a')
 
 	for i, f in enumerate(pride_accessions):
-		print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
-		api = 'https://www.ebi.ac.uk/pride/ws/archive/project/'+f
-		apijson = requests.get(api).json()
-		
-		metadata = {}
-		maxquant = False
-		for g in apijson:
-			metadata[g] = apijson[g]
-			if 'maxquant' in str(apijson[g]).lower():
-				maxquant = True
-		metadata['maxquant'] = maxquant
+		try:
+			print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
+			api = 'https://www.ebi.ac.uk/pride/ws/archive/project/'+f
+			apijson = requests.get(api).json()
+			
+			metadata = {}
+			maxquant = False
+			for g in apijson:
+				metadata[g] = apijson[g]
+				if 'maxquant' in str(apijson[g]).lower():
+					maxquant = True
+			metadata['maxquant'] = maxquant
 
-		files = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/'+f
-		filesjson = requests.get(files).json()
-		filetypes = []
-		for f in filesjson['list']:
-			filetype = f['fileName'][re.search('\.',f['fileName']).span()[1]:]
-			if filetype not in filetypes:
-				filetypes.append(filetype)
-		metadata['filetypes'] = filetypes
-		
-		if metadata['maxquant'] == True and 'zip' in metadata['filetypes']:
-			try:
-				for f in filesjson['list']:
-					filetype = f['fileName'][re.search('\.',f['fileName']).span()[1]:]
-					if f['fileType'] == 'SEARCH' and filetype == 'zip':
-						zipfile = f['downloadLink']
-						break
-				os.system('wget -q -O '+path+'file.zip '+zipfile)
+			files = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/'+f
+			filesjson = requests.get(files).json()
+			filetypes = []
+			for f in filesjson['list']:
+				filetype = f['fileName'][re.search('\.',f['fileName']).span()[1]:]
+				if filetype not in filetypes:
+					filetypes.append(filetype)
+			metadata['filetypes'] = filetypes
+			
+			if metadata['maxquant'] == True and 'zip' in metadata['filetypes']:
+				try:
+					for f in filesjson['list']:
+						filetype = f['fileName'][re.search('\.',f['fileName']).span()[1]:]
+						if f['fileType'] == 'SEARCH' and filetype == 'zip':
+							zipfile = f['downloadLink']
+							break
+					os.system('wget -q -O '+path+'file.zip '+zipfile)
 
-				with ZipFile(path+'file.zip','r') as zipped:
-					ziplist = zipped.namelist()
-				os.remove(path+'file.zip')
+					with ZipFile(path+'file.zip','r') as zipped:
+						ziplist = zipped.namelist()
+					os.remove(path+'file.zip')
 
-				for xx in ziplist:
-					if 'allPeptides.txt' in xx:
-						metadata['allpeptides'] = True
-						break
-			except Exception:
+					for xx in ziplist:
+						if 'allPeptides.txt' in xx:
+							metadata['allpeptides'] = True
+							break
+				except Exception:
+					metadata['allpeptides'] = False
+			else:
 				metadata['allpeptides'] = False
-		else:
-			metadata['allpeptides'] = False
-		
-		outfile.write(json.dumps(metadata)+'\n')
+			
+			outfile.write(json.dumps(metadata)+'\n')
+		except Exception:
+			print(f)
+			quit()
 
 
 def validated_input(prompt, valid_values):
