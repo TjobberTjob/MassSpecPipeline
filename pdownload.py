@@ -5,6 +5,7 @@ if 'import' == 'import':
 	import matplotlib.cm as cm
 	import matplotlib.pyplot as plt
 	import bisect
+	import re
 	import matplotlib as mpl
 	import pickle
 	import time
@@ -28,21 +29,22 @@ def get_lower_bound(haystack, needle):
 		raise ValueError(f"{needle} is out of bounds of {haystack}"	)
 
 
-def zipfile_finder(accession, path):
-	url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'+accession
+def filefinder(accession, path):
+	url = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/'+accession
+	urljson = requests.get(url).json()
+	zipfiles = []
+	rawfiles = []
+	for f in urljson['list']: 
+		filetype = f['fileName'][re.search('\.',f['fileName']).span()[1]:]
+		if f['fileType'] == 'SEARCH' and filetype == 'zip':
+			zipfiles.append(f['downloadLink'])
+		if f['fileType'] == 'RAW' and filetype == 'raw':
+			rawfiles.append(f['downloadLink'])
+	
+	return zipfiles, rawfiles
 
-	#Download readme file
-	os.system('wget -q -O '+path+accession[-9:]+'-readme.txt '+url+'/README.txt')
 
-	#Handle and remove readme file
-	df = pd.read_csv(path+accession[-9:]+'-readme.txt',sep='\t')
-	os.remove(path+accession[-9:]+'-readme.txt')
-
-	searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI']
-	return searchfiles, url
-
-
-def rawfile_finder(zipfile, path, maxquant_file):
+def zipfile_downloader(zipfile, path, maxquant_file):
 	#Handle spaces in urls
 	zipfile = zipfile.replace(' ','%20')
 	zipfilename = zipfile[63:]
@@ -76,9 +78,12 @@ def rawfile_finder(zipfile, path, maxquant_file):
 	return rawfiles, df, zipfilename
 
 
-def filehandling(filename, zipfilename, path, maxquant_file, df, url):
-	filepath = path+filename+'/'
+def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawfiles):
+	accessionpath = path+accession+'/'
+	filepath = accessionpath+filename+'/'
 	#Make the file directory if it doesnt exist
+	if not os.path.exists(accessionpath):	
+		os.mkdir(accessionpath)
 	if not os.path.exists(filepath):	
 		os.mkdir(filepath)
 
@@ -96,11 +101,13 @@ def filehandling(filename, zipfilename, path, maxquant_file, df, url):
 		if os.path.exists(filepath+'file.raw'):
 			if os.path.getsize(filepath+'file.raw') == 0: #If this is an empty file with nothing in it, remove it (causes problems with download)
 				os.remove(filepath+'file.raw')
-		os.system('wget -q --show-progress -O '+filepath+'/file.raw -c '+url+'/'+filename+'.raw')
+		for f in rawfiles:
+			if filename in f:
+				os.system('wget -q --show-progress -O '+filepath+'/file.raw -c '+f)
 	return df2, filepath
 
 
-def formatFile(filename, path, filepath):
+def formatFile(accession,filename, path, filepath):
 	print('Formatting file to mzML               ', end = '\r')
 	#Check whether the docker file is implemented or not
 	if not (os.path.exists(filepath+'file.mzML') or os.path.exists(filepath+'mzML.json')):
@@ -116,7 +123,7 @@ def formatFile(filename, path, filepath):
 		else:
 			relpath =os.getcwd()+path[:-1] 
 		os.system('chmod -R a+rwx '+path+'*')
-		os.system('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+filename+'/file.raw -o=/data_input/'+filename+'/ -f=1 -m=1')#, shell=True)		
+		os.system('docker run -v \"'+relpath+':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/'+accession+'/'+filename+'/file.raw -o=/data_input/'+accession+'/'+filename+'/ -f=1 -m=1')#, shell=True)		
 		os.remove(filepath+'file-metadata.txt')
 		os.remove(filepath+'file.raw')
 
@@ -394,17 +401,13 @@ def endstats(inputlists, interval, accession, filename, total_datapoints, nonzer
 
 def combined(accession, maxquant_file, path, metapath):
 	#Find all zip files
-	output      = zipfile_finder(accession = accession, path = path)
-	searchfiles = output[0]
-	url 	    = output[1]
+	output      = filefinder(accession = accession, path = path)
+	allZip 	= output[0]
+	allRaw 	= output[1]
 
-	for zips in searchfiles:
-		#only continue if its a zip file
-		if zips[-4:] != '.zip':
-			continue
-
+	for zips in reversed(allZip):
 		#finds raw files for this zip file
-		output   = rawfile_finder(zipfile = zips, path = path, maxquant_file = pepfile)
+		output   = zipfile_downloader(zipfile = zips, path = path, maxquant_file = pepfile)
 		rawfiles = output[0]
 		df		 = output[1]
 		zipfilename = output[2]
@@ -418,7 +421,7 @@ def combined(accession, maxquant_file, path, metapath):
 
 			print('\nfile: '+accession+'/'+filename) 
 			print('downloading raw file                  ', end = '\r')
-			output   = filehandling(filename = filename, zipfilename = zipfilename, path = path, maxquant_file = pepfile, df = df, url = url)
+			output   = filehandling(accession, filename = filename, zipfilename = zipfilename, path = path, maxquant_file = pepfile, df = df, rawfiles = allRaw)
 			df2 	 = output[0]
 			filepath = output[1]
 
@@ -462,8 +465,8 @@ def combined(accession, maxquant_file, path, metapath):
 
 if __name__ == '__main__':
 	#Path to data
-	datapath = '/data/ProteomeToolsRaw/' #Server datapath
-	# datapath = 'Data/' 
+	# datapath = '/data/ProteomeToolsRaw/' #Server datapath
+	datapath = 'Data/' 
 	metapath = datapath+'metadata/'
 
 	#Assigning accession number and maxquant output file name

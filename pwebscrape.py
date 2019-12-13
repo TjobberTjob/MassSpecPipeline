@@ -46,7 +46,7 @@ def get_accessions(path):
 			for level3 in soup_3.find_all('a', href = True):
 				accession = level3['href'].replace('/','')
 				if len(accession) == len('PRD000000'):
-					all_accessions.append(level1.text+level2.text+accession)
+					all_accessions.append(accession)
 
 	with open(path+accessions, "wb") as pa:
 		pickle.dump(all_accessions, pa)
@@ -64,98 +64,54 @@ def accessions_metadata(path):
 
 	with open(path+accessions, "rb") as pa:
 		pride_accessions = pickle.load(pa) #Loading the data
-	i = 0
+	
 	outfile = open(join(path,metadata),'a')
 
-	for f in pride_accessions:
-		accession = f[-9:]
-		i   += 1
-		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession
-		html = requests.get(url).text
-		print(html)
-		soup = BeautifulSoup(html,'html.parser')
-		my_dict = {}
-		my_dict['accession'] = accession
-		my_dict['database path'] = f
-		quit()
-		try:
-			for div in soup.find_all('div', {'class': 'ivu-card-body'}):
-				for div2 in div.find_all('div', {'class': 'property-row'}):
-					print(div2.find('a').text)
-		except Exception:
-			print('no bueno')
-			quit()
-	
-
-			# for div2 in div.find_all('div', {'class': 'grid_12'}): 
-			# 	try:
-			# 		name  = div2.find('h5').text 
-			# 	except Exception:
-			# 		continue
-			# 	try:
-			# 		value = div2.find('a').text 
-			# 	except Exception:
-			# 		value = "Not available"
-			# 	my_dict[name] = value 
-
-		for div in soup.find_all('div', {'class': 'grid_16 left-column'}):
-			plist = []
-			for p in div.find_all('p'):
-				plist.append(p.text.strip())
-			my_dict['Submission Date'] = plist[-2]
-			my_dict['Publication Date'] = plist[-1]
-
-		url  = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession+'/files'
-		html = requests.get(url).text
-		soup = BeautifulSoup(html,'html.parser')
-
-		filetypes = []
-		for div in soup.find_all('div', {'class': 'grid_23 clearfix file-list'}):
-			for h5 in div.find_all('h5'):
-				name  = h5.text[re.search(' ',h5.text).span()[1]:]
-				value = h5.text[:re.search(' ',h5.text).span()[0]]
-				my_dict[name] = value
-
-			for ta in div.find_all('table'):
-				try:
-					filetypes.append(ta.find('td').text.strip()[re.search('\.',ta.find('td').text.strip()).span()[1]:])
-				except Exception:
-					print('f')
-			my_dict['filetypes'] = filetypes
-
+	for i, f in enumerate(pride_accessions):
+		print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
+		api = 'https://www.ebi.ac.uk/pride/ws/archive/project/'+f
+		apijson = requests.get(api).json()
 		
-		url = 'https://www.ebi.ac.uk/pride/archive/projects/'+accession
-		page = requests.get(url).text
-		my_dict['maxquant'] = 'maxquant' in page.lower()
+		metadata = {}
+		maxquant = False
+		for g in apijson:
+			metadata[g] = apijson[g]
+			if 'maxquant' in str(apijson[g]).lower():
+				maxquant = True
+		metadata['maxquant'] = maxquant
 
-		#Check for allpeptides.txt		
-		if my_dict['maxquant'] == True and 'zip' in my_dict['filetypes']:
+		files = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/'+f
+		filesjson = requests.get(files).json()
+		filetypes = []
+		for f in filesjson['list']:
+			filetype = f['fileName'][re.search('\.',f['fileName']).span()[1]:]
+			if filetype not in filetypes:
+				filetypes.append(filetype)
+		metadata['filetypes'] = filetypes
+		
+		if metadata['maxquant'] == True and 'zip' in metadata['filetypes']:
 			try:
-				for div in soup.find_all('div', {'class': 'grid_6 omega'}):
-					url = div.find('a')['href'] #Update URL with FTP link
-					break
-				os.system('wget -q -O '+path+'readme.txt '+url+'/README.txt')
-				df = pd.read_csv(path+'readme.txt',sep='\t')
-				os.remove(path+'readme.txt')
-				searchfiles = df.loc[df['TYPE'] == 'SEARCH',]['URI'].tolist()
-				os.system('wget -q -O '+path+'file.zip '+searchfiles[0])
+				for f in filesjson['list']:
+					filetype = f['fileName'][re.search('\.',f['fileName']).span()[1]:]
+					if f['fileType'] == 'SEARCH' and filetype == 'zip':
+						zipfile = f['downloadLink']
+						break
+				os.system('wget -q -O '+path+'file.zip '+zipfile)
 
 				with ZipFile(path+'file.zip','r') as zipped:
 					ziplist = zipped.namelist()
+				os.remove(path+'file.zip')
 
 				for xx in ziplist:
 					if 'allPeptides.txt' in xx:
-						my_dict['allpeptides'] = True
+						metadata['allpeptides'] = True
 						break
 			except Exception:
-				my_dict['allpeptides'] = 'Error'
+				metadata['allpeptides'] = False
 		else:
-			my_dict['allpeptides'] = False
-
-		print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
-
-		outfile.write(json.dumps(my_dict)+'\n')
-	outfile.close()
+			metadata['allpeptides'] = False
+		
+		outfile.write(json.dumps(metadata)+'\n')
 
 
 def replace_accessions():
@@ -179,8 +135,8 @@ def validated_input(prompt, valid_values):
 
 
 if __name__ == '__main__':
-	# datapath = 'Data/'
-	datapath = '/data/ProteomeToolsRaw/'
+	datapath = 'Data/'
+	# datapath = '/data/ProteomeToolsRaw/'
 	metapath = datapath+'metadata/'
 
 	cmd = sys.argv[1]
