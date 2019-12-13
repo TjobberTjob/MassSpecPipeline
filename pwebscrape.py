@@ -135,8 +135,8 @@ def validated_input(prompt, valid_values):
 
 
 if __name__ == '__main__':
-	datapath = 'Data/'
-	# datapath = '/data/ProteomeToolsRaw/'
+	# datapath = 'Data/'
+	datapath = '/data/ProteomeToolsRaw/'
 	metapath = datapath+'metadata/'
 
 	cmd = sys.argv[1]
