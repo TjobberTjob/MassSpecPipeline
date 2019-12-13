@@ -87,6 +87,12 @@ def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawf
 	if not os.path.exists(filepath):	
 		os.mkdir(filepath)
 
+	#Check if old version exists
+	if os.path.exists(path+filename+'/'):
+		for files in os.listdir(path+filename+'/'):
+			if not os.path.exists(filepath+files):
+				shutil.move(path+filename+'/'+files, filepath+files)
+
 	#Move or rm zip.file
 	if not os.path.exists(filepath+zipfilename): 
 		shutil.copyfile(path+zipfilename, filepath+'file.zip')
@@ -415,7 +421,7 @@ def combined(accession, maxquant_file, path, metapath):
 		for raws in rawfiles:
 			filename = str(raws)
 
-			#Skip this special case. Something wrong
+			#Skip this special case. Something wrong... dont know, dont care
 			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": 
 				continue
 
@@ -428,7 +434,6 @@ def combined(accession, maxquant_file, path, metapath):
 			formatFile(filename = filename, path = path, filepath = filepath)
 			internalmzML(path = filepath)
 			
-			# resolution   	 = {'x':1250,'y':1000}
 			output 	= preparameters(filepath)
 			mzml 		= output[0]
 			inputlists 	= output[1]
