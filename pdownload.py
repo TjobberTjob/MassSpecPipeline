@@ -92,7 +92,7 @@ def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawf
 		for files in os.listdir(path+filename+'/'):
 			if not os.path.exists(filepath+files):
 				shutil.move(path+filename+'/'+files, filepath+files)
-		os.remove(path+filename+'/')
+		shutil.rmtree(path+filename+'/')
 
 	#Move or rm zip.file
 	if not os.path.exists(filepath+zipfilename): 
