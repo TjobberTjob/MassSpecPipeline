@@ -77,10 +77,11 @@ def accessions_metadata(path):
 			maxquant = False
 			for g in apijson:
 				metadata[g] = apijson[g]
-				if 'maxquant' in str(apijson[g]).lower():
-					maxquant = True
-			metadata['maxquant'] = maxquant
+			# 	if 'maxquant' in str(apijson[g]).lower():
+			# 		maxquant = True
+			# metadata['maxquant'] = maxquant
 
+			print(apijson == metadata)
 			files = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/'+f
 			filesjson = requests.get(files).json()
 			filetypes = []
