@@ -16,11 +16,11 @@ def filter(path, file):
 		data = json.loads(line)
 		##### ADD FILTER HERE #####
 		# if (float(data['m/z']) > 450) and (float(data['m/z']) < 451):
-			if data['allpeptides'] == True and 'raw' in data['filetypes']:# and data['Modification'] != 'No PTMs are included in the dataset':
+		if data['allpeptides'] and 'raw' in data['filetypes']:# and data['Modification'] != 'No PTMs are included in the dataset':
 		###########################
-				if line not in lines_seen:
-					outfile.write(line)
-					lines_seen.add(line)
+			if line not in lines_seen:
+				outfile.write(line)
+				lines_seen.add(line)
 	outfile.close()
 
 
