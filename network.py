@@ -23,7 +23,7 @@ if 'import' == 'import':
 def datafetcher(path, imgpath,classification, imageclass, splitratio):
 	imgfiles = os.listdir(imgpath)
 	for f in imgfiles:
-		print(os.path.exists(imgpath+imgfiles[0:10]))
+		print(os.path.exists(imgpath+f))
 	quit()
 	with open(imgfiles[0], "rb") as pa:
 		image = pickle.load(pa)
