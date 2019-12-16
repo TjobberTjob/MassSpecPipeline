@@ -22,11 +22,7 @@ if 'import' == 'import':
 
 def datafetcher(path, imgpath,classification, imageclass, splitratio):
 	imgfiles = os.listdir(imgpath)
-	for f in imgfiles:
-		if not os.path.exists(imgpath+f):
-			print('hey')
-	quit()
-	with open(imgfiles[0], "rb") as pa:
+	with open(imgpath+imgfiles[0], "rb") as pa:
 		image = pickle.load(pa)
 	imagelen = len(image)
 	pixellen = len(image[0])
