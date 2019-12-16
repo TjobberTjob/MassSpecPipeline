@@ -9,7 +9,6 @@ if 'import' == 'import':
 	from keras.models import Model
 	from keras.callbacks import ModelCheckpoint
 	from keras import regularizers
-	import glob
 	import re
 	import pandas as pd
 	from collections import defaultdict
@@ -21,8 +20,8 @@ if 'import' == 'import':
 	import os
 	import operator
 
-def datafetcher(path, impath,classification, imageclass, splitratio):
-	imgfiles = glob.glob(impath+'/*')
+def datafetcher(path, imgpath,classification, imageclass, splitratio):
+	imgfiles = os.listdir(imgpath)
 	with open(imgfiles[0], "rb") as pa:
 		image = pickle.load(pa)
 	imagelen = len(image)
