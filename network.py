@@ -141,9 +141,7 @@ class DataGenerator(keras.utils.Sequence):
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass):
 	input = Input(shape=(imglen, pixellen, n_channels,))
 	x  = Dense(128, activation = 'relu')(input)
-	x  = Dense(128, activation = 'relu')(x)
-	x  = Dense(128, activation = 'relu')(x)
-	x  = Flatten()(x)
+	x  = Dense(128, activation = 'relu')(input)
 	x  = Dropout(rate = 0.25)(x)		
 	if 	not classification:
 		output = Dense(1, activation = 'linear')(x)
