@@ -33,4 +33,4 @@ if __name__ == '__main__':
 	
 	filetofilter = sys.argv[1]
 
-	filter(path, filetofilter)
+	filter(datapath, filetofilter)
