@@ -29,7 +29,7 @@ if __name__ == '__main__':
 	with open('config.json') as json_file:
    		data = json.load(json_file)
    	
-	datapath = data['path']
+	datapath = data['path']+'metadata/'
 	
 	filetofilter = sys.argv[1]
 
