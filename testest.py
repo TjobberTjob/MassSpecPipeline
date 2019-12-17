@@ -7,6 +7,7 @@ imgshape = (165,66,4)
 for f in imgfiles:
 	with open(imgpath+f, "rb") as pa:
 		image = pickle.load(pa)
-	image = np.array(image) 
-	print(image.shape)
+	image = np.array(image)
+	if image.shape == shape:
+		print('hey') 
 	quit()
