@@ -8,6 +8,6 @@ for f in imgfiles:
 	with open(imgpath+f, "rb") as pa:
 		image = pickle.load(pa)
 	image = np.array(image)
-	if image.shape == shape:
+	if image.shape == imgshape:
 		print('hey') 
 	quit()
