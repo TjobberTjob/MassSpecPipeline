@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pickle
 imgpath = '/data/ProteomeToolsRaw/images/'
 imgfiles = os.listdir(imgpath)
 imgshape = (165,66,4)
