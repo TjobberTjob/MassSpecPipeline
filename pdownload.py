@@ -350,29 +350,29 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 		mzlen = int(subimage_interval['mz']/mz_bin)
 		rtlen = int(subimage_interval['rt']/rt_bin)
 
-		mzlower = int(get_lower_bound(mzrangelist,rows['m/z']) - mzlen)
-		mzupper = int(get_lower_bound(mzrangelist,rows['m/z']) + mzlen) 
-		rtlower = int(get_lower_bound(rtrangelist,rows['Retention time']) - rtlen) 
-		rtupper = int(get_lower_bound(rtrangelist,rows['Retention time']) + rtlen)
+		mzlower = int(get_lower_bound(mzrangelist, rows['m/z']) - mzlen)
+		mzupper = int(get_lower_bound(mzrangelist, rows['m/z']) + mzlen)
+		rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen) 
+		rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
 
-		subimage = [lines[mzlower:mzupper] for lines in image[rtlower+1:rtupper]]
+		subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
 		subimage2 = np.array(subimage)
-		
-		#Save image as txt file
-		with open(imgpath+filename+'-'+str(index+1)+'.txt', 'wb') as pa:
-			pickle.dump(subimage, pa)
-		
 
+		#Save image as txt file
+		with open(imgpath+filename+'-'+str(index+1)+'.txt', 'wb') as imagefile:
+			pickle.dump(subimage, imagefile)
+		
 		if savepng: #save subimages to png
-			subpng(subimage, imgpath, filename, index, lowbound, highbound)
+			subpng(subimage, imgpath, fileName, index, lowbound, highbound)
 
 		new_metadata = {}
-		new_metadata.update({"image" : filename+'-'+str(index+1)})
-		for ele in df.columns[1:]:
+		new_metadata['image'] = filename+'-'+str(index+1)
+		new_metadata['size'] = subimage2.shape
+		for ele in df.columns:
 			if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
 				continue
 			else:
-				new_metadata.update({str(ele) : str(rows[ele])})
+				new_metadata[str(ele)] = str(rows[ele])
 		outfile.write(json.dumps(new_metadata)+'\n')
 	outfile.close()
 	

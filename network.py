@@ -128,8 +128,6 @@ class DataGenerator(keras.utils.Sequence):
 			with open(imagepath+ID, "rb") as pa:
 				image = pickle.load(pa)
 			image = np.array(image)
-			print(image.shape)
-			quit()
 			image = image[:,:,0:self.n_channels]
 			X[i,] = image
 
@@ -176,7 +174,7 @@ if __name__ == '__main__':
 	datapath = data['path']
 	metapath 	= datapath+'metadata/'
 	imagepath 	= datapath+'images/'
-	
+
 	#Cmd inputs
 	classification 	= sys.argv[1] == 'T'
 	imageclass 		= sys.argv[2]
