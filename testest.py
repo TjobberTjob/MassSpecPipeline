@@ -1,14 +1,18 @@
 import os
 import numpy as np
+import json
 import pickle
 with open('config.json') as json_file:
    	data = json.load(json_file)
+path = data['path']+'metadata/'
    	
-imgpath = data['path']+'images/'
-imgfiles = os.listdir(imgpath)
-for f in imgfiles:
-	with open(imgpath+f, "rb") as pa:
-		image = pickle.load(pa)
+sizedict = {}
+for line in open(path+'subimage.json'):
+	data  = json.loads(line)
+	try:
+		sizedict[str(data['size'])] = str(int(sizedict[data['size']])+1)
+	except Exception:
+		sizedict[str(data['size'])] = 1
 
-	image = np.array(image)
-	print(image.shape)
+print(sizedict)
+
