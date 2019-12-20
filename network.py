@@ -20,11 +20,11 @@ if 'import' == 'import':
 	import os
 	import operator
 
-def datafetcher(path, imgpath,classification, imageclass, splitratio, nchannels):
+def datafetcher(path, imgpath,classification, imageclass, splitratio):
 	imgfiles = os.listdir(imgpath)
 	with open(imgpath+imgfiles[0], "rb") as pa:
 		image = pickle.load(pa)
-	imagelen = nchannels
+	imagelen = len(image)
 	pixellen = len(image[0])
 
 	if not classification:
