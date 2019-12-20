@@ -188,17 +188,19 @@ if __name__ == '__main__':
 	imglen   = output[2]
 	pixellen = output[3]
 
+	###Classes and Channels:
 	if classification:
 		n_classes = len(labels)
 	else:
 		n_classes = 1
 
-	n_channels = 4
+	n_channels = 1
+	#######################
 
 	params = {'size': (pixellen,imglen),
 			  'batch_size': 32,
 			  'n_classes' : n_classes,
-			  'n_channels': 1,
+			  'n_channels': n_channels,
 			  'shuffle': True}
 
 	training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
