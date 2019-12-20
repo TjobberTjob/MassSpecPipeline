@@ -14,6 +14,8 @@ def filter(path, file):
 	outfile = open(path+str(filetofilter)+'_filtered.json','w')
 	for line in open(path+str(filetofilter)+'.json','r'):
 		data = json.loads(line)
+		print(data)
+		quit()
 		##### ADD FILTER HERE #####
 		# if (float(data['m/z']) > 450) and (float(data['m/z']) < 451):
 		if data['allpeptides'] and 'raw' in data['filetypes'] and str(data['size']) == '[166, 66, 4]':# and data['Modification'] != 'No PTMs are included in the dataset':
