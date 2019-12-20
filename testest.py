@@ -9,10 +9,10 @@ path = data['path']+'metadata/'
 sizedict = {}
 for line in open(path+'subimage.json'):
 	data  = json.loads(line)
-	try:
-		sizedict[str(data['size'])] = str(int(sizedict[data['size']])+1)
-	except Exception:
-		sizedict[str(data['size'])] = 1
-
+	name = str(data['size'])
+	if name in sizedict:
+		sizedict[name] = sizedict[name]+1
+	else:
+		sizedict[name] = 1
 print(sizedict)
 
