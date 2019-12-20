@@ -20,11 +20,11 @@ if 'import' == 'import':
 	import os
 	import operator
 
-def datafetcher(path, imgpath,classification, imageclass, splitratio):
+def datafetcher(path, imgpath,classification, imageclass, splitratio, nchannels):
 	imgfiles = os.listdir(imgpath)
 	with open(imgpath+imgfiles[0], "rb") as pa:
 		image = pickle.load(pa)
-	imagelen = len(image)
+	imagelen = nchannels
 	pixellen = len(image[0])
 
 	if not classification:
@@ -182,12 +182,6 @@ if __name__ == '__main__':
 
 	nameofclass = imageclass.replace('/','')
 
-	output = datafetcher(metapath, imagepath, classification, imageclass, splitratio)
-	partition = output[0]
-	labels   = output[1]
-	imglen   = output[2]
-	pixellen = output[3]
-
 	if classification:
 		n_classes = len(labels)
 	else:
@@ -196,10 +190,17 @@ if __name__ == '__main__':
 	n_channels = 4
 
 	params = {'size': (pixellen,imglen),
-			  'batch_size': 32,
-			  'n_classes' : n_classes,
-			  'n_channels': 1,
-			  'shuffle': True}
+		  'batch_size': 32,
+		  'n_classes' : n_classes,
+		  'n_channels': 1,
+		  'shuffle': True}
+
+	output = datafetcher(metapath, imagepath, classification, imageclass, splitratio, params['n_channels'])
+	partition = output[0]
+	labels   = output[1]
+	imglen   = output[2]
+	pixellen = output[3]
+
 
 	training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
 	validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
