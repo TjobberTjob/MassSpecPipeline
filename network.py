@@ -198,7 +198,7 @@ if __name__ == '__main__':
 	params = {'size': (pixellen,imglen),
 			  'batch_size': 32,
 			  'n_classes' : n_classes,
-			  'n_channels': n_channels,
+			  'n_channels': 1,
 			  'shuffle': True}
 
 	training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
