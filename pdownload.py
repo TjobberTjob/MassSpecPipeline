@@ -423,7 +423,7 @@ def combined(accession, maxquant_file, path, metapath):
 			filename = str(raws)
 
 			#Skip this special case. Something wrong... dont know, dont care
-			if filename == "01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1": 
+			if filename == '01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1' or filename == '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1': 
 				continue
 
 			print('\nfile: '+accession+'/'+filename) 
