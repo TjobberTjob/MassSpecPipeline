@@ -126,12 +126,16 @@ class DataGenerator(keras.utils.Sequence):
 		for i, ID in enumerate(list_IDs_temp):
 			# Store sample
 			with open(imagepath+ID, "rb") as pa:
-				image = pickle.load(pa)
+				try:
+					image = pickle.load(pa)
+				except Exception:
+					print(ID)
 			image = np.array(image)
 			image = image[:,:,0:self.n_channels]
 			X[i,] = image
 
 			y[i] = self.labels[ID]
+
 		if not classification:
 			return X, y
 		else:
