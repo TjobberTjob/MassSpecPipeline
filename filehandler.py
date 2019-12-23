@@ -44,6 +44,5 @@ if __name__ == '__main__':
 		moveserver(path, tarpath, ssh)
 
 
-	
-
-
+# python3 filter subimages
+# python3 filehandler.py move /data/ProteomeToolsRaw/images/ /home/tochr15/images/ tochr15@yeast.imada.sdu.dk
