@@ -144,9 +144,18 @@ class DataGenerator(keras.utils.Sequence):
 
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass):
 	input = Input(shape=(imglen, pixellen, n_channels,))
-	x  = Dense(64, activation = 'relu')(input)
-	x  = Dense(64, activation = 'relu')(x)
+	x  = Conv2D(16, kernel_size=(1,1), activation = 'relu')(input)
+	x  = MaxPooling2D(pool_size = (2,2))(x)
+
+	x1  = Conv2D(16, kernel_size=(3,3), activation = 'relu')(input)
+	x1  = MaxPooling2D(pool_size = (2,2))(x1)
+
+	x2  = Conv2D(16, kernel_size=(5,5), activation = 'relu')(input)
+	x2  = MaxPooling2D(pool_size = (2,2))(x2)
+
+	x  = Concatenate()([x, x1, x2])
 	x  = Flatten()(x)
+	x  = Dense(64, activation = 'relu')(x)
 	x  = Dropout(rate = 0.25)(x)		
 	if 	not classification:
 		output = Dense(1, activation = 'linear')(x)
