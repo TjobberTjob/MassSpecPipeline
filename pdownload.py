@@ -1,14 +1,11 @@
 if 'import' == 'import':
 	import shutil
 	import pandas as pd
-	import csv
 	import matplotlib.cm as cm
 	import matplotlib.pyplot as plt
 	import bisect
 	import re
-	import matplotlib as mpl
 	import pickle
-	import time
 	import requests
 	import json
 	import sys		
@@ -17,8 +14,7 @@ if 'import' == 'import':
 	import subprocess
 	import os
 	from zipfile import ZipFile
-	from bs4 import BeautifulSoup
-	from pyteomics import mzml,mzid,mgf
+	from pyteomics import mzml
 
 
 def get_lower_bound(haystack, needle):
