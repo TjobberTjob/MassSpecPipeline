@@ -1,7 +1,6 @@
 import json
-import numpy as np
-import sys
 import os
+import sys
 
 
 def filter(path, file):
@@ -48,4 +47,4 @@ if __name__ == '__main__':
 
 # python3 filter subimages
 # python3 filehandler.py move /data/ProteomeToolsRaw/images/ /home/tochr15/images/ tochr15@yeast.imada.sdu.dk
-# python3 filehandler.py move /data/ProteomeToolsRaw/metadata/subimage.json /home/tochr15/metadata/ tochr15@yeast.imada.sdu.dk
+# python3 filehandler.py move /data/ProteomeToolsRaw/metadata/ /home/tochr15/metadata/ tochr15@yeast.imada.sdu.dk
