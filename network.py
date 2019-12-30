@@ -69,6 +69,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
 
     return partition, labels, imagelen, pixellen
 
+
 # Developing the data generator
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
@@ -130,6 +131,7 @@ class DataGenerator(keras.utils.Sequence):
             return X, y
         else:
             return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
+
 
 # Developing the neural network
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass):
