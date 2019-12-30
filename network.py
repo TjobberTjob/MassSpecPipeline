@@ -1,16 +1,6 @@
 if 'import' == 'import':
 	import keras
-	import tensorflow
-	import tensorboard
-	from keras.utils import plot_model
-	from keras.preprocessing.image import ImageDataGenerator
-	from keras.layers import Activation, Dropout, Flatten, Dense, Input, Concatenate, BatchNormalization, Conv2D, MaxPooling2D
-	from keras import backend as K
-	from keras.models import Model
-	from keras.callbacks import ModelCheckpoint
-	from keras import regularizers
-	import re
-	import pandas as pd
+	from keras.layers import Dropout, Flatten, Dense, Input, Concatenate, Conv2D, MaxPooling2D
 	from collections import defaultdict
 	import numpy as np
 	import json
@@ -18,7 +8,7 @@ if 'import' == 'import':
 	import random
 	import pickle
 	import os
-	import operator
+
 
 def datafetcher(path, imgpath,classification, imageclass, splitratio):
 	imgfiles = os.listdir(imgpath)
