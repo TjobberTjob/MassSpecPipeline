@@ -126,15 +126,17 @@ def formatFile(accnr, filename, path, filepath):
                     'cd .. && git clone https://github.com/compomics/ThermoRawFileParser.git && cd MassSpecPipeline/')
             except Exception:
                 pass
-            os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd ../MassSpecPipeline/')
+            os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                      '../MassSpecPipeline/')
 
         if path[0] == '/':
             relpath = path[:-1]
         else:
             relpath = os.getcwd() + path[:-1]
         os.system('chmod -R a+rwx ' + path + '*')
-        os.system(
-            'docker run -v \"' + relpath + ':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/' + accnr + '/' + filename + '/file.raw -o=/data_input/' + accnr + '/' + filename + '/ -f=1 -m=1')  # , shell=True)
+        os.system('docker run -v \"' + relpath + ':/data_input\" -i -t thermorawparser mono '
+                                                 'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/' + accnr +
+                  '/' + filename + '/file.raw -o=/data_input/' + accnr + '/' + filename + '/ -f=1 -m=1')
         os.remove(filepath + 'file-metadata.txt')
         os.remove(filepath + 'file.raw')
 
