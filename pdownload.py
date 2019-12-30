@@ -425,7 +425,7 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
 
 def combined(accnr, maxquant_file, path):
     # Find all zip files
-    output = filefinder(accnr, path)
+    output = filefinder(accnr)
     allZip = output[0]
     allRaw = output[1]
 
