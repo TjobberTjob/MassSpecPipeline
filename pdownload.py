@@ -24,8 +24,8 @@ def get_lower_bound(haystack, needle):
         raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def filefinder(accession, path):
-    url = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/' + accession
+def filefinder(accnr):
+    url = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/' + accnr
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
@@ -73,8 +73,8 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     return rawfiles, df, zipfilename
 
 
-def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawfiles):
-    accessionpath = path + accession + '/'
+def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles):
+    accessionpath = path + accnr + '/'
     filepath = accessionpath + filename + '/'
     # Make the file directory if it doesnt exist
     if not os.path.exists(accessionpath):
@@ -93,12 +93,15 @@ def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawf
     if not os.path.exists(filepath + zipfilename):
         shutil.copyfile(path + zipfilename, filepath + 'file.zip')
 
-    # Move or rm txt.file
-    if not os.path.exists(filepath + zipfilename[:-4] + '-' + maxquant_file):
-        df2 = df.loc[df['Raw file'] == filename,]
-        pd.DataFrame.to_csv(df, filepath + maxquant_file)
+    # Check if filespecific allPeptides.txt exists
+    if not os.path.exists(filepath + maxquant_file):
+        df2 = df.loc[df['Raw file'] == filename, ]
+        pd.DataFrame.to_csv(df2, filepath + maxquant_file)
+    else:
+        df2 = pd.read_csv(filepath + maxquant_file)
 
     # Download the raw file
+    print('Downloading raw file                                                    ', end='\r')
     if not (os.path.exists(filepath + 'file.mzML') or os.path.exists(filepath + 'mzML.json')):
         if os.path.exists(filepath + 'file.raw'):
             if os.path.getsize(
@@ -108,10 +111,11 @@ def filehandling(accession, filename, zipfilename, path, maxquant_file, df, rawf
             if filename in f:
                 os.system('wget -q --show-progress -O ' + filepath + '/file.raw -c ' + f)
                 break
-    return df2, filepath
+
+    return filepath, df2
 
 
-def formatFile(accession, filename, path, filepath):
+def formatFile(accnr, filename, path, filepath):
     print('Formatting file to mzML										', end='\r')
     # Check whether the docker file is implemented or not
     if not (os.path.exists(filepath + 'file.mzML') or os.path.exists(filepath + 'mzML.json')):
@@ -122,15 +126,15 @@ def formatFile(accession, filename, path, filepath):
                     'cd .. && git clone https://github.com/compomics/ThermoRawFileParser.git && cd MassSpecPipeline/')
             except Exception:
                 pass
-            os.system(
-                'cd .. & cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd ../MassSpecPipeline/')
+            os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd ../MassSpecPipeline/')
+
         if path[0] == '/':
             relpath = path[:-1]
         else:
             relpath = os.getcwd() + path[:-1]
         os.system('chmod -R a+rwx ' + path + '*')
         os.system(
-            'docker run -v \"' + relpath + ':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/' + accession + '/' + filename + '/file.raw -o=/data_input/' + accession + '/' + filename + '/ -f=1 -m=1')  # , shell=True)
+            'docker run -v \"' + relpath + ':/data_input\" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/' + accnr + '/' + filename + '/file.raw -o=/data_input/' + accnr + '/' + filename + '/ -f=1 -m=1')  # , shell=True)
         os.remove(filepath + 'file-metadata.txt')
         os.remove(filepath + 'file.raw')
 
@@ -390,19 +394,19 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
     return [inbound, outbound], metapath
 
 
-def endstats(inputlists, interval, accession, filename, total_datapoints, nonzero_counter, inorout, metapath):
+def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath):
     print('Calculating end statistics:                                                    ', end='\r')
     mzlist = inputlists[0]
     rtlist = inputlists[1]
 
-    mzlist_inrange = [i for i in mzlist if i > interval['mz']['min'] and i < interval['mz']['max']]
-    rtlist_inrange = [i for i in rtlist if i > interval['rt']['min'] and i < interval['rt']['max']]
+    mzlist_inrange = [i for i in mzlist if interval['mz']['min'] < i < interval['mz']['max']]
+    rtlist_inrange = [i for i in rtlist if interval['rt']['min'] < i < interval['rt']['max']]
 
     inbound = inorout[0]
     outbound = inorout[1]
 
     end_stats = {}
-    end_stats['accession'] = accession
+    end_stats['accession'] = accnr
     end_stats['filename'] = filename
     end_stats['unique mz'] = len(mzlist_inrange)
     end_stats['unique rt'] = len(rtlist_inrange)
@@ -411,21 +415,21 @@ def endstats(inputlists, interval, accession, filename, total_datapoints, nonzer
     end_stats['In bounds'] = inbound
     end_stats['Out of bounds'] = outbound
 
-    outfile = open(metapath + 'sub_statistics.json', 'a')
+    outfile = open(mpath + 'sub_statistics.json', 'a')
     outfile.write(json.dumps(end_stats) + '\n')
     outfile.close()
     print('Done!                                                    ')
 
 
-def combined(accession, maxquant_file, path):
+def combined(accnr, maxquant_file, path):
     # Find all zip files
-    output = filefinder(accession=accession, path=path)
+    output = filefinder(accnr, path)
     allZip = output[0]
     allRaw = output[1]
 
     for zips in reversed(allZip):
         # finds raw files for this zip file
-        output = zipfile_downloader(zipfile=zips, path=path, maxquant_file=maxquant_file)
+        output = zipfile_downloader(zips, path, maxquant_file)
         rawfiles = output[0]
         df = output[1]
         zipfilename = output[2]
@@ -437,15 +441,13 @@ def combined(accession, maxquant_file, path):
             if filename == '01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1' or filename == '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1':
                 continue
 
-            print('\nfile: ' + accession + '/' + filename)
-            print('Downloading raw file                                                    ', end='\r')
-            output = filehandling(accession, filename=filename, zipfilename=zipfilename, path=path,
-                                  maxquant_file=pepfile, df=df, rawfiles=allRaw)
+            print('\nfile: ' + accnr + '/' + filename)
+            output = filehandling(accnr, filename, zipfilename, path, pepfile, df, allRaw)
             df2 = output[0]
             filepath = output[1]
 
-            formatFile(accession, filename=filename, path=path, filepath=filepath)
-            internalmzML(path=filepath)
+            formatFile(accnr, filename, path, filepath)
+            internalmzML(filepath)
 
             output = preparameters(filepath)
             mzml = output[0]
@@ -476,7 +478,7 @@ def combined(accession, maxquant_file, path):
             inorout = output[0]
             metapath = output[1]
 
-            endstats(inputlists, interval, accession, filename, total_datapoints, nonzero_counter, inorout, metapath)
+            endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, metapath)
 
         os.remove(datapath + zipfilename)
         os.remove(datapath + zipfilename[:-4] + '-' + pepfile)
@@ -492,29 +494,19 @@ if __name__ == '__main__':
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
-    input = sys.argv[1]
-    if str(input) == 'accessions' or str(input) == 'accessions_filtered':
+    sysinput = sys.argv[1]
+    if str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
         for line in reversed(list(open(metapath + sys.argv[1] + '.json'))):
             data = json.loads(line)
             accession = data['accession']
             try:
-                combined(str(accession), maxquant_file=pepfile, path=datapath, metapath=metapath)
+                combined(str(accession), pepfile, datapath)
             except Exception:
                 print('Problem occured with: ' + accession + '. unable to proceed at this time')
                 pass
     else:
-        with open(metapath + 'accessions.txt', "rb") as pa:
-            pride_accessions = pickle.load(pa)
-
-        for a in pride_accessions:
-            if input in a:
-                accession = a
-                break
-        # try:
-        combined(str(accession), maxquant_file=pepfile, path=datapath, metapath=metapath)
-    # except Exception:
-    # 	print('Problem occured with: '+accession+'. unable to proceed at this time')
-    # 	pass
+        accession = sysinput
+        combined(str(accession), pepfile, datapath)
 
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
