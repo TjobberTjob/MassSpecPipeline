@@ -15,10 +15,9 @@ def filter(path, file):
     for line in open(path + str(filetofilter) + '.json', 'r'):
         data = json.loads(line)
 
-        ##### ADD FILTER HERE #####
         # # if str(data['size']) == '[166, 66, 4]':
         # try:
-        #     if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen:
+        #     if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen: ### FILTER HERE ###
         #         outfile.write(line)
         #         lines_seen.add(line)
         # except:
