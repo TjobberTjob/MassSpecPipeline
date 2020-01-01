@@ -18,11 +18,9 @@ def filter(path, file):
         # if str(data['size']) == '[166, 66, 4]':
         print(data['allpeptides'])
         try:
-            if data['allpeptides'] and 'raw' in data['filetypes']:
-        ###########################
-                if line not in lines_seen:
-                    outfile.write(line)
-                    lines_seen.add(line)
+            if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen:
+                outfile.write(line)
+                lines_seen.add(line)
         except:
             pass
     outfile.close()
