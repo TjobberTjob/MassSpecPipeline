@@ -136,14 +136,14 @@ class DataGenerator(keras.utils.Sequence):
 # Developing the neural network
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass):
     input = Input(shape=(imglen, pixellen, n_channels,))
-    x = Conv2D(16, kernel_size=(1, 1, n_channels), activation='relu', padding='same')(input)
-    x = MaxPooling2D(pool_size=(2, 2, n_channels))(x)
+    x = Conv2D(16, kernel_size=(1, 1), activation='relu', padding='same')(input)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
 
-    x1 = Conv2D(16, kernel_size=(3, 3, n_channels), activation='relu', padding='same')(input)
-    x1 = MaxPooling2D(pool_size=(2, 2, n_channels))(x1)
+    x1 = Conv2D(16, kernel_size=(3, 3), activation='relu', padding='same')(input)
+    x1 = MaxPooling2D(pool_size=(2, 2))(x1)
 
-    x2 = Conv2D(16, kernel_size=(5, 5, n_channels), activation='relu', padding='same')(input)
-    x2 = MaxPooling2D(pool_size=(2, 2, n_channels))(x2)
+    x2 = Conv2D(16, kernel_size=(5, 5), activation='relu', padding='same')(input)
+    x2 = MaxPooling2D(pool_size=(2, 2))(x2)
 
     x = Concatenate()([x, x1, x2])
     x = Flatten()(x)
