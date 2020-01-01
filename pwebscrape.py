@@ -16,6 +16,8 @@ def get_accessions(path):
         rm = validated_input('File already exists, overwrite?', ('y', 'n'))
         if rm == 'y':
             os.remove(path + accessions)
+        if rm == 'n':
+            quit()
 
     url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'
     page = requests.get(url).text
@@ -70,12 +72,12 @@ def accessions_metadata(path):
             metadata = {}
             maxquant = False
             for g in apijson:
-                metadata[g] = apijson[g]
-            # 	if 'maxquant' in str(apijson[g]).lower():
-            # 		maxquant = True
-            # metadata['maxquant'] = maxquant
+                if ':' not in str(apijson[g]):
+                    metadata[g] = apijson[g]
+                if 'maxquant' in str(apijson[g]).lower():
+                    maxquant = True
+            metadata['maxquant'] = maxquant
 
-            print(apijson == metadata)
             files = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/' + f
             filesjson = requests.get(files).json()
             filetypes = []
