@@ -20,7 +20,7 @@ def filter(path, file):
             if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen:
                 outfile.write(line)
                 lines_seen.add(line)
-        except Exception:
+        except:
             pass
     outfile.close()
 
