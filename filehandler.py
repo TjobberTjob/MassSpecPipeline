@@ -14,6 +14,7 @@ def filter(path, file):
     outfile = open(path + str(filetofilter) + '_filtered.json', 'w')
     for line in open(path + str(filetofilter) + '.json', 'r'):
         data = json.loads(line)
+
         ##### ADD FILTER HERE #####
         # if str(data['size']) == '[166, 66, 4]':
         try:
@@ -21,7 +22,7 @@ def filter(path, file):
                 outfile.write(line)
                 lines_seen.add(line)
         except:
-            pass
+            print(data)
     outfile.close()
 
 
