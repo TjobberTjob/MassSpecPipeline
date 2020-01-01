@@ -16,12 +16,11 @@ def filter(path, file):
         data = json.loads(line)
         ##### ADD FILTER HERE #####
         # if str(data['size']) == '[166, 66, 4]':
-        print(data['allpeptides'])
         try:
             if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen:
                 outfile.write(line)
                 lines_seen.add(line)
-        except:
+        except Exception:
             pass
     outfile.close()
 
