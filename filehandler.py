@@ -16,6 +16,8 @@ def filter(path, file):
         data = json.loads(line)
         ##### ADD FILTER HERE #####
         # if str(data['size']) == '[166, 66, 4]':
+        print(data)
+        quit()
         if data['allpeptides'] and 'raw' in data['filetypes']:# and data['Modification'] != 'No PTMs are included in the dataset':
         ###########################
             if line not in lines_seen:
