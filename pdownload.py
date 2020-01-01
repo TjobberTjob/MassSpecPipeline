@@ -349,6 +349,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 
     outbound = 0
     inbound = 0
+    inmzbound = 0
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
         if (index + 1) % int(df.shape[0] / 40) == 0:
@@ -363,6 +364,10 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
         inbound += 1
         if os.path.exists(imgpath + filename + '-' + str(index + 1) + '.png'):
             continue
+
+        if not 450 < rows ['m/z'] < 450.5:
+            continue
+        inmzbound += 1
 
         mzlen = int(subimage_interval['mz'] / mz_bin)
         rtlen = int(subimage_interval['rt'] / rt_bin)
@@ -393,7 +398,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
         outfile.write(json.dumps(new_metadata) + '\n')
     outfile.close()
 
-    return [inbound, outbound], metapath
+    return [inbound, outbound, inmzbound], metapath
 
 
 def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath):
@@ -406,6 +411,7 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
 
     inbound = inorout[0]
     outbound = inorout[1]
+    inmzbound = inorout[2]
 
     end_stats = {}
     end_stats['accession'] = accnr
@@ -416,6 +422,7 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
     end_stats['data per pixel'] = total_datapoints / nonzero_counter
     end_stats['In bounds'] = inbound
     end_stats['Out of bounds'] = outbound
+    end_stats['in mz range'] = inmzbound
 
     outfile = open(mpath + 'sub_statistics.json', 'a')
     outfile.write(json.dumps(end_stats) + '\n')
