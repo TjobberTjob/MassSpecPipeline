@@ -142,4 +142,3 @@ if __name__ == '__main__':
 
 # python3 pwebscrape.py accessions
 # python3 pwebscrape.py metadata
-# python3 pwebscrape.py replace
