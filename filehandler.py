@@ -9,6 +9,7 @@ def filter(path, file):
         print('Removing old filtered version')
     except Exception:
         pass
+    allpep=0
     lines_seen = set()
     outfile = open(path + str(filetofilter) + '_filtered.json', 'w')
     for line in open(path + str(filetofilter) + '.json', 'r'):
@@ -19,10 +20,11 @@ def filter(path, file):
         #     outfile.write(line)
         #     lines_seen.add(line)
         try:
-            data['allpeptides']
+            if data['allpeptides']:
+                allpep+=1
         except:
-            print(data)
-            quit()
+            pass
+    print(allpep)
     outfile.close()
 
 
@@ -47,6 +49,6 @@ if __name__ == '__main__':
         ssh = sys.argv[4]
         moveserver(path, tarpath, ssh)
 
-# python3 filehandler.py filter subimages
+# python3 filehandler.py filter accessions
 # python3 filehandler.py move /data/ProteomeToolsRaw/images/ /home/tochr15/images/ tochr15@yeast.imada.sdu.dk
 # python3 filehandler.py move /data/ProteomeToolsRaw/metadata/ /home/tochr15/metadata/ tochr15@yeast.imada.sdu.dk
