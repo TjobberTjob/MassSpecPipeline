@@ -1,4 +1,5 @@
 import json
+import os
 
 with open('config.json') as json_file:
 	data = json.load(json_file)
@@ -18,5 +19,6 @@ for line in open(path + 'subimage.json'):
 	except:
 		lendict[len(name)] = 1
 print(Seen)
-print(str(i)+' different classes')
+
+print(str(os.system('lsxl'))+' files in '+str(i)+' different classes')
 print(lendict)
