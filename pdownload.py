@@ -95,7 +95,7 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
 
     # Check if filespecific allPeptides.txt exists
     if not os.path.exists(filepath + maxquant_file):
-        df2 = df.loc[df['Raw file'] == filename, ]
+        df2 = df.loc[df['Raw file'] == filename,]
         pd.DataFrame.to_csv(df2, filepath + maxquant_file)
     else:
         df2 = pd.read_csv(filepath + maxquant_file)
@@ -272,7 +272,7 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
                 ms1_array[_key] = [intensity_val]
 
     # Create the final image.
-    nonzero_counter = 0   # How many pixels have non-zero values
+    nonzero_counter = 0  # How many pixels have non-zero values
     total_datapoints = 0  # How many datapoints does the file contain.
     image = []
     for y_i in range(0, resolution['y']):
@@ -365,7 +365,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
         if os.path.exists(imgpath + filename + '-' + str(index + 1) + '.png'):
             continue
 
-        if not 450 < rows ['m/z'] < 450.5:
+        if not 450 < rows['m/z'] < 450.05:  # Filter
             continue
         inmzbound += 1
 
@@ -506,7 +506,7 @@ if __name__ == '__main__':
     sysinput = sys.argv[1]
     if str(sysinput) == 'reset':
         try:
-            shutil.rmtree(datapath+'images')
+            shutil.rmtree(datapath + 'images')
             os.remove(metapath + 'subimage.json')
             os.remove(metapath + 'subimage_filtered.json')
             os.remove(metapath + 'end_statistics.txt')
