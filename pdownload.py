@@ -504,7 +504,15 @@ if __name__ == '__main__':
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
     sysinput = sys.argv[1]
-    if str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
+    if str(sysinput) == 'reset':
+        try:
+            shutil.rmtree(datapath+'images')
+            os.remove(metapath + 'subimage.json')
+            os.remove(metapath + 'subimage_filtered.json')
+            os.remove(metapath + 'end_statistics.txt')
+        except:
+            pass
+    elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
         for line in reversed(list(open(metapath + sys.argv[1] + '.json'))):
             data = json.loads(line)
             accession = data['accession']
