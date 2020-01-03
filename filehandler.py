@@ -9,24 +9,15 @@ def filter(path, file):
         print('Removing old filtered version')
     except Exception:
         pass
-    nopep = 0
     lines_seen = set()
     outfile = open(path + str(filetofilter) + '_filtered.json', 'w')
     for line in open(path + str(filetofilter) + '.json', 'r'):
         data = json.loads(line)
 
-        # # if str(data['size']) == '[166, 66, 4]':
-        # try:
-        #     if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen: ### FILTER HERE ###
-        #         outfile.write(line)
-        #         lines_seen.add(line)
-        # except:
-        #     print(data)
-        try:
-            data['allPeptides']
-        except:
-            nopep += 1
-    print(nopep)
+        # if str(data['size']) == '[166, 66, 4]':
+        if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen: ### FILTER HERE ###
+            outfile.write(line)
+            lines_seen.add(line)
     outfile.close()
 
 
