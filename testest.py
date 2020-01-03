@@ -14,7 +14,7 @@ for line in open(path + 'subimage.json'):
 		Seen.append(name)
 		i += 1
 	try:
-		lendict[len(name)] += 1
+		lendict[len(name)] = int(lendict[len(name)]) + 1
 	except:
 		lendict[len(name)] = 1
 print(Seen, i)
