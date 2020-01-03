@@ -112,7 +112,7 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
                 os.system('wget -q --show-progress -O ' + filepath + '/file.raw -c ' + f)
                 break
 
-    return filepath, df2
+    return df2, filepath
 
 
 def formatFile(accnr, filename, path, filepath):
