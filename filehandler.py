@@ -16,15 +16,13 @@ def filter(path, file):
         data = json.loads(line)
 
         # if str(data['size']) == '[166, 66, 4]':
-        # if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen: ### FILTER HERE ###
-        #     outfile.write(line)
-        #     lines_seen.add(line)
         try:
-            data['allpeptides']
+            if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen: ### FILTER HERE ###
+                outfile.write(line)
+                lines_seen.add(line)
         except:
-            allpep += 1
             pass
-    print(allpep)
+
     outfile.close()
 
 
