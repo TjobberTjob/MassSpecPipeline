@@ -15,9 +15,14 @@ def filter(path, file):
         data = json.loads(line)
 
         # if str(data['size']) == '[166, 66, 4]':
-        if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen: ### FILTER HERE ###
-            outfile.write(line)
-            lines_seen.add(line)
+        # if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen: ### FILTER HERE ###
+        #     outfile.write(line)
+        #     lines_seen.add(line)
+        try:
+            data['allPeptides']
+        except:
+            print(data)
+            quit()
     outfile.close()
 
 
@@ -42,6 +47,6 @@ if __name__ == '__main__':
         ssh = sys.argv[4]
         moveserver(path, tarpath, ssh)
 
-# python3 filter subimages
+# python3 filehandler.py filter subimages
 # python3 filehandler.py move /data/ProteomeToolsRaw/images/ /home/tochr15/images/ tochr15@yeast.imada.sdu.dk
 # python3 filehandler.py move /data/ProteomeToolsRaw/metadata/ /home/tochr15/metadata/ tochr15@yeast.imada.sdu.dk
