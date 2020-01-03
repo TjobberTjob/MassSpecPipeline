@@ -18,5 +18,5 @@ for line in open(path + 'subimage.json'):
 	except:
 		lendict[len(name)] = 1
 print(Seen, i)
-for w in sorted(lendict, key=d.get, reverse=True):
+for w in sorted(lendict, key=lendict.get, reverse=True):
 	print(w, lendict[w])
