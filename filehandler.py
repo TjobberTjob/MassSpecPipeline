@@ -20,7 +20,7 @@ def filter(path, file):
         #     outfile.write(line)
         #     lines_seen.add(line)
         try:
-            data['allpeptides']:
+            data['allpeptides']
         except:
             allpep += 1
             pass
