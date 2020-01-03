@@ -509,7 +509,7 @@ if __name__ == '__main__':
             shutil.rmtree(datapath + 'images')
             os.remove(metapath + 'subimage.json')
             os.remove(metapath + 'subimage_filtered.json')
-            os.remove(metapath + 'end_statistics.txt')
+            os.remove(metapath + 'sub_statistics.json')
         except:
             pass
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
