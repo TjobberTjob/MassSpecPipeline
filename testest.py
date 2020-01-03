@@ -9,7 +9,13 @@ i = 0
 for line in open(path + 'subimage.json'):
 	data = json.loads(line)
 	name = str(data['Sequence'])
+	lendict = {}
 	if name not in Seen:
 		Seen.append(name)
 		i += 1
+	try:
+		lendict[len(name)] += 1
+	except:
+		lendict[len(name)] = 1
 print(Seen, i)
+print(lendict)
