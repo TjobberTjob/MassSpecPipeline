@@ -19,6 +19,6 @@ for line in open(path + 'subimage.json'):
 	except:
 		lendict[len(name)] = 1
 print(Seen)
-
-print(str(os.system('lsxl'))+' files in '+str(i)+' different classes')
+os.system('lsxl')
+print('files in '+str(i)+' different classes')
 print(lendict)
