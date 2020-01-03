@@ -47,7 +47,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     # Download zip file
     try:
         os.remove(path + zipfilename)
-    except Exception:
+    except:
         pass
     os.system('wget -q --show-progress -O ' + path + zipfilename + ' ' + zipfile)
 
@@ -124,7 +124,7 @@ def formatFile(accnr, filename, path, filepath):
             try:
                 os.system(
                     'cd .. && git clone https://github.com/compomics/ThermoRawFileParser.git && cd MassSpecPipeline/')
-            except Exception:
+            except:
                 pass
             os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
                       '../MassSpecPipeline/')
@@ -510,7 +510,7 @@ if __name__ == '__main__':
             accession = data['accession']
             try:
                 combined(str(accession), pepfile, datapath)
-            except Exception:
+            except:
                 print('Problem occured with: ' + accession + '. unable to proceed at this time')
                 pass
     else:

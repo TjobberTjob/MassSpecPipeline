@@ -32,7 +32,7 @@ def get_accessions(path):
         for level2 in soup_2.find_all('a', href=True):
             try:
                 int(level2['href'][0:2])  # Only look at numerics...
-            except Exception:
+            except:
                 continue
             print('Getting accessions from ' + level1.text + level2.text, end='\r')
             page_3 = requests.get(url + level1['href'] + level2['href']).text
@@ -104,13 +104,13 @@ def accessions_metadata(path):
                         if 'allPeptides.txt' in xx:
                             metadata['allpeptides'] = True
                             break
-                except Exception:
+                except:
                     metadata['allpeptides'] = False
             else:
                 metadata['allpeptides'] = False
 
             outfile.write(json.dumps(metadata) + '\n')
-        except Exception:
+        except:
             pass
 
 
