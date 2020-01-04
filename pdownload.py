@@ -518,7 +518,7 @@ if __name__ == '__main__':
             accession = data['accession']
             try:
                 combined(str(accession), pepfile, datapath)
-            except:
+            except KeyboardInterrupt:
                 print('Problem occured with: ' + accession + '. unable to proceed at this time')
                 pass
     else:
