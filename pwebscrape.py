@@ -129,6 +129,8 @@ if __name__ == '__main__':
 
     datapath = data['path']
     metapath = datapath + 'metadata/'
+    if not os.path.exists(metapath):
+        os.mkdir(metapath)
 
     cmd = sys.argv[1]
 
