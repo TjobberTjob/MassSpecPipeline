@@ -365,7 +365,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
         if os.path.exists(imgpath + filename + '-' + str(index + 1) + '.png'):
             continue
 
-        if not 450 < rows['m/z'] < 450.25:  # Filter
+        if not 450 < rows['m/z'] < 450.50:  # Filter
             continue
         inmzbound += 1
 
