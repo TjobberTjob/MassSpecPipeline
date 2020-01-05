@@ -512,6 +512,14 @@ if __name__ == '__main__':
             os.remove(metapath + 'sub_statistics.json')
         except:
             pass
+    elif str(sysinput) == 'owned':
+        listofowned = [f for f in os.listdir(datapath) if os.path.isdir(datapath+f) and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        for accession in listofowned:
+            try:
+                combined(str(accession), pepfile, datapath)
+            except KeyboardInterrupt:
+                print('Problem occured with: ' + accession + '. unable to proceed at this time')
+                pass
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
         for line in reversed(list(open(metapath + sys.argv[1] + '.json'))):
             data = json.loads(line)
