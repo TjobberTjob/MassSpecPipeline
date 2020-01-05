@@ -107,9 +107,10 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
             if os.path.getsize(filepath + 'file.raw') == 0:  # If this is an empty file with nothing in it, remove it
                 # (causes problems with download)
                 os.remove(filepath + 'file.raw')
-        print(rawfiles)
-        quit()
         for f in rawfiles:
+            print(f)
+            print(filename)
+            quit()
             if filename in f:
                 os.system('wget -q --show-progress -O ' + filepath + '/file.raw -c ' + f)
                 break
