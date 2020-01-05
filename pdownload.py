@@ -102,6 +102,7 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
 
     # Download the raw file
     print('Downloading raw file                                                    ', end='\r')
+    print('heyyy')
     if not (os.path.exists(filepath + 'file.mzML') or os.path.exists(filepath + 'mzML.json')):
         if os.path.exists(filepath + 'file.raw'):
             if os.path.getsize(
