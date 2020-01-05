@@ -102,7 +102,6 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
 
     # Download the raw file
     print('Downloading raw file                                                    ', end='\r')
-    print('heyyy')
     if not (os.path.exists(filepath + 'file.mzML') or os.path.exists(filepath + 'mzML.json')):
         if os.path.exists(filepath + 'file.raw'):
             if os.path.getsize(
@@ -110,6 +109,7 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
                 os.remove(filepath + 'file.raw')
         for f in rawfiles:
             if filename in f:
+                print('heyyy')
                 os.system('wget -q --show-progress -O ' + filepath + '/file.raw -c ' + f)
                 break
 
