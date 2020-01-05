@@ -108,10 +108,7 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
                 # (causes problems with download)
                 os.remove(filepath + 'file.raw')
         for f in rawfiles:
-            print(f)
-            print(filename)
-            quit()
-            if filename in f:
+            if filename in f or len(rawfiles) == 1:
                 os.system('wget -q --show-progress -O ' + filepath + '/file.raw -c ' + f)
                 break
 
