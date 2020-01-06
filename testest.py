@@ -30,6 +30,7 @@ k = Counter(a)
 
 # Finding 3 highest values
 high = k.most_common(3)
+print(high)
 
 print("Dictionary with 3 highest values:")
 print("Keys: Values")
