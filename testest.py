@@ -1,6 +1,5 @@
 import json
-import operator
-import os
+from collections import Counter
 
 with open('config.json') as json_file:
 	data = json.load(json_file)
@@ -27,8 +26,17 @@ a = {}
 for f in Seen:
 	a[f] = Seen.count(f)
 
-maxindict = max(a.items(), key=operator.itemgetter(1))[0:3]
-print(maxindict)
+k = Counter(a)
+
+# Finding 3 highest values
+high = k.most_common(3)
+
+print("Dictionary with 3 highest values:")
+print("Keys: Values")
+
+for i in high:
+	print(i[0], " :", i[1], " ")
+
 quit()
 print(Seen)
 print('files in '+str(i)+' different classes')
