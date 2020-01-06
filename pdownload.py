@@ -90,7 +90,10 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
         shutil.rmtree(path + filename + '/')
 
     # Move or rm zip.file
-    if not os.path.exists(filepath + zipfilename):
+    if os.path.exists(filepath + 'file.zip'):
+        if os.path.getsize(path + zipfilename) > os.path.getsize(filepath + 'file.zip'):
+            shutil.copyfile(path + zipfilename, filepath + 'file.zip')
+    else:
         shutil.copyfile(path + zipfilename, filepath + 'file.zip')
 
     # Check if filespecific allPeptides.txt exists
