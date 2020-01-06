@@ -501,6 +501,11 @@ if __name__ == '__main__':
     datapath = data['path']
     metapath = datapath + 'metadata/'
 
+    try:
+        os.system('rm ' + datapath + '*.*')
+    except:
+        pass
+
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
     sysinput = sys.argv[1]
