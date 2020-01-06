@@ -25,20 +25,7 @@ for line in open(path + 'subimage.json'):
 a = {}
 for f in Seen:
 	a[str(f)] = Seen.count(f)
-
-k = Counter(a)
-
-# Finding 3 highest values
-high = k.most_common(3)
-print(high)
-
-print("Dictionary with 3 highest values:")
-print("Keys: Values")
-
-for i in high:
-	print(i[0], " :", i[1], " ")
-
-quit()
-print(Seen)
+print(Counter(a).most_common(3))
+# print(Seen)
 print('files in '+str(i)+' different classes')
 print(lendict)
