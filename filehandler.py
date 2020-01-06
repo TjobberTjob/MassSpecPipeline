@@ -9,7 +9,7 @@ def filter(path, file):
         print('Removing old filtered version')
     except Exception:
         pass
-    allpep=0
+
     lines_seen = set()
     outfile = open(path + str(filetofilter) + '_filtered.json', 'w')
     for line in open(path + str(filetofilter) + '.json', 'r'):
