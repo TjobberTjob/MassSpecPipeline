@@ -24,7 +24,7 @@ for line in open(path + 'subimage.json'):
 
 a = {}
 for f in Seen:
-	a[f] = Seen.count(f)
+	a[str(f)] = Seen.count(f)
 
 k = Counter(a)
 
