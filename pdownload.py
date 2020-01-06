@@ -471,7 +471,7 @@ def combined(accnr, maxquant_file, path):
 
             # Make the image
             if not os.path.exists(filepath + str(resolution['x']) + 'x' + str(resolution['y']) + '.txt'):
-                output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=True)
+                output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
                 image = output[0]
                 nonzero_counter = output[1]
                 total_datapoints = output[2]
