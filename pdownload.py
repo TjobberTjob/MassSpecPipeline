@@ -90,15 +90,15 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
         shutil.rmtree(path + filename + '/')
 
     # Move or rm zip.file
-    if not os.path.exists(filepath + zipfilename):
-        shutil.copyfile(path + zipfilename, filepath + 'file.zip')
+    # if not os.path.exists(filepath + zipfilename):
+    shutil.copyfile(path + zipfilename, filepath + 'file.zip')
 
     # Check if filespecific allPeptides.txt exists
-    if not os.path.exists(filepath + maxquant_file):
-        df2 = df.loc[df['Raw file'] == filename,]
-        pd.DataFrame.to_csv(df2, filepath + maxquant_file)
-    else:
-        df2 = pd.read_csv(filepath + maxquant_file)
+    # if not os.path.exists(filepath + maxquant_file):
+    df2 = df.loc[df['Raw file'] == filename,]
+    pd.DataFrame.to_csv(df2, filepath + maxquant_file)
+    # else:
+    #     df2 = pd.read_csv(filepath + maxquant_file)
 
     # Download the raw file
     print('Downloading raw file                                                    ', end='\r')
