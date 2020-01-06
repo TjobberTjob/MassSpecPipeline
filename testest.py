@@ -25,7 +25,7 @@ for line in open(path + 'subimage.json'):
 a = {}
 for f in Seen:
 	a[f] = Seen.count(f)
-maxindict = max(a.iteritems(), key=operator.itemgetter(1))[0:3]
+maxindict = max(a.items(), key=operator.itemgetter(1))[0]
 print(maxindict)
 quit()
 print(Seen)
