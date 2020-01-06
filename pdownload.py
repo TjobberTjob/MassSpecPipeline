@@ -516,7 +516,10 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(datapath+f) and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
             try:
-                os.system('rm ' + datapath + ' *.zip')
+                try:
+                    os.system('rm ' + datapath + ' *.zip')
+                except:
+                    pass
                 combined(str(accession), pepfile, datapath)
             except KeyboardInterrupt:
                 print('Problem occured with: ' + accession + '. unable to proceed at this time')
@@ -526,14 +529,20 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
             try:
-                os.system('rm ' + datapath + ' *.zip')
+                try:
+                    os.system('rm ' + datapath + ' *.zip')
+                except:
+                    pass
                 combined(str(accession), pepfile, datapath)
             except KeyboardInterrupt:
                 print('Problem occured with: ' + accession + '. unable to proceed at this time')
                 pass
     else:
         accession = sysinput
-        os.system('rm ' + datapath + ' *.zip')
+        try:
+            os.system('rm ' + datapath + ' *.zip')
+        except:
+            pass
         combined(str(accession), pepfile, datapath)
 
 
