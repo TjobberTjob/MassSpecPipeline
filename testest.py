@@ -27,7 +27,7 @@ a = {}
 for f in Seen:
 	a[f] = Seen.count(f)
 
-maxindict = max(a.items(), key=operator.itemgetter(1))[0]
+maxindict = max(a.items(), key=operator.itemgetter(1))[0:3]
 print(maxindict)
 quit()
 print(Seen)
