@@ -21,6 +21,13 @@ for line in open(path + 'subimage.json'):
 			lendict[len(name)] = 1
 	except:
 		pass
+
+a = {}
+for f in Seen:
+	a[f] = Seen.count(f)
+maxindict = max(a.iteritems(), key=operator.itemgetter(1))[0:3]
+print(maxindict)
+quit()
 print(Seen)
 print('files in '+str(i)+' different classes')
 print(lendict)
