@@ -23,7 +23,7 @@ for line in open(path + 'subimage.json'):
 a = {}
 for f in Seen:
 	a[str(f)] = Seen.count(f)
-print(Counter(a).most_common(3))
+print(Counter(a).most_common(4))
 # print(Seen)
 print('files in '+str(i)+' different classes')
 print(lendict)
