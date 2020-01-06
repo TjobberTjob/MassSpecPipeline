@@ -1,4 +1,5 @@
 import json
+import operator
 import os
 
 with open('config.json') as json_file:
@@ -25,6 +26,7 @@ for line in open(path + 'subimage.json'):
 a = {}
 for f in Seen:
 	a[f] = Seen.count(f)
+
 maxindict = max(a.items(), key=operator.itemgetter(1))[0]
 print(maxindict)
 quit()
