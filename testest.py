@@ -1,5 +1,5 @@
 import json
-from collections import Counter, defaultdict
+from collections import Counter
 
 with open('config.json') as json_file:
 	data = json.load(json_file)
@@ -7,12 +7,18 @@ path = data['path'] + 'metadata/'
 
 # names = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
 Seen = []
+lendict = {}
 for line in open(path + 'subimage.json'):
 	try:
 		data = json.loads(line)
 		name = str(data['Sequence'])
 		Seen.append(name)
-		lendict = defaultdict(len(name): (int(lendict[len(name)]) + 1))
+		try:
+			lendict[len(name)] = int(lendict[len(name)]) + 1
+		except:
+			lendict[len(name)] = 1
+	except:
+		pass
 a = {}
 for f in Seen:
 	a[str(f)] = Seen.count(f)
