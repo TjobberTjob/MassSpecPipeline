@@ -24,5 +24,4 @@ a = {}
 for f in Leng:
 	a[str(f)] = leng.count(f)
 print(Counter(a).most_common(4))
-# print('files in '+str(i)+' different classes')
-# print(lendict)
+print('files in '+str(len(Seen))+' different classes')
