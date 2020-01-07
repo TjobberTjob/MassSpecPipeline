@@ -29,13 +29,15 @@ def filefinder(accnr):
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
+    a = [f['downloadLink'] for f in urljson['list'] if f['fileName'][re.search('\.', f['fileName']).span()[1]:] == 'zip' and f[f['fileName'][re.search('\.', f['fileName']).span()[1]:]] == 'SEARCH']
     for f in urljson['list']:
         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
         if f['fileType'] == 'SEARCH' and filetype == 'zip':
             zipfiles.append(f['downloadLink'])
         if f['fileType'] == 'RAW' and filetype == 'raw':
             rawfiles.append(f['downloadLink'])
-
+    print(a == zipfiles)
+    quit()
     return zipfiles, rawfiles
 
 
@@ -451,7 +453,8 @@ def combined(accnr, maxquant_file, path):
             filename = str(raws)
 
             # Skip this special case. Something wrong... dont know, dont care
-            if filename == '01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1' or filename == '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1':
+            not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1', '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1']
+            if filename in not_working:
                 continue
 
             print('\nfile: ' + accnr + '/' + filename)
