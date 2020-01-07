@@ -24,7 +24,5 @@ a = {}
 for f in Seen:
 	a[str(f)] = Seen.count(f)
 print(Counter(a).most_common(4))
-Seen = [f[0] for f in Counter(a).most_common(4)]
-print(Seen)
 # print('files in '+str(i)+' different classes')
 # print(lendict)
