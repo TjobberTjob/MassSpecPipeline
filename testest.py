@@ -13,7 +13,7 @@ Leng = []
 for line in open(path + 'subimage.json'):
 	data = json.loads(line)
 	if 'Sequence' in data:
-		Seen.append(str(data['Sequence']))
+		seen.append(str(data['Sequence']))
 		leng.append(len(data['Sequence']))
 		if str(data['Sequence']) not in Seen:
 			Seen.append(str(data['Sequence']))
