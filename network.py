@@ -62,10 +62,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
             splits = round(len(labels2[f]) * float(splitratio))
             trainlist = (labels2[f][0:splits])
             vallist = (labels2[f][splits:])
-            for x in trainlist:
-                partition['train'].append(x)
-            for x in vallist:
-                partition['validation'].append(x)
+            partition['train'] = [x for x in trainlist]
+            partition['validation'] = [x for x in vallist]
 
     return partition, labels, imagelen, pixellen
 
