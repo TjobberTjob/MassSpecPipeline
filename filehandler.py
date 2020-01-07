@@ -4,6 +4,9 @@ import sys
 
 
 def filter(path, file):
+    is os.path.exists(path + str(file) + '_filtered.json'):
+        os.remove(path + str(file) + '_filtered.json')
+
     # Used to get only most abundant classes
     Seen = [json.loads(line)['Sequence'] for line in open(path + 'subimage.json') if 'Sequence' in json.loads(line)]
     a = {}
@@ -11,24 +14,16 @@ def filter(path, file):
         a[str(f)] = Seen.count(f)
     Seen = [f[0] for f in Counter(a).most_common(4)]
 
-    try:
-        os.remove(path + str(filetofilter) + '_filtered.json')
-        print('Removing old filtered version')
-    except Exception:
-        pass
-
     lines_seen = set()
-    outfile = open(path + str(filetofilter) + '_filtered.json', 'w')
-    for line in open(path + str(filetofilter) + '.json', 'r'):
+    outfile = open(path + str(file) + '_filtered.json', 'w')
+    for line in open(path + str(file) + '.json', 'r'):
         data = json.loads(line)
 
         # if str(data['size']) == '[166, 66, 4]' and str(data['Sequence']) in Seen:
-        try:
-            if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
-                outfile.write(line)
-                lines_seen.add(line)
-        except:
-            pass
+        if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes']  and line not in lines_seen:  ### FILTER HERE ###
+            outfile.write(line)
+            lines_seen.add(line)
+
 
     outfile.close()
 
