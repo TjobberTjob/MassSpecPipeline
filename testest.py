@@ -9,7 +9,7 @@ Seen = []
 lendict = {}
 strdict = {}
 i = 0
-Seen = [json.loads(line) for line in open(path + 'subimage.json')]
+Seen = [try: json.loads(line) except: pass for line in open(path + 'subimage.json')]
 print(Seen)
 quit()
 for line in open(path + 'subimage.json'):
