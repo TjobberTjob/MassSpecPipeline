@@ -29,7 +29,7 @@ def filefinder(accnr):
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
-    a = [f['downloadLink'] for f in urljson['list'] if (f['fileName'][re.search('\.', f['fileName']).span()[1]:] == 'zip' and f[f['fileName'][re.search('\.', f['fileName']).span()[1]:]] == 'SEARCH')]
+    a = [f['downloadLink'] for f in urljson['list'] if (str(f['fileName'][re.search('\.', f['fileName']).span()[1]:]) == 'zip' and f[f['fileName'][re.search('\.', f['fileName']).span()[1]:]] == 'SEARCH')]
     for f in urljson['list']:
         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
         if f['fileType'] == 'SEARCH' and filetype == 'zip':
