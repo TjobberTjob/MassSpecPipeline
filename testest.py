@@ -8,7 +8,7 @@ path = data['path'] + 'metadata/'
 
 # names = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
 Seen = []
-lendict = defaultdict()
+lendict = defaultdict(int)
 for line in open(path + 'subimage.json'):
 	try:
 		data = json.loads(line)
