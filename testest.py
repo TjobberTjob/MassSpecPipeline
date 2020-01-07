@@ -1,17 +1,32 @@
 import json
 from collections import Counter
+import time
 
 with open('config.json') as json_file:
 	data = json.load(json_file)
 path = data['path'] + 'metadata/'
 
+start = time.time()
 defdict = {}
 names = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
 imgclass = [(json.loads(line)['m/z']) for line in open(path + 'subimage.json') if 'm/z' in json.loads(line)]
 if len(names) == len(imgclass):
 	for i in range(len(names)):
 		defdict[names[i]] = imgclass[i]
-print(defdict)
+end = time.time()
+print(end - start)
+
+start = time.time()
+names = []
+labels = {}
+for line in open(path + 'subimage.json'):
+	data = json.loads(line)
+	name = data['image'] + ".txt"
+	names.append(name)
+	labels[name] = data['m/z']
+end = time.time()
+print(end - start)
+
 quit()
 Seen = []
 lendict = {}
