@@ -5,9 +5,13 @@ with open('config.json') as json_file:
 	data = json.load(json_file)
 path = data['path'] + 'metadata/'
 
+defdict = {}
 names = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
 imgclass = [(json.loads(line)['m/z']) for line in open(path + 'subimage.json') if 'm/z' in json.loads(line)]
-print(imgclass)
+if len(names) == len(imgclass):
+	for i in range(len(names)):
+		defdict[names[i]] = imgclass[i]
+print(defdict)
 quit()
 Seen = []
 lendict = {}
