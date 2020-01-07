@@ -7,6 +7,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from zipfile import ZipFile
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -29,13 +30,21 @@ def filefinder(accnr):
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
+    start = time.time()
     a = [f['downloadLink'] for f in urljson['list'] if f['fileName'][re.search('\.', f['fileName']).span()[1]:] == 'zip' and f['fileType'] == 'SEARCH']
+    b = [f['downloadLink'] for f in urljson['list'] if
+         f['fileName'][re.search('\.', f['fileName']).span()[1]:] == 'raw' and f['fileType'] == 'SEARCH']
+    end = time.time()
+    print(end - start)
+    start = time.time()
     for f in urljson['list']:
         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
         if f['fileType'] == 'SEARCH' and filetype == 'zip':
             zipfiles.append(f['downloadLink'])
         if f['fileType'] == 'RAW' and filetype == 'raw':
             rawfiles.append(f['downloadLink'])
+    end = time.time()
+    print(end - start)
     print(a == zipfiles)
     quit()
     return zipfiles, rawfiles
