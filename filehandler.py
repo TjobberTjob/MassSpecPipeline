@@ -4,6 +4,19 @@ import sys
 
 
 def filter(path, file):
+    # Used to get only most abundant classes
+    # Seen = []
+    # for line in open(path + 'subimage.json'):
+    #     try:
+    #         data = json.loads(line)
+    #         Seen.append(str(data['Sequence']))
+    #     except:
+    #         pass
+    # a = {}
+    # for f in Seen:
+    #     a[str(f)] = Seen.count(f)
+    # Seen = [f[0] for f in Counter(a).most_common(4)]
+
     try:
         os.remove(path + str(filetofilter) + '_filtered.json')
         print('Removing old filtered version')
@@ -15,9 +28,9 @@ def filter(path, file):
     for line in open(path + str(filetofilter) + '.json', 'r'):
         data = json.loads(line)
 
-        # if str(data['size']) == '[166, 66, 4]':
+        # if str(data['size']) == '[166, 66, 4]' and str(data['Sequence']) in Seen:
         try:
-            if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen: ### FILTER HERE ###
+            if data['allpeptides'] and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
                 outfile.write(line)
                 lines_seen.add(line)
         except:
