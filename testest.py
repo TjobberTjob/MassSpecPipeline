@@ -9,6 +9,9 @@ Seen = []
 lendict = {}
 strdict = {}
 i = 0
+Seen = [json.loads(line)['Sequence'] for line in open(path + 'subimage.json')]
+print(Seen)
+quit()
 for line in open(path + 'subimage.json'):
 	try:
 		data = json.loads(line)
