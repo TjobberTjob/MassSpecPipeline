@@ -25,4 +25,4 @@ a = {}
 for f in Leng:
 	a[str(f)] = leng.count(f)
 print(Counter(a).most_common(4))
-print(str(os.system('ls /data/ProteomeToolsRaw/images/ | wc -l'))+' files in '+str(len(Seen))+' different classes')
+print('files in '+str(len(Seen))+' different classes')
