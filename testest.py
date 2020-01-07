@@ -14,7 +14,7 @@ for line in open(path + 'subimage.json'):
 		data = json.loads(line)
 		name = str(data['Sequence'])
 		Seen.append(name)
-		lendict[len(name)] = int(lendict[len(name)]) + 1
+		lendict[len(name)] = lendict[len(name)] + 1
 	except:
 		pass
 a = {}
