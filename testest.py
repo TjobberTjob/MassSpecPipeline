@@ -1,6 +1,6 @@
 import json
-import os
 from collections import Counter
+
 import numpy as np
 
 with open('config.json') as json_file:
