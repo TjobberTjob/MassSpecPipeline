@@ -5,28 +5,26 @@ with open('config.json') as json_file:
 	data = json.load(json_file)
 path = data['path'] + 'metadata/'
 
-# names = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
+names, length = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
+seen = []
 Seen = []
-lendict = {}
 leng = []
+Leng = []
 for line in open(path + 'subimage.json'):
-	try:
-		data = json.loads(line)
-		name = str(data['Sequence'])
-		Seen.append(name)
-		leng.append(len(name))
-		# try:
-		# 	lendict[len(name)] = int(lendict[len(name)]) + 1
-		# except:
-		# 	lendict[len(name)] = 1
-	except:
-		pass
+	data = json.loads(line)
+	if 'Sequence' in data:
+		Seen.append(str(data['Sequence']))
+		leng.append(len(data['Sequence']))
+		if str(data['Sequence']) not in Seen:
+			Seen.append(str(data['Sequence']))
+		if len(data['Sequence']) not in Leng:
+			Leng.append(len(data['Sequence']))
 a = {}
 for f in Seen:
-	a[str(f)] = Seen.count(f)
+	a[str(f)] = seen.count(f)
 print(Counter(a).most_common(4))
 a = {}
-for f in leng:
+for f in Leng:
 	a[str(f)] = leng.count(f)
 print(Counter(a).most_common(4))
 # print('files in '+str(i)+' different classes')
