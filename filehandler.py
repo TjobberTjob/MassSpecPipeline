@@ -5,17 +5,11 @@ import sys
 
 def filter(path, file):
     # Used to get only most abundant classes
-    # Seen = []
-    # for line in open(path + 'subimage.json'):
-    #     try:
-    #         data = json.loads(line)
-    #         Seen.append(str(data['Sequence']))
-    #     except:
-    #         pass
-    # a = {}
-    # for f in Seen:
-    #     a[str(f)] = Seen.count(f)
-    # Seen = [f[0] for f in Counter(a).most_common(4)]
+    Seen = [json.loads(line)['Sequence'] for line in open(path + 'subimage.json') if 'Sequence' in json.loads(line)]
+    a = {}
+    for f in Seen:
+        a[str(f)] = Seen.count(f)
+    Seen = [f[0] for f in Counter(a).most_common(4)]
 
     try:
         os.remove(path + str(filetofilter) + '_filtered.json')
