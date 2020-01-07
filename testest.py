@@ -5,18 +5,11 @@ with open('config.json') as json_file:
 	data = json.load(json_file)
 path = data['path'] + 'metadata/'
 
-for line in open(path + 'subimage.json'):
-	data = json.loads(line)
-	try:
-		data['Sequence']
-	except:
-		print(data)
-		quit()
 Seen = []
 lendict = {}
 strdict = {}
 i = 0
-Seen = [json.loads(line) for line in open(path + 'subimage.json')]
+Seen = [json.loads(line)['Sequence'] for line in open(path + 'subimage.json') if 'Sequence' in json.loads(line)]
 print(Seen)
 quit()
 for line in open(path + 'subimage.json'):

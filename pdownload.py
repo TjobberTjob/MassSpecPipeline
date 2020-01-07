@@ -392,6 +392,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
 
         new_metadata = {}
         new_metadata['image'] = filename + '-' + str(index + 1)
+        new_metadata['accession'] = accession
         new_metadata['size'] = subimage2.shape
         for ele in df.columns:
             if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
