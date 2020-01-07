@@ -1,5 +1,6 @@
 import json
 from collections import Counter
+import numpy as np
 
 with open('config.json') as json_file:
 	data = json.load(json_file)
@@ -7,18 +8,14 @@ path = data['path'] + 'metadata/'
 
 # names, length = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
 seen = []
-Seen = []
 leng = []
-Leng = []
 for line in open(path + 'subimage.json'):
 	data = json.loads(line)
 	if 'Sequence' in data:
 		seen.append(str(data['Sequence']))
 		leng.append(len(data['Sequence']))
-		if str(data['Sequence']) not in Seen:
-			Seen.append(str(data['Sequence']))
-		if len(data['Sequence']) not in Leng:
-			Leng.append(len(data['Sequence']))
+Seen = np.unique(seen)
+Leng = np.unique(leng)
 a = {}
 for f in Seen:
 	a[str(f)] = seen.count(f)
