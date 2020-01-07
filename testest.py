@@ -5,7 +5,7 @@ with open('config.json') as json_file:
 	data = json.load(json_file)
 path = data['path'] + 'metadata/'
 
-names, length = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
+# names, length = [(json.loads(line)['image']+".txt") for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
 seen = []
 Seen = []
 leng = []
