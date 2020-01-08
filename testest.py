@@ -28,3 +28,5 @@ for f in Leng:
 print(Counter(a).most_common(4))
 
 # find /data/ProteomeToolsRaw/ -name file.mzML -exec rm -f {} \;
+# find /data/ProteomeToolsRaw/ -name file-metadata.txt -exec rm -f {} \;
+
