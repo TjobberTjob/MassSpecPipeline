@@ -522,7 +522,7 @@ if __name__ == '__main__':
         for accession in listofowned:
             try:
                 combined(str(accession), pepfile, datapath)
-            except KeyboardInterrupt and FileNotFoundError:
+            except KeyboardInterrupt:# and FileNotFoundError:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
@@ -531,7 +531,7 @@ if __name__ == '__main__':
             accession = data['accession']
             try:
                 combined(str(accession), pepfile, datapath)
-            except KeyboardInterrupt and FileNotFoundError:
+            except KeyboardInterrupt:# and FileNotFoundError:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
     else:
