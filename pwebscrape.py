@@ -12,10 +12,10 @@ import sys
 def get_accessions(path):
     all_accessions = []
     accessions = 'accessions.txt'
-    if os.path.exists(path + accessions):
+    if os.path.exists(f'{path}{accessions}'):
         rm = validated_input('File already exists, overwrite?', ('y', 'n'))
         if rm == 'y':
-            os.remove(path + accessions)
+            os.remove(f'{path}{accessions}')
         if rm == 'n':
             quit()
 
@@ -26,7 +26,7 @@ def get_accessions(path):
     for level1 in soup.find_all('a', href=True):
         if '20' not in level1['href']:
             continue  # To avoid the non years
-        page_2 = requests.get(url + level1['href']).text
+        page_2 = requests.get(f'{url}{level1["href"]}').text
         soup_2 = BeautifulSoup(page_2, 'html.parser')
         # Level 2 - year subfolders
         for level2 in soup_2.find_all('a', href=True):
@@ -34,8 +34,8 @@ def get_accessions(path):
                 int(level2['href'][0:2])  # Only look at numerics...
             except:
                 continue
-            print('Getting accessions from ' + level1.text + level2.text, end='\r')
-            page_3 = requests.get(url + level1['href'] + level2['href']).text
+            print(f'Getting accessions from {level1.text}{level2.text}', end='\r')
+            page_3 = requests.get(f'{url}{level1["href"]}{level2["href"]}').text
             soup_3 = BeautifulSoup(page_3, 'html.parser')
 
             # Level 3- actual accession numbers.
@@ -44,21 +44,21 @@ def get_accessions(path):
                 if len(accession) == len('PRD000000'):
                     all_accessions.append(accession)
 
-    with open(path + accessions, "wb") as pa:
+    with open(f'{path}{accessions}', "wb") as pa:
         pickle.dump(all_accessions, pa)
 
 
 def accessions_metadata(path):
     metadata = 'accessions.json'
     accessions = 'accessions.txt'
-    if os.path.exists(path + metadata):
+    if os.path.exists(f'{path}{metadata}'):
         overwrite = validated_input('Metadata already exists, wanna overwrite?', ('y', 'n'))
         if overwrite == 'y':
-            os.remove(path + metadata)
+            os.remove(f'{path}{metadata}')
         else:
             quit()
 
-    with open(path + accessions, "rb") as pa:
+    with open(f'{path}{accessions}', "rb") as pa:
         pride_accessions = pickle.load(pa)  # Loading the data
 
     outfile = open(join(path, metadata), 'a')
@@ -66,7 +66,7 @@ def accessions_metadata(path):
     for i, f in enumerate(pride_accessions):
         try:
             print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
-            api = 'https://www.ebi.ac.uk/pride/ws/archive/project/' + f
+            api = f'https://www.ebi.ac.uk/pride/ws/archive/project/{f}'
             apijson = requests.get(api).json()
 
             metadata = {}
@@ -78,7 +78,7 @@ def accessions_metadata(path):
                     maxquant = True
             metadata['maxquant'] = maxquant
 
-            files = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/' + f
+            files = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{f}'
             filesjson = requests.get(files).json()
             filetypes = []
             for f in filesjson['list']:
@@ -87,18 +87,18 @@ def accessions_metadata(path):
                     filetypes.append(filetype)
             metadata['filetypes'] = filetypes
 
-            if metadata['maxquant'] == True and 'zip' in metadata['filetypes']:
+            if metadata['maxquant'] and 'zip' in metadata['filetypes']:
                 try:
                     for f in filesjson['list']:
                         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
                         if f['fileType'] == 'SEARCH' and filetype == 'zip':
                             zipfile = f['downloadLink']
                             break
-                    os.system('wget -q -O ' + path + 'file.zip ' + zipfile)
+                    os.system(f'wget -q -O {path}file.zip {zipfile}')
 
-                    with ZipFile(path + 'file.zip', 'r') as zipped:
+                    with ZipFile(f'{path}file.zip', 'r') as zipped:
                         ziplist = zipped.namelist()
-                    os.remove(path + 'file.zip')
+                    os.remove(f'{path}file.zip')
 
                     for xx in ziplist:
                         if 'allPeptides.txt' in xx:
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         data = json.load(json_file)
 
     datapath = data['path']
-    metapath = datapath + 'metadata/'
+    metapath = f'{datapath}metadata/'
     if not os.path.exists(metapath):
         os.mkdir(metapath)
 

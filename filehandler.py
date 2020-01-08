@@ -4,19 +4,19 @@ import sys
 
 
 def filter(path, file):
-    if os.path.exists(path + str(file) + '_filtered.json'):
-        os.remove(path + str(file) + '_filtered.json')
+    if os.path.exists(f'{path}{str(file)}_filtered.json'):
+        os.remove(f'{path}{str(file)}_filtered.json')
 
     # Used to get only most abundant classes
-    # Seen = [json.loads(line)['Sequence'] for line in open(path + 'subimage.json') if 'Sequence' in json.loads(line)]
+    # Seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
     # a = {}
     # for f in Seen:
     #     a[str(f)] = Seen.count(f)
     # Seen = [f[0] for f in Counter(a).most_common(4)]
 
     lines_seen = set()
-    outfile = open(path + str(file) + '_filtered.json', 'w')
-    for line in open(path + str(file) + '.json', 'r'):
+    outfile = open(f'{path}{str(file)}_filtered.json', 'w')
+    for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
 
         # if str(data['size']) == '[166, 66, 4]' and str(data['Sequence']) in Seen:
@@ -30,7 +30,7 @@ def filter(path, file):
 
 def moveserver(path, tarpath, ssh):
     os.chdir(path)
-    os.system('tar -c . | ssh ' + ssh + ' \'tar -xvf - -C ' + tarpath + '\'')
+    os.system(f'tar -c . | ssh {ssh} "tar -xvf - -C  {tarpath}"')
 
 
 if __name__ == '__main__':
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     with open('config.json') as json_file:
         data = json.load(json_file)
 
-    datapath = data['path'] + 'metadata/'
+    datapath = f'{data["path"]}metadata/'
 
     if sys.argv[1] == 'filter':
         filetofilter = sys.argv[2]

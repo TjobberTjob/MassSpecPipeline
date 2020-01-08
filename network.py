@@ -11,7 +11,7 @@ import os
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio):
     imgfiles = os.listdir(imgpath)
-    with open(imgpath + imgfiles[0], "rb") as pa:
+    with open(f'{imgpath}{imgfiles[0]}', "rb") as pa:
         image = pickle.load(pa)
     imagelen = len(image)
     pixellen = len(image[0])
@@ -19,16 +19,16 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
     if not classification:
         names = []
         labels = {}
-        if os.path.exists(path + 'subimage_filtered.json'):
-            for line in open(path + 'subimage_filtered.json'):
+        if os.path.exists(f'{path}subimage_filtered.json'):
+            for line in open(f'{path}subimage_filtered.json'):
                 data = json.loads(line)
-                name = data['image'] + ".txt"
+                name = f'{data["image"]}.txt'
                 names.append(name)
                 labels[name] = data[imageclass]
-        elif os.path.exists(path + 'subimage.json'):
-            for line in open(path + 'subimage.json'):
+        elif os.path.exists(f'{path}subimage.json'):
+            for line in open(f'{path}subimage.json'):
                 data = json.loads(line)
-                name = data['image'] + ".txt"
+                name = f'{data["image"]}.txt'
                 names.append(name)
                 labels[name] = data[imageclass]
         else:
@@ -40,15 +40,15 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
 
     else:
         labels = {}
-        if os.path.exists(path + 'subimage_filtered.json'):
-            for line in open(path + 'subimage_filtered.json'):
+        if os.path.exists(f'{path}subimage_filtered.json'):
+            for line in open(f'{path}subimage_filtered.json'):
                 data = json.loads(line)
-                name = data['image'] + ".txt"
+                name = f'{data["image"]}.txt'
                 labels[name] = data[imageclass]
-        elif os.path.exists(path + 'subimage.json'):
-            for line in open(path + 'subimage.json'):
+        elif os.path.exists(f'{path}subimage.json'):
+            for line in open(f'{path}subimage.json'):
                 data = json.loads(line)
-                name = data['image'] + ".txt"
+                name = f'{data["image"]}.txt'
                 labels[name] = data[imageclass]
         else:
             print('No metadata for images exists')
@@ -114,7 +114,7 @@ class DataGenerator(keras.utils.Sequence):
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            with open(imagepath + ID, "rb") as pa:
+            with open(f'{imagepath}{ID}', "rb") as pa:
                 try:
                     image = pickle.load(pa)
                 except:
@@ -163,11 +163,9 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass)
 
     # Create callbacks
     if classification:
-        checkpoint = keras.callbacks.ModelCheckpoint('Best-' + imageclass + '.h5', monitor='val_accuracy',
-                                                     save_best_only=True)
+        checkpoint = keras.callbacks.ModelCheckpoint(f'Best-{imageclass}.h5', monitor='val_accuracy', save_best_only=True)
     else:
-        checkpoint = keras.callbacks.ModelCheckpoint('Best-' + imageclass + '.h5', monitor='val_mse',
-                                                     save_best_only=True)
+        checkpoint = keras.callbacks.ModelCheckpoint(f'Best-{imageclass}.h5', monitor='val_mse', save_best_only=True)
     early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=4)
     callbacks_list = [checkpoint, early_stopping]
 
@@ -180,8 +178,8 @@ if __name__ == '__main__':
         data = json.load(json_file)
 
     datapath = data['path']
-    metapath = datapath + 'metadata/'
-    imagepath = datapath + 'images/'
+    metapath = f'{datapath}metadata/'
+    imagepath = f'{datapath}images/'
 
     # Cmd inputs
     classification = sys.argv[1] == 'T'
