@@ -106,6 +106,7 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
         df2 = pd.read_csv(filepath + maxquant_file)
     print(filename)
     print(rawfiles)
+    quit()
     # Download the raw file
     print('Downloading raw file                                                    ', end='\r')
     if not (os.path.exists(filepath + 'file.mzML') or os.path.exists(filepath + 'mzML.json')):
