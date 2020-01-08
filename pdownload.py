@@ -500,10 +500,10 @@ if __name__ == '__main__':
     datapath = data['path']
     metapath = f'{datapath}metadata/'
 
-    # try:
-    #     os.system(f'rm {datapath} *.*')
-    # except:
-    #     pass
+    try:
+        print(f'rm {datapath} *.*')
+    except:
+        pass
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
