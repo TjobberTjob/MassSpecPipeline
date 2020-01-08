@@ -125,7 +125,7 @@ def formatFile(accnr, filename, path, filepath):
                 pass
             os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
                       '../MassSpecPipeline/')
-
+        print(path)
         if path[0] == '/':
             relpath = path[:-1]
         else:
