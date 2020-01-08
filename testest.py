@@ -18,9 +18,10 @@ for line in open(path + 'subimage.json'):
 Seen = np.unique(seen)
 Leng = np.unique(leng)
 a = {}
+print(len(Seen))
 for f in Seen:
 	a[str(f)] = seen.count(f)
-print(Counter(a).most_common(4) + ' Total amount of classes: '+str(len(Seen)))
+print(Counter(a).most_common(4) + ' Total amount of classes: ' + str(len(Seen)))
 a = {}
 for f in Leng:
 	a[str(f)] = leng.count(f)
