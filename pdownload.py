@@ -501,7 +501,7 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
 
     try:
-        print(f'rm {datapath} *.*')
+        print(f'rm {datapath}*.*')
     except:
         pass
 
