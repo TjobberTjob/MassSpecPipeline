@@ -519,7 +519,7 @@ if __name__ == '__main__':
     elif str(sysinput) == 'owned':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
-        for accession in listofowned:
+        for accession in reversed(listofowned):
             try:
                 combined(str(accession), pepfile, datapath)
             except:
