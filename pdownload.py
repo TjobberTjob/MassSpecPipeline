@@ -46,10 +46,8 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     zipfilename = zipfile[63:]
 
     # Download zip file
-    try:
+    if os.path.exists(f'{path}{zipfilename}'):
         os.remove(f'{path}{zipfilename}')
-    except:
-        pass
     os.system(f'wget -q --show-progress -O  {path}{zipfilename} {zipfile}')
 
     # Get a list of files with directories from zip file
@@ -503,7 +501,8 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
 
     try:
-        os.system(f'rm {datapath}*.*')
+        print(f'rm {datapath}*.*')
+        quit()
     except:
         pass
 
