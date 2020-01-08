@@ -522,7 +522,7 @@ if __name__ == '__main__':
         for accession in reversed(listofowned):
             try:
                 combined(str(accession), pepfile, datapath)
-            except:
+            except KeyboardInterrupt:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
