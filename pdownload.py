@@ -7,7 +7,6 @@ import re
 import shutil
 import subprocess
 import sys
-import time
 from zipfile import ZipFile
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -26,7 +25,7 @@ def get_lower_bound(haystack, needle):
 
 
 def filefinder(accnr):
-    url = 'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/' + accnr
+    url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}'
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
@@ -48,27 +47,27 @@ def zipfile_downloader(zipfile, path, maxquant_file):
 
     # Download zip file
     try:
-        os.remove(path + zipfilename)
+        os.remove(f'{path}{zipfilename}')
     except:
         pass
-    os.system('wget -q --show-progress -O ' + path + zipfilename + ' ' + zipfile)
+    os.system(f'wget -q --show-progress -O  {path}{zipfilename} {zipfile}')
 
     # Get a list of files with directories from zip file
-    with ZipFile(path + zipfilename, 'r') as zipped:
+    with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
         ziplist = zipped.namelist()
 
     # Extract the peptide file from the zipfile
     for a in ziplist:
         if maxquant_file in a:
-            with ZipFile(path + zipfilename) as z:
-                with z.open(a) as zf, open(path + zipfilename[:-4] + '-' + maxquant_file, 'wb') as zfg:
+            with ZipFile(f'{path}{zipfilename}') as z:
+                with z.open(a) as zf, open(f'{path}{zipfilename[:-4]}-{maxquant_file}', 'wb') as zfg:
                     shutil.copyfileobj(zf, zfg)
                     break
         else:
             continue
 
     # Go through the maxquant output file and get all the raw files
-    df = pd.read_csv(path + zipfilename[:-4] + '-' + maxquant_file, sep='\t', low_memory=False)
+    df = pd.read_csv(f'{path}{zipfilename[:-4]}-{maxquant_file}', sep='\t', low_memory=False)
     df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
     rawfiles = np.unique(df['Raw file'])
 
@@ -76,45 +75,38 @@ def zipfile_downloader(zipfile, path, maxquant_file):
 
 
 def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles):
-    accessionpath = path + accnr + '/'
-    filepath = accessionpath + filename + '/'
+    accessionpath = f'{path}{accnr}/'
+    filepath = f'{accessionpath}{filename}/'
     # Make the file directory if it doesnt exist
     if not os.path.exists(accessionpath):
         os.mkdir(accessionpath)
     if not os.path.exists(filepath):
         os.mkdir(filepath)
 
-    # Check if old version exists
-    if os.path.exists(path + filename + '/'):
-        for files in os.listdir(path + filename + '/'):
-            if not os.path.exists(filepath + files):
-                shutil.move(path + filename + '/' + files, filepath + files)
-        shutil.rmtree(path + filename + '/')
-
     # Move or rm zip.file
-    if os.path.exists(filepath + 'file.zip'):
-        if os.path.getsize(path + zipfilename) > os.path.getsize(filepath + 'file.zip'):
-            shutil.copyfile(path + zipfilename, filepath + 'file.zip')
+    if os.path.exists(f'{filepath}file.zip'):
+        if os.path.getsize(f'{path}{zipfilename}') > os.path.getsize(f'{filepath}file.zip'):
+            shutil.copyfile(f'{path}{zipfilename}', f'{filepath}file.zip')
     else:
-        shutil.copyfile(path + zipfilename, filepath + 'file.zip')
+        shutil.copyfile(f'{path}{zipfilename}', f'{filepath}file.zip')
 
     # Check if filespecific allPeptides.txt exists
-    if not os.path.exists(filepath + maxquant_file):
+    if not os.path.exists(f'{filepath}{maxquant_file}'):
         df2 = df.loc[df['Raw file'] == filename,]
-        pd.DataFrame.to_csv(df2, filepath + maxquant_file)
+        pd.DataFrame.to_csv(df2, f'{filepath}{maxquant_file}')
     else:
-        df2 = pd.read_csv(filepath + maxquant_file)
+        df2 = pd.read_csv(f'{filepath}{maxquant_file}')
 
     # Download the raw file
     print('Downloading raw file                                                    ', end='\r')
-    if not (os.path.exists(filepath + 'file.mzML') or os.path.exists(filepath + 'mzML.json')):
-        if os.path.exists(filepath + 'file.raw'):
-            if os.path.getsize(filepath + 'file.raw') == 0:  # If this is an empty file with nothing in it, remove it
+    if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
+        if os.path.exists(f'{filepath}file.raw'):
+            if os.path.getsize(f'{filepath}file.raw') == 0:  # If this is an empty file with nothing in it, remove it
                 # (causes problems with download)
-                os.remove(filepath + 'file.raw')
+                os.remove(f'{filepath}file.raw')
         for f in rawfiles:
             if filename in f or len(rawfiles) == 1:
-                os.system('wget -q --show-progress -O ' + filepath + '/file.raw -c ' + f)
+                os.system(f'wget -q --show-progress -O {filepath}/file.raw -c {f}')
                 break
 
     return df2, filepath
@@ -123,7 +115,7 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
 def formatFile(accnr, filename, path, filepath):
     print('Formatting file to mzML										', end='\r')
     # Check whether the docker file is implemented or not
-    if not (os.path.exists(filepath + 'file.mzML') or os.path.exists(filepath + 'mzML.json')):
+    if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         dockerls = subprocess.check_output('docker image ls', shell=True)
         if not 'thermorawparser' in str(dockerls):
             try:
@@ -137,13 +129,12 @@ def formatFile(accnr, filename, path, filepath):
         if path[0] == '/':
             relpath = path[:-1]
         else:
-            relpath = os.getcwd() + path[:-1]
-        os.system('chmod -R a+rwx ' + path + '*')
-        os.system('docker run -v \"' + relpath + ':/data_input\" -i -t thermorawparser mono '
-                                                 'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/' + accnr +
-                  '/' + filename + '/file.raw -o=/data_input/' + accnr + '/' + filename + '/ -f=1 -m=1')
-        os.remove(filepath + 'file-metadata.txt')
-        os.remove(filepath + 'file.raw')
+            relpath = f'{os.getcwd()}{path[:-1]}'
+        os.system(f'chmod -R a+rwx {path} *')
+        os.system(
+            f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_input/{accnr}/{filename}/ -f=1 -m=1')
+        os.remove(f'{filepath}file-metadata.txt')
+        os.remove(f'{filepath}file.raw')
 
 
 def process_ms1(spectrum):
@@ -159,9 +150,9 @@ def process_ms1(spectrum):
 
 def internalmzML(path):
     # Extract the data from the mzml, if we havnt already
-    if not os.path.exists(path + 'mzML.json'):
+    if not os.path.exists(f'{path}mzML.json'):
         print('Extracting data from mzML                                                    ', end='\r')
-        data = mzml.MzML(path + 'file.mzML')
+        data = mzml.MzML(f'{path}file.mzML')
 
         # Extracted data
         extracted = {'ms1': {}}
@@ -179,15 +170,15 @@ def internalmzML(path):
             extracted['ms1'][scan_id] = {'mz': ms1_spectrum['mz'], 'intensity': ms1_spectrum['intensity'],
                                          'scan_time': ms1_spectrum['scan_time']}
 
-        f = open(path + 'mzML.json', 'w')
+        f = open(f'{path}mzML.json', 'w')
         f.write(json.dumps(extracted))
         f.close()
-        os.remove(path + 'file.mzML')
+        os.remove(f'{path}file.mzML')
 
 
 def preparameters(filepath):
     print('Preparing parameter for image creation                                                    ', end='\r')
-    mzml = json.load(open(filepath + '/mzML.json'))
+    mzml = json.load(open(f'{filepath}mzML.json'))
 
     mzlist = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
     rtlist = [mzml['ms1'][f]['scan_time'] for f in mzml['ms1']]
@@ -218,8 +209,7 @@ def fullpng(image, filepath, resolution, interval, lowbound, highbound):
         fullimage.reverse()
         titleofplot = listnames[i]
 
-        if not os.path.exists(
-                filepath + str(resolution['x']) + 'x' + str(resolution['y']) + '-' + titleofplot + '.png'):
+        if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}-{titleofplot}.png'):
             # Set color of missing data
             fullimage = np.ma.masked_equal(fullimage, 0)
             # Setup colormap
@@ -241,7 +231,7 @@ def fullpng(image, filepath, resolution, interval, lowbound, highbound):
             if titleofplot == 'Collapsed':
                 plt.colorbar(extend='both')
             plt.tight_layout()
-            plt.savefig(filepath + str(resolution['x']) + 'x' + str(resolution['y']) + '-' + titleofplot + '.png')
+            plt.savefig(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}-{titleofplot}.png')
             plt.close()
 
 
@@ -303,7 +293,7 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
     # image.reverse()
     imagedata = [image, nonzero_counter, total_datapoints]
     # Save as txt file
-    with open(filepath + str(resolution['x']) + 'x' + str(resolution['y']) + '.txt', "wb") as pa:
+    with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "wb") as pa:
         pickle.dump(imagedata, pa)
     lowbound = bounds[0]
     highbound = bounds[1]
@@ -329,7 +319,7 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     fig.add_axes(ax)
     plt.set_cmap('hot')
     ax.imshow(newimage, aspect='equal', cmap=colMap, vmin=lowbound, vmax=highbound)
-    plt.savefig(imgpath + filename + '-' + str(index + 1) + '.png')
+    plt.savefig(f'{imgpath}{filename}-{str(index + 1)}.png')
     plt.close()
 
 
@@ -339,18 +329,18 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
     mzrangelist = [interval['mz']['min'] + i * mz_bin for i in range(int(resolution['x']))]
     rtrangelist = [interval['rt']['min'] + i * rt_bin for i in range(int(resolution['y']))]
 
-    imgpath = path + 'images/'
+    imgpath = f'{path}images/'
     if not os.path.exists(imgpath):
         os.mkdir(imgpath)
 
-    metapath = path + 'metadata/'
+    metapath = f'{path}metadata/'
     if not os.path.exists(metapath):
         os.mkdir(metapath)
 
     lowbound = bounds[0]
     highbound = bounds[1]
 
-    outfile = open(metapath + 'subimage.json', 'a')  # The metadata file
+    outfile = open(f'{metapath}subimage.json', 'a')  # The metadata file
 
     outbound = 0
     inbound = 0
@@ -367,7 +357,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
             outbound += 1  # Check if this image can be created in our range or not
             continue
         inbound += 1
-        if os.path.exists(imgpath + filename + '-' + str(index + 1) + '.png'):
+        if os.path.exists(f'{imgpath}{filename}-{str(index + 1)}.txt'):
             continue
 
         if not 450 < rows['m/z'] < 455:  # Filter
@@ -386,14 +376,14 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
         subimage2 = np.array(subimage)
 
         # Save image as txt file
-        with open(imgpath + filename + '-' + str(index + 1) + '.txt', 'wb') as imagefile:
+        with open(f'{imgpath}{filename}-{str(index + 1)}.txt', 'wb') as imagefile:
             pickle.dump(subimage, imagefile)
 
         if savepng:  # save subimages to png
             subpng(subimage, imgpath, filename, index, lowbound, highbound)
 
         new_metadata = {}
-        new_metadata['image'] = filename + '-' + str(index + 1)
+        new_metadata['image'] = f'{filename}-{str(index + 1)}'
         new_metadata['accession'] = accession
         new_metadata['size'] = subimage2.shape
         for ele in df.columns:
@@ -430,7 +420,7 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
     end_stats['Out of bounds'] = outbound
     end_stats['in mz range'] = inmzbound
 
-    outfile = open(mpath + 'sub_statistics.json', 'a')
+    outfile = open(f'{mpath}sub_statistics.json', 'a')
     outfile.write(json.dumps(end_stats) + '\n')
     outfile.close()
     print('Done!                                                    ')
@@ -453,11 +443,13 @@ def combined(accnr, maxquant_file, path):
             filename = str(raws)
 
             # Skip this special case. Something wrong... dont know, dont care
-            not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1', '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1', '01709a_GD2-TUM_first_pool_110_01_01-2xIT_2xHCD-1h-R1']
+            not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1',
+                           '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1',
+                           '01709a_GD2-TUM_first_pool_110_01_01-2xIT_2xHCD-1h-R1']
             if filename in not_working:
                 continue
 
-            print('\nfile: ' + accnr + '/' + filename)
+            print(f'\nfile: {accnr}/{filename}')
             output = filehandling(accnr, filename, zipfilename, path, pepfile, df, allRaw)
             df2 = output[0]
             filepath = output[1]
@@ -474,7 +466,7 @@ def combined(accnr, maxquant_file, path):
             resolution = output[5]
 
             # Make the image
-            if not os.path.exists(filepath + str(resolution['x']) + 'x' + str(resolution['y']) + '.txt'):
+            if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt'):
                 output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
                 image = output[0]
                 nonzero_counter = output[1]
@@ -482,7 +474,7 @@ def combined(accnr, maxquant_file, path):
             # Retrieve if exist already
             else:
                 print('Loading image data                                                    ', end='\r')
-                with open(filepath + str(resolution['x']) + 'x' + str(resolution['y']) + '.txt', "rb") as pa:
+                with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "rb") as pa:
                     output = pickle.load(pa)
                 image = output[0]
                 nonzero_counter = output[1]
@@ -496,8 +488,8 @@ def combined(accnr, maxquant_file, path):
 
             endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, metapath)
 
-        os.remove(datapath + zipfilename)
-        os.remove(datapath + zipfilename[:-4] + '-' + pepfile)
+        os.remove(f'{datapath}{zipfilename}')
+        os.remove(f'{datapath}{zipfilename[:-4]}-{pepfile}')
 
 
 if __name__ == '__main__':
@@ -506,10 +498,10 @@ if __name__ == '__main__':
         data = json.load(json_file)
 
     datapath = data['path']
-    metapath = datapath + 'metadata/'
+    metapath = f'{datapath}metadata/'
 
     try:
-        os.system('rm ' + datapath + '*.*')
+        os.system(f'rm {datapath} *.*')
     except:
         pass
 
@@ -518,33 +510,33 @@ if __name__ == '__main__':
     sysinput = sys.argv[1]
     if str(sysinput) == 'reset':
         try:
-            shutil.rmtree(datapath + 'images')
-            os.remove(metapath + 'subimage.json')
-            os.remove(metapath + 'subimage_filtered.json')
-            os.remove(metapath + 'sub_statistics.json')
+            shutil.rmtree(f'{datapath}images/')
+            os.remove(f'{metapath}subimage.json')
+            os.remove(f'{metapath}subimage_filtered.json')
+            os.remove(f'{metapath}sub_statistics.json')
         except:
             pass
     elif str(sysinput) == 'owned':
-        listofowned = [f for f in os.listdir(datapath) if os.path.isdir(datapath+f) and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        listofowned = [f for f in os.listdir(datapath) if
+                       os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
             try:
                 combined(str(accession), pepfile, datapath)
-            except KeyboardInterrupt:
-                print('Problem occured with: ' + accession + '. unable to proceed at this time')
+            except KeyboardInterrupt and FileNotFoundError:
+                print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
-        for line in reversed(list(open(metapath + sys.argv[1] + '.json'))):
+        for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
             data = json.loads(line)
             accession = data['accession']
             try:
                 combined(str(accession), pepfile, datapath)
-            except FileNotFoundError:
-                print('Problem occured with: ' + accession + '. unable to proceed at this time')
+            except KeyboardInterrupt and FileNotFoundError:
+                print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
     else:
         accession = sysinput
         combined(str(accession), pepfile, datapath)
-
 
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
