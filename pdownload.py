@@ -453,7 +453,7 @@ def combined(accnr, maxquant_file, path):
             filename = str(raws)
 
             # Skip this special case. Something wrong... dont know, dont care
-            not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1', '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1', '01709a_GD2-TUM_first_pool_110_01_01-2xIT_2xHCD-1h-R1'']
+            not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1', '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1', '01709a_GD2-TUM_first_pool_110_01_01-2xIT_2xHCD-1h-R1']
             if filename in not_working:
                 continue
 
