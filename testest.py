@@ -20,7 +20,7 @@ Leng = np.unique(leng)
 a = {}
 for f in Seen:
 	a[str(f)] = seen.count(f)
-print(Counter(a).most_common(4) + ' Total amount of classes: ' + str(len(Seen)))
+print(Counter(a).most_common(4) + ' Total amount of classes: ' + len(Seen))
 a = {}
 for f in Leng:
 	a[str(f)] = leng.count(f)
