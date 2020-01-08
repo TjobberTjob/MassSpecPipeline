@@ -130,6 +130,8 @@ def formatFile(accnr, filename, path, filepath):
             relpath = path[:-1]
         else:
             relpath = f'{os.getcwd()}{path[:-1]}'
+        print(relpath)
+        quit()
         os.system(f'chmod -R a+rwx {path} *')
         os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
                   f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
@@ -138,7 +140,7 @@ def formatFile(accnr, filename, path, filepath):
         #                                          'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/' + accnr +
         #           '/' + filename + '/file.raw -o=/data_input/' + accnr + '/' + filename + '/ -f=1 -m=1')
         os.remove(f'{filepath}file-metadata.txt')
-        os.remove(f'{filepath}file.raw')
+        # os.remove(f'{filepath}file.raw')
 
 
 def process_ms1(spectrum):
