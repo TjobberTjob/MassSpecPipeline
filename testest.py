@@ -21,7 +21,7 @@ a = {}
 for f in Seen:
 	a[str(f)] = seen.count(f)
 
-print(f"{Counter(a).most_common(4)}  Total amount of classes: {len(Seen)}")
+f"{Counter(a).most_common(4)}  Total amount of classes: {len(Seen)}"
 a = {}
 for f in Leng:
 	a[str(f)] = leng.count(f)
