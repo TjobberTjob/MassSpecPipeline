@@ -154,7 +154,10 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass)
     model = keras.Model(input, output)
 
     if classification:
-        model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
+        if n_classes == 2:
+            model.compile(loss='binary_crossentropy', metrics=['accuracy'], optimizer='adam')
+        else:
+            model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
     else:
         model.compile(loss='mse', metrics=['mse'], optimizer='rmsprop')
 
