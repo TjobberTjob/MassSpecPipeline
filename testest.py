@@ -20,7 +20,8 @@ Leng = np.unique(leng)
 a = {}
 for f in Seen:
 	a[str(f)] = seen.count(f)
-print(Counter(a).most_common(4) + ' Total amount of classes: ' + len(Seen))
+	f"{needle} is out of bounds of {haystack}"
+print(f"{Counter(a).most_common(4)}  Total amount of classes: {len(Seen)}")
 a = {}
 for f in Leng:
 	a[str(f)] = leng.count(f)
