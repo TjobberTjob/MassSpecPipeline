@@ -32,7 +32,7 @@ for f in Leng:
 print(Counter(a).most_common(10))
 
 a = {}
-print(Size)
+print(size)
 for f in Size:
     a[str(f)] = size.count(f)
 print(Counter(a).most_common(10))
