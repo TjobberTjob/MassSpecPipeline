@@ -494,9 +494,9 @@ if __name__ == '__main__':
 
     print(f'{listdir(datapath)}')
     quit()
-        os.system(f'rm {datapath}*.*')
-    except:
-        pass
+    #     os.system(f'rm {datapath}*.*')
+    # except:
+    #     pass
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
