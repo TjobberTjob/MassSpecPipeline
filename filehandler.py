@@ -23,6 +23,7 @@ def filter(path, file):
 
         if 'size' in data and data['size'] == [166, 66, 4] and 'Length' in data and data['Length'] in Seen:
             outfile.write(line)
+            i += 1
 
         # if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
         #     outfile.write(line)
