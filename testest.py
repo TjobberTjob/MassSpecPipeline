@@ -11,7 +11,7 @@ path = f'{data["path"]}metadata/'
 seen = []
 leng = []
 size = []
-for line in open(f'{path}subimage_filtered.json'):
+for line in open(f'{path}subimage.json'):
     data = json.loads(line)
     if 'Sequence' in data:
         seen.append(str(data['Sequence']))
@@ -32,7 +32,6 @@ for f in Leng:
 print(Counter(a).most_common(10))
 
 a = {}
-print(size)
 for f in Size:
     a[str(f)] = size.count(f)
 print(Counter(a).most_common(10))
