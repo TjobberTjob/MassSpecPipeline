@@ -8,7 +8,7 @@ def filter(path, file):
         os.remove(f'{path}{str(file)}_filtered.json')
 
     # Used to get only most abundant classes
-    Seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
+    Seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
     print(Seen)
     a = {}
     for f in Seen:
