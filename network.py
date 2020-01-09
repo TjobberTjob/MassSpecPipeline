@@ -219,4 +219,4 @@ if __name__ == '__main__':
                         callbacks=callbacks_list)
 
 # python3 network.py F m/z 0.8
-# python3 network.py T Charge 0.8
+# python3 network.py T Length 0.8
