@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from collections import Counter
 
 
 def filter(path, file):
@@ -44,6 +45,7 @@ if __name__ == '__main__':
     if sys.argv[1] == 'filter':
         filetofilter = sys.argv[2]
         filter(datapath, filetofilter)
+
     elif sys.argv[1] == 'move':
         path = sys.argv[2]
         tarpath = sys.argv[3]
