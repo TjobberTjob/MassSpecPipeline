@@ -9,18 +9,20 @@ def filter(path, file):
         os.remove(f'{path}{str(file)}_filtered.json')
 
     # Used to get only most abundant classes
-    Seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
+    Seen = [len(json.loads(line)['Sequence']) for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
     a = {}
     for f in Seen:
         a[str(f)] = Seen.count(f)
     Seen = [f[0] for f in Counter(a).most_common(4)]
 
     lines_seen = set()
+    i = 0
     outfile = open(f'{path}{str(file)}_filtered.json', 'w')
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
 
-        if str(data['size']) == '[166, 66, 4]' and 'Sequence' in data and str(data['Sequence']) in Seen:
+        if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and len(data['Sequence']) in Seen:
+            i += 1
             data['seqlen'] = len(data['Sequence'])
             outfile.write(json.dumps(data) + '\n')
 
@@ -28,6 +30,7 @@ def filter(path, file):
         #     outfile.write(line)
         #     lines_seen.add(line)
     outfile.close()
+    print(i)
 
 
 def moveserver(path, tarpath, ssh):
