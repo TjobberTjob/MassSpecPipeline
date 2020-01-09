@@ -60,9 +60,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
             with ZipFile(f'{path}{zipfilename}') as z:
                 with z.open(a) as zf, open(f'{path}{zipfilename[:-4]}-{maxquant_file}', 'wb') as zfg:
                     shutil.copyfileobj(zf, zfg)
-                    break
-        else:
-            continue
+                break
 
     # Go through the maxquant output file and get all the raw files
     df = pd.read_csv(f'{path}{zipfilename[:-4]}-{maxquant_file}', sep='\t', low_memory=False)
