@@ -80,13 +80,10 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
         os.mkdir(accessionpath)
     if not os.path.exists(filepath):
         os.mkdir(filepath)
-    quit()
+
     # Check if filespecific allPeptides.txt exists
     df2 = df.loc[df['Raw file'] == filename,]
-    if os.path.exists(f'{filepath}{maxquant_file}'):
-        os.remove(f'{filepath}{maxquant_file}')
-        pd.DataFrame.to_csv(df2, f'{filepath}{maxquant_file}')
-    else:
+    if not os.path.exists(f'{filepath}{maxquant_file}'):
         pd.DataFrame.to_csv(df2, f'{filepath}{maxquant_file}')
 
     # Download the raw file
@@ -100,7 +97,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
             if filename in f or len(rawfiles) == 1:
                 os.system(f'wget -q --show-progress -O {filepath}/file.raw -c {f}')
                 break
-
+    quit()
     return df2, filepath
 
 
