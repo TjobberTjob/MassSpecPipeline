@@ -489,6 +489,7 @@ def partOne(accnr, maxquant_file, path):
                     continue
 
                 print(f'\nfile: {accnr}/{filename}                                               ')
+
                 output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                 df2 = output[0]
                 filepath = output[1]
@@ -499,9 +500,11 @@ def partOne(accnr, maxquant_file, path):
                 filename = str(raws[63:-4])
                 if filename in not_working:
                     continue
+
                 print(f'\nfile: {accnr}/{filename}                                               ')
+
                 filepath = f'{path}{accnr}/{filename}/'
-                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                 partTwo(accnr, filename, path, filepath, df2)
 
 
