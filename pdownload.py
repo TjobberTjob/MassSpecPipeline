@@ -46,8 +46,8 @@ def filefinder(accnr, path):
             break
 
     placeholder = {}
-    for files in rawfiles[:-4]:
-        if files in zipfiles[:-4] and 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}'):
+    for files in rawfiles[63:-4]:
+        if files in zipfiles[63:-4] and 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}'):
             placeholder[str(files)] = True
         else:
             placeholder[str(files)] = False
