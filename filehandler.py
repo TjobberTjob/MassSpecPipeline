@@ -9,6 +9,7 @@ def filter(path, file):
 
     # Used to get only most abundant classes
     Seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
+    print(Seen)
     a = {}
     for f in Seen:
         a[str(f)] = Seen.count(f)
