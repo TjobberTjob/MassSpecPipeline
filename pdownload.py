@@ -103,6 +103,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
 
 
 def formatFile(accnr, filename, path, filepath):
+    quit()
     print('Formatting file to mzML										', end='\r')
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
@@ -124,10 +125,10 @@ def formatFile(accnr, filename, path, filepath):
             relpath = f'{os.getcwd()}{path[:-1]}'
 
         os.system(f'chmod -R a+rwx {path} *')
-        print(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
+        os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
               f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
               f't/{accnr}/{filename}/ -f=1 -m=1')
-        quit()
+
         os.remove(f'{filepath}file-metadata.txt')
         os.remove(f'{filepath}file.raw')
 
