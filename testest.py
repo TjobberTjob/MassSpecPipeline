@@ -29,4 +29,4 @@ print(Counter(a).most_common(10))
 
 # find /data/ProteomeToolsRaw/ -name file.mzML -exec rm -f {} \;
 # find /data/ProteomeToolsRaw/ -name file-metadata.txt -exec rm -f {} \;
-# find /data/ProteomeToolsRaw/ -name file.zip -exec rm -f {} \;
+# find /data/ProteomeToolsRaw/ -name 1250x1000.txt -exec rm -f {} \;
