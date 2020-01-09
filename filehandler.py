@@ -8,16 +8,12 @@ def filter(path, file):
         os.remove(f'{path}{str(file)}_filtered.json')
 
     # Used to get only most abundant classes
-    for line in open(f'{path}{str(file)}.json'):
-        print(line)
-        quit()
     Seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
-    print(Seen)
     a = {}
     for f in Seen:
         a[str(f)] = Seen.count(f)
     Seen = [f[0] for f in Counter(a).most_common(4)]
-    print(Seen)
+
     lines_seen = set()
     outfile = open(f'{path}{str(file)}_filtered.json', 'w')
     for line in open(f'{path}{str(file)}.json', 'r'):
