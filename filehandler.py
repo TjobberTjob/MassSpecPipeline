@@ -8,23 +8,24 @@ def filter(path, file):
         os.remove(f'{path}{str(file)}_filtered.json')
 
     # Used to get only most abundant classes
-    # Seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
-    # a = {}
-    # for f in Seen:
-    #     a[str(f)] = Seen.count(f)
-    # Seen = [f[0] for f in Counter(a).most_common(4)]
+    Seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
+    a = {}
+    for f in Seen:
+        a[str(f)] = Seen.count(f)
+    Seen = [f[0] for f in Counter(a).most_common(4)]
 
     lines_seen = set()
     outfile = open(f'{path}{str(file)}_filtered.json', 'w')
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
 
-        # if str(data['size']) == '[166, 66, 4]' and str(data['Sequence']) in Seen:
-        if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
-            outfile.write(line)
-            lines_seen.add(line)
+        if str(data['size']) == '[166, 66, 4]' and str(data['Sequence']) in Seen:
+            data['seqlen'] = len(data['Sequence'])
+            outfile.write(data)
 
-
+        # if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
+        #     outfile.write(line)
+        #     lines_seen.add(line)
     outfile.close()
 
 

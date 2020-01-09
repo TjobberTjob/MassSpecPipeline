@@ -507,15 +507,16 @@ if __name__ == '__main__':
             os.remove(f'{metapath}sub_statistics.json')
         except:
             pass
+
     elif str(sysinput) == 'owned':
-        listofowned = [f for f in os.listdir(datapath) if
-                       os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in reversed(listofowned):
             try:
                 combined(str(accession), pepfile, datapath)
-            except KeyboardInterrupt:
+            except:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
+
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
         for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
             data = json.loads(line)
@@ -525,6 +526,7 @@ if __name__ == '__main__':
             except:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
+
     else:
         accession = sysinput
         combined(str(accession), pepfile, datapath)
