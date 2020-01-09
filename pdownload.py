@@ -499,7 +499,7 @@ def partOne(accnr, maxquant_file, path):
                 partTwo(accnr, filename, path, filepath, df2)
         else:
             for raws in allRaw:
-                filename = str(raws[63:])
+                filename = str(raws[63:-4])
                 if filename in not_working:
                     continue
 
