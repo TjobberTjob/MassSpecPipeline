@@ -41,12 +41,9 @@ def filefinder(accnr, path):
 
     haveallMQF = True
     for files in os.listdir(f'{path}{accnr}'):
-        if not 'allPeptides.txt' in os.listdir(f'{path}{accnr}{files}'):
-            haveallMQF = True
+        if not ('allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}') and len(os.listdir(f'{path}{accnr}/{files}')) == len(rawfiles)):
+            haveallMQF = False
             break
-
-    print(haveallMQF)
-    quit()
 
     return zipfiles, rawfiles, haveallMQF
 
@@ -431,66 +428,81 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
     print('Done!                                                    ')
 
 
-def combined(accnr, maxquant_file, path):
+def partTwo(accnr, filename, path, filepath, df2):
+    formatFile(accnr, filename, path, filepath)
+    internalmzML(filepath)
+
+    output = preparameters(filepath)
+    mzml = output[0]
+    inputlists = output[1]
+    bounds = output[2]
+    interval = output[3]
+    bins = output[4]
+    resolution = output[5]
+
+    # Make the image
+    if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt'):
+        output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
+        image = output[0]
+        nonzero_counter = output[1]
+        total_datapoints = output[2]
+    # Retrieve if exist already
+    else:
+        print('Loading image data                                                    ', end='\r')
+        with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "rb") as pa:
+            output = pickle.load(pa)
+        image = output[0]
+        nonzero_counter = output[1]
+        total_datapoints = output[2]
+
+    subimage_interval = {'mz': 25, 'rt': 5}
+    output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
+                     savepng=False)
+    inorout = output[0]
+    metapath = output[1]
+
+    endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, metapath)
+
+
+def partOne(accnr, maxquant_file, path):
+    # Skip this special case. Something wrong... dont know, dont care
+    not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1',
+                   '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1',
+                   '01709a_GD2-TUM_first_pool_110_01_01-2xIT_2xHCD-1h-R1']
+
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
     allRaw = output[1]
+    haveallMQF = output[2]
 
     for zips in reversed(allZip):
         # finds raw files for this zip file
-        output = zipfile_downloader(zips, path, maxquant_file)
-        rawfiles = output[0]
-        df = output[1]
+        if not haveallMQF:
+            output = zipfile_downloader(zips, path, maxquant_file)
+            rawfiles = output[0]
+            df = output[1]
 
-        for raws in rawfiles:
-            filename = str(raws)
+            for raws in rawfiles:
+                filename = str(raws)
+                if filename in not_working:
+                    continue
 
-            # Skip this special case. Something wrong... dont know, dont care
-            not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1',
-                           '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1',
-                           '01709a_GD2-TUM_first_pool_110_01_01-2xIT_2xHCD-1h-R1']
-            if filename in not_working:
-                continue
+                print(f'\nfile: {accnr}/{filename}')
+                output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                df2 = output[0]
+                filepath = output[1]
 
-            print(f'\nfile: {accnr}/{filename}')
-            output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-            df2 = output[0]
-            filepath = output[1]
+                partTwo(accnr, filename, path, filepath, df2)
+        else:
+            for raws in allRaw:
+                filename = raws
+                if filename in not_working:
+                    continue
 
-            formatFile(accnr, filename, path, filepath)
-            internalmzML(filepath)
-
-            output = preparameters(filepath)
-            mzml = output[0]
-            inputlists = output[1]
-            bounds = output[2]
-            interval = output[3]
-            bins = output[4]
-            resolution = output[5]
-
-            # Make the image
-            if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt'):
-                output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
-                image = output[0]
-                nonzero_counter = output[1]
-                total_datapoints = output[2]
-            # Retrieve if exist already
-            else:
-                print('Loading image data                                                    ', end='\r')
-                with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "rb") as pa:
-                    output = pickle.load(pa)
-                image = output[0]
-                nonzero_counter = output[1]
-                total_datapoints = output[2]
-
-            subimage_interval = {'mz': 25, 'rt': 5}
-            output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
-                             savepng=False)
-            inorout = output[0]
-            metapath = output[1]
-
-            endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, metapath)
+                filepath = f'{path}{accnr}/{filename}/'
+                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+                partTwo(accnr, filename, path, filepath, df2)
 
 
 if __name__ == '__main__':
@@ -522,7 +534,7 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in reversed(listofowned):
             try:
-                combined(str(accession), pepfile, datapath)
+                partOne(str(accession), pepfile, datapath)
             except:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
@@ -532,14 +544,14 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
             try:
-                combined(str(accession), pepfile, datapath)
+                partOne(str(accession), pepfile, datapath)
             except:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 pass
 
     else:
         accession = sysinput
-        combined(str(accession), pepfile, datapath)
+        partOne(str(accession), pepfile, datapath)
 
 # python3 pdownload.py PXD004732
 # python3 pdownload.py PXD010595
