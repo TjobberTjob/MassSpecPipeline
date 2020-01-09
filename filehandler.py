@@ -20,14 +20,9 @@ def filter(path, file):
     outfile = open(f'{path}{str(file)}_filtered.json', 'w')
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
-        print(data)
-        print(Seen)
-        quit()
 
-        if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and len(data['Sequence']) in Seen:
-            i += 1
-            data['seqlen'] = len(data['Sequence'])
-            outfile.write(json.dumps(data) + '\n')
+        if 'size' in data and data['size'] == [166, 66, 4] and 'Length' in data and data['Length'] in Seen:
+            outfile.write(line)
 
         # if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
         #     outfile.write(line)
