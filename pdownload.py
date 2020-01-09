@@ -2,6 +2,7 @@ import bisect
 import json
 import math
 import os
+from pathlib import Path
 import pickle
 import re
 import shutil
@@ -97,23 +98,26 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
             if filename in f or len(rawfiles) == 1:
                 os.system(f'wget -q --show-progress -O {filepath}/file.raw -c {f}')
                 break
-    quit()
+
     return df2, filepath
 
 
 def formatFile(accnr, filename, path, filepath):
+    quit()
     print('Formatting file to mzML										', end='\r')
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         dockerls = subprocess.check_output('docker image ls', shell=True)
         if not 'thermorawparser' in str(dockerls):
-            try:
+            if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
+                os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
                 os.system(
-                    'cd .. && git clone https://github.com/compomics/ThermoRawFileParser.git && cd MassSpecPipeline/')
-            except:
-                pass
-            os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                      '../MassSpecPipeline/')
+                    f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
+                os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                          '../MassSpecPipeline/')
+            else:
+                os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                          '../MassSpecPipeline/')
 
         if path[0] == '/':
             relpath = path[:-1]
