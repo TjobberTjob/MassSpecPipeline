@@ -10,7 +10,7 @@ path = f'{data["path"]}metadata/'
 # length = [f'{json.loads(line)["image"]}.txt' for line in open(path + 'subimage.json') if 'image' in json.loads(line)]
 seen = []
 leng = []
-for line in open(f'{path}subimage.json'):
+for line in open(f'{path}subimage_filtered.json'):
     data = json.loads(line)
     if 'Sequence' in data:
         seen.append(str(data['Sequence']))
