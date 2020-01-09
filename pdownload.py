@@ -45,15 +45,6 @@ def filefinder(accnr, path):
             haveallMQF = False
             break
 
-    placeholder = {}
-    for files in rawfiles:
-        if files[63:-4] in zipfiles[63:-4] and 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}'):
-            placeholder[str(files[63:-4])] = True
-        else:
-            placeholder[str(files[63:-4])] = False
-    print(placeholder)
-    quit()
-
     return zipfiles, rawfiles, haveallMQF
 
 
