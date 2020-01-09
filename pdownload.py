@@ -80,7 +80,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
         os.mkdir(accessionpath)
     if not os.path.exists(filepath):
         os.mkdir(filepath)
-
+    quit()
     # Check if filespecific allPeptides.txt exists
     df2 = df.loc[df['Raw file'] == filename,]
     if os.path.exists(f'{filepath}{maxquant_file}'):
@@ -494,7 +494,6 @@ if __name__ == '__main__':
         if '.' in f:
             os.system(f'rm {datapath}*.*')
             break
-
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
