@@ -20,7 +20,7 @@ def filter(path, file):
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
 
-        if str(data['size']) == '[166, 66, 4]' and str(data['Sequence']) in data:
+        if str(data['size']) == '[166, 66, 4]' and 'Sequence' in data and str(data['Sequence']) in Seen:
             data['seqlen'] = len(data['Sequence'])
             outfile.write(json.dumps(data) + '\n')
 
