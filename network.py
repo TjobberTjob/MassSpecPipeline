@@ -200,7 +200,7 @@ if __name__ == '__main__':
     else:
         n_classes = 1
 
-    n_channels = 1
+    n_channels = 4
     #######################
 
     params = {'size': (pixellen, imglen),
