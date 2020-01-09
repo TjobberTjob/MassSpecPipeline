@@ -493,6 +493,7 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
 
     print(f'{os.listdir(datapath)}')
+    print('.' in os.listdir(datapath))
     quit()
     #     os.system(f'rm {datapath}*.*')
     # except:
