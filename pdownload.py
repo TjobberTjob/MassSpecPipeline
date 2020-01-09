@@ -43,6 +43,8 @@ def filefinder(accnr):
 def zipfile_downloader(zipfile, path, maxquant_file):
     # Handle spaces in urls
     zipfile = zipfile.replace(' ', '%20')
+    print(zipfile)
+    quit()
     zipfilename = zipfile[63:]
 
     # Download zip file
@@ -69,7 +71,8 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
     rawfiles = np.unique(df['Raw file'])
 
-    return rawfiles, df, zipfilename
+    os.remove(f'{path}{zipfilename}')
+    return rawfiles, df
 
 
 def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles):
@@ -83,17 +86,18 @@ def filehandling(accnr, filename, zipfilename, path, maxquant_file, df, rawfiles
 
     # Move or rm zip.file
     if os.path.exists(f'{filepath}file.zip'):
-        if os.path.getsize(f'{path}{zipfilename}') > os.path.getsize(f'{filepath}file.zip'):
-            shutil.copyfile(f'{path}{zipfilename}', f'{filepath}file.zip')
+        os.remove(f'{filepath}file.zip')
+        shutil.copyfile(f'{path}{zipfilename}', f'{filepath}file.zip')
     else:
         shutil.copyfile(f'{path}{zipfilename}', f'{filepath}file.zip')
 
     # Check if filespecific allPeptides.txt exists
-    if not os.path.exists(f'{filepath}{maxquant_file}'):
-        df2 = df.loc[df['Raw file'] == filename,]
+    df2 = df.loc[df['Raw file'] == filename,]
+    if os.path.exists(f'{filepath}{maxquant_file}'):
+        os.remove(f'{filepath}{maxquant_file}')
         pd.DataFrame.to_csv(df2, f'{filepath}{maxquant_file}')
     else:
-        df2 = pd.read_csv(f'{filepath}{maxquant_file}')
+        pd.DataFrame.to_csv(df2, f'{filepath}{maxquant_file}')
 
     # Download the raw file
     print('Downloading raw file                                                    ', end='\r')
