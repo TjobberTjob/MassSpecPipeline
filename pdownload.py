@@ -30,7 +30,7 @@ def filefinder(accnr, path):
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
-    # If all the raw files are with allpeptides in the accession, skip downloading zipfiles
+
     # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
     for f in urljson['list']:
         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
@@ -44,6 +44,15 @@ def filefinder(accnr, path):
         if not 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}') or len(os.listdir(f'{path}{accnr}/')) != len(rawfiles):
             haveallMQF = False
             break
+
+    placeholder = {}
+    for files in rawfiles:
+        if files in zipfiles and 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}'):
+            placeholder[str(files)] = True
+        else:
+            placeholder[str(files)] = False
+    print(placeholder)
+    quit()
 
     return zipfiles, rawfiles, haveallMQF
 
