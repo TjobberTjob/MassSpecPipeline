@@ -25,12 +25,13 @@ def get_lower_bound(haystack, needle):
         raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def filefinder(accnr):
+def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}'
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
-
+    # If all the raw files are with allpeptides in the accession, skip downloading zipfiles
+    # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
     for f in urljson['list']:
         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
         if f['fileType'] == 'SEARCH' and filetype == 'zip':
@@ -38,7 +39,16 @@ def filefinder(accnr):
         if f['fileType'] == 'RAW' and filetype == 'raw':
             rawfiles.append(f['downloadLink'])
 
-    return zipfiles, rawfiles
+    haveallMQF = True
+    for files in os.listdir(f'{path}{accnr}'):
+        if not 'allPeptides.txt' in os.listdir(f'{path}{accnr}{files}'):
+            haveallMQF = True
+            break
+
+    print(haveallMQF)
+    quit()
+
+    return zipfiles, rawfiles, haveallMQF
 
 
 def zipfile_downloader(zipfile, path, maxquant_file):
@@ -423,7 +433,7 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
 
 def combined(accnr, maxquant_file, path):
     # Find all zip files
-    output = filefinder(accnr)
+    output = filefinder(accnr, path)
     allZip = output[0]
     allRaw = output[1]
 
