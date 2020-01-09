@@ -68,6 +68,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     rawfiles = np.unique(df['Raw file'])
 
     os.remove(f'{path}{zipfilename}')  # Remove useless zipfile
+    os.remove(f'{path}{zipfilename[:-4]}-{maxquant_file}')
     return rawfiles, df
 
 
@@ -480,9 +481,6 @@ def combined(accnr, maxquant_file, path):
 
             endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, metapath)
 
-        os.remove(f'{datapath}{zipfilename}')
-        os.remove(f'{datapath}{zipfilename[:-4]}-{pepfile}')
-
 
 if __name__ == '__main__':
     # Read datapath from config file
@@ -492,12 +490,11 @@ if __name__ == '__main__':
     datapath = data['path']
     metapath = f'{datapath}metadata/'
 
-    print(f'{os.listdir(datapath)}')
-    print('.' in os.listdir(datapath))
-    quit()
-    #     os.system(f'rm {datapath}*.*')
-    # except:
-    #     pass
+    for f in os.listdir(datapath):
+        if '.' in f:
+            os.system(f'rm {datapath}*.*')
+            break
+
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
