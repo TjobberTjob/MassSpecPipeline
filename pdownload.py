@@ -39,8 +39,10 @@ def filefinder(accnr, path):
         if f['fileType'] == 'RAW' and filetype == 'raw':
             rawfiles.append(f['downloadLink'])
 
+    if not os.path.exists(f'{path}{accnr}/'):
+        os.mkdir(f'{path}{accnr}/')
     haveallMQF = True
-    for files in os.listdir(f'{path}{accnr}'):
+    for files in os.listdir(f'{path}{accnr}/'):
         if not 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}') or len(os.listdir(f'{path}{accnr}/')) != len(rawfiles):
             haveallMQF = False
             break
