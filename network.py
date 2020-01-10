@@ -56,18 +56,19 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         else:
             print('No metadata for images exists')
 
-        # partition = {'train': [], 'validation': []}
-        partition = defaultdict(list)
         labels2 = defaultdict(list)
         for k, v in labels.items():
             labels2[v].append(k)
+
+        partition = defaultdict(list)
         for f in labels2:
-            random.shuffle(labels2[f])
+            random.shuffle(labels2[f])  # Shuffles to get random images into training and validation
             splits = round(len(labels2[f]) * float(splitratio))
             trainlist = (labels2[f][0:splits])
             vallist = (labels2[f][splits:])
             partition['train'].append(trainlist)
             partition['validation'].append(vallist)
+
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
 
@@ -131,7 +132,6 @@ class DataGenerator(keras.utils.Sequence):
 
             y[i] = self.labels[ID]
 
-
         if not classification:
             return X, y
         else:
@@ -170,7 +170,8 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass)
 
     # Create callbacks
     if classification:
-        checkpoint = keras.callbacks.ModelCheckpoint(f'Best-{imageclass}.h5', monitor='val_accuracy', save_best_only=True)
+        checkpoint = keras.callbacks.ModelCheckpoint(f'Best-{imageclass}.h5', monitor='val_accuracy',
+                                                     save_best_only=True)
     else:
         checkpoint = keras.callbacks.ModelCheckpoint(f'Best-{imageclass}.h5', monitor='val_mse', save_best_only=True)
     early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=4)
