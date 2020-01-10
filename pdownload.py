@@ -47,7 +47,7 @@ def filefinder(accnr, path):
         if not 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}') or len(os.listdir(f'{path}{accnr}/')) != len(rawfiles):
             haveallMQF = False
             break
-    print(len(os.listdir(f'{path}{accnr}/')))
+    print(len(os.listdir(f'{path}{accnr}/')) != len(rawfiles))
     return zipfiles, rawfiles, haveallMQF
 
 
