@@ -44,7 +44,7 @@ def filefinder(accnr, path):
 
 
     allCheck = ['allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/') if len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
-    if False in allCheck:
+    if False in allCheck or allCheck == []:
         haveallMQF = False
     else:
         haveallMQF = True
