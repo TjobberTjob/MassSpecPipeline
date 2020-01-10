@@ -34,6 +34,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         else:
             print('No metadata for images exists')
         splits = round(len(names) * float(splitratio))
+        random.shuffle(names)
         trainlist = names[0:splits]
         vallist = names[splits:]
         partition = {'train': trainlist, 'validation': vallist}
@@ -64,7 +65,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
             vallist = (labels2[f][splits:])
             partition['train'] = [x for x in trainlist]
             partition['validation'] = [x for x in vallist]
-    print(labels)
+    print(partition['train'])
+    quit()
     return partition, labels, imagelen, pixellen
 
 
