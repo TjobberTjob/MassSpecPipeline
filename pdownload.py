@@ -86,8 +86,6 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     accessionpath = f'{path}{accnr}/'
     filepath = f'{accessionpath}{filename}/'
     # Make the file directory if it doesnt exist
-    if not os.path.exists(accessionpath):
-        os.mkdir(accessionpath)
     if not os.path.exists(filepath):
         os.mkdir(filepath)
 
