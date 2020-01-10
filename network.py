@@ -124,7 +124,7 @@ class DataGenerator(keras.utils.Sequence):
             X[i,] = image
 
             y[i] = self.labels[ID]
-            print(X)
+            # print(X)
             print(y)
             quit()
 
