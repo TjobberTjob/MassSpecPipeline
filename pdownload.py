@@ -50,7 +50,6 @@ def filefinder(accnr, path):
             haveallMQF = False
             # print('hey1')
             break
-        else:
             # print('hey2')
     quit()
 
