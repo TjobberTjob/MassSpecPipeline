@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from collections import Counter
+import numpy as np
 
 
 def filter(path, file):
@@ -10,10 +11,11 @@ def filter(path, file):
         os.remove(f'{path}{str(file)}_filtered.json')
 
     # Used to get only most abundant classes
-    Seen = [json.loads(line)['Length'] for line in open(f'{path}{str(file)}.json') if 'Length' in json.loads(line)]
+    seen = [json.loads(line)['Length'] for line in open(f'{path}{str(file)}.json') if 'Length' in json.loads(line)]
+    Seen = np.unique(seen)
     a = {}
     for f in Seen:
-        a[str(f)] = Seen.count(f)
+        a[str(f)] = seen.count(f)
     Seen = [f[0] for f in Counter(a).most_common(4)]
 
     lines_seen = set()
