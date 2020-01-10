@@ -6,6 +6,7 @@ from collections import Counter
 
 def filter(path, file):
     if os.path.exists(f'{path}{str(file)}_filtered.json'):
+        print('Removing old filtered version')
         os.remove(f'{path}{str(file)}_filtered.json')
 
     # Used to get only most abundant classes
