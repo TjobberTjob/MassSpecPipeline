@@ -1,3 +1,5 @@
+from itertools import chain
+
 import keras
 from keras.layers import Dropout, Flatten, Dense, Input, Concatenate, Conv2D, MaxPooling2D
 from collections import defaultdict
@@ -54,7 +56,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         else:
             print('No metadata for images exists')
 
-        partition = {'train': [], 'validation': []}
+        # partition = {'train': [], 'validation': []}
+        partition = defaultdict(list)
         labels2 = defaultdict(list)
         for k, v in labels.items():
             labels2[v].append(k)
@@ -63,10 +66,11 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
             splits = round(len(labels2[f]) * float(splitratio))
             trainlist = (labels2[f][0:splits])
             vallist = (labels2[f][splits:])
-            partition['train'] = [x for x in trainlist]
-            partition['validation'] = [x for x in vallist]
-    print(partition['train'])
-    quit()
+            partition['train'].append(trainlist)
+            partition['validation'].append(vallist)
+        partition['train'] = list(chain.from_iterable(partition['train']))
+        partition['validation'] = list(chain.from_iterable(partition['validation']))
+        print(partition['train'])
     return partition, labels, imagelen, pixellen
 
 
