@@ -481,7 +481,6 @@ def partOne(accnr, maxquant_file, path):
     for zips in reversed(allZip):
         # finds raw files for this zip file
         if not haveallMQF:
-            print('hey')
             output = zipfile_downloader(zips, path, maxquant_file)
             rawfiles = output[0]
             df = output[1]
@@ -499,7 +498,6 @@ def partOne(accnr, maxquant_file, path):
 
                 partTwo(accnr, filename, path, filepath, df2)
         else:
-            print('hey2')
             for raws in allRaw:
                 filename = str(raws[63:-4])
                 if filename in not_working:
