@@ -124,6 +124,9 @@ class DataGenerator(keras.utils.Sequence):
             X[i,] = image
 
             y[i] = self.labels[ID]
+            print(X)
+            print(y)
+            quit()
 
         if not classification:
             return X, y
