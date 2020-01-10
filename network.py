@@ -124,7 +124,7 @@ class DataGenerator(keras.utils.Sequence):
             X[i,] = image
 
             y[i] = self.labels[ID]
-            # print(X)
+            print(X)
             print(y)
             quit()
 
@@ -211,7 +211,8 @@ if __name__ == '__main__':
               'n_classes': n_classes,
               'n_channels': n_channels,
               'shuffle': True}
-
+    print(labels)
+    quit()
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
