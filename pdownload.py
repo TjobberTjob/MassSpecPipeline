@@ -48,7 +48,6 @@ def filefinder(accnr, path):
         haveallMQF = False
     else:
         haveallMQF = True
-    print(haveallMQF)
 
     return zipfiles, rawfiles, haveallMQF
 
