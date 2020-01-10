@@ -70,7 +70,9 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
             partition['validation'].append(vallist)
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
-        print(partition['train'])
+        for f in partition:
+            print(f)
+        quit()
     return partition, labels, imagelen, pixellen
 
 
