@@ -64,7 +64,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
             vallist = (labels2[f][splits:])
             partition['train'] = [x for x in trainlist]
             partition['validation'] = [x for x in vallist]
-
+    print(labels[0:10])
     return partition, labels, imagelen, pixellen
 
 
@@ -124,7 +124,6 @@ class DataGenerator(keras.utils.Sequence):
             X[i,] = image
 
             y[i] = self.labels[ID]
-            print(y[i])
 
 
         if not classification:
