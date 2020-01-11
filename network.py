@@ -116,7 +116,11 @@ class DataGenerator(keras.utils.Sequence):
         'Generates data containing batch_size samples'
         # Initialization
         X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
-        y = np.empty((self.batch_size), dtype="S20")
+        try:
+            int(self.labels[0])
+            y = np.empty((self.batch_size), dtype=float)
+        except:
+            y = np.empty((self.batch_size), dtype="S20")
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
@@ -127,9 +131,9 @@ class DataGenerator(keras.utils.Sequence):
             image = image[:, :, 0:self.n_channels]
             X[i,] = image
             y[i] = self.labels[ID]
-        print(keras.utils.to_categorical(y, num_classes=self.n_classes))
-        quit()
+
         if classification:
+            y = keras.utils.to_categorical(y, num_classes=self.n_classes)
             return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
         else:
             return X, y
