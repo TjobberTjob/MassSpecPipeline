@@ -171,7 +171,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass)
                                                      save_best_only=True)
     else:
         checkpoint = keras.callbacks.ModelCheckpoint(f'Best-{imageclass}.h5', monitor='val_mse', save_best_only=True)
-    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=4)
+    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=6)
     callbacks_list = [checkpoint, early_stopping]
 
     return model, callbacks_list
@@ -209,7 +209,7 @@ if __name__ == '__main__':
     #######################
 
     params = {'size': (pixellen, imglen),
-              'batch_size': 128,
+              'batch_size': 32,
               'n_classes': n_classes,
               'n_channels': n_channels,
               'shuffle': True}
