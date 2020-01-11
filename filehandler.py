@@ -21,11 +21,13 @@ def filter(path, file):
     lines_seen = set()
     i = 0
     outfile = open(f'{path}{str(file)}_filtered.json', 'w')
+
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
 
         if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
-            outfile.write(line)
+            data['Seq_class'] = Seen.index(data['Sequence'])
+            outfile.write(data)
             i += 1
 
         # if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
