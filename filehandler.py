@@ -27,7 +27,7 @@ def filter(path, file):
 
         if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
             data['Seq_class'] = Seen.index(data['Sequence'])
-            outfile.write(data)
+            outfile.write(json.dumps(new_metadata) + '\n')
             i += 1
 
         # if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
