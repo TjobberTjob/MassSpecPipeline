@@ -71,6 +71,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
 
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
+        print(keras.utils.to_categorical(labels))
+        quit()
 
     return partition, labels, imagelen, pixellen
 
@@ -116,11 +118,7 @@ class DataGenerator(keras.utils.Sequence):
         'Generates data containing batch_size samples'
         # Initialization
         X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
-        try:
-            int(self.labels[0])
-            y = np.empty((self.batch_size), dtype=float)
-        except:
-            y = np.empty((self.batch_size), dtype="S20")
+        y = np.empty((self.batch_size), dtype=float)
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
