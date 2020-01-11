@@ -116,21 +116,16 @@ class DataGenerator(keras.utils.Sequence):
         'Generates data containing batch_size samples'
         # Initialization
         X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
-        y = np.empty((self.batch_size), dtype=float)
+        y = np.empty((self.batch_size), dtype="S15")
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
             with open(f'{imagepath}{ID}', "rb") as pa:
-                try:
-                    image = pickle.load(pa)
-                except:
-                    print(ID)
+                image = pickle.load(pa)
             image = np.array(image)
             image = image[:, :, 0:self.n_channels]
             X[i,] = image
-            print(self.labels[ID])
-            quit()
             y[i] = self.labels[ID]
 
         if not classification:
