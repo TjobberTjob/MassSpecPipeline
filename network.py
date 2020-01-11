@@ -13,7 +13,7 @@ import os
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio):
     seqs = [json.loads(f)['Sequence'] for f in open(f'{path}subimage_filtered.json')]
-    Seqs = np.unque(seqs)
+    Seqs = np.unique(seqs)
     print(Seqs)
     quit()
     imgfiles = os.listdir(imgpath)
