@@ -11,7 +11,7 @@ def filter(path, file):
         os.remove(f'{path}{str(file)}_filtered.json')
 
     # Used to get only most abundant classes
-    seen = [json.loads(line)['Length'] for line in open(f'{path}{str(file)}.json') if 'Length' in json.loads(line)]
+    seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
     Seen = np.unique(seen)
     a = {}
     for f in Seen:
@@ -24,7 +24,7 @@ def filter(path, file):
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
 
-        if 'size' in data and data['size'] == [166, 66, 4] and 'Length' in data and data['Length'] in Seen:
+        if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
             outfile.write(line)
             i += 1
 
