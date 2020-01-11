@@ -12,6 +12,10 @@ import os
 
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio):
+    seqs = [json.loads(f)['Sequence'] for f in open(f'{path}subimage_filtered.json')]
+    Seqs = np.unque(seqs)
+    print(Seqs)
+    quit()
     imgfiles = os.listdir(imgpath)
     with open(f'{imgpath}{imgfiles[0]}', "rb") as pa:
         image = pickle.load(pa)
@@ -71,8 +75,6 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
 
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
-        print(keras.utils.to_categorical(labels))
-        quit()
 
     return partition, labels, imagelen, pixellen
 
