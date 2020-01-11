@@ -127,11 +127,12 @@ class DataGenerator(keras.utils.Sequence):
             image = image[:, :, 0:self.n_channels]
             X[i,] = image
             y[i] = self.labels[ID]
-
-        if not classification:
-            return X, y
-        else:
+        print(keras.utils.to_categorical(y, num_classes=self.n_classes))
+        quit()
+        if classification:
             return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
+        else:
+            return X, y
 
 
 # Developing the neural network
