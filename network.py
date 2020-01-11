@@ -134,7 +134,7 @@ class DataGenerator(keras.utils.Sequence):
 
         if classification:
             y = keras.utils.to_categorical(y, num_classes=self.n_classes)
-            return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
+            return X, y
         else:
             return X, y
 
