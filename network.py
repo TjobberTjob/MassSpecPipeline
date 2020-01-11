@@ -14,7 +14,7 @@ import os
 def datafetcher(path, imgpath, classification, imageclass, splitratio):
     seqs = [json.loads(f)['Sequence'] for f in open(f'{path}subimage_filtered.json')]
     Seqs = np.unique(seqs)
-    print(Seqs)
+    print(keras.utils.to_categorical(Seqs))
     quit()
     imgfiles = os.listdir(imgpath)
     with open(f'{imgpath}{imgfiles[0]}', "rb") as pa:
