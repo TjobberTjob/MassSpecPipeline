@@ -126,6 +126,9 @@ class DataGenerator(keras.utils.Sequence):
             image = np.array(image)
             image = image[:, :, 0:self.n_channels]
             X[i,] = image
+            print(ID)
+            print(self.labels[ID])
+            quit()
             y[i] = self.labels[ID]
 
         if not classification:
