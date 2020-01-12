@@ -16,7 +16,7 @@ def filter(path, file):
     a = {}
     for f in Seen:
         a[str(f)] = seen.count(f)
-    Seen = [f[0] for f in Counter(a).most_common(4)]
+    Seen = [f[0] for f in Counter(a).most_common(10)]
 
     lines_seen = set()
     i = 0
