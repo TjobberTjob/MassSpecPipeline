@@ -220,7 +220,7 @@ if __name__ == '__main__':
     output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass)
     model = output[0]
     callbacks_list = output[1]
-    model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=50,
+    model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=100,
                         callbacks=callbacks_list)
 
 # python3 network.py F m/z 0.8
