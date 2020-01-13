@@ -554,6 +554,7 @@ if __name__ == '__main__':
             except Exception as e:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 debuggerFile.write(f'{accession} - {e}\n')
+                debuggerFile.close()
                 quit()
                 pass
 
