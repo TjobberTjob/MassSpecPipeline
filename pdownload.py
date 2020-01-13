@@ -76,7 +76,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
 
     # Go through the maxquant output file and get all the raw files
     df = pd.read_csv(f'{path}{zipfilename[:-4]}-{maxquant_file}', sep='\t', low_memory=False)
-    print(df)
+    print(df.columns)
     quit()
     df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
     rawfiles = np.unique(df['Raw file'])
