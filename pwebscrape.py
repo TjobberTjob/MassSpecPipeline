@@ -100,7 +100,7 @@ def update_metadata(mpath):
     metadata = 'accessions.json'
     accessions = 'accessions.txt'
 
-    # get_accessions(path=mpath)
+    get_accessions(path=mpath)
 
     with open(f'{mpath}{accessions}', "rb") as pa:
         pride_accessions = pickle.load(pa)  # Loading the data
