@@ -76,8 +76,6 @@ def zipfile_downloader(zipfile, path, maxquant_file):
 
     # Go through the maxquant output file and get all the raw files
     df = pd.read_csv(f'{path}{zipfilename[:-4]}-{maxquant_file}', sep='\t', low_memory=False)
-    print(df.columns)
-    quit()
     df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
     rawfiles = np.unique(df['Raw file'])
 
@@ -547,14 +545,17 @@ if __name__ == '__main__':
                 pass
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
+        debuggerFile = open(f'{metapath}debugger.txt', 'a')
         for line in open(f'{metapath}{sys.argv[1]}.json'):
             data = json.loads(line)
             accession = data['accession']
-            # try:
-            partOne(str(accession), pepfile, datapath)
-            # except:
-            #     print(f'Problem occured with: {accession}. unable to proceed at this time')
-            #     pass
+            try:
+                partOne(str(accession), pepfile, datapath)
+            except Exception as e:
+                print(f'Problem occured with: {accession}. unable to proceed at this time')
+                debuggerFile.write(f'{accession} - %s' % e)
+                quit()
+                pass
 
     else:
         accession = sysinput
