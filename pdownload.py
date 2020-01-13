@@ -548,11 +548,11 @@ if __name__ == '__main__':
         for line in open(f'{metapath}{sys.argv[1]}.json'):
             data = json.loads(line)
             accession = data['accession']
-            try:
-                partOne(str(accession), pepfile, datapath)
-            except:
-                print(f'Problem occured with: {accession}. unable to proceed at this time')
-                pass
+            # try:
+            partOne(str(accession), pepfile, datapath)
+            # except:
+            #     print(f'Problem occured with: {accession}. unable to proceed at this time')
+            #     pass
 
     else:
         accession = sysinput
