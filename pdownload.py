@@ -569,3 +569,5 @@ if __name__ == '__main__':
 # python3 pdownload.py PXD010595
 # python3 pdownload.py accessions_filtered
 # python3 pdownload.py owned
+
+#Seq_class (10) val_loss: 1.2392 - val_accuracy: 0.6107
