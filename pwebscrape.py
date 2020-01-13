@@ -12,12 +12,6 @@ import sys
 def get_accessions(path):
     all_accessions = []
     accessions = 'accessions.txt'
-    if os.path.exists(f'{path}{accessions}'):
-        rm = validated_input('File already exists, overwrite?', ('y', 'n'))
-        if rm == 'y':
-            os.remove(f'{path}{accessions}')
-        if rm == 'n':
-            quit()
 
     url = 'http://ftp.pride.ebi.ac.uk/pride/data/archive/'
     page = requests.get(url).text
@@ -48,29 +42,23 @@ def get_accessions(path):
         pickle.dump(all_accessions, pa)
 
 
-def accessions_metadata(path):
-    metadata = 'accessions.json'
-    accessions = 'accessions.txt'
-
-    with open(f'{path}{accessions}', "rb") as pa:
-        pride_accessions = pickle.load(pa)  # Loading the data
-
-    outfile = open(join(path, metadata), 'a')
-
-    for i, f in enumerate(pride_accessions):
+def accessions_metadata(file_list, path):
+    metafile = 'accessions.json'
+    outfile = open(join(metapath, metafile), 'a')
+    for i, f in enumerate(file_list):
         try:
-            print('Progress {:2.1%}'.format(i / len(pride_accessions)), end='\r')
+            print('Progress {:2.1%}'.format(i / len(file_list)), end='\r')
             api = f'https://www.ebi.ac.uk/pride/ws/archive/project/{f}'
             apijson = requests.get(api).json()
 
-            metadata = {}
+            metafile = {}
             maxquant = False
             for g in apijson:
                 if ':' not in str(apijson[g]):
-                    metadata[g] = apijson[g]
+                    metafile[g] = apijson[g]
                 if 'maxquant' in str(apijson[g]).lower():
                     maxquant = True
-            metadata['maxquant'] = maxquant
+            metafile['maxquant'] = maxquant
 
             files = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{f}'
             filesjson = requests.get(files).json()
@@ -79,9 +67,9 @@ def accessions_metadata(path):
                 filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
                 if filetype not in filetypes:
                     filetypes.append(filetype)
-            metadata['filetypes'] = filetypes
+            metafile['filetypes'] = filetypes
 
-            if metadata['maxquant'] and 'zip' in metadata['filetypes']:
+            if metafile['maxquant'] and 'zip' in metafile['filetypes']:
                 try:
                     for f in filesjson['list']:
                         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
@@ -96,14 +84,14 @@ def accessions_metadata(path):
 
                     for xx in ziplist:
                         if 'allPeptides.txt' in xx:
-                            metadata['allpeptides'] = True
+                            metafile['allpeptides'] = True
                             break
                 except:
-                    metadata['allpeptides'] = False
+                    metafile['allpeptides'] = False
             else:
-                metadata['allpeptides'] = False
+                metafile['allpeptides'] = False
 
-            outfile.write(json.dumps(metadata) + '\n')
+            outfile.write(json.dumps(metafile) + '\n')
         except:
             pass
 
@@ -118,14 +106,11 @@ def update_metadata(mpath):
         pride_accessions = pickle.load(pa)  # Loading the data
 
     all_accessions = [f for f in pride_accessions]
-    had_accessions = [json.loads(line)['accession'] for line in open(f'{mpath}{metadata}') if 'accession' in json.loads(line)]
+    had_accessions = [json.loads(line)['accession'] for line in open(f'{mpath}{metadata}') if
+                      'accession' in json.loads(line)]
     missing_accessions = [f for f in all_accessions if f not in had_accessions]
-    print(missing_accessions)
-    quit()
 
-    outfile = open(join(mpath, metadata), 'a')
-
-    # for i, f in enumerate(pride_accessions):
+    accessions_metadata(missing_accessions)
 
 
 def validated_input(prompt, valid_values):
@@ -150,20 +135,34 @@ if __name__ == '__main__':
 
     # Download pride accession numbers.
     if cmd == 'accessions':
+        accessions = 'accessions.txt'
+        if os.path.exists(f'{metapath}{accessions}'):
+            rm = validated_input('File already exists, overwrite?', ('y', 'n'))
+            if rm == 'y':
+                os.remove(f'{metapath}{accessions}')
+            if rm == 'n':
+                quit()
         get_accessions(path=metapath)
 
     # Get Metadata for all accession numbers
     if cmd == 'metadata':
         metadata = 'accessions.json'
+        accessions = 'accessions.txt'
+
         if os.path.exists(f'{metapath}{metadata}'):
             overwrite = validated_input('Metadata already exists, wanna overwrite?', ('y', 'n'))
             if overwrite == 'y':
                 os.remove(f'{metapath}{metadata}')
             else:
                 quit()
-        accessions_metadata(path=metapath)
+
+        with open(f'{metapath}{accessions}', "rb") as pa:
+            pride_accessions = pickle.load(pa)  # Loading the data
+
+        accessions_metadata(pride_accessions, metapath)
 
     if cmd == 'update':
         update_metadata(metapath)
+
 # python3 pwebscrape.py accessions
 # python3 pwebscrape.py metadata
