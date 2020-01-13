@@ -47,7 +47,7 @@ def accessions_metadata(file_list, path):
     outfile = open(join(metapath, metafile), 'a')
     for i, f in enumerate(file_list):
         try:
-            print('Progress {:2.1%}'.format(i / len(file_list)), end='\r')
+            print('Progress {:2.1%}                                       '.format(i / len(file_list)), end='\r')
             api = f'https://www.ebi.ac.uk/pride/ws/archive/project/{f}'
             apijson = requests.get(api).json()
 
@@ -99,6 +99,7 @@ def accessions_metadata(file_list, path):
 def update_metadata(mpath):
     metadata = 'accessions.json'
     accessions = 'accessions.txt'
+
     if os.path.exists(f'{mpath}{accessions}'):
         os.remove(f'{mpath}{accessions}')
     get_accessions(path=mpath)
