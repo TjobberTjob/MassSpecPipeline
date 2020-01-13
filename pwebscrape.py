@@ -99,7 +99,8 @@ def accessions_metadata(file_list, path):
 def update_metadata(mpath):
     metadata = 'accessions.json'
     accessions = 'accessions.txt'
-
+    if os.path.exists(f'{mpath}{accessions}'):
+        os.remove(f'{mpath}{accessions}')
     get_accessions(path=mpath)
 
     with open(f'{mpath}{accessions}', "rb") as pa:
