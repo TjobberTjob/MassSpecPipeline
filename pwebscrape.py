@@ -51,12 +51,6 @@ def get_accessions(path):
 def accessions_metadata(path):
     metadata = 'accessions.json'
     accessions = 'accessions.txt'
-    if os.path.exists(f'{path}{metadata}'):
-        overwrite = validated_input('Metadata already exists, wanna overwrite?', ('y', 'n'))
-        if overwrite == 'y':
-            os.remove(f'{path}{metadata}')
-        else:
-            quit()
 
     with open(f'{path}{accessions}', "rb") as pa:
         pride_accessions = pickle.load(pa)  # Loading the data
@@ -114,6 +108,25 @@ def accessions_metadata(path):
             pass
 
 
+def update_metadata(mpath):
+    metadata = 'accessions.json'
+    accessions = 'accessions.txt'
+
+    get_accessions(path=mpath)
+    with open(f'{mpath}{accessions}', "rb") as pa:
+        pride_accessions = pickle.load(pa)  # Loading the data
+
+    all_accessions = [f for f in pride_accessions]
+    had_accessions = [json.loads(line)['accession'] for line in open(f'{mpath}{metadata}.json') if 'accession' in json.loads(line)]
+    missing_accessions = [f for f in all_accessions if f not in had_accessions]
+    print(missing_accessions)
+    quit()
+
+    outfile = open(join(mpath, metadata), 'a')
+
+    for i, f in enumerate(pride_accessions):
+
+
 def validated_input(prompt, valid_values):
     valid_input = False
     while not valid_input:
@@ -140,6 +153,13 @@ if __name__ == '__main__':
 
     # Get Metadata for all accession numbers
     if cmd == 'metadata':
+        metadata = 'accessions.json'
+        if os.path.exists(f'{metapath}{metadata}'):
+            overwrite = validated_input('Metadata already exists, wanna overwrite?', ('y', 'n'))
+            if overwrite == 'y':
+                os.remove(f'{metapath}{metadata}')
+            else:
+                quit()
         accessions_metadata(path=metapath)
 
 # python3 pwebscrape.py accessions
