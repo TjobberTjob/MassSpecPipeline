@@ -553,14 +553,12 @@ if __name__ == '__main__':
                 partOne(str(accession), pepfile, datapath)
                 debuggerlist = [accession, 'No error']
                 debuggerFile.write(f'{debuggerlist}\n')
-                debuggerFile.close()
             except Exception as e:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 debuggerlist = [accession, e]
                 debuggerFile.write(f'{debuggerlist}\n')
-                debuggerFile.close()
                 pass
-
+        debuggerFile.close()
     else:
         accession = sysinput
         partOne(str(accession), pepfile, datapath)
