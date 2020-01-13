@@ -124,7 +124,7 @@ def update_metadata(mpath):
 
     outfile = open(join(mpath, metadata), 'a')
 
-    for i, f in enumerate(pride_accessions):
+    # for i, f in enumerate(pride_accessions):
 
 
 def validated_input(prompt, valid_values):
