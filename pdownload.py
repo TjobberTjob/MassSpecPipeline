@@ -551,6 +551,8 @@ if __name__ == '__main__':
             accession = data['accession']
             try:
                 partOne(str(accession), pepfile, datapath)
+                debuggerFile.write(f'{accession} - No error\n')
+                debuggerFile.close()
             except Exception as e:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
                 debuggerFile.write(f'{accession} - {e}\n')
