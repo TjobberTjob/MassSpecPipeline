@@ -553,7 +553,7 @@ if __name__ == '__main__':
                 partOne(str(accession), pepfile, datapath)
             except Exception as e:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
-                debuggerFile.write(f'{accession} - %s' % e)
+                debuggerFile.write(f'{accession} - {e}\n')
                 quit()
                 pass
 
