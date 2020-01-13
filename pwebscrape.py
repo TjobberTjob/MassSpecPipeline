@@ -110,7 +110,7 @@ def update_metadata(mpath):
                       'accession' in json.loads(line)]
     missing_accessions = [f for f in all_accessions if f not in had_accessions]
 
-    accessions_metadata(missing_accessions)
+    accessions_metadata(missing_accessions, mpath)
 
 
 def validated_input(prompt, valid_values):
