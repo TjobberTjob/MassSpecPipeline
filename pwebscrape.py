@@ -112,12 +112,13 @@ def update_metadata(mpath):
     metadata = 'accessions.json'
     accessions = 'accessions.txt'
 
-    get_accessions(path=mpath)
+    # get_accessions(path=mpath)
+
     with open(f'{mpath}{accessions}', "rb") as pa:
         pride_accessions = pickle.load(pa)  # Loading the data
 
     all_accessions = [f for f in pride_accessions]
-    had_accessions = [json.loads(line)['accession'] for line in open(f'{mpath}{metadata}.json') if 'accession' in json.loads(line)]
+    had_accessions = [json.loads(line)['accession'] for line in open(f'{mpath}{metadata}') if 'accession' in json.loads(line)]
     missing_accessions = [f for f in all_accessions if f not in had_accessions]
     print(missing_accessions)
     quit()
