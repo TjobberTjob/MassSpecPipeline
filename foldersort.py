@@ -154,4 +154,4 @@ if __name__ == '__main__':
 	else:
 		classifyImages(path = imagepath, trainpath = trainpath, valpath = valpath,  metapath = metapath, imgClass = Class)
 
-
+# python3 foldersort.py Sequence

@@ -565,10 +565,10 @@ if __name__ == '__main__':
         accession = sysinput
         partOne(str(accession), pepfile, datapath)
 
-# python3 pdownload.py PXD004732
-# python3 pdownload.py PXD010595
-# python3 pdownload.py accessions_filtered
-# python3 pdownload.py owned
+# python3 extractor.py PXD004732
+# python3 extractor.py PXD010595
+# python3 extractor.py accessions_filtered
+# python3 extractor.py owned
 
 #Seq_class (4)  val_loss: 0.1033 - val_accuracy: 0.9505
 #Seq_class (10) val_loss: 1.2392 - val_accuracy: 0.6107

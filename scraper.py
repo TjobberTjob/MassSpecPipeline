@@ -166,5 +166,6 @@ if __name__ == '__main__':
     if cmd == 'update':
         update_metadata(metapath)
 
-# python3 pwebscrape.py accessions
-# python3 pwebscrape.py metadata
+# python3 scraper.py accessions
+# python3 scraper.py metadata
+# python3 scraper.py update
