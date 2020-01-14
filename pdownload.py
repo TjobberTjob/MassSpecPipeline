@@ -545,7 +545,7 @@ if __name__ == '__main__':
                 pass
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
-        for line in open(f'{metapath}{sys.argv[1]}.json'):
+        for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
             data = json.loads(line)
             accession = data['accession']
             debuggerFile = open(f'{metapath}debugger.txt', 'a')
