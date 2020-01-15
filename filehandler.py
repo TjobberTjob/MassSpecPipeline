@@ -11,8 +11,8 @@ def debugger(path):
     Seen = np.unique(Seen)
 
     for f in Seen:
-        print(f'error: {f}', f'\noccourences: {len([g[2:11] for g in debugger if g[14:-2] == f])}',
-              f'\naccessions: {[g[2:12] for g in debugger if g[14:-2] == f]}\n')
+        print(f'error: {f}', f'\noccourences: {len([g for g in debugger if g[14:-2] == f])}',
+              f'\naccessions: {[g[2:11] for g in debugger if g[14:-2] == f]}\n')
 
 
 def filter(path, file):
