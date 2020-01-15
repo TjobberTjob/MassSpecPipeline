@@ -4,20 +4,18 @@ import sys
 from collections import Counter
 import numpy as np
 
+def debugger(path):
+    f = open(f'{path}debugger.txt', 'r')
+    debugger = f.readlines()
+    Seen = [line[14:-2] for line in debugger]
+    Seen = np.unique(Seen)
+
+    for f in Seen:
+        print(f'error: {f}', f'\noccourences: {len([g[2:12] for g in debugger if g[14:-2] == f])}',
+              f'\naccessions: {[g[2:12] for g in debugger if g[14:-2] == f]}\n')
+
 
 def filter(path, file):
-
-    if file == 'debugger':
-        # filter debugger for extractor
-        f = open(f'{path}debugger.txt', 'r')
-        debugger = f.readlines()
-        Seen = [line[14:-2] for line in debugger]
-        Seen = np.unique(Seen)
-
-        for f in Seen:
-            print(f'error: {f}', f'\noccourences: {len([g[2:12] for g in debugger if g[14:-2] == f])}', f'\naccessions: {[g[2:12] for g in debugger if g[14:-2] == f]}\n')
-        quit()
-
     if os.path.exists(f'{path}{str(file)}_filtered.json'):
         print('Removing old filtered version')
         os.remove(f'{path}{str(file)}_filtered.json')
@@ -60,6 +58,9 @@ if __name__ == '__main__':
         data = json.load(json_file)
 
     datapath = f'{data["path"]}metadata/'
+
+    if sys.argv[1] == 'debugger':
+        debugger(datapath)
 
     if sys.argv[1] == 'filter':
         filetofilter = sys.argv[2]
