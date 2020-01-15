@@ -13,8 +13,8 @@ def filter(path, file):
     # filter debugger for extractor
     debugger = open(f'{path}debugger.txt', "r")
     print(debugger)
-    for line in debugger:
-        print(line[1])
+    Seen = np.unique([line[1] for line in debugger])
+        print(Seen)
         quit()
 
     # # Used to get only most abundant classes
