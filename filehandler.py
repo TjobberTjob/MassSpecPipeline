@@ -10,31 +10,38 @@ def filter(path, file):
         print('Removing old filtered version')
         os.remove(f'{path}{str(file)}_filtered.json')
 
-    # Used to get only most abundant classes
-    seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
-    Seen = np.unique(seen)
-    a = {}
-    for f in Seen:
-        a[str(f)] = seen.count(f)
-    Seen = [f[0] for f in Counter(a).most_common(4)]
+    # # Used to get only most abundant classes
+    # seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
+    # Seen = np.unique(seen)
+    # a = {}
+    # for f in Seen:
+    #     a[str(f)] = seen.count(f)
+    # Seen = [f[0] for f in Counter(a).most_common(4)]
+    #
+    # lines_seen = set()
+    # outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
-    lines_seen = set()
-    i = 0
-    outfile = open(f'{path}{str(file)}_filtered.json', 'w')
+    # for line in open(f'{path}{str(file)}.json', 'r'):
+    #     data = json.loads(line)
 
-    for line in open(f'{path}{str(file)}.json', 'r'):
-        data = json.loads(line)
+        # # Filter for classification
+        # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
+        #     data['Seq_class'] = Seen.index(data['Sequence'])
+        #     outfile.write(json.dumps(data) + '\n')
 
-        if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
-            data['Seq_class'] = Seen.index(data['Sequence'])
-            outfile.write(json.dumps(data) + '\n')
-            i += 1
-
+        # # filter metadata for extractor
         # if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
         #     outfile.write(line)
         #     lines_seen.add(line)
-    outfile.close()
-    print(i)
+
+    # outfile.close()
+
+    # filter debugger for extractor
+    debugger = open(f'{path}debugger.txt',"r")
+    for line in debugger:
+        print(line)
+        quit()
+
 
 
 def moveserver(path, tarpath, ssh):
