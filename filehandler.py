@@ -14,6 +14,8 @@ def filter(path, file):
         # Seen = np.unique(Seen)
         for line in debugger:
             print(line)
+            print(line[0])
+            print(line[1])
             quit()
         # print(Seen)
         quit()
@@ -23,23 +25,23 @@ def filter(path, file):
         os.remove(f'{path}{str(file)}_filtered.json')
 
     # # Used to get only most abundant classes
-    # seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
-    # Seen = np.unique(seen)
-    # a = {}
-    # for f in Seen:
-    #     a[str(f)] = seen.count(f)
-    # Seen = [f[0] for f in Counter(a).most_common(4)]
+    seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
+    Seen = np.unique(seen)
+    a = {}
+    for f in Seen:
+        a[str(f)] = seen.count(f)
+    Seen = [f[0] for f in Counter(a).most_common(4)]
     #
     # lines_seen = set()
-    # outfile = open(f'{path}{str(file)}_filtered.json', 'w')
+    outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
-    # for line in open(f'{path}{str(file)}.json', 'r'):
-    #     data = json.loads(line)
+    for line in open(f'{path}{str(file)}.json', 'r'):
+        data = json.loads(line)
 
         # # Filter for classification
-        # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
-        #     data['Seq_class'] = Seen.index(data['Sequence'])
-        #     outfile.write(json.dumps(data) + '\n')
+        if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
+            data['Seq_class'] = Seen.index(data['Sequence'])
+            outfile.write(json.dumps(data) + '\n')
 
         # # filter metadata for extractor
         # if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
