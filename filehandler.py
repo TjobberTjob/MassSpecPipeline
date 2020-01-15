@@ -13,8 +13,10 @@ def filter(path, file):
     # filter debugger for extractor
     debugger = open(f'{path}debugger.txt', "r")
     print(debugger)
-    Seen = [line[1] for line in debugger]
-    Seen = np.unique(Seen)
+    # Seen = [line[1] for line in debugger]
+    # Seen = np.unique(Seen)
+    for line in debugger:
+        print(line[1])
     print(Seen)
     quit()
 
