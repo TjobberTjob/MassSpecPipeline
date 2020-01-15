@@ -6,19 +6,20 @@ import numpy as np
 
 
 def filter(path, file):
+    if file == 'debugger':
+        # filter debugger for extractor
+        debugger = open(f'{path}debugger.txt', "r")
+        print(debugger)
+        # Seen = [line[1] for line in debugger]
+        # Seen = np.unique(Seen)
+        for line in debugger:
+            print(line[1])
+        # print(Seen)
+        quit()
+
     if os.path.exists(f'{path}{str(file)}_filtered.json'):
         print('Removing old filtered version')
         os.remove(f'{path}{str(file)}_filtered.json')
-
-    # filter debugger for extractor
-    debugger = open(f'{path}debugger.txt', "r")
-    print(debugger)
-    # Seen = [line[1] for line in debugger]
-    # Seen = np.unique(Seen)
-    for line in debugger:
-        print(line[1])
-    # print(Seen)
-    quit()
 
     # # Used to get only most abundant classes
     # seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
