@@ -9,7 +9,7 @@ def filter(path, file):
     if os.path.exists(f'{path}{str(file)}_filtered.json'):
         print('Removing old filtered version')
         os.remove(f'{path}{str(file)}_filtered.json')
-
+    print('hey')
     # # Used to get only most abundant classes
     # seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
     # Seen = np.unique(seen)
