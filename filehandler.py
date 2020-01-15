@@ -13,7 +13,8 @@ def filter(path, file):
         # Seen = [line[1] for line in debugger]
         # Seen = np.unique(Seen)
         for line in debugger:
-            print(line[1])
+            print(line)
+            quit()
         # print(Seen)
         quit()
 
