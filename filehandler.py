@@ -17,7 +17,7 @@ def filter(path, file):
     # Seen = np.unique(Seen)
     for line in debugger:
         print(line[1])
-    print(Seen)
+    # print(Seen)
     quit()
 
     # # Used to get only most abundant classes
