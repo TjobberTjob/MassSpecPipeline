@@ -6,39 +6,37 @@ import numpy as np
 
 
 def filter(path, file):
+
     if file == 'debugger':
         # filter debugger for extractor
-        debugger = open(f'{path}debugger.txt', "r")
-        print(debugger)
-        # Seen = [line[1] for line in debugger]
-        # Seen = np.unique(Seen)
-        for line in debugger:
-            print(line)
-            print(line[0:5])
-            print(line[1])
-            quit()
-        # print(Seen)
+        f = open(f'{path}debugger.txt', 'r')
+        debugger = f.readlines()
+        Seen = [line[14:-2] for line in debugger]
+        Seen = np.unique(Seen)
+
+        for f in Seen:
+            print(f'error: {f}', f'\noccourences: {len([g[2:12] for g in debugger if g[14:-2] == f])}', f'\naccessions: {[g[2:12] for g in debugger if g[14:-2] == f]}\n')
         quit()
 
     if os.path.exists(f'{path}{str(file)}_filtered.json'):
         print('Removing old filtered version')
         os.remove(f'{path}{str(file)}_filtered.json')
 
-    # # Used to get only most abundant classes
+    # Used to get only most abundant classes
     seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
     Seen = np.unique(seen)
     a = {}
     for f in Seen:
         a[str(f)] = seen.count(f)
     Seen = [f[0] for f in Counter(a).most_common(4)]
-    #
+
     # lines_seen = set()
     outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
 
-        # # Filter for classification
+        # Filter for classification
         if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
             data['Seq_class'] = Seen.index(data['Sequence'])
             outfile.write(json.dumps(data) + '\n')
@@ -49,9 +47,6 @@ def filter(path, file):
         #     lines_seen.add(line)
 
     # outfile.close()
-
-
-
 
 
 def moveserver(path, tarpath, ssh):
