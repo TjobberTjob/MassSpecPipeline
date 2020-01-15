@@ -14,7 +14,7 @@ def filter(path, file):
     debugger = open(f'{path}debugger.txt', "r")
     print(debugger)
     for line in debugger:
-        print(line)
+        print(line[1])
         quit()
 
     # # Used to get only most abundant classes
