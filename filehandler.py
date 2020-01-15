@@ -14,8 +14,8 @@ def filter(path, file):
     debugger = open(f'{path}debugger.txt', "r")
     print(debugger)
     Seen = np.unique([line[1] for line in debugger])
-        print(Seen)
-        quit()
+    print(Seen)
+    quit()
 
     # # Used to get only most abundant classes
     # seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
