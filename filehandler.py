@@ -14,7 +14,7 @@ def filter(path, file):
         # Seen = np.unique(Seen)
         for line in debugger:
             print(line)
-            print(line[0])
+            print(line[0:5])
             print(line[1])
             quit()
         # print(Seen)
