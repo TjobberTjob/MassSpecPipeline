@@ -580,7 +580,7 @@ if __name__ == '__main__':
 # python3 extractor.py accessions_filtered
 # python3 extractor.py owned
 
-#Seq_class (4)  val_loss: 0.1033 - val_accuracy: 0.9505
+#Seq_class (4)  val_loss: 0.0595 - val_accuracy: 0.9775
 #Seq_class (10) val_loss: 1.2392 - val_accuracy: 0.6107
 #m/z val_mse: 4000
 #Length val_accuracy: 0.5160
