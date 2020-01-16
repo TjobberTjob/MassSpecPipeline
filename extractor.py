@@ -523,6 +523,10 @@ if __name__ == '__main__':
             os.system(f'rm {datapath}*.*')
             break
 
+    if os.path.exists(f'{metapath}brokenlinks.txt'):
+        with open(f'{metapath}brokenlinks.txt', "rb") as pa:
+            brokenlinks = pickle.load(pa)
+
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
     sysinput = sys.argv[1]
@@ -538,6 +542,8 @@ if __name__ == '__main__':
     elif str(sysinput) == 'owned':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in reversed(listofowned):
+            if accession in brokenlinks:
+                continue
             try:
                 partOne(str(accession), pepfile, datapath)
             except:
@@ -549,6 +555,8 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
             debuggerFile = open(f'{metapath}debugger.txt', 'a')
+            if accession in brokenlinks:
+                continue
             try:
                 partOne(str(accession), pepfile, datapath)
                 debuggerlist = [accession, 'No error']
@@ -563,6 +571,8 @@ if __name__ == '__main__':
 
     else:
         accession = sysinput
+        if accession in brokenlinks:
+            print('Accession is broken')
         partOne(str(accession), pepfile, datapath)
 
 # python3 extractor.py PXD004732
