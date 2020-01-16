@@ -543,6 +543,7 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in reversed(listofowned):
             if accession in brokenlinks:
+                print('Accession is broken')
                 continue
             try:
                 partOne(str(accession), pepfile, datapath)
@@ -556,6 +557,7 @@ if __name__ == '__main__':
             accession = data['accession']
             debuggerFile = open(f'{metapath}debugger.txt', 'a')
             if accession in brokenlinks:
+                print('Accession is broken')
                 continue
             try:
                 partOne(str(accession), pepfile, datapath)
