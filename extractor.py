@@ -573,6 +573,7 @@ if __name__ == '__main__':
         accession = sysinput
         if accession in brokenlinks:
             print('Accession is broken')
+            quit()
         partOne(str(accession), pepfile, datapath)
 
 # python3 extractor.py PXD004732
@@ -580,7 +581,7 @@ if __name__ == '__main__':
 # python3 extractor.py accessions_filtered
 # python3 extractor.py owned
 
-#Seq_class (4)  val_loss: 0.0595 - val_accuracy: 0.9775
-#Seq_class (10) val_loss: 1.2392 - val_accuracy: 0.6107
+#Seq_class (4)  val_loss: 0.0092 - val_accuracy: 0.9775
+#Seq_class (10) val_loss: 1.2964 - val_accuracy: 0.7448
 #m/z val_mse: 4000
 #Length val_accuracy: 0.5160
