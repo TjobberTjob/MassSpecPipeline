@@ -584,6 +584,6 @@ if __name__ == '__main__':
 # python3 extractor.py owned
 
 #Seq_class (4)  val_loss: 0.0092 - val_accuracy: 0.9775
-#Seq_class (10) val_loss: 1.2964 - val_accuracy: 0.7448
+#Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
 #m/z val_mse: 4000
 #Length val_accuracy: 0.5160
