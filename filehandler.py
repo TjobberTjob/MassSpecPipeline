@@ -8,8 +8,8 @@ import numpy as np
 def debugger(path):
     f = open(f'{path}debugger.txt', 'r')
     debugger = f.readlines()
-    Seen = [line[14:-2] for line in debugger]
-    Seen = np.unique(Seen)
+    seen = [line[14:-2] for line in debugger]
+    Seen = np.unique(seen)
 
     for f in Seen:
         print(f'error: {f}', f'\noccourences: {len([g for g in debugger if g[14:-2] == f])}',
@@ -17,7 +17,7 @@ def debugger(path):
 
     brokenAccessions = [f[2:11] for f in debugger if f[14:-2] == "KeyError('Sequence',)" or f[14:-2] == "ZeroDivisionError('integer division or modulo by zero',)" or f[14:-2] == "OSError(36, 'File name too long')" or f[14:-2] == "OSError(36, 'File name too long')" or f[14:-2] == "BadZipFile('File is not a zip file',)"]
     print(brokenAccessions)
-    print(len(debugger))
+    print(len(seen))
 
     with open(f'{path}brokenlinks.txt', "wb") as pa:
         pickle.dump(brokenAccessions, pa)
