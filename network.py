@@ -209,7 +209,7 @@ if __name__ == '__main__':
     #######################
 
     params = {'size': (pixellen, imglen),
-              'batch_size': 64,
+              'batch_size': 124,
               'n_classes': n_classes,
               'n_channels': n_channels,
               'shuffle': True}
