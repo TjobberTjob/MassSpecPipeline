@@ -1,5 +1,4 @@
 from itertools import chain
-
 import keras
 from keras.layers import Dropout, Flatten, Dense, Input, Concatenate, Conv2D, MaxPooling2D
 from collections import defaultdict
@@ -9,6 +8,8 @@ import sys
 import random
 import pickle
 import os
+
+from keras.utils import plot_model
 
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio):
@@ -156,6 +157,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass)
     else:
         output = Dense(n_classes, activation='softmax')(x)
     model = keras.Model(input, output)
+    plot_model(model, to_file="model.png")
 
     if classification:
         if n_classes == 2:

@@ -5,6 +5,7 @@ import sys
 from collections import Counter
 import numpy as np
 
+
 def debugger(path):
     f = open(f'{path}debugger.txt', 'r')
     debugger = f.readlines()
