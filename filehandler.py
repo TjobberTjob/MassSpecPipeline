@@ -17,6 +17,7 @@ def debugger(path):
 
     brokenAccessions = [f[2:11] for f in debugger if f[14:-2] == "KeyError('Sequence',)" or f[14:-2] == "ZeroDivisionError('integer division or modulo by zero',)" or f[14:-2] == "OSError(36, 'File name too long')" or f[14:-2] == "OSError(36, 'File name too long')" or f[14:-2] == "BadZipFile('File is not a zip file',)"]
     print(brokenAccessions)
+    print(len(debugger))
 
     with open(f'{path}brokenlinks.txt', "wb") as pa:
         pickle.dump(brokenAccessions, pa)
