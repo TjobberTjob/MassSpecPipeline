@@ -8,6 +8,7 @@ from itertools import chain
 import keras
 import matplotlib.pyplot as plt
 import numpy as np
+from keras.engine.saving import load_model
 from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D
 from keras.utils import plot_model
 
@@ -19,25 +20,14 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
     imagelen = len(image)
     pixellen = len(image[0])
 
-    if not classification:
+    if not classification: # Single output networks
         names = []
-        rawfiles = []
         labels = {}
         if os.path.exists(f'{path}subimage_filtered.json'):
             for line in open(f'{path}subimage_filtered.json'):
                 data = json.loads(line)
                 name = f'{data["image"]}.txt'
                 names.append(name)
-                if data['Raw file'] not in rawfiles:
-                    rawfiles.append(data['Raw file'])
-                labels[name] = data[imageclass]
-        elif os.path.exists(f'{path}subimage.json'):
-            for line in open(f'{path}subimage.json'):
-                data = json.loads(line)
-                name = f'{data["image"]}.txt'
-                names.append(name)
-                if data['Raw file'] not in rawfiles:
-                    rawfiles.append(data['Raw file'])
                 labels[name] = data[imageclass]
         else:
             print('No metadata for images exists')
@@ -47,20 +37,20 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         vallist = names[splits:]
         partition = {'train': trainlist, 'validation': vallist}
 
-    else:
+    else: # Multiple output classifier
         labels = {}
         if os.path.exists(f'{path}subimage_filtered.json'):
             for line in open(f'{path}subimage_filtered.json'):
                 data = json.loads(line)
                 name = f'{data["image"]}.txt'
                 labels[name] = data[imageclass]
-        elif os.path.exists(f'{path}subimage.json'):
-            for line in open(f'{path}subimage.json'):
-                data = json.loads(line)
-                name = f'{data["image"]}.txt'
-                labels[name] = data[imageclass]
         else:
             print('No metadata for images exists')
+
+        accessions = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        random.shuffle(accessions)
+        test_list = [line for line in open(f'{path}subimage_filtered.json') if open(f'{path}subimage_filtered.json')['accession'] in accessions[0:10]]
+        print(test_list)
 
         labels2 = defaultdict(list)
         for k, v in labels.items():
@@ -74,6 +64,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
             vallist = (labels2[f][splits:])
             partition['train'].append(trainlist)
             partition['validation'].append(vallist)
+            partition['test'].append()
 
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
@@ -227,6 +218,10 @@ if __name__ == '__main__':
         plt.plot(history.history['val_accuracy'])
     else:
         plt.plot(history.history['val_mse'])
+
+    model = load_model(f'Best-{imageclass}.h5')
+    test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
+    print("Accuracy for model C:", model.evaluate_generator(testGen3, 3500 // 32))
 
 # python3 network.py F m/z 0.8
 # python3 network.py T Length 0.8
