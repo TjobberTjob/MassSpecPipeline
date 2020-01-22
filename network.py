@@ -53,6 +53,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         test_list = []
         for line in open(f'{path}subimage_filtered.json'):
             dat = json.loads(line)
+            print(dat)
             if dat['accession'] in accessions:
                 test_list.append(f'{json.loads(line)["image"]}.txt')
         print(test_list)
