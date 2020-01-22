@@ -208,9 +208,10 @@ if __name__ == '__main__':
         n_classes = 1
 
     with open('config.json') as json_file:
-        n_channels = json.load(json_file)['networkattributes']['n_channels']
-        batch_size = json.load(json_file)['networkattributes']['batch_size']
-        epochs = json.load(json_file)['networkattributes']['epochs']
+        config = json.load(json_file)['networkattributes']
+    n_channels = config['n_channels']
+    batch_size = config['batch_size']
+    epochs = config['epochs']
 
     params = {'size': (pixellen, imglen),
               'batch_size': batch_size,
