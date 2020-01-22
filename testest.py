@@ -37,9 +37,7 @@ for f in listofshit:
     dictofshit[f[33:]] = f[23:32]
 print(dictofshit)
 quit()
-print(listofshit)
-print(len(listofshit))
-quit()
+
 
 # find /data/ProteomeToolsRaw/ -name file.mzML -exec rm -f {} \;
 # find /data/ProteomeToolsRaw/ -name file-metadata.txt -exec rm -f {} \;
