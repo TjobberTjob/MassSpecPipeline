@@ -38,6 +38,7 @@ for f in listofshit:
 
 for line in open(f'/data/ProteomeToolsRaw/metadata/subimage.json', 'r'):
     data = json.loads(line)
+    print(data)
     accession = dictofshit['Raw file']
     print(accession)
     quit()
