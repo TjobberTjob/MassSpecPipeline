@@ -33,6 +33,7 @@ def filter(path, file):
     # Used to get only most abundant classes
     seen = []
     for line in open(f'{path}{str(file)}.json'):
+        print(line)
         if 'Sequence' in json.loads(line):
             try:
                 seen.append(json.loads(line)['Sequence'])
