@@ -47,9 +47,13 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         else:
             print('No metadata for images exists')
 
-        accessions = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json' if 'accession' in json.loads(line)]
         random.shuffle(accessions)
-        test_list = [f'{json.loads(line)["image"]}.txt'for line in open(f'{path}subimage_filtered.json') if 'accessions' in json.loads(line) and json.loads(line)['accession'] in accessions]
+        test_list = []
+        for line in open(f'{path}subimage_filtered.json'):
+            dat = json.loads(line)
+            if 'accessions' in dat and dat['accession'] in accessions:
+                test_list.append(f'{json.loads(line)["image"]}.txt')
         print(test_list)
         quit()
 
