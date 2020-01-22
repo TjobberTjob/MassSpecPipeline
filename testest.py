@@ -31,7 +31,7 @@ import numpy as np
 #     a[str(f)] = leng.count(f)
 # print(Counter(a).most_common(10))
 
-listofshit = glob('/data/ProteomeToolsRaw/*/*')
+listofshit = glob('/data/ProteomeToolsRaw/P*/*')
 print(listofshit)
 quit()
 
