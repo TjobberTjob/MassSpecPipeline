@@ -9,7 +9,7 @@ with open('config.json') as json_file:
 path = f'{data["path"]}metadata/'
 
 scores = []
-for line in open(f'{path}{str(file)}.json'):
+for line in open(f'{path}subimage.json'):
     try:
         if 'PIF' in json.loads(line):
             scores.append(float(json.loads(line)['PIF']))
