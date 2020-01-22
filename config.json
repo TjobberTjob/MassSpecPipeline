@@ -1,1 +1,1 @@
-{"path": "Data/"}
+{"path": "Data/", "mz_bin": 0.75, "rt_bin": 0.06, "mz_interval": 25, "rt_interval": 5, "networkattributes": {"batch_size": 124, "epochs": 100, "n_channels": 4}}
