@@ -49,7 +49,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
 
         accessions = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         random.shuffle(accessions)
-        test_list = [line for line in open(f'{path}subimage_filtered.json') if open(f'{path}subimage_filtered.json')['accession'] in accessions[0:10]]
+        test_list = [f'{json.loads(line)["image"]}.txt'for line in open(f'{path}subimage_filtered.json') if 'accessions' in json.loads(line) and json.loads(line)['accession'] in accessions]
         print(test_list)
         quit()
 
