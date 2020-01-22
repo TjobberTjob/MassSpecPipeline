@@ -211,7 +211,7 @@ if __name__ == '__main__':
     # n_channels = 4
     #######################
     with open('config.json') as json_file:
-        n_channels = json.load(json_file)['networkattributes']
+        n_channels = json.load(json_file)['networkattributes']['n_channels']
     print(n_channels)
     quit()
 
