@@ -1,15 +1,15 @@
-from itertools import chain
-import keras
-from keras.layers import Dropout, Flatten, Dense, Input, Concatenate, Conv2D, MaxPooling2D
+import json
+import os
+import pickle
+import random
+import sys
 from collections import defaultdict
+from itertools import chain
+
+import keras
 import matplotlib.pyplot as plt
 import numpy as np
-import json
-import sys
-import random
-import pickle
-import os
-
+from keras.layers import Dropout, Dense, Input
 from keras.utils import plot_model
 
 
@@ -219,8 +219,8 @@ if __name__ == '__main__':
     output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass)
     model = output[0]
     callbacks_list = output[1]
-    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=100,
-                                  callbacks=callbacks_list)
+    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=100)#,
+                                  # callbacks=callbacks_list)
     if classification:
         plt.plot(history.history['val_accuracy'])
     else:
