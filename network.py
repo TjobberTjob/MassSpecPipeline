@@ -19,6 +19,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         image = pickle.load(pa)
     imagelen = len(image)
     pixellen = len(image[0])
+    print(imagelen, pixellen)
+    quit()
 
     if not classification:
         names = []
