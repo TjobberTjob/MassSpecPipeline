@@ -202,21 +202,18 @@ if __name__ == '__main__':
     imglen = output[2]
     pixellen = output[3]
 
-    ###Classes and Channels:
     if classification:
         n_classes = len(labels)
     else:
         n_classes = 1
 
-    # n_channels = 4
-    #######################
     with open('config.json') as json_file:
         n_channels = json.load(json_file)['networkattributes']['n_channels']
-    print(n_channels)
-    quit()
+        batch_size = json.load(json_file)['networkattributes']['batch_size']
+        epochs = json.load(json_file)['networkattributes']['epochs']
 
     params = {'size': (pixellen, imglen),
-              'batch_size': 124,
+              'batch_size': batch_size,
               'n_classes': n_classes,
               'n_channels': n_channels,
               'shuffle': True}
