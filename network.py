@@ -9,7 +9,7 @@ from itertools import chain
 import keras
 import matplotlib.pyplot as plt
 import numpy as np
-from keras.layers import Dropout, Dense, Input
+from keras.layers import Dropout, Dense, Input, Flatten
 from keras.utils import plot_model
 
 
