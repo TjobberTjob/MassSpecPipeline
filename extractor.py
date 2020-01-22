@@ -197,10 +197,10 @@ def preparameters(filepath):
     }
 
     # Define the intervals for the given resolution
-    # mz_bin = (float(interval['mz']['max']) - float(interval['mz']['min']))/resolution['x']
-    mz_bin = 0.75
-    # rt_bin = (float(interval['rt']['max']) - float(interval['rt']['min']))/resolution['y']
-    rt_bin = 0.06
+    with open('config.json') as json_file:
+        mz_bin = float(json.load(json_file)['mz_bin'])
+        rt_bin = float(json.load(json_file)['rt_bin'])
+
     resolution = {'x': int((max(mzlist) - min(mzlist)) / mz_bin), 'y': int((max(rtlist) - min(rtlist)) / rt_bin)}
 
     return mzml, [mzlist, rtlist, intlist], [lowbound, highbound], interval, [mz_bin, rt_bin], resolution
@@ -457,7 +457,8 @@ def partTwo(accnr, filename, path, filepath, df2):
         nonzero_counter = output[1]
         total_datapoints = output[2]
 
-    subimage_interval = {'mz': 25, 'rt': 5}
+    with open('config.json') as json_file:
+        subimage_interval = {'mz': json.load(json_file)['mz_interval'], 'rt': json.load(json_file)['rt_interval']}
     output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
                      savepng=False)
     inorout = output[0]
@@ -542,7 +543,7 @@ if __name__ == '__main__':
     elif str(sysinput) == 'owned':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in reversed(listofowned):
-            if accession in brokenlinks:
+            if accession in brokenlinks and 'brokenlinks' in globals():
                 print('Accession is broken')
                 continue
             try:
@@ -556,7 +557,7 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
             debuggerFile = open(f'{metapath}debugger.txt', 'a')
-            if accession in brokenlinks:
+            if accession in brokenlinks and 'brokenlinks' in globals():
                 print('Accession is broken')
                 continue
             try:
@@ -573,7 +574,7 @@ if __name__ == '__main__':
 
     else:
         accession = sysinput
-        if accession in brokenlinks:
+        if accession in brokenlinks and 'brokenlinks' in globals():
             print('Accession is broken')
             quit()
         partOne(str(accession), pepfile, datapath)

@@ -2,6 +2,7 @@ from itertools import chain
 import keras
 from keras.layers import Dropout, Flatten, Dense, Input, Concatenate, Conv2D, MaxPooling2D
 from collections import defaultdict
+import matplotlib.pyplot as plt
 import numpy as np
 import json
 import sys
@@ -139,17 +140,17 @@ class DataGenerator(keras.utils.Sequence):
 # Developing the neural network
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass):
     input = Input(shape=(imglen, pixellen, n_channels,))
-    x = Conv2D(16, kernel_size=(1, 1), activation='relu', padding='same')(input)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
+    # x = Conv2D(16, kernel_size=(1, 1), activation='relu', padding='same')(input)
+    # x = MaxPooling2D(pool_size=(2, 2))(x)
 
     x1 = Conv2D(16, kernel_size=(3, 3), activation='relu', padding='same')(input)
     x1 = MaxPooling2D(pool_size=(2, 2))(x1)
 
-    x2 = Conv2D(16, kernel_size=(5, 5), activation='relu', padding='same')(input)
-    x2 = MaxPooling2D(pool_size=(2, 2))(x2)
-
-    x = Concatenate()([x, x1, x2])
-    x = Flatten()(x)
+    # x2 = Conv2D(16, kernel_size=(5, 5), activation='relu', padding='same')(input)
+    # x2 = MaxPooling2D(pool_size=(2, 2))(x2)
+    #
+    # x = Concatenate()([x, x1, x2])
+    x = Flatten()(x1)
     x = Dense(64, activation='relu')(x)
     x = Dropout(rate=0.25)(x)
     if not classification:
@@ -207,8 +208,11 @@ if __name__ == '__main__':
     else:
         n_classes = 1
 
-    n_channels = 4
+    # n_channels = 4
     #######################
+    with open('config.json') as json_file:
+        n_channels = json.load(json_file)['networkattributes']['n_channels']
+    print(n_channels)
 
     params = {'size': (pixellen, imglen),
               'batch_size': 124,
@@ -222,8 +226,12 @@ if __name__ == '__main__':
     output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass)
     model = output[0]
     callbacks_list = output[1]
-    model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=100,
-                        callbacks=callbacks_list)
+    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=100,
+                                  callbacks=callbacks_list)
+    if classification:
+        plt.plot(history.history['val_accuracy'])
+    else:
+        plt.plot(history.history['val_mse'])
 
 # python3 network.py F m/z 0.8
 # python3 network.py T Length 0.8
