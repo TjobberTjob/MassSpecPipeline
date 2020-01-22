@@ -32,8 +32,8 @@ import numpy as np
 # print(Counter(a).most_common(10))
 
 listofshit = glob('/data/ProteomeToolsRaw/P*/*')
-print(len(listofshit))
 print(listofshit)
+print(len(listofshit))
 quit()
 
 # find /data/ProteomeToolsRaw/ -name file.mzML -exec rm -f {} \;
