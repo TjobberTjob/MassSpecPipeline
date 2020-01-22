@@ -8,20 +8,20 @@ with open('config.json') as json_file:
     data = json.load(json_file)
 path = f'{data["path"]}metadata/'
 
-scores = []
-for line in open(f'{path}subimage.json'):
-    try:
-        if 'PIF' in json.loads(line):
-            scores.append(float(json.loads(line)['PIF']))
-    except:
-        pass
-meanpif = mean(scores)
+# scores = []
+# for line in open(f'{path}subimage.json'):
+#     try:
+#         if 'PIF' in json.loads(line):
+#             scores.append(float(json.loads(line)['PIF']))
+#     except:
+#         pass
+# meanpif = np.percentile(intlist, 0.5)
 
 seen = []
 leng = []
 for line in open(f'{path}subimage.json'):
     data = json.loads(line)
-    if 'Sequence' in data and 'PIF' in data and data['PIF'] != 'Non Numérique' and float(data['PIF']) > meanpif:
+    if 'Sequence' in data and 'PIF' in data and data['PIF'] != 'Non Numérique' and float(data['PIF']) > 0.5:
         seen.append(str(data['Sequence']))
         leng.append(len(data['Sequence']))
 
