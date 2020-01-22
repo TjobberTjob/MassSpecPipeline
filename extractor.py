@@ -198,8 +198,9 @@ def preparameters(filepath):
 
     # Define the intervals for the given resolution
     with open('config.json') as json_file:
-        mz_bin = float(json.load(json_file)['mz_bin'])
-        rt_bin = float(json.load(json_file)['rt_bin'])
+        config = json.load(json_file)
+    mz_bin = float(config['mz_bin'])
+    rt_bin = float(config['rt_bin'])
 
     resolution = {'x': int((max(mzlist) - min(mzlist)) / mz_bin), 'y': int((max(rtlist) - min(rtlist)) / rt_bin)}
 
