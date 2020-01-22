@@ -543,6 +543,7 @@ if __name__ == '__main__':
             os.remove(f'{metapath}subimage.json')
             os.remove(f'{metapath}subimage_filtered.json')
             os.remove(f'{metapath}sub_statistics.json')
+            os.remove(f'{metapath}debugger.txt')
         except:
             pass
 
