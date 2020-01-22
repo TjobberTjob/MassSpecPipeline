@@ -38,7 +38,10 @@ for f in listofshit:
 outfile = open(f'/data/ProteomeToolsRaw/metadata/subimage2.json', 'a')
 for line in open(f'/data/ProteomeToolsRaw/metadata/subimage.json', 'r'):
     data = json.loads(line)
-    data['accession'] = dictofshit[data['Raw file']]
+    try:
+        data['accession']
+    except:
+        data['accession'] = dictofshit[data['Raw file']]
     outfile.write(json.dumps(data) + '\n')
 outfile.close()
 

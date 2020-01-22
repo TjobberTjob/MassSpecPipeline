@@ -459,7 +459,12 @@ def partTwo(accnr, filename, path, filepath, df2):
         total_datapoints = output[2]
 
     with open('config.json') as json_file:
-        subimage_interval = {'mz': json.load(json_file)['mz_interval'], 'rt': json.load(json_file)['rt_interval']}
+        config = json.load(json_file)
+    subimage_interval = {}
+    subimage_interval['mz'] = config['mz_interval']
+    subimage_interval['rt'] = config['rt_interval']
+
+
     output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
                      savepng=False)
     inorout = output[0]
