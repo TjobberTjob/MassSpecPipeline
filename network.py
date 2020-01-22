@@ -49,13 +49,12 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         if os.path.exists(f'{path}subimage_filtered.json'):
             for line in open(f'{path}subimage_filtered.json'):
                 data = json.loads(line)
-                if f'{data["image"]}.txt' in testlist:
-                    if f'{data["image"]}.txt' not in testlist:
-                        name = f'{data["image"]}.txt'
-                        labels[name] = data[imageclass]
-                    else:
-                        name = f'{data["image"]}.txt'
-                        testlabels[name] = data[imageclass]
+                if f'{data["image"]}.txt' not in testlist:
+                    name = f'{data["image"]}.txt'
+                    labels[name] = data[imageclass]
+                else:
+                    name = f'{data["image"]}.txt'
+                    testlabels[name] = data[imageclass]
         else:
             print('No metadata for images exists')
 
