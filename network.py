@@ -20,7 +20,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
     imagelen = len(image)
     pixellen = len(image[0])
 
-    if not classification: # Single output networks
+    if not classification:  # Single output networks
         names = []
         labels = {}
         if os.path.exists(f'{path}subimage_filtered.json'):
@@ -37,27 +37,29 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         vallist = names[splits:]
         partition = {'train': trainlist, 'validation': vallist}
 
-    else: # Multiple output classifier
+    else:  # Multiple output classifier
+        accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json') if
+                      'accession' in json.loads(line)]
+        random.shuffle(accessions)
+        testlist = [f'{json.loads(line)["image"]}.txt' for line in open(f'{path}subimage_filtered.json') if
+                    json.loads(line)['accession'] in accessions[:10]]
+
         labels = {}
+        testlabels = {}
         if os.path.exists(f'{path}subimage_filtered.json'):
             for line in open(f'{path}subimage_filtered.json'):
                 data = json.loads(line)
-                name = f'{data["image"]}.txt'
-                labels[name] = data[imageclass]
+                if f'{data["image"]}.txt' in testlist:
+                    if f'{data["image"]}.txt' not in testlist:
+                        name = f'{data["image"]}.txt'
+                        labels[name] = data[imageclass]
+                    else:
+                        name = f'{data["image"]}.txt'
+                        testlabels[name] = data[imageclass]
         else:
             print('No metadata for images exists')
 
-        accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json') if 'accession' in json.loads(line)]
-        random.shuffle(accessions)
-        print(accessions[0:10])
-        test_list = []
-        for line in open(f'{path}subimage_filtered.json'):
-            dat = json.loads(line)
-            if dat['accession'] in accessions:
-                test_list.append(f'{json.loads(line)["image"]}.txt')
-        print(test_list)
-        quit()
-
+        # Make train and validation data
         labels2 = defaultdict(list)
         for k, v in labels.items():
             labels2[v].append(k)
@@ -70,10 +72,19 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
             vallist = (labels2[f][splits:])
             partition['train'].append(trainlist)
             partition['validation'].append(vallist)
-            partition['test'].append()
+
+        # Make test data
+        testlabels2 = defaultdict(list)
+        for k, v in testlabels.items():
+            testlabels2[v].append(k)
+
+        for f in testlabels2:
+            testlist = testlabels2[f]
+            partition['test'].append(testlist)
 
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
+        partition['test'] = list(chain.from_iterable(partition['test']))
 
     return partition, labels, imagelen, pixellen
 
@@ -218,8 +229,8 @@ if __name__ == '__main__':
     output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass)
     model = output[0]
     callbacks_list = output[1]
-    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=100)#,
-                                  # callbacks=callbacks_list)
+    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=100)  # ,
+    # callbacks=callbacks_list)
     if classification:
         plt.plot(history.history['val_accuracy'])
     else:
