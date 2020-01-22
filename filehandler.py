@@ -47,7 +47,7 @@ def filter(path, file):
                 scores.append(json.loads(line)['PIF'])
         except:
             pass
-    print(scores[0:10])
+    print(mean(scores))
     quit()
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
