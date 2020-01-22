@@ -42,7 +42,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
                       'accession' in json.loads(line)]
         random.shuffle(accessions)
         testlist = [f'{json.loads(line)["image"]}.txt' for line in open(f'{path}subimage_filtered.json') if
-                    json.loads(line)['accession'] in accessions[0:test_accessions-1]]
+                    json.loads(line)['accession'] in accessions[:test_accessions]]
+        print(testlist)
 
         labels = {}
         testlabels = {}
