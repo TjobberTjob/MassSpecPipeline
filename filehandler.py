@@ -4,6 +4,7 @@ import pickle
 import sys
 from collections import Counter
 import numpy as np
+from statistics import mean
 
 
 def debugger(path):
@@ -40,7 +41,7 @@ def filter(path, file):
     # lines_seen = set()
     outfile = open(f'{path}{str(file)}_filtered.json', 'w')
     scores = [json.loads(line)['PIF'] for line in open(f'{path}{str(file)}.json') if 'PIF' in json.loads(line)]
-    print(np.mean(scores))
+    print(mean(scores))
     quit()
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
