@@ -35,7 +35,6 @@ listofshit = glob('/data/ProteomeToolsRaw/P*/*')
 dictofshit = {}
 for f in listofshit:
     dictofshit[f[33:]] = f[23:32]
-    quit()
 print(dictofshit)
 quit()
 print(listofshit)
