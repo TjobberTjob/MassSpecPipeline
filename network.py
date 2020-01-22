@@ -5,11 +5,10 @@ import random
 import sys
 from collections import defaultdict
 from itertools import chain
-
 import keras
 import matplotlib.pyplot as plt
 import numpy as np
-from keras.layers import Dropout, Dense, Input, Flatten
+from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D
 from keras.utils import plot_model
 
 
