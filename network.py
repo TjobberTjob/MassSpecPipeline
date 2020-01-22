@@ -49,6 +49,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
 
         accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json') if 'accession' in json.loads(line)]
         random.shuffle(accessions)
+        print(accessions[0:10])
         test_list = []
         for line in open(f'{path}subimage_filtered.json'):
             dat = json.loads(line)
