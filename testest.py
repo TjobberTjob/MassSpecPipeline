@@ -35,13 +35,12 @@ listofshit = glob('/data/ProteomeToolsRaw/P*/*')
 dictofshit = {}
 for f in listofshit:
     dictofshit[f[33:]] = f[23:32]
-
+outfile = open(f'/data/ProteomeToolsRaw/metadata/subimage2.json', 'a')
 for line in open(f'/data/ProteomeToolsRaw/metadata/subimage.json', 'r'):
     data = json.loads(line)
-    print(data)
-    accession = dictofshit[data['Raw file']]
-    print(accession)
-    quit()
+    data['accession'] = dictofshit[data['Raw file']]
+    outfile.write(json.dumps(data) + '\n')
+outfile.close()
 
 
 # find /data/ProteomeToolsRaw/ -name file.mzML -exec rm -f {} \;
