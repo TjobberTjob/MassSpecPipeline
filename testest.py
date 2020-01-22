@@ -32,6 +32,7 @@ import numpy as np
 # print(Counter(a).most_common(10))
 
 listofshit = glob('/data/ProteomeToolsRaw/P*/*')
+print(len(listofshit))
 print(listofshit)
 quit()
 
