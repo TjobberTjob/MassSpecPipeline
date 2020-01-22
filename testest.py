@@ -1,5 +1,6 @@
 import json
 from collections import Counter
+from statistics import mean
 
 import numpy as np
 
@@ -7,11 +8,20 @@ with open('config.json') as json_file:
     data = json.load(json_file)
 path = f'{data["path"]}metadata/'
 
+scores = []
+for line in open(f'{path}{str(file)}.json'):
+    try:
+        if 'PIF' in json.loads(line):
+            scores.append(float(json.loads(line)['PIF']))
+    except:
+        pass
+meanpif = mean(scores)
+
 seen = []
 leng = []
 for line in open(f'{path}subimage.json'):
     data = json.loads(line)
-    if 'Sequence' in data:
+    if 'Sequence' in data and 'PIF' in data and data['PIF' > meanpif]:
         seen.append(str(data['Sequence']))
         leng.append(len(data['Sequence']))
 
