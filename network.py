@@ -13,7 +13,7 @@ from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D
 from keras.utils import plot_model
 
 
-def datafetcher(path, imgpath, classification, imageclass, splitratio):
+def datafetcher(path, imgpath, classification, imageclass, splitratio, test_accessions):
     imgfiles = os.listdir(imgpath)
     with open(f'{imgpath}{imgfiles[0]}', "rb") as pa:
         image = pickle.load(pa)
@@ -42,7 +42,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
                       'accession' in json.loads(line)]
         random.shuffle(accessions)
         testlist = [f'{json.loads(line)["image"]}.txt' for line in open(f'{path}subimage_filtered.json') if
-                    json.loads(line)['accession'] in accessions[:10]]
+                    json.loads(line)['accession'] in accessions[:test_accessions]]
 
         labels = {}
         testlabels = {}
@@ -195,6 +195,13 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
     imagepath = f'{datapath}images/'
 
+    with open('config.json') as json_file:
+        config = json.load(json_file)['networkattributes']
+    test_accessions = config['test_accessions']
+    n_channels = config['n_channels']
+    batch_size = config['batch_size']
+    epochs = config['epochs']
+
     # Cmd inputs
     classification = sys.argv[1] == 'T'
     imageclass = sys.argv[2]
@@ -202,7 +209,7 @@ if __name__ == '__main__':
 
     nameofclass = imageclass.replace('/', '')
 
-    output = datafetcher(metapath, imagepath, classification, imageclass, splitratio)
+    output = datafetcher(metapath, imagepath, classification, imageclass, splitratio, test_accessions)
     partition = output[0]
     labels = output[1]
     imglen = output[2]
@@ -212,12 +219,6 @@ if __name__ == '__main__':
         n_classes = len(labels)
     else:
         n_classes = 1
-
-    with open('config.json') as json_file:
-        config = json.load(json_file)['networkattributes']
-    n_channels = config['n_channels']
-    batch_size = config['batch_size']
-    epochs = config['epochs']
 
     params = {'size': (pixellen, imglen),
               'batch_size': batch_size,
