@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
     with open('config.json') as json_file:
 
-        print(json.load(json_file)['networkattributes']['n_channels'])
+        print(json.load(json_file)['networkattributes']['batch_size'])
         quit()
         n_channels = json.load(json_file)['networkattributes']['n_channels']
         batch_size = json.load(json_file)['networkattributes']['batch_size']
