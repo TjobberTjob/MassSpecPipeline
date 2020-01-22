@@ -32,6 +32,10 @@ import numpy as np
 #     a[str(f)] = leng.count(f)
 # print(Counter(a).most_common(10))
 listofshit = glob('/data/ProteomeToolsRaw/P*/*')
+for f in listofshit:
+    print(f[23:30])
+    print(f[30:])
+    quit()
 print(listofshit)
 print(len(listofshit))
 quit()
