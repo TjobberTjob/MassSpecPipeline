@@ -51,6 +51,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         random.shuffle(accessions)
         test_list = [line for line in open(f'{path}subimage_filtered.json') if open(f'{path}subimage_filtered.json')['accession'] in accessions[0:10]]
         print(test_list)
+        quit()
 
         labels2 = defaultdict(list)
         for k, v in labels.items():
