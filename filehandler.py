@@ -40,12 +40,13 @@ def filter(path, file):
 
     # lines_seen = set()
     outfile = open(f'{path}{str(file)}_filtered.json', 'w')
-    scores = [json.loads(line)['PIF'] for line in open(f'{path}{str(file)}.json') if 'PIF' in json.loads(line)]
-    try:
-        for f in scores:
-            float(f)
-    except:
-        print(f)
+    scores = []
+    for line in open(f'{path}{str(file)}.json'):
+        try:
+            if 'PIF' in json.loads(line):
+                scores.append(json.loads(line)['PIF'])
+        except:
+            pass
     print(scores[0:10])
     quit()
     for line in open(f'{path}{str(file)}.json', 'r'):
