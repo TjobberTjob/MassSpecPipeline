@@ -47,7 +47,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
         else:
             print('No metadata for images exists')
 
-        accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json' if 'accession' in json.loads(line)]
+        accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json') if 'accession' in json.loads(line)]
         random.shuffle(accessions)
         test_list = []
         for line in open(f'{path}subimage_filtered.json'):
