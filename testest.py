@@ -31,7 +31,7 @@ import numpy as np
 # for f in Leng:
 #     a[str(f)] = leng.count(f)
 # print(Counter(a).most_common(10))
-direct_output = subprocess.check_output('ls /data/ProteomeToolsRaw/P*/', shell=True)
+direct_output = os.popen('ls /data/ProteomeToolsRaw/P*/').read()
 print(direct_output)
 quit()
 listofshit = glob('/data/ProteomeToolsRaw/P*/*')
