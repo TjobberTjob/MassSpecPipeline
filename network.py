@@ -84,8 +84,6 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
         partition['test'] = list(chain.from_iterable(partition['test']))
-        print(partition)
-        quit()
 
     return partition, labels, imagelen, pixellen
 
@@ -240,7 +238,7 @@ if __name__ == '__main__':
 
     model = load_model(f'Best-{imageclass}.h5')
     test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
-    print("Accuracy for model C:", model.evaluate_generator(testGen3, 3500 // 32))
+    print("Accuracy for model C:", model.evaluate_generator(test_generator))
 
 # python3 network.py F m/z 0.8
 # python3 network.py T Length 0.8
