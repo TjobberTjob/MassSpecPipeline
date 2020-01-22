@@ -543,7 +543,7 @@ if __name__ == '__main__':
     elif str(sysinput) == 'owned':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in reversed(listofowned):
-            if accession in brokenlinks and 'brokenlinks' in globals():
+            if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
                 continue
             try:
@@ -557,7 +557,7 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
             debuggerFile = open(f'{metapath}debugger.txt', 'a')
-            if accession in brokenlinks and 'brokenlinks' in globals():
+            if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
                 continue
             try:
@@ -574,7 +574,7 @@ if __name__ == '__main__':
 
     else:
         accession = sysinput
-        if accession in brokenlinks and 'brokenlinks' in globals():
+        if 'brokenlinks' in globals() and accession in brokenlinks:
             print('Accession is broken')
             quit()
         partOne(str(accession), pepfile, datapath)
