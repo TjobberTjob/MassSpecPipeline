@@ -38,6 +38,7 @@ def filter(path, file):
                 seen.append(json.loads(line)['Sequence'])
             except:
                 print(json.loads(line))
+    quit()
     Seen = np.unique(seen)
     a = {}
     for f in Seen:
