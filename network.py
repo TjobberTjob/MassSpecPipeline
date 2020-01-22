@@ -21,18 +21,23 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio):
 
     if not classification:
         names = []
+        rawfiles = []
         labels = {}
         if os.path.exists(f'{path}subimage_filtered.json'):
             for line in open(f'{path}subimage_filtered.json'):
                 data = json.loads(line)
                 name = f'{data["image"]}.txt'
                 names.append(name)
+                if data['Raw file'] not in rawfiles:
+                    rawfiles.append(data['Raw file'])
                 labels[name] = data[imageclass]
         elif os.path.exists(f'{path}subimage.json'):
             for line in open(f'{path}subimage.json'):
                 data = json.loads(line)
                 name = f'{data["image"]}.txt'
                 names.append(name)
+                if data['Raw file'] not in rawfiles:
+                    rawfiles.append(data['Raw file'])
                 labels[name] = data[imageclass]
         else:
             print('No metadata for images exists')
