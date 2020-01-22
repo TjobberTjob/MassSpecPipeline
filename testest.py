@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 from collections import Counter
 from glob import glob
 from statistics import mean
@@ -30,7 +31,9 @@ import numpy as np
 # for f in Leng:
 #     a[str(f)] = leng.count(f)
 # print(Counter(a).most_common(10))
-
+direct_output = subprocess.check_output('ls /data/ProteomeToolsRaw/P*/', shell=True)
+print(direct_output)
+quit()
 listofshit = glob('/data/ProteomeToolsRaw/P*/*')
 print(listofshit)
 print(len(listofshit))
