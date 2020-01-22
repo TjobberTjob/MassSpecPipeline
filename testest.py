@@ -21,7 +21,7 @@ seen = []
 leng = []
 for line in open(f'{path}subimage.json'):
     data = json.loads(line)
-    if 'Sequence' in data and 'PIF' in data and float(data['PIF']) > meanpif:
+    if 'Sequence' in data and 'PIF' in data and data['PIF'] != 'Non Numérique' and float(data['PIF']) > meanpif:
         seen.append(str(data['Sequence']))
         leng.append(len(data['Sequence']))
 
