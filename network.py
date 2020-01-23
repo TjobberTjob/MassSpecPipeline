@@ -247,7 +247,7 @@ if __name__ == '__main__':
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
-
+    print('hey')
     model = load_model(f'Best-{imageclass}.h5')
     batch_size = len(partition['test'])
     test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
