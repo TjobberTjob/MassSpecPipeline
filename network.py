@@ -49,6 +49,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         if os.path.exists(f'{path}subimage_filtered.json'):
             for line in open(f'{path}subimage_filtered.json'):
                 data = json.loads(line)
+
                 if f'{data["image"]}.txt' not in testlist:
                     name = f'{data["image"]}.txt'
                     labels[name] = data[imageclass]
@@ -85,7 +86,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         partition['validation'] = list(chain.from_iterable(partition['validation']))
         partition['test'] = list(chain.from_iterable(partition['test']))
 
-    return partition, labels, imagelen, pixellen
+    return partition, labels, imagelen, pixellen, testlabels
 
 
 # Developing the data generator
@@ -136,8 +137,6 @@ class DataGenerator(keras.utils.Sequence):
             # Store sample
             with open(f'{imagepath}{ID}', "rb") as pa:
                 image = pickle.load(pa)
-            print(self.labels)
-            quit()
             image = np.array(image)
             image = image[:, :, 0:self.n_channels]
             X[i,] = image
@@ -250,10 +249,9 @@ if __name__ == '__main__':
     #     plt.legend(['train', 'test'], loc='upper left')
     #     plt.savefig(f'{metapath}{imageclass}.png')
 
-    print('hey')
     model = load_model(f'Best-{imageclass}.h5')
     batch_size = len(partition['test'])
-    test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
+    test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
     print("Accuracy for model C:", model.evaluate_generator(test_generator))
 
 # python3 network.py F m/z 0.8
