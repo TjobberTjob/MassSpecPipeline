@@ -41,8 +41,13 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json') if
                       'accession' in json.loads(line)]
         random.shuffle(accessions)
+        test_accessions = accessions[0:test_accessions]
         testlist = [f'{json.loads(line)["image"]}.txt' for line in open(f'{path}subimage_filtered.json') if
-                    json.loads(line)['accession'] in accessions[0]]
+                    json.loads(line)['accession'] in test_accessions]
+
+        f'{metapath}Best-{imageclass}.txt'
+        with open(f'{metapath}Best-{imageclass}.txt', "wb") as pa:
+            pickle.dump(test_accessions, pa)
 
         labels = {}
         testlabels = {}
@@ -227,15 +232,6 @@ if __name__ == '__main__':
               'n_classes': n_classes,
               'n_channels': n_channels,
               'shuffle': True}
-
-    if sys.argv[4] == 'test':
-        imageclass = sys.argv[2]
-        model = load_model(f'{metapath}Best-{imageclass}.h5')
-        print(model.summary())
-        test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
-        testaccuracy = model.evaluate_generator(test_generator)
-        print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
-        quit()
 
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
