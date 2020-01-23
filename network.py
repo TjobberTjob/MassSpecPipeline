@@ -150,7 +150,7 @@ class DataGenerator(keras.utils.Sequence):
 
 
 # Developing the neural network
-def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass):
+def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath):
     input = Input(shape=(imglen, pixellen, n_channels,))
     x = Conv2D(16, kernel_size=(3, 3), activation='relu', padding='same')(input)
     x = MaxPooling2D(pool_size=(2, 2))(x)
@@ -178,7 +178,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass)
         checkpoint = keras.callbacks.ModelCheckpoint(f'Best-{imageclass}.h5', monitor='val_accuracy',
                                                      save_best_only=True)
     else:
-        checkpoint = keras.callbacks.ModelCheckpoint(f'Best-{imageclass}.h5', monitor='val_mse', save_best_only=True)
+        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_mse', save_best_only=True)
     early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=6)
     callbacks_list = [checkpoint, early_stopping]
 
@@ -229,26 +229,26 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass)
+    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath)
     model = output[0]
     callbacks_list = output[1]
-    # history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs, callbacks=callbacks_list)
-    # if classification:
-    #     plt.plot(history.history['accuracy'])
-    #     plt.plot(history.history['val_accuracy'])
-    #     plt.title('model accuracy')
-    #     plt.ylabel('accuracy')
-    #     plt.xlabel('epoch')
-    #     plt.legend(['train', 'test'], loc='upper left')
-    #     plt.savefig(f'{metapath}{imageclass}.png')
-    # else:
-    #     plt.plot(history.history['mse'])
-    #     plt.plot(history.history['val_mse'])
-    #     plt.title('model accuracy')
-    #     plt.ylabel('Mean squared errpr')
-    #     plt.xlabel('epoch')
-    #     plt.legend(['train', 'test'], loc='upper left')
-    #     plt.savefig(f'{metapath}{imageclass}.png')
+    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs, callbacks=callbacks_list)
+    if classification:
+        plt.plot(history.history['accuracy'])
+        plt.plot(history.history['val_accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.savefig(f'{metapath}{imageclass}.png')
+    else:
+        plt.plot(history.history['mse'])
+        plt.plot(history.history['val_mse'])
+        plt.title('model accuracy')
+        plt.ylabel('Mean squared errpr')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.savefig(f'{metapath}{imageclass}.png')
 
     model = load_model(f'Best-{imageclass}.h5')
     batch_size = len(partition['test'])
