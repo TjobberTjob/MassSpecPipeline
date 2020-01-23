@@ -252,7 +252,8 @@ if __name__ == '__main__':
     model = load_model(f'{metapath}Best-{imageclass}.h5')
     batch_size = len(partition['test'])
     test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
-    print(f'Accuracy on test data. Loss: {model.evaluate_generator(test_generator)[0]}. Accuracy: {model.evaluate_generator(test_generator)[1]}')
+    testaccuracy = model.evaluate_generator(test_generator)
+    print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
 
 # python3 network.py F m/z 0.8
 # python3 network.py T Length 0.8
