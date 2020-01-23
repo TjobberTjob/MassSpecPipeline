@@ -217,7 +217,7 @@ if __name__ == '__main__':
     testlabels = output[4]
 
     if classification:
-        classes = [json.loads(line)['Seq_class'] for line in open(f'{path}{str(file)}.json', 'r') if 'Seq_class' in json.loads(line)]
+        classes = [json.loads(line)['Seq_class'] for line in open(f'{metapath}subimage_filtered.json', 'r') if 'Seq_class' in json.loads(line)]
         n_classes = len(np.unique(classes))
     else:
         n_classes = 1
