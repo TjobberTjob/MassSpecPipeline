@@ -548,7 +548,7 @@ if __name__ == '__main__':
         except:
             pass
 
-    elif str(sysinput) == 'owned':
+    elif str(sysinput) == 'complete':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
             if 'brokenlinks' in globals() and accession in brokenlinks:
