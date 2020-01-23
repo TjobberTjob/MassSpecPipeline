@@ -229,8 +229,7 @@ if __name__ == '__main__':
     output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass)
     model = output[0]
     callbacks_list = output[1]
-    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs)  # ,
-    # callbacks=callbacks_list)
+    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs, callbacks=callbacks_list)
     if classification:
         plt.plot(history.history['val_accuracy'])
     else:
