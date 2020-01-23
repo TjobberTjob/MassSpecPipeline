@@ -175,9 +175,11 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
 
     # Create callbacks
     if classification:
-        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_accuracy', save_best_only=True)
+        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_accuracy',
+                                                     save_best_only=True)
     else:
-        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_mse', save_best_only=True)
+        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_mse',
+                                                     save_best_only=True)
     early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=6)
     callbacks_list = [checkpoint, early_stopping]
 
@@ -200,7 +202,6 @@ if __name__ == '__main__':
     batch_size = config['batch_size']
     epochs = config['epochs']
 
-
     # Cmd inputs
     classification = sys.argv[1] == 'T'
     imageclass = sys.argv[2]
@@ -216,7 +217,8 @@ if __name__ == '__main__':
     testlabels = output[4]
 
     if classification:
-        n_classes = len(labels)
+        classes = [json.loads(line)['Seq_class'] for line in open(f'{path}{str(file)}.json', 'r') if 'Seq_class' in json.loads(line)]
+        n_classes = len(np.unique(classes))
     else:
         n_classes = 1
 
@@ -243,7 +245,8 @@ if __name__ == '__main__':
     print(model.summary())
     quit()
     callbacks_list = output[1]
-    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs, callbacks=callbacks_list)
+    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
+                                  callbacks=callbacks_list)
     if classification:
         plt.plot(history.history['accuracy'])
         plt.plot(history.history['val_accuracy'])
