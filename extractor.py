@@ -181,7 +181,7 @@ def internalmzML(path):
 
 
 def preparameters(filepath):
-    print('Preparing parameter for image creation                                                    ', end='\r')
+    print('Preparing parameter for image dcreation                                                    ', end='\r')
     mzml = json.load(open(f'{filepath}mzML.json'))
 
     mzlist = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
