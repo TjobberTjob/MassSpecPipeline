@@ -175,8 +175,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
 
     # Create callbacks
     if classification:
-        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_accuracy',
-                                                     save_best_only=True)
+        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_accuracy', save_best_only=True)
     else:
         checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_mse', save_best_only=True)
     early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=6)
