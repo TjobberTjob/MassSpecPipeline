@@ -230,23 +230,24 @@ if __name__ == '__main__':
     output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass)
     model = output[0]
     callbacks_list = output[1]
-    history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs, callbacks=callbacks_list)
-    if classification:
-        plt.plot(history.history['accuracy'])
-        plt.plot(history.history['val_accuracy'])
-        plt.title('model accuracy')
-        plt.ylabel('accuracy')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig(f'{metapath}{imageclass}.png')
-    else:
-        plt.plot(history.history['mse'])
-        plt.plot(history.history['val_mse'])
-        plt.title('model accuracy')
-        plt.ylabel('Mean squared errpr')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
-        plt.savefig(f'{metapath}{imageclass}.png')
+    # history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs, callbacks=callbacks_list)
+    # if classification:
+    #     plt.plot(history.history['accuracy'])
+    #     plt.plot(history.history['val_accuracy'])
+    #     plt.title('model accuracy')
+    #     plt.ylabel('accuracy')
+    #     plt.xlabel('epoch')
+    #     plt.legend(['train', 'test'], loc='upper left')
+    #     plt.savefig(f'{metapath}{imageclass}.png')
+    # else:
+    #     plt.plot(history.history['mse'])
+    #     plt.plot(history.history['val_mse'])
+    #     plt.title('model accuracy')
+    #     plt.ylabel('Mean squared errpr')
+    #     plt.xlabel('epoch')
+    #     plt.legend(['train', 'test'], loc='upper left')
+    #     plt.savefig(f'{metapath}{imageclass}.png')
+
     print('hey')
     model = load_model(f'Best-{imageclass}.h5')
     batch_size = len(partition['test'])
