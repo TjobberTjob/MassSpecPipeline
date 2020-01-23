@@ -549,7 +549,7 @@ if __name__ == '__main__':
 
     elif str(sysinput) == 'owned':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
-        for accession in reversed(listofowned):
+        for accession in listofowned:
             if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
                 continue
