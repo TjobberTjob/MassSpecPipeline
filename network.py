@@ -237,6 +237,7 @@ if __name__ == '__main__':
         plt.plot(history.history['val_mse'])
 
     model = load_model(f'Best-{imageclass}.h5')
+    batch_size = len(partition['test'])
     test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
     print("Accuracy for model C:", model.evaluate_generator(test_generator))
 
