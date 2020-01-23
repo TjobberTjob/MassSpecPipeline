@@ -200,6 +200,14 @@ if __name__ == '__main__':
     batch_size = config['batch_size']
     epochs = config['epochs']
 
+    if sys.argv[1] == 'reset':
+        imageclass = sys.argv[2]
+        model = load_model(f'{metapath}Best-{imageclass}.h5')
+        test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
+        testaccuracy = model.evaluate_generator(test_generator)
+        print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
+        quit()
+
     # Cmd inputs
     classification = sys.argv[1] == 'T'
     imageclass = sys.argv[2]
