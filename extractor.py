@@ -488,6 +488,7 @@ def partOne(accnr, maxquant_file, path):
     for zips in reversed(allZip):
         # finds raw files for this zip file
         if not haveallMQF:
+            continue
             output = zipfile_downloader(zips, path, maxquant_file)
             rawfiles = output[0]
             df = output[1]
@@ -557,6 +558,7 @@ if __name__ == '__main__':
                 partOne(str(accession), pepfile, datapath)
             except:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
+                os.system(f'rm {datapath}*.*')
                 pass
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
@@ -574,6 +576,7 @@ if __name__ == '__main__':
                 debuggerFile.close()
             except Exception as e:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
+                os.system(f'rm {datapath}*.*')
                 debuggerlist = [accession, e]
                 debuggerFile.write(f'{debuggerlist}\n')
                 debuggerFile.close()
