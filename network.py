@@ -250,7 +250,6 @@ if __name__ == '__main__':
         plt.savefig(f'{metapath}{imageclass}.png')
 
     model = load_model(f'{metapath}Best-{imageclass}.h5')
-    batch_size = len(partition['test'])
     test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
     testaccuracy = model.evaluate_generator(test_generator)
     print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
