@@ -243,7 +243,6 @@ if __name__ == '__main__':
     output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath)
     model = output[0]
     print(model.summary())
-    quit()
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
                                   callbacks=callbacks_list)
