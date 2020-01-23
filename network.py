@@ -41,13 +41,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json') if
                       'accession' in json.loads(line)]
         random.shuffle(accessions)
-        test_accessions = accessions[0:test_accessions]
         testlist = [f'{json.loads(line)["image"]}.txt' for line in open(f'{path}subimage_filtered.json') if
-                    json.loads(line)['accession'] in test_accessions]
-
-        f'{metapath}Best-{imageclass}.txt'
-        with open(f'{metapath}Best-{imageclass}.txt', "wb") as pa:
-            pickle.dump(test_accessions, pa)
+                    json.loads(line)['accession'] in accessions[0:test_accessions]]
 
         labels = {}
         testlabels = {}
@@ -238,6 +233,7 @@ if __name__ == '__main__':
 
     output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath)
     model = output[0]
+    print(model.summary())
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
                                   callbacks=callbacks_list)
