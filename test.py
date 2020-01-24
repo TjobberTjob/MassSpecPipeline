@@ -10,6 +10,6 @@ for f in os.listdir('/data/ProteomeToolsRaw/'):
             print(path)
             data = json.load(open(f'{path}mzML.json'))
 
-            with gzip.GzipFile(f'{path}mzML.json', 'w') as fout:
+            with gzip.GzipFile(f'{path}mzML2.json', 'w') as fout:
                 fout.write(json.dumps(data).encode('utf-8'))
             quit()
