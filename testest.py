@@ -30,7 +30,7 @@ a = {}
 for f in Leng:
     a[str(f)] = leng.count(f)
 print(f'{Counter(a).most_common(10)} Total images: {len(os.listdir("/data/ProteomeToolsRaw/images/"))}')
-print(os.stat('/data/ProteomeToolsRaw/images/').st_size)
+print(os.stat('/data/ProteomeToolsRaw/images/').st_size / 1024)
 
 
 # find /data/ProteomeToolsRaw/ -name file.mzML -exec rm -f {} \;
