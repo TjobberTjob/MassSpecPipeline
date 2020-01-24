@@ -175,7 +175,7 @@ def internalmzML(path):
             extracted['ms1'][scan_id] = {'mz': ms1_spectrum['mz'], 'intensity': ms1_spectrum['intensity'],
                                          'scan_time': ms1_spectrum['scan_time']}
 
-        with gzip.GzipFile('{path}mzML.json', 'w') as fout:
+        with gzip.GzipFile(f'{path}mzML.json', 'w') as fout:
             fout.write(json.dumps(extracted).encode('utf-8'))
         fout.close()
         os.remove(f'{path}file.mzML')
