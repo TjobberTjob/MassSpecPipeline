@@ -1,4 +1,5 @@
 import bisect
+import gzip
 import json
 import math
 import os
@@ -174,15 +175,16 @@ def internalmzML(path):
             extracted['ms1'][scan_id] = {'mz': ms1_spectrum['mz'], 'intensity': ms1_spectrum['intensity'],
                                          'scan_time': ms1_spectrum['scan_time']}
 
-        f = open(f'{path}mzML.json', 'w')
-        f.write(json.dumps(extracted))
-        f.close()
+        with gzip.GzipFile('{path}mzML.json', 'w') as fout:
+            fout.write(json.dumps(extracted).encode('utf-8'))
+        fout.close()
         os.remove(f'{path}file.mzML')
 
 
 def preparameters(filepath):
     print('Preparing parameter for image dcreation                                                    ', end='\r')
-    mzml = json.load(open(f'{filepath}mzML.json'))
+    with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
+        mzml = json.loads(fin.read().decode('utf-8'))
 
     mzlist = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
     rtlist = [mzml['ms1'][f]['scan_time'] for f in mzml['ms1']]
