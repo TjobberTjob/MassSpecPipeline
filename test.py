@@ -12,3 +12,4 @@ while i < 10:
     for line in open(f'/data/ProteomeToolsRaw/PXD010595/02101a_GA8-TUM_proteo_TMT_8_01_01-ETD-1h-R1/mzML.json', 'r'):
         data2 = json.loads(line)
     print(data == data2)
+    quit()
