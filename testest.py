@@ -29,7 +29,7 @@ print(f"{Counter(a).most_common(10)}  Total amount of classes: {len(Seen)}")
 a = {}
 for f in Leng:
     a[str(f)] = leng.count(f)
-print(f'{Counter(a).most_common(10)} Total images: {os.system(f"ls /data/ProteomeToolsRaw/images  | wc -l")}')
+print(f'{Counter(a).most_common(10)} Total images: {os.system(f"ls /data/ProteomeToolsRaw/images/ | wc -l")}')
 
 
 # find /data/ProteomeToolsRaw/ -name file.mzML -exec rm -f {} \;
