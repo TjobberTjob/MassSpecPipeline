@@ -13,6 +13,5 @@ for f in os.listdir('/data/ProteomeToolsRaw/'):
 
                 with gzip.GzipFile(f'{path}mzML2.json', 'w') as fout:
                     fout.write(json.dumps(data).encode('utf-8'))
-                quit()
             except:
                 pass
