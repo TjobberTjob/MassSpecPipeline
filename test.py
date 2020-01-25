@@ -3,7 +3,7 @@ import json
 import os
 
 for f in os.listdir('/data/ProteomeToolsRaw/'):
-    if os.path.isdir(f'/data/ProteomeToolsRaw/{f}') and f[0:3] == 'PXD'asd or f[0:3] == 'PRD':
+    if os.path.isdir(f'/data/ProteomeToolsRaw/{f}') and f[0:3] == 'PXD' or f[0:3] == 'PRD':
         print(f'/data/ProteomeToolsRaw/{f}')
         for g in os.listdir(f'/data/ProteomeToolsRaw/{f}'):
             try:
