@@ -2,7 +2,9 @@ import gzip
 import json
 import os
 i = 0
-
+a = [f'/data/ProteomeToolsRaw/{f}/{g}/' for f in os.listdir('/data/ProteomeToolsRaw/') for g in os.listdir(f'/data/ProteomeToolsRaw/{f}')]
+print(a)
+quit()
 for f in os.listdir('/data/ProteomeToolsRaw/'):
     i += 1
     if os.path.isdir(f'/data/ProteomeToolsRaw/{f}') and f[0:3] == 'PXD' or f[0:3] == 'PRD':
