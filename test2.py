@@ -7,6 +7,6 @@ for f in os.listdir('/data/ProteomeToolsRaw/'):
     if os.path.isdir(f'/data/ProteomeToolsRaw/{f}') and f[0:3] == 'PXD' or f[0:3] == 'PRD':
         for g in os.listdir(f'/data/ProteomeToolsRaw/{f}'):
             i += 1
-            if g == '20160820_MHW_195_6':
+            if g == '20151214_UC_ColID_47_Benzing_Rinschen_0089_151125MaRi_09':
                 print(f'{i} / {str(len(a))}')
 
