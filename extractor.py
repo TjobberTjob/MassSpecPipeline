@@ -31,7 +31,7 @@ def filefinder(accnr, path):
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
-
+    print(urljson)
     # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
     for f in urljson['list']:
         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
