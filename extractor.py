@@ -182,7 +182,7 @@ def internalmzML(path):
 
 
 def preparameters(filepath):
-    print('Preparing parameter for image dcreation                                                    ', end='\r')
+    print('Preparing parameter for image creation                                                    ', end='\r')
     with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
         mzml = json.loads(fin.read().decode('utf-8'))
 
