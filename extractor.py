@@ -184,7 +184,7 @@ def internalmzML(path):
 def preparameters(filepath):
     print('Preparing parameter for image creation                                                    ', end='\r')
     with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
-        mzml = json.loads(fin.read().decode('utf-8'))
+            mzml = json.loads(fin.read().decode('utf-8'))
 
     mzlist = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
     rtlist = [mzml['ms1'][f]['scan_time'] for f in mzml['ms1']]
@@ -552,6 +552,8 @@ if __name__ == '__main__':
 
     elif str(sysinput) == 'complete':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        print(listofowned)
+        quit()
         for accession in listofowned:
             if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
