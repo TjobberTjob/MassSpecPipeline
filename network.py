@@ -248,7 +248,7 @@ if __name__ == '__main__':
         plt.plot(history.history['mse'])
         plt.plot(history.history['val_mse'])
         plt.title('model accuracy')
-        plt.ylabel('Mean squared errpr')
+        plt.ylabel('Mean squared error')
         plt.xlabel('epoch')
         plt.legend(['train', 'test'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
