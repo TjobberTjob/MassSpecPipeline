@@ -42,12 +42,11 @@ def filter(path, file):
         for line in open(f'{path}subimage.json'):
             if 'Modifications' in json.loads(line):
                 if json.loads(line)['Sequence'] == 'Unmodified':
-                    a = 0
+                    seen[0].append(json.loads(line)['image'])
                 else:
-                    a = 1
-                seen[a] = json.loads(line)['image']
+                    seen[1].append(json.loads(line)['image'])
         for f in seen:
-            print(f'Class: {f}, Amoung: {len(seen[f])}')
+            print(f'Class: {f}, Amount: {len(seen[f])}')
         quit()
         a = {}
         for f in Seen:
