@@ -31,7 +31,7 @@ def filter(path, file):
             os.remove(f'{path}{str(file)}_filtered.json')
 
         ####### Used to get only most abundant classes #######
-        # seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
+        # seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
         # Seen = np.unique(seen)
         # a = {}
         # for f in Seen:
@@ -39,7 +39,7 @@ def filter(path, file):
         # Seen = [f[0] for f in Counter(a).most_common(10)]
 
         seen = defaultdict(list)
-        for line in open(f'{path}{str(file)}.json'):
+        for line in open(f'{path}subimage.json'):
             if 'Modifications' in json.loads(line):
                 if json.loads(line)['Sequence'] == 'Unmodified':
                     a = 0
@@ -47,7 +47,7 @@ def filter(path, file):
                     a = 1
                 seen[a] = json.loads(line)['image']
         for f in seen:
-            print(len(seen[f]))
+            print(f'Class: {f}, Amoung: {len(seen[f])}')
         quit()
         a = {}
         for f in Seen:
