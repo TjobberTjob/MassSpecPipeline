@@ -3,6 +3,8 @@ import os
 import pickle
 import sys
 from collections import Counter, defaultdict
+import random
+
 import numpy as np
 
 
@@ -45,13 +47,11 @@ def filter(path, file):
                     seen[0].append(json.loads(line)['image'])
                 else:
                     seen[1].append(json.loads(line)['image'])
+        amounts = [len(seen(f)) for f in seen]
+        lowestamount = min(amounts)
+        Seen = defaultdict(list)
         for f in seen:
-            print(f'Class: {f}, Amount: {len(seen[f])}')
-        quit()
-        a = {}
-        for f in Seen:
-            a[str(f)] = seen.count(f)
-        # Seen = [f[0] for f in Counter(a).most_common(10)]
+            Seen[f].append(random.shuffle(seen[f])[0:lowestamount])
         ####### Used to get only most abundant classes #######
 
         lines_seen = set()
@@ -63,9 +63,9 @@ def filter(path, file):
             # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
             #     data['Seq_class'] = Seen.index(data['Sequence'])
             if 'size' in data and data['size'] == [166, 66, 4] and 'Modifications' in data and line not in lines_seen:
-                if data['Modifications'] == 'Unmodified':
+                if data['Modifications'] == 'Unmodified' and data['image'] in Seen[0]:
                     data['Modi_class'] = 0
-                else:
+                elif data['image'] in Seen[1]:
                     data['Modi_class'] = 1
                 lines_seen.add(line)
 
