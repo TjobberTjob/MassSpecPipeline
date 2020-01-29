@@ -47,7 +47,7 @@ def filter(path, file):
         # Filter for classification
         # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
         if 'size' in data and data['size'] == [166, 66, 4] and 'Modifications' in data:
-            data['modi'] = data['Modifications'] == 'Unmodified'
+            data['modi'] = data['Modifications'] != 'Unmodified'
             # data['Seq_class'] = Seen.index(data['Sequence'])
             outfile.write(json.dumps(data) + '\n')
 
