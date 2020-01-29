@@ -51,9 +51,8 @@ def filter(path, file):
         lowestamount = min(amounts)
         Seen = defaultdict(list)
         for f in seen:
-            print(random.shuffle(seen[f])[0:lowestamount])
-            quit()
-            # Seen[f] = random.shuffle(seen[f])[0:lowestamount]
+            random.shuffle(seen[f])
+            Seen[f] = seen[f][0:lowestamount]
         ####### Used to get only most abundant classes #######
 
         lines_seen = set()
