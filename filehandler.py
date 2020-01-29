@@ -47,7 +47,7 @@ def filter(path, file):
                     seen[0].append(json.loads(line)['image'])
                 else:
                     seen[1].append(json.loads(line)['image'])
-        amounts = [len(seen(f)) for f in seen]
+        amounts = [len(seen[f]) for f in seen]
         lowestamount = min(amounts)
         Seen = defaultdict(list)
         for f in seen:
