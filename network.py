@@ -86,8 +86,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
         partition['test'] = list(chain.from_iterable(partition['test']))
-        for ff in testlabels2:
-            print(f'Test data - {ff}: {len(testlabels2[ff])}')
+        for f in testlabels2:
+            print(f'Test data - {f}: {len(testlabels2[f])}')
 
     return partition, labels, imagelen, pixellen, testlabels
 
