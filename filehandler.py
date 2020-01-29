@@ -64,13 +64,14 @@ def filter(path, file):
             # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
             #     data['Seq_class'] = Seen.index(data['Sequence'])
             if 'size' in data and data['size'] == [166, 66, 4] and 'Modifications' in data and line not in lines_seen:
-                if data['Modifications'] == 'Unmodified' and data['image'] in Seen[0]:
+                if data['image'] in Seen[0]:
                     data['Modi_class'] = 0
+                    lines_seen.add(line)
+                    outfile.write(json.dumps(data) + '\n')
                 elif data['image'] in Seen[1]:
                     data['Modi_class'] = 1
-                lines_seen.add(line)
-
-                outfile.write(json.dumps(data) + '\n')
+                    lines_seen.add(line)
+                    outfile.write(json.dumps(data) + '\n')
         outfile.close()
 
     elif file == 'accession':
