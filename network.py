@@ -166,6 +166,8 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     plot_model(model, to_file="model.png")
 
     if classification:
+        print(n_classes)
+        quit()
         if n_classes == 2:
             model.compile(loss='binary_crossentropy', metrics=['accuracy'], optimizer='adam')
         else:
