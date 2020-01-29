@@ -39,7 +39,7 @@ def filter(path, file):
     # Seen = [f[0] for f in Counter(a).most_common(10)]
 
     # lines_seen = set()
-    outfile = open(f'{path}{str(file)}_filtered .json', 'w')
+    outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
     for line in open(f'{path}{str(file)}.json', 'r'):
         data = json.loads(line)
