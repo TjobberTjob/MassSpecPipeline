@@ -14,6 +14,7 @@ from keras.utils import plot_model
 
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio, test_accessions):
+    print('Data fetching')
     imgfiles = os.listdir(imgpath)
     with open(f'{imgpath}{imgfiles[0]}', "rb") as pa:
         image = pickle.load(pa)
@@ -255,6 +256,7 @@ if __name__ == '__main__':
         plt.legend(['train', 'test'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
 
+    print('Creating and running model')
     model = load_model(f'{metapath}Best-{imageclass}.h5')
     test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
     testaccuracy = model.evaluate_generator(test_generator)
