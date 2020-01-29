@@ -167,8 +167,6 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     plot_model(model, to_file="model.png")
 
     if classification:
-        print(n_classes)
-        quit()
         if n_classes == 2:
             model.compile(loss='binary_crossentropy', metrics=['accuracy'], optimizer='adam')
         else:
@@ -220,7 +218,7 @@ if __name__ == '__main__':
     testlabels = output[4]
 
     if classification:
-        classes = [json.loads(line)['Seq_class'] for line in open(f'{metapath}subimage_filtered.json', 'r') if 'Seq_class' in json.loads(line)]
+        classes = [json.loads(line)['Modi_class'] for line in open(f'{metapath}subimage_filtered.json', 'r') if 'Modi_class' in json.loads(line)]
         n_classes = len(np.unique(classes))
     else:
         n_classes = 1
