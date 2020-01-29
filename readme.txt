@@ -1,4 +1,6 @@
-Usage of pipeline for MaxQuant datasets ONLY:
+# Usage of pipeline for MaxQuant datasets ONLY:
+
+
 python proteomeTools.py all-PT -> Downloads all the data from proteomeTools datasets
 
 python proteomeTools.py https://www.ebi.ac.uk/pride/data/archive/2019/05/PXD010595/01974c_BC1-TUM_missing_first_3_01_01-ETD-1h-R4 -> Downloads the data from this one link. Do not specify filetype (e.g .raw at the end)
