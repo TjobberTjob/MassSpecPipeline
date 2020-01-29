@@ -2,7 +2,7 @@ import json
 import os
 import pickle
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 import numpy as np
 
 
@@ -25,40 +25,73 @@ def debugger(path):
 
 
 def filter(path, file):
-    if os.path.exists(f'{path}{str(file)}_filtered.json'):
-        print('Removing old filtered version')
-        os.remove(f'{path}{str(file)}_filtered.json')
+    if file == 'subimage':
+        if os.path.exists(f'{path}subimage_filtered.json'):
+            print('Removing old filtered version')
+            os.remove(f'{path}{str(file)}_filtered.json')
 
-    # Used to get only most abundant classes
-    # seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
-    # Seen = np.unique(seen)
-    # a = {}
-    # for f in Seen:
-    #     a[str(f)] = seen.count(f)
-    # Seen = [f[0] for f in Counter(a).most_common(10)]
+        ####### Used to get only most abundant classes #######
+        # seen = [json.loads(line)['Sequence'] for line in open(f'{path}{str(file)}.json') if 'Sequence' in json.loads(line)]
+        # Seen = np.unique(seen)
+        # a = {}
+        # for f in Seen:
+        #     a[str(f)] = seen.count(f)
+        # Seen = [f[0] for f in Counter(a).most_common(10)]
 
-    # lines_seen = set()
-    outfile = open(f'{path}{str(file)}_filtered.json', 'w')
+        seen = defaultdict(list)
+        for line in open(f'{path}{str(file)}.json'):
+            if 'Modifications' in json.loads(line):
+                if json.loads(line)['Sequence'] == 'Unmodified':
+                    a = 0
+                else:
+                    a = 1
+                seen[a] = json.loads(line)['image']
+        for f in seen:
+            print(len(seen[f]))
+        quit()
+        a = {}
+        for f in Seen:
+            a[str(f)] = seen.count(f)
+        # Seen = [f[0] for f in Counter(a).most_common(10)]
+        ####### Used to get only most abundant classes #######
 
-    for line in open(f'{path}{str(file)}.json', 'r'):
-        data = json.loads(line)
+        lines_seen = set()
+        outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
-        # Filter for classification
-        # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
-        if 'size' in data and data['size'] == [166, 66, 4] and 'Modifications' in data:
-            if data['Modifications'] == 'Unmodified':
-                data['Modi_class'] = 0
-            else:
-                data['Modi_class'] = 1
-            # data['Seq_class'] = Seen.index(data['Sequence'])
-            outfile.write(json.dumps(data) + '\n')
+        for line in open(f'{path}{str(file)}.json', 'r'):
+            data = json.loads(line)
 
-        # # filter metadata for extractor
-        # if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
-        #     outfile.write(line)
-        #     lines_seen.add(line)
+            # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen:
+            #     data['Seq_class'] = Seen.index(data['Sequence'])
+            if 'size' in data and data['size'] == [166, 66, 4] and 'Modifications' in data and line not in lines_seen:
+                if data['Modifications'] == 'Unmodified':
+                    data['Modi_class'] = 0
+                else:
+                    data['Modi_class'] = 1
+                lines_seen.add(line)
 
-    # outfile.close()
+                outfile.write(json.dumps(data) + '\n')
+        outfile.close()
+
+    elif file == 'accession':
+        if os.path.exists(f'{path}accession_filtered.json'):
+            print('Removing old filtered version')
+            os.remove(f'{path}{str(file)}_filtered.json')
+
+        lines_seen = set()
+        outfile = open(f'{path}{str(file)}_filtered.json', 'w')
+
+        for line in open(f'{path}{str(file)}.json', 'r'):
+            data = json.loads(line)
+            if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
+                outfile.write(line)
+                lines_seen.add(line)
+
+                outfile.write(json.dumps(data) + '\n')
+        outfile.close()
+    else:
+        print('nobueno')
+        quit()
 
 
 def moveserver(path, tarpath, ssh):
