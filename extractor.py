@@ -490,7 +490,6 @@ def partOne(accnr, maxquant_file, path):
     for zips in reversed(allZip):
         # finds raw files for this zip file
         if not haveallMQF:
-            continue
             output = zipfile_downloader(zips, path, maxquant_file)
             rawfiles = output[0]
             df = output[1]
