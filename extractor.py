@@ -570,7 +570,7 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
             debuggerFile = open(f'{metapath}debugger.txt', 'a')
-            if 'brokenlinks' in globals() and accession in brokenlinks:
+            if accession == 'PXD010595' or 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
                 continue
             try:
