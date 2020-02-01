@@ -161,6 +161,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     x = Flatten()(x)
     x = Dropout(rate=0.25)(x)
     x = Dense(64, activation='relu')(x)
+    x = Dense(32, activation='relu')(x)
     if not classification:
         output = Dense(1, activation='linear')(x)
     else:
