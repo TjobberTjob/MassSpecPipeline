@@ -1,4 +1,5 @@
 import bisect
+import glob
 import gzip
 import json
 import math
@@ -131,7 +132,7 @@ def formatFile(accnr, filename, path, filepath):
         if path[0] == '/':
             relpath = path[:-1]
         else:
-            relpath = f'{os.getcwd()}{path[:-1]}'
+            relpath = f'{os.getcwd()}{path[:-1]}' # Either gives path as root path or have data as a sub folder to the one the code is in
 
         os.system(f'chmod -R a+rwx {path}*')
         os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
@@ -507,7 +508,7 @@ def partOne(accnr, maxquant_file, path):
 
                 partTwo(accnr, filename, path, filepath, df2)
         else:
-            continue
+            # continue
             for raws in allRaw:
                 filename = str(raws[63:-4])
                 if filename in not_working:
@@ -518,6 +519,44 @@ def partOne(accnr, maxquant_file, path):
                 filepath = f'{path}{accnr}/{filename}/'
                 df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                 partTwo(accnr, filename, path, filepath, df2)
+
+
+def offline(path, filename):
+    filepath = f'{sysinput}{filename}/'
+    matches = [i for i, a in enumerate(sysinput) if a == '/']
+    accnr = f'{filepath[matches[-2]+1:matches[-1]]}'
+    print(f'\nfile: {accnr}/{filename}')
+
+    for file in os.listdir(f'{filepath}'):
+        if file.endswith('.zip'):
+            zipfile = file
+    for file in os.listdir(f'{filepath}'):
+        if file.endswith('.raw'):
+            rawfile = file
+
+    if 'rawfile' not in locals() and 'zipfile' not in locals():
+        print(f'Necessary files dont exist in {f}')
+        quit()
+
+    # Get a list of files with directories from zip file
+    with ZipFile(f'{filepath}{zipfile}', 'r') as zipped:
+        ziplist = zipped.namelist()
+
+    # Extract the peptide file from the zipfile
+    maxquant_file = 'allPeptides.txt'
+    for a in ziplist:
+        if maxquant_file in a:
+            with ZipFile(f'{filepath}{zipfile}') as z:
+                with z.open(a) as zf, open(f'{filepath}allPeptides.txt', 'wb') as zfg:
+                    shutil.copyfileobj(zf, zfg)
+                break
+
+    df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+    df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
+    df = df.loc[df['Raw file'] == rawfile,]
+    pd.DataFrame.to_csv(df, f'{filepath}{maxquant_file}')
+
+    partTwo(accnr, filename, path, filepath, df)
 
 
 if __name__ == '__main__':
@@ -549,6 +588,11 @@ if __name__ == '__main__':
             os.remove(f'{metapath}debugger.txt')
         except:
             pass
+
+    elif str(sysinput)[0] == '/':
+        dirsinpath = os.listdir(sysinput)
+        for f in dirsinpath:
+            offline(datapath, f)
 
     elif str(sysinput) == 'complete':
         listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
