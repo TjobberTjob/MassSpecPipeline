@@ -538,23 +538,26 @@ def offline(path, filename):
         print(f'Necessary files dont exist in {f}')
         quit()
 
-    # Get a list of files with directories from zip file
-    with ZipFile(f'{filepath}{zipfile}', 'r') as zipped:
-        ziplist = zipped.namelist()
-
-    # Extract the peptide file from the zipfile
     maxquant_file = 'allPeptides.txt'
-    for a in ziplist:
-        if maxquant_file in a:
-            with ZipFile(f'{filepath}{zipfile}') as z:
-                with z.open(a) as zf, open(f'{filepath}allPeptides.txt', 'wb') as zfg:
-                    shutil.copyfileobj(zf, zfg)
-                break
+    if not os.path.exists(f'{filepath}{maxquant_file}'):
+        # Get a list of files with directories from zip file
+        with ZipFile(f'{filepath}{zipfile}', 'r') as zipped:
+            ziplist = zipped.namelist()
 
-    df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
-    df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
-    df = df.loc[df['Raw file'] == rawfile,]
-    pd.DataFrame.to_csv(df, f'{filepath}{maxquant_file}')
+        # Extract the peptide file from the zipfile
+        for a in ziplist:
+            if maxquant_file in a:
+                with ZipFile(f'{filepath}{zipfile}') as z:
+                    with z.open(a) as zf, open(f'{filepath}allPeptides.txt', 'wb') as zfg:
+                        shutil.copyfileobj(zf, zfg)
+                    break
+
+        df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+        df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
+        df = df.loc[df['Raw file'] == rawfile,]
+        pd.DataFrame.to_csv(df, f'{filepath}{maxquant_file}')
+    else:
+        df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
 
     partTwo(accnr, filename, path, filepath, df)
 
