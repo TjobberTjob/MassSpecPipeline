@@ -44,8 +44,8 @@ def filefinder(accnr, path):
     if not os.path.exists(f'{path}{accnr}/'):
         os.mkdir(f'{path}{accnr}/')
 
-
-    allCheck = ['allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/') if len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
+    allCheck = ['allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/') if
+                len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
     if False in allCheck or allCheck == []:
         haveallMQF = False
     else:
@@ -132,12 +132,12 @@ def formatFile(accnr, filename, path, filepath):
         if path[0] == '/':
             relpath = path[:-1]
         else:
-            relpath = f'{os.getcwd()}{path[:-1]}' # Either gives path as root path or have data as a sub folder to the one the code is in
+            relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
 
         os.system(f'chmod -R a+rwx {path}*')
         os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
-              f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
-              f't/{accnr}/{filename}/ -f=1 -m=1')
+                  f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
+                  f't/{accnr}/{filename}/ -f=1 -m=1')
 
         os.remove(f'{filepath}file-metadata.txt')
         os.remove(f'{filepath}file.raw')
@@ -185,7 +185,7 @@ def internalmzML(path):
 def preparameters(filepath):
     print('Preparing parameter for image creation                                                    ', end='\r')
     with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
-            mzml = json.loads(fin.read().decode('utf-8'))
+        mzml = json.loads(fin.read().decode('utf-8'))
 
     mzlist = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
     rtlist = [mzml['ms1'][f]['scan_time'] for f in mzml['ms1']]
@@ -467,7 +467,6 @@ def partTwo(accnr, filename, path, filepath, df2):
     subimage_interval['mz'] = config['mz_interval']
     subimage_interval['rt'] = config['rt_interval']
 
-
     output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
                      savepng=False)
     inorout = output[0]
@@ -522,9 +521,10 @@ def partOne(accnr, maxquant_file, path):
 
 
 def offline(path, filename):
+    maxquant_file = 'allPeptides.txt'
     filepath = f'{sysinput}{filename}/'
     matches = [i for i, a in enumerate(sysinput) if a == '/']
-    accnr = f'{filepath[matches[-2]+1:matches[-1]]}'
+    accnr = f'{filepath[matches[-2] + 1:matches[-1]]}'
     print(f'\nfile: {accnr}/{filename}')
 
     for file in os.listdir(f'{filepath}'):
@@ -533,33 +533,37 @@ def offline(path, filename):
     for file in os.listdir(f'{filepath}'):
         if file.endswith('.raw'):
             rawfile = file
+    if os.path.exists(f'{filepath}{maxquant_file}'):
+        allPep = True
+    else:
+        allPep = False
 
-    if 'rawfile' not in locals() and 'zipfile' not in locals():
+    if 'rawfile' in locals() and (allPep or 'zipfile' in locals()):
+        if not os.path.exists(f'{filepath}{maxquant_file}'):
+            # Get a list of files with directories from zip file
+            with ZipFile(f'{filepath}{zipfile}', 'r') as zipped:
+                ziplist = zipped.namelist()
+
+            # Extract the peptide file from the zipfile
+            for a in ziplist:
+                if maxquant_file in a:
+                    with ZipFile(f'{filepath}{zipfile}') as z:
+                        with z.open(a) as zf, open(f'{filepath}allPeptides.txt', 'wb') as zfg:
+                            shutil.copyfileobj(zf, zfg)
+                        break
+
+            df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+            df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
+            df = df.loc[df['Raw file'] == rawfile,]
+            pd.DataFrame.to_csv(df, f'{filepath}{maxquant_file}')
+        else:
+            df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+
+        partTwo(accnr, filename, path, filepath, df)
+    else:
         print(f'Necessary files dont exist in {f}')
         quit()
 
-    maxquant_file = 'allPeptides.txt'
-    if not os.path.exists(f'{filepath}{maxquant_file}'):
-        # Get a list of files with directories from zip file
-        with ZipFile(f'{filepath}{zipfile}', 'r') as zipped:
-            ziplist = zipped.namelist()
-
-        # Extract the peptide file from the zipfile
-        for a in ziplist:
-            if maxquant_file in a:
-                with ZipFile(f'{filepath}{zipfile}') as z:
-                    with z.open(a) as zf, open(f'{filepath}allPeptides.txt', 'wb') as zfg:
-                        shutil.copyfileobj(zf, zfg)
-                    break
-
-        df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
-        df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
-        df = df.loc[df['Raw file'] == rawfile,]
-        pd.DataFrame.to_csv(df, f'{filepath}{maxquant_file}')
-    else:
-        df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
-
-    partTwo(accnr, filename, path, filepath, df)
 
 
 if __name__ == '__main__':
@@ -598,7 +602,8 @@ if __name__ == '__main__':
             offline(datapath, f)
 
     elif str(sysinput) == 'complete':
-        listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        listofowned = [f for f in os.listdir(datapath) if
+                       os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         print(listofowned)
         quit()
         for accession in listofowned:
@@ -645,7 +650,7 @@ if __name__ == '__main__':
 # python3 extractor.py accessions_filtered
 # python3 extractor.py owned
 
-#Seq_class (4)  val_loss: 0.0092 - val_accuracy: 0.9775
-#Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
-#m/z val_mse: 4000
-#Length val_accuracy: 0.5160
+# Seq_class (4)  val_loss: 0.0092 - val_accuracy: 0.9775
+# Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
+# m/z val_mse: 4000
+# Length val_accuracy: 0.5160
