@@ -507,7 +507,8 @@ def partOne(accnr, maxquant_file, path):
 
                 partTwo(accnr, filename, path, filepath, df2)
         else:
-            # continue
+            if skipnoncomplete:
+                continue
             for raws in allRaw:
                 filename = str(raws[63:-4])
                 if filename in not_working:
@@ -565,7 +566,6 @@ def offline(path, filename):
         quit()
 
 
-
 if __name__ == '__main__':
     # Read datapath from config file
     with open('config.json') as json_file:
@@ -604,8 +604,8 @@ if __name__ == '__main__':
     elif str(sysinput) == 'complete':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
-        print(listofowned)
-        quit()
+
+        skipnoncomplete = True
         for accession in listofowned:
             if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
