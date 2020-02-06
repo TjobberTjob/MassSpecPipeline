@@ -194,6 +194,7 @@ if __name__ == '__main__':
     # Read datapath from config file
     with open('config.json') as json_file:
         data = json.load(json_file)
+        print(data)
 
     datapath = data['path']
     metapath = f'{datapath}metadata/'
