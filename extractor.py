@@ -490,6 +490,8 @@ def partOne(accnr, maxquant_file, path):
     for zips in reversed(allZip):
         # finds raw files for this zip file
         if not haveallMQF:
+            if skip_incomplete:
+                continue
             output = zipfile_downloader(zips, path, maxquant_file)
             rawfiles = output[0]
             df = output[1]
@@ -507,7 +509,7 @@ def partOne(accnr, maxquant_file, path):
 
                 partTwo(accnr, filename, path, filepath, df2)
         else:
-            if skipnoncomplete:
+            if acquire_only_new:
                 continue
             for raws in allRaw:
                 filename = str(raws[63:-4])
@@ -573,6 +575,8 @@ if __name__ == '__main__':
 
     datapath = data['path']
     metapath = f'{datapath}metadata/'
+    acquire_only_new = data['acquire_only_new']
+    skip_incomplete = data['skip_incomplete']
 
     for f in os.listdir(datapath):
         if '.' in f:
@@ -605,7 +609,6 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
 
-        skipnoncomplete = True
         for accession in listofowned:
             if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
@@ -649,6 +652,8 @@ if __name__ == '__main__':
 # python3 extractor.py PXD010595
 # python3 extractor.py accessions_filtered
 # python3 extractor.py owned
+# python3 extractor.py /mnt/c/Users/TobiaGC/Dropbox/Universitet/CompBiomed/Speciale/MassSpecPipeline
+
 
 # Seq_class (4)  val_loss: 0.0092 - val_accuracy: 0.9775
 # Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
