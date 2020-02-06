@@ -247,7 +247,7 @@ if __name__ == '__main__':
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
     else:
         plt.plot(history.history['mse'])
@@ -255,7 +255,7 @@ if __name__ == '__main__':
         plt.title('model accuracy')
         plt.ylabel('Mean squared error')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
 
     print('Creating and running model')
