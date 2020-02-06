@@ -153,7 +153,7 @@ class DataGenerator(keras.utils.Sequence):
 
 
 # Developing the neural network
-def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath):
+def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience):
     input = Input(shape=(imglen, pixellen, n_channels,))
     x = Conv2D(16, kernel_size=(3, 3), activation='relu', padding='same')(input)
     x = MaxPooling2D(pool_size=(2, 2))(x)
@@ -184,7 +184,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     else:
         checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_mse',
                                                      save_best_only=True)
-    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=6)
+    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience)
     callbacks_list = [checkpoint, early_stopping]
 
     return model, callbacks_list
@@ -205,6 +205,7 @@ if __name__ == '__main__':
     n_channels = config['n_channels']
     batch_size = config['batch_size']
     epochs = config['epochs']
+    patience = config['ES_patience']
 
     # Cmd inputs
     classification = sys.argv[1] == 'T'
@@ -235,7 +236,7 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath)
+    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath, patience)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
