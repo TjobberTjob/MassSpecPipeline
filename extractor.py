@@ -575,8 +575,8 @@ if __name__ == '__main__':
 
     datapath = data['path']
     metapath = f'{datapath}metadata/'
-    acquire_only_new = data['acquire_only_new']
-    skip_incomplete = data['skip_incomplete']
+    acquire_only_new = data['acquire_only_new'] == 'True'
+    skip_incomplete = data['skip_incomplete'] == 'True'
 
     for f in os.listdir(datapath):
         if '.' in f:

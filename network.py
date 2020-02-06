@@ -193,7 +193,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
 if __name__ == '__main__':
     # Read datapath from config file
     with open('config.json') as json_file:
-        data = json.loads(json_file)
+        data = json.load(json_file)
 
     datapath = data['path']
     metapath = f'{datapath}metadata/'
