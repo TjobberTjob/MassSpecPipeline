@@ -205,7 +205,7 @@ if __name__ == '__main__':
     n_channels = config['n_channels']
     batch_size = config['batch_size']
     epochs = config['epochs']
-    patience = config['ES_patience']
+    patience = config['early_stopping']
 
     # Cmd inputs
     classification = sys.argv[1] == 'T'
