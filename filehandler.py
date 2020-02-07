@@ -33,26 +33,25 @@ def filter(path, file):
             os.remove(f'{path}{str(file)}_filtered.json')
 
         ####### Used to get only most abundant classes #######
-        # seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
-        # Seen = np.unique(seen)
-        # a = {}
-        # for f in Seen:
-        #     a[str(f)] = seen.count(f)
-        # Seen = [f[0] for f in Counter(a).most_common(10)]
+        seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
+        Seen = np.unique(seen)
+        a = {}
+        for f in Seen:
+            a[str(f)] = seen.count(f)
+        Seen = [f[0] for f in Counter(a).most_common(10)]
 
-        seen = defaultdict(list)
-        for line in open(f'{path}subimage.json'):
-            if 'Modifications' in json.loads(line):
-                if json.loads(line)['Modifications'] == 'Unmodified':
-                    seen[0].append(json.loads(line)['image'])
-                else:
-                    seen[1].append(json.loads(line)['image'])
-        amounts = [len(seen[f]) for f in seen]
-        lowestamount = min(amounts)
-        Seen = defaultdict(list)
-        for f in seen:
-            random.shuffle(seen[f])
-            Seen[f] = seen[f][0:lowestamount]
+        # seen = defaultdict(list)
+        # for line in open(f'{path}subimage.json'):
+        #     if 'Modifications' in json.loads(line):
+        #         if json.loads(line)['Modifications'] == 'Unmodified':
+        #             seen[0].append(json.loads(line)['image'])
+        #         else:
+        #             seen[1].append(json.loads(line)['image'])
+        # amounts = [len(seen[f]) for f in seen]
+        # Seen = defaultdict(list)
+        # for f in seen:
+        #     random.shuffle(seen[f])
+        #     Seen[f] = seen[f][0:lowestamount]
         ####### Used to get only most abundant classes #######
 
         lines_seen = set()
@@ -61,19 +60,19 @@ def filter(path, file):
         for line in open(f'{path}{str(file)}.json', 'r'):
             data = json.loads(line)
 
-            # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen and line not in lines_seen:
-            #     data['Seq_class'] = Seen.index(data['Sequence'])
-            #     lines_seen.add(line)
-            #     outfile.write(json.dumps(data) + '\n')
-            if 'size' in data and data['size'] == [166, 66, 4] and 'Modifications' in data and line not in lines_seen:
-                if data['image'] in Seen[0]:
-                    data['Modi_class'] = 0
-                    lines_seen.add(line)
-                    outfile.write(json.dumps(data) + '\n')
-                elif data['image'] in Seen[1]:
-                    data['Modi_class'] = 1
-                    lines_seen.add(line)
-                    outfile.write(json.dumps(data) + '\n')
+            if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen and line not in lines_seen:
+                data['Seq_class'] = Seen.index(data['Sequence'])
+                lines_seen.add(line)
+                outfile.write(json.dumps(data) + '\n')
+            # if 'size' in data and data['size'] == [166, 66, 4] and 'Modifications' in data and line not in lines_seen:
+            #     if data['image'] in Seen[0]:
+            #         data['Modi_class'] = 0
+            #         lines_seen.add(line)
+            #         outfile.write(json.dumps(data) + '\n')
+            #     elif data['image'] in Seen[1]:
+            #         data['Modi_class'] = 1
+            #         lines_seen.add(line)
+            #         outfile.write(json.dumps(data) + '\n')
         outfile.close()
 
     elif file == 'accession':
