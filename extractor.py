@@ -58,6 +58,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     # Handle spaces in urls
     zipfileurl = zipfile.replace(' ', '%20')
     zipfilename = zipfile.replace(' ', '_')[63:]
+    print(zipfileurl)
 
     # Download zip file
     if os.path.exists(f'{path}{zipfilename}'):
