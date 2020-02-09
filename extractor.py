@@ -583,9 +583,9 @@ if __name__ == '__main__':
     #         os.system(f'rm {datapath}*.*')
     #         break
 
-    if os.path.exists(f'{metapath}brokenlinks.txt'):
-        with open(f'{metapath}brokenlinks.txt', "rb") as pa:
-            brokenlinks = pickle.load(pa)
+    # if os.path.exists(f'{metapath}brokenlinks.txt'):
+    #     with open(f'{metapath}brokenlinks.txt', "rb") as pa:
+    #         brokenlinks = pickle.load(pa)
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
