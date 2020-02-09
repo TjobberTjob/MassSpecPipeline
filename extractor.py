@@ -629,10 +629,10 @@ if __name__ == '__main__':
                 print('Accession is broken')
                 continue
             # try:
-                    partOne(str(accession), pepfile, datapath)
-                    debuggerlist = [accession, 'No error']
-                    debuggerFile.write(f'{debuggerlist}\n')
-                    debuggerFile.close()
+            partOne(str(accession), pepfile, datapath)
+            debuggerlist = [accession, 'No error']
+            debuggerFile.write(f'{debuggerlist}\n')
+            debuggerFile.close()
             # except Exception as e:
             #     print(f'Problem occured with: {accession}. unable to proceed at this time')
             #     os.system(f'rm {datapath}*.*')
