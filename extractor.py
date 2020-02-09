@@ -578,10 +578,10 @@ if __name__ == '__main__':
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
 
-    for f in os.listdir(datapath):
-        if '.' in f:
-            os.system(f'rm {datapath}*.*')
-            break
+    # for f in os.listdir(datapath):
+    #     if '.' in f:
+    #         os.system(f'rm {datapath}*.*')
+    #         break
 
     if os.path.exists(f'{metapath}brokenlinks.txt'):
         with open(f'{metapath}brokenlinks.txt', "rb") as pa:
