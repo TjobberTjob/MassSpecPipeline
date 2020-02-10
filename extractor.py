@@ -577,7 +577,6 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
-    print(acquire_only_new,skip_incomplete)
 
     if os.path.exists(f'{metapath}brokenlinks.txt'):
         with open(f'{metapath}brokenlinks.txt', "rb") as pa:
@@ -630,7 +629,10 @@ if __name__ == '__main__':
                 debuggerFile.close()
             except Exception as e:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
-                os.system(f'rm {datapath}*.*')
+                try:
+                    os.system(f'rm {datapath}*.*')
+                except:
+                    pass
                 debuggerlist = [accession, e]
                 debuggerFile.write(f'{debuggerlist}\n')
                 debuggerFile.close()
