@@ -62,7 +62,9 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     # Download zip file
     if os.path.exists(f'{path}{zipfilename}'):
         os.remove(f'{path}{zipfilename}')
-    os.system(f'wget --show-progress -O  {path}{zipfilename} {zipfileurl}')
+    print('hey')
+    quit()
+    os.system(f'wget -q --show-progress -O  {path}{zipfilename} {zipfileurl}')
 
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
