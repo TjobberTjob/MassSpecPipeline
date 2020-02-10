@@ -619,13 +619,12 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
             debuggerFile = open(f'{metapath}debugger.txt', 'a')
-            if accession == 'PXD010595' or 'brokenlinks' in globals() and accession in brokenlinks:
+            if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
                 continue
             try:
                 partOne(str(accession), pepfile, datapath)
-                debuggerlist = [accession, 'No error']
-                debuggerFile.write(f'{debuggerlist}\n')
+                debuggerFile.write(f'{[accession, "No error"]}\n')
                 debuggerFile.close()
             except Exception as e:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
@@ -633,8 +632,7 @@ if __name__ == '__main__':
                     os.system(f'rm {datapath}*.*')
                 except:
                     pass
-                debuggerlist = [accession, e]
-                debuggerFile.write(f'{debuggerlist}\n')
+                debuggerFile.write(f'{[accession, e]}\n')
                 debuggerFile.close()
                 pass
     else:
