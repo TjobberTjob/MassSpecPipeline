@@ -63,9 +63,8 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     if os.path.exists(f'{path}{zipfilename}'):
         os.remove(f'{path}{zipfilename}')
     print('hey')
-    quit()
     os.system(f'wget -q --show-progress -O  {path}{zipfilename} {zipfileurl}')
-
+    quit()
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
         ziplist = zipped.namelist()
