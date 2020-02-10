@@ -111,6 +111,7 @@ def update_metadata(mpath):
     had_accessions = [json.loads(line)['accession'] for line in open(f'{mpath}{metadata}') if
                       'accession' in json.loads(line)]
     missing_accessions = [f for f in all_accessions if f not in had_accessions]
+    print(missing_accessions)
 
     accessions_metadata(missing_accessions, mpath)
 
