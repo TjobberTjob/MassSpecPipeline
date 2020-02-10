@@ -62,7 +62,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     # Download zip file
     if os.path.exists(f'{path}{zipfilename}'):
         os.remove(f'{path}{zipfilename}')
-    os.system(f'wget -q --show-progress -O  {path}{zipfilename} {zipfileurl}')
+    os.system(f'wget --show-progress -O  {path}{zipfilename} {zipfileurl}')
 
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
@@ -619,9 +619,11 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
             debuggerFile = open(f'{metapath}debugger.txt', 'a')
+
             if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
                 continue
+
             try:
                 partOne(str(accession), pepfile, datapath)
                 debuggerFile.write(f'{[accession, "No error"]}\n')
