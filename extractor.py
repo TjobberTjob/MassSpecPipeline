@@ -577,15 +577,11 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
+    print(acquire_only_new,skip_incomplete)
 
-    # for f in os.listdir(datapath):
-    #     if '.' in f:
-    #         os.system(f'rm {datapath}*.*')
-    #         break
-
-    # if os.path.exists(f'{metapath}brokenlinks.txt'):
-    #     with open(f'{metapath}brokenlinks.txt', "rb") as pa:
-    #         brokenlinks = pickle.load(pa)
+    if os.path.exists(f'{metapath}brokenlinks.txt'):
+        with open(f'{metapath}brokenlinks.txt', "rb") as pa:
+            brokenlinks = pickle.load(pa)
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
@@ -608,7 +604,6 @@ if __name__ == '__main__':
     elif str(sysinput) == 'complete':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
-
         for accession in listofowned:
             if 'brokenlinks' in globals() and accession in brokenlinks:
                 print('Accession is broken')
@@ -640,7 +635,6 @@ if __name__ == '__main__':
                 debuggerFile.write(f'{debuggerlist}\n')
                 debuggerFile.close()
                 pass
-
     else:
         accession = sysinput
         if 'brokenlinks' in globals() and accession in brokenlinks:
