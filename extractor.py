@@ -630,10 +630,8 @@ if __name__ == '__main__':
                 debuggerFile.close()
             except Exception as e:
                 print(f'Problem occured with: {accession}. unable to proceed at this time')
-                try:
+                if len(glob.glob(f'{datapath}*.*')) != 0:
                     os.system(f'rm {datapath}*.*')
-                except:
-                    pass
                 debuggerFile.write(f'{[accession, e]}\n')
                 debuggerFile.close()
                 pass
