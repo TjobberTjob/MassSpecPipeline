@@ -62,7 +62,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     # Download zip file
     if os.path.exists(f'{path}{zipfilename}'):
         os.remove(f'{path}{zipfilename}')
-    os.system(f'wget -q --show-progress -O  {path}{zipfilename} {zipfileurl}')
+    os.system(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
 
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
@@ -475,52 +475,50 @@ def partTwo(accnr, filename, path, filepath, df2):
     endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, metapath)
 
 
-def partOne(accnr, maxquant_file, path):
-    # Skip this special case. Something wrong... dont know, dont care
-    not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1',
-                   '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1',
-                   '01709a_GD2-TUM_first_pool_110_01_01-2xIT_2xHCD-1h-R1']
-
+def partOne(accnr, maxquant_file, path, nonworkingzips):
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
     allRaw = output[1]
     haveallMQF = output[2]
 
+    brokenfiles = []
     for zips in reversed(allZip):
-        # finds raw files for this zip file
-        if not haveallMQF:
-            if skip_incomplete:
-                continue
-            output = zipfile_downloader(zips, path, maxquant_file)
-            rawfiles = output[0]
-            df = output[1]
-
-            for raws in rawfiles:
-                filename = str(raws)
-                if filename in not_working:
+        if zips in nonworkingzips:
+            print('Zipfile in broken.json - going to next zipfile')
+            continue
+        try:
+            if not haveallMQF:
+                if skip_incomplete:
                     continue
+                output = zipfile_downloader(zips, path, maxquant_file)
+                rawfiles = output[0]
+                df = output[1]
 
-                print(f'\nfile: {accnr}/{filename}                                               ')
+                for raws in rawfiles:
+                    filename = str(raws)
 
-                output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                df2 = output[0]
-                filepath = output[1]
+                    print(f'\nfile: {accnr}/{filename}                                               ')
 
-                partTwo(accnr, filename, path, filepath, df2)
-        else:
-            if acquire_only_new:
-                continue
-            for raws in allRaw:
-                filename = str(raws[63:-4])
-                if filename in not_working:
+                    output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                    df2 = output[0]
+                    filepath = output[1]
+                    partTwo(accnr, filename, path, filepath, df2)
+            else:
+                if acquire_only_new:
                     continue
+                for raws in allRaw:
+                    filename = str(raws[63:-4])
+                    print(f'\nfile: {accnr}/{filename}                                               ')
 
-                print(f'\nfile: {accnr}/{filename}                                               ')
-
-                filepath = f'{path}{accnr}/{filename}/'
-                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                partTwo(accnr, filename, path, filepath, df2)
+                    filepath = f'{path}{accnr}/{filename}/'
+                    df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
+                    partTwo(accnr, filename, path, filepath, df2)
+        except:
+            print('issue occoured, going to next zipfile')
+            brokenfiles.append(zips)
+            pass
+    return brokenfiles
 
 
 def offline(path, filename):
@@ -578,14 +576,10 @@ if __name__ == '__main__':
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
 
-    if os.path.exists(f'{metapath}brokenlinks.txt'):
-        with open(f'{metapath}brokenlinks.txt', "rb") as pa:
-            brokenlinks = pickle.load(pa)
-
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
     sysinput = sys.argv[1]
-    if str(sysinput) == 'reset':
+    if str(sysinput) == 'reset':  # Reset files and folders if you want to remake all images in another setting
         try:
             shutil.rmtree(f'{datapath}images/')
             os.remove(f'{metapath}subimage.json')
@@ -595,52 +589,57 @@ if __name__ == '__main__':
         except:
             pass
 
-    elif str(sysinput)[0] == '/':
+    elif str(sysinput)[0] == '/':  # For local fine purposes.
         dirsinpath = os.listdir(sysinput)
         for f in dirsinpath:
             offline(datapath, f)
 
-    elif str(sysinput) == 'complete':
+    elif str(sysinput) == 'complete':  # For re-creating images from already downloaded and parsed files
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
-            if 'brokenlinks' in globals() and accession in brokenlinks:
-                print('Accession is broken')
-                continue
-            try:
-                partOne(str(accession), pepfile, datapath)
-            except:
-                print(f'Problem occured with: {accession}. unable to proceed at this time')
-                os.system(f'rm {datapath}*.*')
-                pass
 
-    elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
+            if os.path.exists(f'{metapath}broken.json'): # loads the broken zip files for this accession
+                for line in open(f'{metapath}broken.json'):
+                    if accession in json.loads(line):
+                        broken = json.loads(line)[accession]
+            else:
+                broken = []
+
+            print(f'Accessions: {accession}')
+            partOne(str(accession), pepfile, datapath, broken)
+
+    elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
             data = json.loads(line)
             accession = data['accession']
-            debuggerFile = open(f'{metapath}debugger.txt', 'a')
 
-            if 'brokenlinks' in globals() and accession in brokenlinks:
-                print('Accession is broken')
-                continue
+            if os.path.exists(f'{metapath}broken.json'): # loads the broken zip files for this accession
+                for line in open(f'{metapath}broken.json'):
+                    if accession in json.loads(line):
+                        broken = json.loads(line)[accession]
+            else:
+                broken = []
 
-            try:
-                partOne(str(accession), pepfile, datapath)
-                debuggerFile.write(f'{[accession, "No error"]}\n')
-                debuggerFile.close()
-            except Exception as e:
-                print(f'Problem occured with: {accession}. unable to proceed at this time')
-                if len(glob.glob(f'{datapath}*.*')) != 0:
-                    os.system(f'rm {datapath}*.*')
-                debuggerFile.write(f'{[accession, e]}\n')
-                debuggerFile.close()
-                pass
-    else:
+            print(f'Accessions: {accession}')
+            output = partOne(str(accession), pepfile, datapath, broken)
+
+            with open(f'{metapath}broken.json', 'a') as outfile:
+                outfile.write(json.dumps({accession: output}) + '\n')
+            outfile.close()
+
+
+    else:  # For single accessions usage
         accession = sysinput
-        if 'brokenlinks' in globals() and accession in brokenlinks:
-            print('Accession is broken')
-            quit()
-        partOne(str(accession), pepfile, datapath)
+        if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
+            for line in open(f'{metapath}broken.json'):
+                if accession in json.loads(line):
+                    broken = json.loads(line)[accession]
+        else:
+            broken = []
+
+        print(f'Accessions: {accession}')
+        partOne(str(accession), pepfile, datapath, broken)
 
 # python3 extractor.py PXD004732
 # python3 extractor.py PXD010595
