@@ -603,6 +603,7 @@ if __name__ == '__main__':
                 for line in open(f'{metapath}broken.json'):
                     if accession in json.loads(line):
                         broken = json.loads(line)[accession]
+                        break
             else:
                 broken = []
 
@@ -618,6 +619,7 @@ if __name__ == '__main__':
                 for line in open(f'{metapath}broken.json'):
                     if accession in json.loads(line):
                         broken = json.loads(line)[accession]
+                        break
             else:
                 broken = []
 
@@ -635,6 +637,7 @@ if __name__ == '__main__':
             for line in open(f'{metapath}broken.json'):
                 if accession in json.loads(line):
                     broken = json.loads(line)[accession]
+                    break
         else:
             broken = []
 
