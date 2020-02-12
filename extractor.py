@@ -33,8 +33,6 @@ def filefinder(accnr, path):
         urljson = requests.get(url).json()
     except requests.exceptions.ConnectionError:
         print("Connection refused")
-    print(urljson)
-    quit()
     zipfiles = []
     rawfiles = []
 
