@@ -495,6 +495,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
         # try:
         if not haveallMQF:
             if skip_incomplete:
+                print('Acquied all data - Continuing')
                 continue
             output = zipfile_downloader(zips, path, maxquant_file)
             rawfiles = output[0]
@@ -510,6 +511,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
                 partTwo(accnr, filename, path, filepath, df2)
         else:
             if acquire_only_new:
+                print('Data not acquired - Continuing')
                 continue
             for raws in allRaw:
                 filename = str(raws[63:-4])
