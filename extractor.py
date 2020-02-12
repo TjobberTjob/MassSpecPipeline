@@ -139,10 +139,10 @@ def formatFile(accnr, filename, path, filepath):
             relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
 
         os.system(f'chmod -R a+rwx {path}*')
-        os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
+        print(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
                   f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
                   f't/{accnr}/{filename}/ -f=1 -m=1')
-
+        quit()
         os.remove(f'{filepath}file-metadata.txt')
         os.remove(f'{filepath}file.raw')
 
@@ -506,7 +506,6 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
                 output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                 df2 = output[0]
                 filepath = output[1]
-                print(filepath)
                 partTwo(accnr, filename, path, filepath, df2)
         else:
             if acquire_only_new:
