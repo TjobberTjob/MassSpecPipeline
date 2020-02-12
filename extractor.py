@@ -489,12 +489,14 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
 
     if haveallMQF:
         if acquire_only_new:
+            brokenfiles = 'skip'
             print('acquire_only_new is True - Continuing')
-            return
+            return brokenfiles
     else:
         if skip_incomplete:
+            brokenfiles = 'skip'
             print('skip_incomplete is True - Continuing')
-            return
+            return brokenfiles
 
 
     brokenfiles = []
@@ -635,6 +637,8 @@ if __name__ == '__main__':
 
             print(f'Accessions: {accession}')
             output = partOne(str(accession), pepfile, datapath, broken)
+            if broken == 'skip':
+                continue
 
             with open(f'{metapath}broken.json', 'a') as outfile:
                 outfile.write(json.dumps({accession: output}) + '\n')
