@@ -487,37 +487,37 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
         if zips in nonworkingzips:
             print('Zipfile in broken.json - going to next zipfile')
             continue
-        try:
-            if not haveallMQF:
-                if skip_incomplete:
-                    continue
-                output = zipfile_downloader(zips, path, maxquant_file)
-                rawfiles = output[0]
-                df = output[1]
+        # try:
+        if not haveallMQF:
+            if skip_incomplete:
+                continue
+            output = zipfile_downloader(zips, path, maxquant_file)
+            rawfiles = output[0]
+            df = output[1]
 
-                for raws in rawfiles:
-                    filename = str(raws)
+            for raws in rawfiles:
+                filename = str(raws)
 
-                    print(f'\nfile: {accnr}/{filename}                                               ')
+                print(f'\nfile: {accnr}/{filename}                                               ')
 
-                    output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                    df2 = output[0]
-                    filepath = output[1]
-                    partTwo(accnr, filename, path, filepath, df2)
-            else:
-                if acquire_only_new:
-                    continue
-                for raws in allRaw:
-                    filename = str(raws[63:-4])
-                    print(f'\nfile: {accnr}/{filename}                                               ')
+                output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                df2 = output[0]
+                filepath = output[1]
+                partTwo(accnr, filename, path, filepath, df2)
+        else:
+            if acquire_only_new:
+                continue
+            for raws in allRaw:
+                filename = str(raws[63:-4])
+                print(f'\nfile: {accnr}/{filename}                                               ')
 
-                    filepath = f'{path}{accnr}/{filename}/'
-                    df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                    partTwo(accnr, filename, path, filepath, df2)
-        except:
-            print('issue occoured, going to next zipfile')
-            brokenfiles.append(zips)
-            pass
+                filepath = f'{path}{accnr}/{filename}/'
+                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
+                partTwo(accnr, filename, path, filepath, df2)
+        # except:
+        #     print('issue occoured, going to next zipfile')
+        #     brokenfiles.append(zips)
+        #     pass
     return brokenfiles
 
 
@@ -640,7 +640,6 @@ if __name__ == '__main__':
                     break
         else:
             broken = []
-
         print(f'Accessions: {accession}')
         partOne(str(accession), pepfile, datapath, broken)
 
