@@ -620,7 +620,7 @@ if __name__ == '__main__':
             else:
                 broken = []
 
-            print(f'\n\nAccessions: {accession}')
+            print(f'\nAccessions: {accession}')
             partOne(str(accession), pepfile, datapath, broken)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
@@ -636,7 +636,7 @@ if __name__ == '__main__':
             else:
                 broken = []
 
-            print(f'Accessions: {accession}')
+            print(f'\nAccessions: {accession}')
             output = partOne(str(accession), pepfile, datapath, broken)
             if output == 'skip':
                 continue
@@ -655,7 +655,7 @@ if __name__ == '__main__':
                     break
         else:
             broken = []
-        print(f'Accessions: {accession}')
+        print(f'\nAccessions: {accession}')
         partOne(str(accession), pepfile, datapath, broken)
 
 # python3 extractor.py PXD004732
