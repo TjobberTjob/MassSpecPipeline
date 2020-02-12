@@ -100,6 +100,8 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
 
     # Download the raw file
     print('Downloading raw file                                                    ', end='\r')
+    print(rawfiles)
+    quit()
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         if os.path.exists(f'{filepath}file.raw'):
             if os.path.getsize(f'{filepath}file.raw') == 0:  # If this is an empty file with nothing in it, remove it
