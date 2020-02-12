@@ -28,7 +28,7 @@ def get_lower_bound(haystack, needle):
 
 
 def filefinder(accnr, path):
-    url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}'
+    url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
     urljson = requests.get(url).json()
     print(urljson)
     quit()
