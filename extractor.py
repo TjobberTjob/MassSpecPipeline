@@ -66,7 +66,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     # Download zip file
     if os.path.exists(f'{path}{zipfilename}'):
         os.remove(f'{path}{zipfilename}')
-    os.system(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
+    os.system(f'wget -q --show-progress -O  {path}{zipfilename} {zipfileurl}')
 
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
@@ -486,7 +486,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
     allZip = output[0]
     allRaw = output[1]
     haveallMQF = output[2]
-    print(allZip)
+
     brokenfiles = []
     for zips in reversed(allZip):
         if zips in nonworkingzips:
