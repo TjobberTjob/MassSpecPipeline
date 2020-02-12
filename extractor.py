@@ -513,7 +513,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
 
                 for raws in rawfiles:
                     filename = str(raws)
-                    print(f'\nfile: {accnr}/{filename}                                               ')
+                    print(f'file: {accnr}/{filename}                                               ')
 
                     output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                     df2 = output[0]
@@ -620,7 +620,7 @@ if __name__ == '__main__':
             else:
                 broken = []
 
-            print(f'Accessions: {accession}')
+            print(f'\nAccessions: {accession}')
             partOne(str(accession), pepfile, datapath, broken)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
