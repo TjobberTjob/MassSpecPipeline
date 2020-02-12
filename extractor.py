@@ -494,16 +494,16 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
             output = zipfile_downloader(zips, path, maxquant_file)
             rawfiles = output[0]
             df = output[1]
-            print(rawfiles)
-            quit()
+
             for raws in rawfiles:
                 filename = str(raws)
-
                 print(f'\nfile: {accnr}/{filename}                                               ')
 
                 output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                 df2 = output[0]
                 filepath = output[1]
+                print(df2)
+                quit()
                 partTwo(accnr, filename, path, filepath, df2)
         else:
             if acquire_only_new:
