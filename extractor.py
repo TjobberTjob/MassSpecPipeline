@@ -29,7 +29,10 @@ def get_lower_bound(haystack, needle):
 
 def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
-    urljson = requests.get(url).json()
+    try:
+        urljson = requests.get(url).json()
+    except requests.exceptions.ConnectionError:
+        print("Connection refused")
     print(urljson)
     quit()
     zipfiles = []
