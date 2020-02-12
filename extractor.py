@@ -637,7 +637,7 @@ if __name__ == '__main__':
 
             print(f'Accessions: {accession}')
             output = partOne(str(accession), pepfile, datapath, broken)
-            if broken == 'skip':
+            if output == 'skip':
                 continue
 
             with open(f'{metapath}broken.json', 'a') as outfile:
