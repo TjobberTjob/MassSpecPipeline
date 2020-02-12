@@ -495,6 +495,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
             rawfiles = output[0]
             df = output[1]
             print(rawfiles)
+            quit()
             for raws in rawfiles:
                 filename = str(raws)
 
