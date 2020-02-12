@@ -620,7 +620,7 @@ if __name__ == '__main__':
             else:
                 broken = []
 
-            print(f'\nAccessions: {accession}')
+            print(f'\n\nAccessions: {accession}')
             partOne(str(accession), pepfile, datapath, broken)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
