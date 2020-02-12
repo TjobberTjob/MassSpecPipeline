@@ -486,7 +486,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
     allZip = output[0]
     allRaw = output[1]
     haveallMQF = output[2]
-
+    print(allZip)
     brokenfiles = []
     for zips in reversed(allZip):
         if zips in nonworkingzips:
@@ -499,7 +499,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
             output = zipfile_downloader(zips, path, maxquant_file)
             rawfiles = output[0]
             df = output[1]
-            print(rawfiles)
+
             for raws in rawfiles:
                 filename = str(raws)
                 print(f'\nfile: {accnr}/{filename}                                               ')
