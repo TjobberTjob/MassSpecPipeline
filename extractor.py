@@ -29,9 +29,9 @@ def get_lower_bound(haystack, needle):
 
 def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}'
-    print(url)
-    quit()
     urljson = requests.get(url).json()
+    print(urljson)
+    quit()
     zipfiles = []
     rawfiles = []
 
