@@ -111,7 +111,8 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
                 os.remove(f'{filepath}file.raw')
         for f in rawfiles:
             if filename in f or len(rawfiles) == 1:
-                os.system(f'wget -q --show-progress -O {filepath}/file.raw -c {f}')
+                print(f'wget -q --show-progress -O {filepath}/file.raw -c {f}')
+                quit()
                 break
 
     return df2, filepath
@@ -139,7 +140,7 @@ def formatFile(accnr, filename, path, filepath):
             relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
 
         os.system(f'chmod -R a+rwx {path}*')
-        print(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
+        os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
                   f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
                   f't/{accnr}/{filename}/ -f=1 -m=1')
         quit()
