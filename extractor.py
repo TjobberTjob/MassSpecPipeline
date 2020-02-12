@@ -29,6 +29,8 @@ def get_lower_bound(haystack, needle):
 
 def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}'
+    print(url)
+    quit()
     urljson = requests.get(url).json()
     zipfiles = []
     rawfiles = []
@@ -502,8 +504,6 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
                 output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                 df2 = output[0]
                 filepath = output[1]
-                print(df2)
-                quit()
                 partTwo(accnr, filename, path, filepath, df2)
         else:
             if acquire_only_new:
