@@ -575,6 +575,10 @@ def offline(path, filename):
 
         partTwo(accnr, filename, path, filepath, df)
     else:
+        try:
+            os.system('rm /data/ProteomeToolsRaw/*.*')
+        except:
+            pass
         print(f'Necessary files dont exist in {f}')
         quit()
 
