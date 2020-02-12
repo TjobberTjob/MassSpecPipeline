@@ -487,6 +487,16 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
     allRaw = output[1]
     haveallMQF = output[2]
 
+    if haveallMQF:
+        if acquire_only_new:
+            print('acquire_only_new is True - Continuing')
+            return
+    else:
+        if skip_incomplete:
+            print('skip_incomplete is True - Continuing')
+            return
+
+
     brokenfiles = []
     for zips in reversed(allZip):
         if zips in nonworkingzips:
@@ -494,9 +504,6 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
             continue
         # try:
         if not haveallMQF:
-            if skip_incomplete:
-                print('skip_incomplete is True - Continuing')
-                continue
             output = zipfile_downloader(zips, path, maxquant_file)
             rawfiles = output[0]
             df = output[1]
@@ -510,9 +517,6 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
                 filepath = output[1]
                 partTwo(accnr, filename, path, filepath, df2)
         else:
-            if acquire_only_new:
-                print('acquire_only_new is True - Continuing')
-                continue
             for raws in allRaw:
                 filename = str(raws[63:-4])
                 print(f'\nfile: {accnr}/{filename}                                               ')
