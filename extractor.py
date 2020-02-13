@@ -628,8 +628,11 @@ if __name__ == '__main__':
             accession = data['accession']
 
             if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-                print(broken)
-                broken = [json.loads(line)[accession]for line in open(f'{metapath}broken.json') if accession in json.loads(line)][0]
+                for line in open(f'{metapath}broken.json'):
+                    if accession in json.loads(line):
+                        print(line)
+                        broken = json.loads(line)[accession]
+                        break
             else:
                 broken = []
 
