@@ -31,8 +31,8 @@ def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
     try:
         urljson = requests.get(url).json()
-    except requests.exceptions.ConnectionError:
-        print("Connection refused")
+    except:
+        print("API connection issue")
 
     zipfiles = []
     rawfiles = []
