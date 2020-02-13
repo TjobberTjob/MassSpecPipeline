@@ -33,14 +33,14 @@ def filefinder(accnr, path):
         urljson = requests.get(url).json()
     except requests.exceptions.ConnectionError:
         print("Connection refused")
-        quit()
+
     zipfiles = []
     rawfiles = []
 
     # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
     for f in urljson['list']:
         filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
-        if f['fileType'] == 'SEARCH' and filetype == 'zip':
+        if (f['fileType'] == 'SEARCH' or f['fileType'] == 'OTHER') and filetype == 'zip':
             zipfiles.append(f['downloadLink'])
         if f['fileType'] == 'RAW' and filetype == 'raw':
             rawfiles.append(f['downloadLink'])
