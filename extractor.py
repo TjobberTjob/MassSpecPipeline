@@ -629,7 +629,7 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
 
-            if brokenlist in globals () and accession in brokenlist:
+            if "brokenlist" in globals () and accession in brokenlist:
                 broken = brokenlist[accession]
             else:
                 broken = []
