@@ -111,7 +111,6 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
                 # (causes problems with download)
                 os.remove(f'{filepath}file.raw')
         for f in rawfiles:
-            quit()
             if filename in f or len(rawfiles) == 1:
                 os.system(f'wget -q --show-progress -O {filepath}/file.raw -c {f}')
                 break
@@ -505,32 +504,32 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
         if zips in nonworkingzips:
             print('Zipfile in broken.json - going to next zipfile')
             continue
-        try:
-            if not haveallMQF:
-                output = zipfile_downloader(zips, path, maxquant_file)
-                rawfiles = output[0]
-                df = output[1]
+        # try:
+        if not haveallMQF:
+            output = zipfile_downloader(zips, path, maxquant_file)
+            rawfiles = output[0]
+            df = output[1]
 
-                for raws in rawfiles:
-                    filename = str(raws)
-                    print(f'file: {accnr}/{filename}                                               ')
+            for raws in rawfiles:
+                filename = str(raws)
+                print(f'file: {accnr}/{filename}                                               ')
 
-                    output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                    df2 = output[0]
-                    filepath = output[1]
-                    partTwo(accnr, filename, path, filepath, df2)
-            else:
-                for raws in allRaw:
-                    filename = str(raws[63:-4])
-                    print(f'\nfile: {accnr}/{filename}                                               ')
+                output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                df2 = output[0]
+                filepath = output[1]
+                partTwo(accnr, filename, path, filepath, df2)
+        else:
+            for raws in allRaw:
+                filename = str(raws[63:-4])
+                print(f'\nfile: {accnr}/{filename}                                               ')
 
-                    filepath = f'{path}{accnr}/{filename}/'
-                    df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                    partTwo(accnr, filename, path, filepath, df2)
-        except:
-            print('issue occoured, going to next zipfile')
-            brokenfiles.append(zips)
-            pass
+                filepath = f'{path}{accnr}/{filename}/'
+                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
+                partTwo(accnr, filename, path, filepath, df2)
+        # except:
+        #     print('issue occoured, going to next zipfile')
+        #     brokenfiles.append(zips)
+        #     pass
     return brokenfiles
 
 
