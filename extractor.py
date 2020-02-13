@@ -527,7 +527,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
                     partTwo(accnr, filename, path, filepath, df2)
         except:
             print('issue occoured, going to next zipfile')
-            brokenfiles.append(zips)
+            brokenfiles.append(zips.replace(' ', '%20'))
             pass
     return brokenfiles
 
