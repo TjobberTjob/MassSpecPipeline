@@ -628,6 +628,7 @@ if __name__ == '__main__':
             accession = data['accession']
 
             if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
+                print(broken)
                 broken = [json.loads(line)[accession]for line in open(f'{metapath}broken.json') if accession in json.loads(line)][0]
             else:
                 broken = []
@@ -645,10 +646,12 @@ if __name__ == '__main__':
     else:  # For single accessions usage
         accession = sysinput
         if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-            broken = [json.loads(line)[accession] for line in open(f'{metapath}broken.json') if accession in json.loads(line)][0]
+            for line in open(f'{metapath}broken.json'):
+                if accession in json.loads(line):
+                    broken = json.loads(line)[accession]
+                    break
         else:
             broken = []
-
         print(f'\nAccessions: {accession}')
         partOne(str(accession), pepfile, datapath, broken)
 
