@@ -498,7 +498,6 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
             print('skip_incomplete is True - Continuing')
             return brokenfiles
 
-
     brokenfiles = []
     for zips in reversed(allZip):
         if zips in nonworkingzips:
@@ -615,7 +614,10 @@ if __name__ == '__main__':
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
             if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-                broken = [json.loads(f)[accession] for f in open(f'{metapath}broken.json') if accession in json.loads(f)][0]
+                broken = []
+                for f in open(f'{metapath}broken.json'):
+                    if accession in json.loads(f):
+                        broken.append(json.loads(f)[accession])
             else:
                 broken = []
 
@@ -628,7 +630,10 @@ if __name__ == '__main__':
             accession = data['accession']
 
             if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-                broken = [json.loads(f)[accession] for f in open(f'{metapath}broken.json') if accession in json.loads(f)][0]
+                broken = []
+                for f in open(f'{metapath}broken.json'):
+                    if accession in json.loads(f):
+                        broken.append(json.loads(f)[accession])
             else:
                 broken = []
 
@@ -646,7 +651,10 @@ if __name__ == '__main__':
         accession = sysinput
 
         if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-            broken = [json.loads(f)[accession] for f in open(f'{metapath}broken.json') if accession in json.loads(f)][0]
+            broken = []
+            for f in open(f'{metapath}broken.json'):
+                if accession in json.loads(f):
+                    broken.append(json.loads(f)[accession])
         else:
             broken = []
 
