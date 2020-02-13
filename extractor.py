@@ -612,12 +612,10 @@ if __name__ == '__main__':
     elif str(sysinput) == 'complete':  # For re-creating images from already downloaded and parsed files
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        brokenlist = json.loads(f'{metapath}broken.json')
         for accession in listofowned:
-            if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-                broken = []
-                for f in open(f'{metapath}broken.json'):
-                    if accession in json.loads(f):
-                        broken.append(json.loads(f)[accession])
+            if accession in brokenlist:
+                broken = brokenlist[accession]
             else:
                 broken = []
 
@@ -625,15 +623,13 @@ if __name__ == '__main__':
             partOne(str(accession), pepfile, datapath, broken)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
+        brokenlist = json.loads(f'{metapath}broken.json')
         for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
             data = json.loads(line)
             accession = data['accession']
 
-            if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-                broken = []
-                for f in open(f'{metapath}broken.json'):
-                    if accession in json.loads(f):
-                        broken.append(json.loads(f)[accession])
+            if accession in brokenlist:
+                broken = brokenlist[accession]
             else:
                 broken = []
 
@@ -642,19 +638,17 @@ if __name__ == '__main__':
             if output == 'skip':
                 continue
 
-            with open(f'{metapath}broken.json', 'a') as outfile:
-                outfile.write(json.dumps({accession: output}) + '\n')
+            inbrokenlist = [json.loads(f) for f in open(f'{metapath}broken.json')]
+            if accession not in inbrokenlist:
+                with open(f'{metapath}broken.json', 'a') as outfile:
+                    outfile.write(json.dumps({accession: output}) + '\n')
             outfile.close()
-
 
     else:  # For single accessions usage
         accession = sysinput
-
-        if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-            broken = []
-            for f in open(f'{metapath}broken.json'):
-                if accession in json.loads(f):
-                    broken.append(json.loads(f)[accession])
+        brokenlist = json.loads(f'{metapath}broken.json')
+        if accession in brokenlist:
+            broken = brokenlist[accession]
         else:
             broken = []
 
