@@ -615,7 +615,7 @@ if __name__ == '__main__':
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
             if os.path.exists(f'{metapath}broken.json'):  # loads the broken zip files for this accession
-                broken = [json.loads(line2)[accession]for line2 in open(f'{metapath}broken.json') if accession in json.loads(line2)][0]
+                broken = [json.loads(line2)[accession] for line2 in open(f'{metapath}broken.json') if accession in json.loads(line2)][0]
             else:
                 broken = []
 
