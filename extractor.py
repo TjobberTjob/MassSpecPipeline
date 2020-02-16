@@ -635,6 +635,8 @@ if __name__ == '__main__':
                 data = json.loads(f)
                 if accession in data:
                     brokenlist = data[accession]
+                else:
+                    brokenlist = []
             print(brokenlist)
 
             if "brokenlist" in globals () and accession in brokenlist:
