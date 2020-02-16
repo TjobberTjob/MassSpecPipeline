@@ -626,7 +626,7 @@ if __name__ == '__main__':
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         if os.path.exists(f'{metapath}broken.json'):
             with open(f'{metapath}broken.json') as bJson:
-                brokenlist = json.load(bJson.read())
+                brokenlist = json.load(bJson)
         else:
             open(f'{metapath}broken.json', 'a').close()
         for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
