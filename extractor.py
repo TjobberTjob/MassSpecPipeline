@@ -643,9 +643,10 @@ if __name__ == '__main__':
                 continue
 
             inbrokenlist = [json.loads(f) for f in open(f'{metapath}broken.json')]
+            brokendict = {str(accession): output}
             if accession not in inbrokenlist:
                 with open(f'{metapath}broken.json', 'a') as outfile:
-                    outfile.write(json.dumps({str(accession): output} + '\n'))
+                    outfile.write(json.dumps(brokendict) + '\n')
             outfile.close()
 
     else:  # For single accessions usage
