@@ -641,7 +641,10 @@ if __name__ == '__main__':
             if output == 'skip':
                 continue
 
-            inbrokenlist = [json.loads(f) for f in open(f'{metapath}broken.json')]
+            for f in open(f'{metapath}broken.json'):
+                data = json.loads(f)
+                if accession in data:
+                    inbrokenlist = data[accession]
             print(inbrokenlist)
             brokendict = {str(accession): output}
             if accession not in inbrokenlist:
