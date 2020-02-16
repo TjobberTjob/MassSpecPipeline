@@ -631,6 +631,12 @@ if __name__ == '__main__':
             data = json.loads(line)
             accession = data['accession']
 
+            for f in open(f'{metapath}broken.json'):
+                data = json.loads(f)
+                if accession in data:
+                    brokenlist = data[accession]
+            print(brokenlist)
+
             if "brokenlist" in globals () and accession in brokenlist:
                 broken = brokenlist[accession]
             else:
@@ -641,15 +647,16 @@ if __name__ == '__main__':
             if output == 'skip':
                 continue
 
+            inbrokenlist = []
             for f in open(f'{metapath}broken.json'):
                 data = json.loads(f)
-                if accession in data:
-                    inbrokenlist = data[accession]
+                inbrokenlist.append(data)
             print(inbrokenlist)
             brokendict = {str(accession): output}
             if accession not in inbrokenlist:
                 with open(f'{metapath}broken.json', 'a') as outfile:
                     outfile.write(json.dumps(brokendict) + '\n')
+            quit()
             outfile.close()
 
     else:  # For single accessions usage
