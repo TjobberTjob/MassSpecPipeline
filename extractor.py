@@ -624,11 +624,9 @@ if __name__ == '__main__':
             partOne(str(accession), pepfile, datapath, broken)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
-        if os.path.exists(f'{metapath}broken.json'):
-            with open(f'{metapath}broken.json') as bJson:
-                brokenlist = json.load(bJson)
-        else:
+        if not os.path.exists(f'{metapath}broken.json'):
             open(f'{metapath}broken.json', 'a').close()
+
         for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
             data = json.loads(line)
             accession = data['accession']
