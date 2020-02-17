@@ -64,7 +64,7 @@ def accessions_metadata(file_list, path):
             filesjson = requests.get(files).json()
             filetypes = []
             for f in filesjson['list']:
-                filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
+                filetype = f['fileName'].split('.')[-1]
                 if filetype not in filetypes:
                     filetypes.append(filetype)
             metafile['filetypes'] = filetypes
@@ -72,7 +72,7 @@ def accessions_metadata(file_list, path):
             if metafile['maxquant'] and 'zip' in metafile['filetypes']:
                 try:
                     for f in filesjson['list']:
-                        filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
+                        filetype = f['fileName'].split('.')[-1]
                         if f['fileType'] == 'SEARCH' and filetype == 'zip':
                             zipfile = f['downloadLink']
                             break

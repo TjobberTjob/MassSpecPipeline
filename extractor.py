@@ -40,7 +40,7 @@ def filefinder(accnr, path):
 
     # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
     for jsonelem in urljson['list']:
-        filetype = jsonelem['fileName'][re.search('\.', jsonelem['fileName']).span()[1]:]
+        filetype = jsonelem['fileName'].split('.')[-1]
         if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip':
             zipfiles.append(jsonelem['downloadLink'])
         if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
@@ -536,8 +536,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
 def offline(path, filename):
     maxquant_file = 'allPeptides.txt'
     filepath = f'{sysinput}{filename}/'
-    matches = [i for i, a in enumerate(sysinput) if a == '/']
-    accnr = f'{filepath[matches[-2] + 1:matches[-1]]}'
+    accnr = sysinput.split('/')[-2:-1][0]
     print(f'\nfile: {accnr}/{filename}')
 
     for file in os.listdir(f'{filepath}'):
@@ -637,7 +636,6 @@ if __name__ == '__main__':
                     brokenlist = data[accession]
                 else:
                     brokenlist = []
-            print(brokenlist)
 
             if "brokenlist" in globals () and accession in brokenlist:
                 broken = brokenlist[accession]
@@ -661,8 +659,17 @@ if __name__ == '__main__':
 
     else:  # For single accessions usage
         accession = sysinput
-        brokenlist = json.loads(f'{metapath}broken.json')
-        if accession in brokenlist:
+        if not os.path.exists(f'{metapath}broken.json'):
+            open(f'{metapath}broken.json', 'a').close()
+
+        for f in open(f'{metapath}broken.json'):
+            data = json.loads(f)
+            if accession in data:
+                brokenlist = data[accession]
+            else:
+                brokenlist = []
+
+        if "brokenlist" in globals() and accession in brokenlist:
             broken = brokenlist[accession]
         else:
             broken = []
@@ -674,7 +681,7 @@ if __name__ == '__main__':
 # python3 extractor.py PXD010595
 # python3 extractor.py accessions_filtered
 # python3 extractor.py owned
-# python3 extractor.py /mnt/c/Users/TobiaGC/Dropbox/Universitet/CompBiomed/Speciale/MassSpecPipeline
+# python3 extractor.py /mnt/c/Users/TobiaGC/Dropbox/Universitet/CompBiomed/Speciale/MassSpecPipeline/Data/PXD010595/
 
 
 # Seq_class (4)  val_loss: 0.0092 - val_accuracy: 0.9775
