@@ -124,16 +124,20 @@ def formatFile(accnr, filename, path, filepath):
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         dockerls = subprocess.check_output('docker image ls', shell=True)
-        if not 'thermorawparser' in str(dockerls):
-            if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
-                os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
-                os.system(
-                    f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
-                os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                          '../MassSpecPipeline/')
-            else:
-                os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                          '../MassSpecPipeline/')
+        try:
+            if not 'thermorawparser' in str(dockerls):
+                if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
+                    os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
+                    os.system(
+                        f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
+                    os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                              '../MassSpecPipeline/')
+                else:
+                    os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                              '../MassSpecPipeline/')
+        except:
+            print('Docker issues')
+            return
 
         if path[0] == '/':
             relpath = path[:-1]
@@ -141,9 +145,12 @@ def formatFile(accnr, filename, path, filepath):
             relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
 
         os.system(f'chmod -R a+rwx {path}*')
-        os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
+        try:
+            os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
                   f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
                   f't/{accnr}/{filename}/ -f=1 -m=1')
+        except:
+            print('Problem formatting file, raw file issues')
 
         os.remove(f'{filepath}file-metadata.txt')
         os.remove(f'{filepath}file.raw')
