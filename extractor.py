@@ -560,6 +560,10 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
                     df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                     partTwo(accnr, filename, path, filepath, df2)
         except:
+            try:
+                os.system('rm /data/ProteomeToolsRaw/*.*')
+            except:
+                pass
             print('issue occoured, going to next zipfile')
             brokenfiles.append(zips.replace(' ', '%20'))
             pass
