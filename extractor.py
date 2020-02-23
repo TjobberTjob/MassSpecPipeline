@@ -31,20 +31,19 @@ def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
     try:
         urljson = requests.get(url).json()
+        zipfiles = []
+        rawfiles = []
+
+        # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
+        for jsonelem in urljson['list']:
+            filetype = jsonelem['fileName'].split('.')[-1]
+            if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip':
+                zipfiles.append(jsonelem['downloadLink'])
+            if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
+                rawfiles.append(jsonelem['downloadLink'])
     except:
         print("API connection issue")
         return [], [], []
-
-    zipfiles = []
-    rawfiles = []
-
-    # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
-    for jsonelem in urljson['list']:
-        filetype = jsonelem['fileName'].split('.')[-1]
-        if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip':
-            zipfiles.append(jsonelem['downloadLink'])
-        if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
-            rawfiles.append(jsonelem['downloadLink'])
 
     if not os.path.exists(f'{path}{accnr}/'):
         os.mkdir(f'{path}{accnr}/')
