@@ -63,7 +63,7 @@ def filefinder(accnr, path):
 def zipfile_downloader(zipfile, path, maxquant_file):
     # Handle spaces in urls
     zipfileurl = zipfile.replace(' ', '%20')
-    zipfilename = zipfile.replace(' ', '-')[63:]
+    zipfilename = zipfile.replace(' ', '-')[63:].replace('(','-')
 
     # Download zip file
     if os.path.exists(f'{path}{zipfilename}'):
