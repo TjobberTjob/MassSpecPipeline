@@ -599,7 +599,7 @@ def partOne(accnr, maxquant_file, path, mpath):
                 print(error)  # 'issue occoured, going to next zipfile')
 
             if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
-                os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")'})
+                os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
 
             brokenfiles.append(zips.replace(' ', '%20'))
             pass
