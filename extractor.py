@@ -587,13 +587,14 @@ def partOne(accnr, maxquant_file, path, mpath):
                     df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                     partTwo(accnr, filename, path, mpath, filepath, df2)
         except Exception as error:
-            print(error)
+            if not multithread:
+                print(error)
             try:
                 os.system('rm /data/ProteomeToolsRaw/*.*')
             except:
                 pass
-            if not multithread:
-                print('issue occoured, going to next zipfile')
+            # if not multithread:
+            #     print('issue occoured, going to next zipfile')
             brokenfiles.append(zips.replace(' ', '%20'))
             pass
 
