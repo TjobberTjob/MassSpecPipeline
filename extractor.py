@@ -588,13 +588,11 @@ def partOne(accnr, maxquant_file, path, mpath):
                     partTwo(accnr, filename, path, mpath, filepath, df2)
         except Exception as error:
             if not multithread:
-                print(error)
+                print(error)#'issue occoured, going to next zipfile')
             try:
                 os.system('rm /data/ProteomeToolsRaw/*.*')
             except:
                 pass
-            # if not multithread:
-            #     print('issue occoured, going to next zipfile')
             brokenfiles.append(zips.replace(' ', '%20'))
             pass
 
@@ -603,7 +601,6 @@ def partOne(accnr, maxquant_file, path, mpath):
             inbrokens = json.loads(brokens)
             inbrokenlist.append(list(inbrokens.keys()))
         brokendict = {str(accnr): output}
-        print(brokendict)
         if accnr not in inbrokenlist:
             with open(f'{mpath}broken.json', 'a') as outfile:
                 outfile.write(json.dumps(brokendict) + '\n')
