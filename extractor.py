@@ -591,7 +591,7 @@ def partOne(accnr, maxquant_file, path, mpath):
 
             for things in os.listdir(f'{path}'):
                 if things.endswith('.txt') or things.endswith('.zip'):
-                    os.remove(things)
+                    print(things)
 
             brokenfiles.append(zips.replace(' ', '%20'))
             pass
