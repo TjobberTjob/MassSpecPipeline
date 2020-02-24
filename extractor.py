@@ -381,7 +381,7 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, image, bounds, savepng, mpath):
+def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, filename, image, bounds, savepng):
     mz_bin = bins[0]
     rt_bin = bins[1]
     mzrangelist = [interval['mz']['min'] + i * mz_bin for i in range(int(resolution['x']))]
@@ -519,8 +519,7 @@ def partTwo(accnr, filename, path, mpath, filepath, df2):
     subimage_interval['mz'] = config['mz_interval']
     subimage_interval['rt'] = config['rt_interval']
 
-    inorout = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
-                     savepng=False)
+    inorout = subimgs(interval, bins, resolution, path,  mpath, df2, subimage_interval, filename, image, bounds, savepng=False)
 
     endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
 
