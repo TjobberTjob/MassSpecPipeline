@@ -685,8 +685,9 @@ if __name__ == '__main__':
         if not os.path.exists(f'{metapath}broken.json'):
             open(f'{metapath}broken.json', 'a').close()
         if multithread:
-            accessions = [(linez['accession'], pepfile, datapath, metapath) for linez in open(f'{metapath}{sys.argv[1]}.json') if 'accession' in linez]
+            accessions = [linez['accession'] for linez in open(f'{metapath}{sys.argv[1]}.json') if 'accession' in linez]
             print(accessions[0:10])
+            quit()
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
         else:
