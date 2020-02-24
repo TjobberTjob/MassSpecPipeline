@@ -116,7 +116,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
                 os.remove(f'{filepath}file.raw')
         for f in rawfiles:
             if filename in f or len(rawfiles) == 1:
-                os.system(f'wget -q --show-progress -O {filepath}/file.raw -c {f}')
+                os.system(f'wget -q -O {filepath}/file.raw -c {f}')
                 break
 
     return df2, filepath
