@@ -564,37 +564,38 @@ def partOne(accnr, maxquant_file, path, mpath):
             if not multithread:
                 print('Zipfile in broken.json - going to next zipfile')
             continue
-        # try:
-        if not haveallMQF:
-            output = zipfile_downloader(zips, path, maxquant_file)
-            rawfiles = output[0]
-            df = output[1]
+        try:
+            if not haveallMQF:
+                output = zipfile_downloader(zips, path, maxquant_file)
+                rawfiles = output[0]
+                df = output[1]
 
-            for raws in rawfiles:
-                filename = str(raws)
-                print(f'file: {accnr}/{filename}                                               ')
+                for raws in rawfiles:
+                    filename = str(raws)
+                    print(f'file: {accnr}/{filename}                                               ')
 
-                output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                df2 = output[0]
-                filepath = output[1]
-                partTwo(accnr, filename, path, mpath, filepath, df2)
-        else:
-            for raws in allRaw:
-                filename = str(raws[63:-4])
-                print(f'\nfile: {accnr}/{filename}                                               ')
+                    output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                    df2 = output[0]
+                    filepath = output[1]
+                    partTwo(accnr, filename, path, mpath, filepath, df2)
+            else:
+                for raws in allRaw:
+                    filename = str(raws[63:-4])
+                    print(f'\nfile: {accnr}/{filename}                                               ')
 
-                filepath = f'{path}{accnr}/{filename}/'
-                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                partTwo(accnr, filename, path, mpath, filepath, df2)
-        # except:
-        #     try:
-        #         os.system('rm /data/ProteomeToolsRaw/*.*')
-        #     except:
-        #         pass
-        #     if not multithread:
-        #         print('issue occoured, going to next zipfile')
-        #     brokenfiles.append(zips.replace(' ', '%20'))
-        #     pass
+                    filepath = f'{path}{accnr}/{filename}/'
+                    df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
+                    partTwo(accnr, filename, path, mpath, filepath, df2)
+        except Exception as error:
+            print(error)
+            try:
+                os.system('rm /data/ProteomeToolsRaw/*.*')
+            except:
+                pass
+            if not multithread:
+                print('issue occoured, going to next zipfile')
+            brokenfiles.append(zips.replace(' ', '%20'))
+            pass
 
         inbrokenlist = []
         for brokens in open(f'{mpath}broken.json'):
