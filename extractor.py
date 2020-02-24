@@ -601,7 +601,7 @@ def partOne(accnr, maxquant_file, path, mpath):
             inbrokens = json.loads(brokens)
             inbrokenlist.append(list(inbrokens.keys()))
         brokendict = {str(accnr): output}
-        if accession not in inbrokenlist:
+        if accnr not in inbrokenlist:
             with open(f'{mpath}broken.json', 'a') as outfile:
                 outfile.write(json.dumps(brokendict) + '\n')
         outfile.close()
@@ -704,7 +704,7 @@ if __name__ == '__main__':
         if not os.path.exists(f'{metapath}broken.json'):
             open(f'{metapath}broken.json', 'a').close()
         if multithread:
-            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath) for linez in open(f'{metapath}{sys.argv[1]}.json') if 'accession' in json.loads(linez)]
+            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath) for linez in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez)]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
         else:
@@ -714,7 +714,6 @@ if __name__ == '__main__':
                 output = partOne(str(accession), pepfile, datapath, metapath)
                 if output == 'skip':
                     continue
-
 
 
     else:  # For single accessions usage
