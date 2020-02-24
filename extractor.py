@@ -603,6 +603,7 @@ def partOne(accnr, maxquant_file, path, mpath):
             inbrokens = json.loads(brokens)
             inbrokenlist.append(list(inbrokens.keys()))
         brokendict = {str(accnr): output}
+        print(brokendict)
         if accnr not in inbrokenlist:
             with open(f'{mpath}broken.json', 'a') as outfile:
                 outfile.write(json.dumps(brokendict) + '\n')
