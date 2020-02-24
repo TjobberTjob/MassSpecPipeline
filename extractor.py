@@ -690,14 +690,7 @@ if __name__ == '__main__':
     elif str(sysinput) == 'complete':  # For re-creating images from already downloaded and parsed files
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
-        brokenlist = json.loads(f'{metapath}broken.json')
         for accession in listofowned:
-            if accession in brokenlist:
-                broken = brokenlist[accession]
-            else:
-                broken = []
-            if not multithread:
-                print(f'\nAccessions: {accession}')
             partOne(str(accession), pepfile, datapath, broken)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
@@ -718,22 +711,6 @@ if __name__ == '__main__':
 
     else:  # For single accessions usage
         accession = sysinput
-        if not os.path.exists(f'{metapath}broken.json'):
-            open(f'{metapath}broken.json', 'a').close()
-
-        for f in open(f'{metapath}broken.json'):
-            data = json.loads(f)
-            if accession in data:
-                brokenlist = data[accession]
-            else:
-                brokenlist = []
-
-        if "brokenlist" in globals() and accession in brokenlist:
-            broken = brokenlist[accession]
-        else:
-            broken = []
-
-        print(f'\nAccessions: {accession}')
         partOne(str(accession), pepfile, datapath, broken)
 
 # python3 extractor.py PXD004732
