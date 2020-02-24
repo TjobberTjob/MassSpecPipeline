@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import requests
 from pyteomics import mzml
+from multiprocessing.dummy import Pool as ThreadPool
 
 
 def get_lower_bound(haystack, needle):
@@ -369,7 +370,7 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, image, bounds, savepng):
+def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, image, bounds, savepng, mpath):
     mz_bin = bins[0]
     rt_bin = bins[1]
     mzrangelist = [interval['mz']['min'] + i * mz_bin for i in range(int(resolution['x']))]
@@ -379,14 +380,13 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
     if not os.path.exists(imgpath):
         os.mkdir(imgpath)
 
-    metapath = f'{path}metadata/'
-    if not os.path.exists(metapath):
-        os.mkdir(metapath)
+    if not os.path.exists(mpath):
+        os.mkdir(mpath)
 
     lowbound = bounds[0]
     highbound = bounds[1]
 
-    outfile = open(f'{metapath}subimage.json', 'a')  # The metadata file
+    outfile = open(f'{mpath}subimage.json', 'a')  # The metadata file
 
     outbound = 0
     inbound = 0
@@ -440,7 +440,7 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
         outfile.write(json.dumps(new_metadata) + '\n')
     outfile.close()
 
-    return [inbound, outbound, inmzbound], metapath
+    return [inbound, outbound, inmzbound]
 
 
 def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath):
@@ -472,7 +472,7 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
     print('Done!                                                    ')
 
 
-def partTwo(accnr, filename, path, filepath, df2):
+def partTwo(accnr, filename, path, mpath, filepath, df2):
     formatFile(accnr, filename, path, filepath)
     internalmzML(filepath)
 
@@ -505,15 +505,14 @@ def partTwo(accnr, filename, path, filepath, df2):
     subimage_interval['mz'] = config['mz_interval']
     subimage_interval['rt'] = config['rt_interval']
 
-    output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
+    inorout = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
                      savepng=False)
-    inorout = output[0]
-    metapath = output[1]
 
-    endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, metapath)
+    endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
 
 
-def partOne(accnr, maxquant_file, path, nonworkingzips):
+def partOne(accnr, maxquant_file, path, mpath):
+    print(f'\nAccessions: {accession}')
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
@@ -530,6 +529,18 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
             brokenfiles = 'skip'
             print('skip_incomplete is True - Continuing')
             return brokenfiles
+
+    for brokens in open(f'{mpath}broken.json'):
+        inbrokens = json.loads(brokens)
+        if accession in inbrokens:
+            brokenlist = data[accession]
+        else:
+            brokenlist = []
+
+    if "brokenlist" in globals() and accession in brokenlist:
+        nonworkingzips = brokenlist[accession]
+    else:
+        nonworkingzips = []
 
     brokenfiles = []
     for zips in reversed(allZip):
@@ -549,7 +560,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
                     output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                     df2 = output[0]
                     filepath = output[1]
-                    partTwo(accnr, filename, path, filepath, df2)
+                    partTwo(accnr, filename, path, mpath, filepath, df2)
             else:
                 for raws in allRaw:
                     filename = str(raws[63:-4])
@@ -557,7 +568,7 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
 
                     filepath = f'{path}{accnr}/{filename}/'
                     df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                    partTwo(accnr, filename, path, filepath, df2)
+                    partTwo(accnr, filename, path, mpath, filepath, df2)
         except:
             try:
                 os.system('rm /data/ProteomeToolsRaw/*.*')
@@ -566,10 +577,20 @@ def partOne(accnr, maxquant_file, path, nonworkingzips):
             print('issue occoured, going to next zipfile')
             brokenfiles.append(zips.replace(' ', '%20'))
             pass
+
+        inbrokenlist = []
+        for brokens in open(f'{mpath}broken.json'):
+            inbrokens = json.loads(brokens)
+            inbrokenlist.append(list(inbrokens.keys()))
+        brokendict = {str(accession): output}
+        if accession not in inbrokenlist:
+            with open(f'{mpath}broken.json', 'a') as outfile:
+                outfile.write(json.dumps(brokendict) + '\n')
+        outfile.close()
     return brokenfiles
 
 
-def offline(path, filename):
+def offline(path, filename, mpath):
     maxquant_file = 'allPeptides.txt'
     filepath = f'{sysinput}{filename}/'
     accnr = sysinput.split('/')[-2:-1][0]
@@ -607,7 +628,7 @@ def offline(path, filename):
         else:
             df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
 
-        partTwo(accnr, filename, path, filepath, df)
+        partTwo(accnr, filename, path, mpath, filepath, df)
     else:
         try:
             os.system('rm /data/ProteomeToolsRaw/*.*')
@@ -626,6 +647,8 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
+    multithread = data['multithread'] == 'True'
+    nr_threads = data['nr_threads']
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
@@ -643,7 +666,7 @@ if __name__ == '__main__':
     elif str(sysinput)[0] == '/':  # For local fine purposes.
         dirsinpath = os.listdir(sysinput)
         for f in dirsinpath:
-            offline(datapath, f)
+            offline(datapath, f, metapath)
 
     elif str(sysinput) == 'complete':  # For re-creating images from already downloaded and parsed files
         listofowned = [f for f in os.listdir(datapath) if
@@ -661,37 +684,22 @@ if __name__ == '__main__':
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         if not os.path.exists(f'{metapath}broken.json'):
             open(f'{metapath}broken.json', 'a').close()
-
-        for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
-            data = json.loads(line)
-            accession = data['accession']
-
-            for f in open(f'{metapath}broken.json'):
-                data = json.loads(f)
-                if accession in data:
-                    brokenlist = data[accession]
-                else:
-                    brokenlist = []
-
-            if "brokenlist" in globals () and accession in brokenlist:
-                broken = brokenlist[accession]
-            else:
-                broken = []
-
-            print(f'\nAccessions: {accession}')
-            output = partOne(str(accession), pepfile, datapath, broken)
+        if multithread:
+            accessions = [(linez['accession'], pepfile, datapath, metapath) for linez in open(f'{metapath}{sys.argv[1]}.json') if 'accession' in linez]
+            print(accessions[0:10])
+            pool = ThreadPool(nr_threads)
+            output = pool.starmap(partOne, accessions)
             if output == 'skip':
                 continue
+        else:
+            for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
+                data = json.loads(line)
+                accession = data['accession']
+                output = partOne(str(accession), pepfile, datapath, metapath)
+                if output == 'skip':
+                    continue
 
-            inbrokenlist = []
-            for f in open(f'{metapath}broken.json'):
-                data = json.loads(f)
-                inbrokenlist.append(list(data.keys()))
-            brokendict = {str(accession): output}
-            if accession not in inbrokenlist:
-                with open(f'{metapath}broken.json', 'a') as outfile:
-                    outfile.write(json.dumps(brokendict) + '\n')
-            outfile.close()
+
 
     else:  # For single accessions usage
         accession = sysinput
