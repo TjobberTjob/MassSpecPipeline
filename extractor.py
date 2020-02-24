@@ -597,7 +597,7 @@ def partOne(accnr, maxquant_file, path, mpath):
         except Exception as error:
             if not multithread:
                 print(error)  # 'issue occoured, going to next zipfile')
-            print(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")'})
+            print(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
                 # os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")'})
             # for things in os.listdir(f'{path}'):
             #     if things.endswith('.txt') or things.endswith('.zip'):
