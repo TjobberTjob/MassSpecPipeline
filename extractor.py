@@ -588,10 +588,11 @@ def partOne(accnr, maxquant_file, path, mpath):
         except Exception as error:
             if not multithread:
                 print(error)#'issue occoured, going to next zipfile')
-            try:
-                os.system('rm /data/ProteomeToolsRaw/*.*')
-            except:
-                pass
+
+            for things in os.listdir(f'{path}'):
+                if things.endswith('.txt') or things.endswith('.zip'):
+                    os.remove(things)
+
             brokenfiles.append(zips.replace(' ', '%20'))
             pass
 
