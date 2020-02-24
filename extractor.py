@@ -691,7 +691,7 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
-            partOne(str(accession), pepfile, datapath, broken)
+            partOne(str(accession), pepfile, datapath, metapath)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         if not os.path.exists(f'{metapath}broken.json'):
@@ -711,7 +711,7 @@ if __name__ == '__main__':
 
     else:  # For single accessions usage
         accession = sysinput
-        partOne(str(accession), pepfile, datapath, broken)
+        partOne(str(accession), pepfile, datapath, metapath)
 
 # python3 extractor.py PXD004732
 # python3 extractor.py PXD010595
