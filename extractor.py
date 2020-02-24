@@ -512,7 +512,7 @@ def partTwo(accnr, filename, path, mpath, filepath, df2):
 
 
 def partOne(accnr, maxquant_file, path, mpath):
-    print(f'\nAccessions: {accession}')
+    print(f'\nAccessions: {accnr}')
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
