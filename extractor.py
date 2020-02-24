@@ -532,13 +532,13 @@ def partOne(accnr, maxquant_file, path, mpath):
 
     for brokens in open(f'{mpath}broken.json'):
         inbrokens = json.loads(brokens)
-        if accession in inbrokens:
-            brokenlist = data[accession]
+        if accnr in inbrokens:
+            brokenlist = data[accnr]
         else:
             brokenlist = []
 
-    if "brokenlist" in globals() and accession in brokenlist:
-        nonworkingzips = brokenlist[accession]
+    if "brokenlist" in globals() and accnr in brokenlist:
+        nonworkingzips = brokenlist[accnr]
     else:
         nonworkingzips = []
 
