@@ -688,9 +688,7 @@ if __name__ == '__main__':
             accessions = [(linez['accession'], pepfile, datapath, metapath) for linez in open(f'{metapath}{sys.argv[1]}.json') if 'accession' in linez]
             print(accessions[0:10])
             pool = ThreadPool(nr_threads)
-            output = pool.starmap(partOne, accessions)
-            if output == 'skip':
-                continue
+            pool.starmap(partOne, accessions)
         else:
             for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
                 data = json.loads(line)
