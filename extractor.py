@@ -554,7 +554,7 @@ def partOne(accnr, maxquant_file, path, mpath):
         if accnr in zipfiles:
             print(accnr)
             print(zipfiles)
-            nonworkingzips = accessionsnumbers[accnr]
+            nonworkingzips = zipfiles[accnr]
             break
         else:
             nonworkingzips = []
