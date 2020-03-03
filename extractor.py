@@ -531,7 +531,6 @@ def partOne(accnr, maxquant_file, path, mpath):
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
-    print(allZip)
     allRaw = output[1]
     haveallMQF = output[2]
 
