@@ -599,12 +599,9 @@ def partOne(accnr, maxquant_file, path, mpath):
             pass
 
         # Create list of broken zip files
-        inbrokenlist = []
-        for brokens in open(f'{mpath}broken.json'):
-            inbrokens = json.loads(brokens)
-            inbrokenlist.append(list(inbrokens.keys()))
+        listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
         brokendict = {str(accnr): brokenfiles}
-        if accnr not in inbrokenlist:
+        if accnr not in listofaccnr:
             with open(f'{mpath}broken.json', 'a') as outfile:
                 outfile.write(json.dumps(brokendict) + '\n')
         outfile.close()
