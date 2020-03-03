@@ -27,7 +27,6 @@ def get_lower_bound(haystack, needle):
     else:
         raise ValueError(f"{needle} is out of bounds of {haystack}")
 
-
 def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
     try:
@@ -431,7 +430,6 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
         mzupper = int(get_lower_bound(mzrangelist, rows['m/z']) + mzlen)
         rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen)
         rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
-
         subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
         subimage2 = np.array(subimage)
 
@@ -552,8 +550,8 @@ def partOne(accnr, maxquant_file, path, mpath):
 
     # load broken zipfiles into list
     for brokens in open(f'{mpath}broken.json'):
-        inbrokens = json.loads(brokens)
-        if accnr in inbrokens:
+        zips = json.loads(brokens)
+        if accnr in zips:
             brokenlist = inbrokens[accnr]
         else:
             brokenlist = []
