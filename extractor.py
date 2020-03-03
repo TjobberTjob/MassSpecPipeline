@@ -550,7 +550,7 @@ def partOne(accnr, maxquant_file, path, mpath):
 
     # load broken zipfiles into list
     for accessionsnumbers in open(f'{mpath}broken.json'):
-        zipfiles = json.loads(str(accessionsnumbers))
+        zipfiles = json.loads(accessionsnumbers)
         if accnr in zipfiles:
             nonworkingzips = zipfiles[accnr]
             break
