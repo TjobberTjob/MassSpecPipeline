@@ -1,15 +1,14 @@
 import bisect
-import glob
 import gzip
 import json
 import math
 import os
-from pathlib import Path
 import pickle
-import re
 import shutil
 import subprocess
 import sys
+from multiprocessing.dummy import Pool as ThreadPool
+from pathlib import Path
 from zipfile import ZipFile
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -17,7 +16,6 @@ import numpy as np
 import pandas as pd
 import requests
 from pyteomics import mzml
-from multiprocessing.dummy import Pool as ThreadPool
 
 
 def get_lower_bound(haystack, needle):
@@ -548,14 +546,17 @@ def partOne(accnr, maxquant_file, path, mpath):
                 print('skip_incomplete is True - Continuing')
             return brokenfiles
 
+    #Makes broken.json if it doesnt exists
+    if not os.path.exists(f'{metapath}broken.json'):
+        open(f'{metapath}broken.json', 'a').close()
     # load broken zipfiles into list
     for accessionsnumbers in open(f'{mpath}broken.json'):
         zipfiles = json.loads(accessionsnumbers)
         if accnr in zipfiles:
             nonworkingzips = zipfiles[accnr]
             break
-        else:
-            nonworkingzips = []
+    if not "nonworkingzips" in globals():
+        nonworkingzips = []
 
     brokenfiles = []
     for zips in reversed(allZip):
@@ -695,8 +696,6 @@ if __name__ == '__main__':
             partOne(str(accession), pepfile, datapath, metapath)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
-        if not os.path.exists(f'{metapath}broken.json'):
-            open(f'{metapath}broken.json', 'a').close()
         if multithread:
             accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath) for linez in
                           reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez)]
