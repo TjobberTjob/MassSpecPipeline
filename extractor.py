@@ -670,7 +670,7 @@ if __name__ == '__main__':
     skip_incomplete = data['skip_incomplete'] == 'True'
     multithread = data['multithread'] == 'True'
     nr_threads = data['nr_threads']
-    usebroken = data['usebroken']
+    usebroken = data['usebroken'] == 'True'
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
