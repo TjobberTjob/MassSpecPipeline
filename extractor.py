@@ -107,13 +107,9 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     if not multithread:
         print('Downloading raw file                                                    ', end='\r')
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        if os.path.exists(f'{filepath}file.raw'):
-            if os.path.getsize(f'{filepath}file.raw') == 0:  # If this is an empty file with nothing in it, remove it
-                # (causes problems with download)
-                os.remove(f'{filepath}file.raw')
         for f in rawfiles:
             if filename in f or len(rawfiles) == 1:
-                os.system(f'wget -q -O {filepath}/file.raw -c {f}')
+                os.system(f'wget -q -c -O {filepath}/file.raw -c {f}')
                 break
 
     return df2, filepath
