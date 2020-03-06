@@ -546,7 +546,7 @@ def partOne(accnr, maxquant_file, path, mpath):
                 print('skip_incomplete is True - Continuing')
             return brokenfiles
 
-    if usebroken:
+    if filterbroken:
         #Makes broken.json if it doesnt exists
         if not os.path.exists(f'{metapath}broken.json'):
             open(f'{metapath}broken.json', 'a').close()
@@ -561,7 +561,7 @@ def partOne(accnr, maxquant_file, path, mpath):
             brokenfiles = []
 
     for zips in reversed(allZip):
-        if usebroken:
+        if filterbroken:
             if zips in nonworkingzips:
                 if not multithread:
                     print('Zipfile in broken.json - going to next zipfile')
@@ -594,13 +594,13 @@ def partOne(accnr, maxquant_file, path, mpath):
         except Exception as error:
             # if not multithread:
             print(error)  # 'issue occoured, going to next zipfile')
-            if usebroken:
+            if filterbroken:
                 if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                     os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
 
                 brokenfiles.append(zips.replace(' ', '%20'))
             pass
-        if usebroken:
+        if filterbroken:
             # Create list of broken zip files
             listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
             brokendict = {str(accnr): brokenfiles}
@@ -670,7 +670,7 @@ if __name__ == '__main__':
     skip_incomplete = data['skip_incomplete'] == 'True'
     multithread = data['multithread'] == 'True'
     nr_threads = data['nr_threads']
-    usebroken = data['usebroken'] == 'True'
+    filterbroken = data['filterbroken'] == 'True'
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
