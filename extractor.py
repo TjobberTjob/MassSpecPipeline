@@ -546,24 +546,26 @@ def partOne(accnr, maxquant_file, path, mpath):
                 print('skip_incomplete is True - Continuing')
             return brokenfiles
 
-    #Makes broken.json if it doesnt exists
-    if not os.path.exists(f'{metapath}broken.json'):
-        open(f'{metapath}broken.json', 'a').close()
-    # load broken zipfiles into list
-    for accessionsnumbers in open(f'{mpath}broken.json'):
-        zipfiles = json.loads(accessionsnumbers)
-        if accnr in zipfiles:
-            nonworkingzips = zipfiles[accnr]
-            break
-    if not "nonworkingzips" in globals():
-        nonworkingzips = []
+    if usebroken:
+        #Makes broken.json if it doesnt exists
+        if not os.path.exists(f'{metapath}broken.json'):
+            open(f'{metapath}broken.json', 'a').close()
+        # load broken zipfiles into list
+        for accessionsnumbers in open(f'{mpath}broken.json'):
+            zipfiles = json.loads(accessionsnumbers)
+            if accnr in zipfiles:
+                nonworkingzips = zipfiles[accnr]
+                break
+        if not "nonworkingzips" in globals():
+            nonworkingzips = []
+            brokenfiles = []
 
-    brokenfiles = []
     for zips in reversed(allZip):
-        if zips in nonworkingzips:
-            if not multithread:
-                print('Zipfile in broken.json - going to next zipfile')
-            continue
+        if usebroken:
+            if zips in nonworkingzips:
+                if not multithread:
+                    print('Zipfile in broken.json - going to next zipfile')
+                continue
         try:
             if not haveallMQF:  # if skip incomplete is true
                 output = zipfile_downloader(zips, path, maxquant_file)
@@ -592,22 +594,20 @@ def partOne(accnr, maxquant_file, path, mpath):
         except Exception as error:
             # if not multithread:
             print(error)  # 'issue occoured, going to next zipfile')
+            if usebroken:
+                if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
+                    os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
 
-            if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
-                os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
-
-            brokenfiles.append(zips.replace(' ', '%20'))
+                brokenfiles.append(zips.replace(' ', '%20'))
             pass
-
-        # Create list of broken zip files
-        listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
-        brokendict = {str(accnr): brokenfiles}
-        if accnr not in listofaccnr:
-            with open(f'{mpath}broken.json', 'a') as outfile:
-                outfile.write(json.dumps(brokendict) + '\n')
-        outfile.close()
-
-    return brokenfiles
+        if usebroken:
+            # Create list of broken zip files
+            listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
+            brokendict = {str(accnr): brokenfiles}
+            if accnr not in listofaccnr:
+                with open(f'{mpath}broken.json', 'a') as outfile:
+                    outfile.write(json.dumps(brokendict) + '\n')
+            outfile.close()
 
 
 def offline(path, filename, mpath):
@@ -670,6 +670,7 @@ if __name__ == '__main__':
     skip_incomplete = data['skip_incomplete'] == 'True'
     multithread = data['multithread'] == 'True'
     nr_threads = data['nr_threads']
+    usebroken = data['usebroken']
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
@@ -705,9 +706,7 @@ if __name__ == '__main__':
             for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
-                output = partOne(str(accession), pepfile, datapath, metapath)
-                if output == 'skip':
-                    continue
+                partOne(str(accession), pepfile, datapath, metapath)
 
 
     else:  # For single accessions usage
