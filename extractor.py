@@ -170,27 +170,27 @@ def process_ms1(spectrum):
     intensity = spectrum['intensity array']
     return {'scan_time': scan_time, 'intensity': intensity.tolist(), 'mz': mz.tolist()}
 
-
-def process_ms2(spectrum):
-    # Fish out the precursors.
-    precursors = spectrum['precursorList']
-    if precursors['count'] != 1:
-        if not multithread:
-            print("Number of precursors different than 1, not designed for that")
-        quit()
-    ion = precursors['precursor'][0]['selectedIonList']
-    if ion['count'] != 1:
-        if not multithread:
-            print("More then one selected ions, not designed for that")
-        quit()
-
-    ion = ion['selectedIon'][0]['selected ion m/z']
-    ms1_scan = int(precursors['precursor'][0]['spectrumRef'].split('scan=')[1])
-
-    # Fish out the scan index
-    scan_index = spectrum['index']
-
-    return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion}
+#
+# def process_ms2(spectrum):
+#     # Fish out the precursors.
+#     precursors = spectrum['precursorList']
+#     if precursors['count'] != 1:
+#         if not multithread:
+#             print("Number of precursors different than 1, not designed for that")
+#         quit()
+#     ion = precursors['precursor'][0]['selectedIonList']
+#     if ion['count'] != 1:
+#         if not multithread:
+#             print("More then one selected ions, not designed for that")
+#         quit()
+#
+#     ion = ion['selectedIon'][0]['selected ion m/z']
+#     ms1_scan = int(precursors['precursor'][0]['spectrumRef'].split('scan=')[1])
+#
+#     # Fish out the scan index
+#     scan_index = spectrum['index']
+#
+#     return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion}
 
 
 def internalmzML(path):
@@ -201,7 +201,7 @@ def internalmzML(path):
         data = mzml.MzML(f'{path}file.mzML')
 
         # Extracted data
-        extracted = {'ms1': {}, 'ms2': {}}
+        extracted = {'ms1': {}}#, 'ms2': {}}
         # Extract the necessary data from spectra
         for spectrum in data:
             if spectrum['ms level'] == 1:
@@ -212,15 +212,17 @@ def internalmzML(path):
                 ms1_spectrum = process_ms1(spectrum)
                 extracted['ms1'][scan_id] = {'mz': ms1_spectrum['mz'], 'intensity': ms1_spectrum['intensity'],
                                              'scan_time': ms1_spectrum['scan_time']}
-            elif spectrum['ms level'] == 2:
-                # Scan id
-                scan_id = int(spectrum['id'].split('scan=')[1])
-
-                # Deal with ms level 1 spectra
-                ms1_spectrum = process_ms1(spectrum)
-                extracted['ms1'][scan_id] = {'mz': process_ms2['precursor_scan'],
-                                             'intensity': process_ms2['precursor_ion'],
-                                             'scan_time': process_ms2['scan_index']}
+            else:
+                pass
+            # elif spectrum['ms level'] == 2:
+            #     # Scan id
+            #     scan_id = int(spectrum['id'].split('scan=')[1])
+            #
+            #     # Deal with ms level 1 spectra
+            #     ms1_spectrum = process_ms1(spectrum)
+            #     extracted['ms1'][scan_id] = {'mz': process_ms2['precursor_scan'],
+            #                                  'intensity': process_ms2['precursor_ion'],
+            #                                  'scan_time': process_ms2['scan_index']}
 
         with gzip.GzipFile(f'{path}mzML.json', 'w') as fout:
             fout.write(json.dumps(extracted).encode('utf-8'))
