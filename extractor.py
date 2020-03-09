@@ -152,10 +152,9 @@ def formatFile(accnr, filename, path, filepath):
         # if os.path.exists(f'{filepath}file.raw'):
         #     os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
         #               f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_input/{accnr}/{filename}/ -f=1 -m=1')
-        else:
-            if not multithread:
-                print('No raw file, cannot format')
-            return
+        if not multithread:
+            print('No raw file, cannot format')
+        return
 
         os.remove(f'{filepath}file-metadata.txt')
         os.remove(f'{filepath}file.raw')
