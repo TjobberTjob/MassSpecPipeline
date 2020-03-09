@@ -25,6 +25,7 @@ def get_lower_bound(haystack, needle):
     else:
         raise ValueError(f"{needle} is out of bounds of {haystack}")
 
+
 def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
     try:
@@ -107,9 +108,9 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     if not multithread:
         print('Downloading raw file                                                    ', end='\r')
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        for f in rawfiles:
-            if filename in f or len(rawfiles) == 1:
-                os.system(f'wget -q -c -O {filepath}/file.raw -c {f}')
+        for rawfile in rawfiles:
+            if filename in rawfile or len(rawfiles) == 1:
+                os.system(f'wget -q -c -O {filepath}/file.raw -c {rawfile}')
                 break
 
     return df2, filepath
@@ -134,7 +135,8 @@ def formatFile(accnr, filename, path, filepath):
             else:
                 relpath = f'{os.getcwd()}{path}'
 
-            os.system(f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
+            os.system(
+                f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
 
             os.remove(f'{filepath}file-metadata.txt')
             os.remove(f'{filepath}file.raw')
@@ -147,11 +149,13 @@ def formatFile(accnr, filename, path, filepath):
                         os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
                         os.system(
                             f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
-                        os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                                  '../MassSpecPipeline/')
+                        os.system(
+                            'cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                            '../MassSpecPipeline/')
                     else:
-                        os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                                  '../MassSpecPipeline/')
+                        os.system(
+                            'cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                            '../MassSpecPipeline/')
             except:
                 if not multithread:
                     print('Docker issues')
@@ -211,7 +215,7 @@ def internalmzML(path):
         data = mzml.MzML(f'{path}file.mzML')
 
         # Extracted data
-        extracted = {'ms1': {}}#, 'ms2': {}}
+        extracted = {'ms1': {}}  # , 'ms2': {}}
         # Extract the necessary data from spectra
         for spectrum in data:
             if spectrum['ms level'] == 1:
@@ -559,7 +563,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread):
             return brokenfiles
 
     if filterbroken:
-        #Makes broken.json if it doesnt exists
+        # Makes broken.json if it doesnt exists
         if not os.path.exists(f'{metapath}broken.json'):
             open(f'{metapath}broken.json', 'a').close()
         # load broken zipfiles into list
