@@ -118,35 +118,40 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
 def formatFile(accnr, filename, path, filepath):
     if not multithread:
         print('Formatting file to mzML										', end='\r')
+
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        dockerls = subprocess.check_output('docker image ls', shell=True)
-        try:
-            if not 'thermorawparser' in str(dockerls):
-                if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
-                    os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
-                    os.system(
-                        f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
-                    os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                              '../MassSpecPipeline/')
-                else:
-                    os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                              '../MassSpecPipeline/')
-        except:
-            if not multithread:
-                print('Docker issues')
-            return
-
         if path[0] == '/':
-            relpath = path[:-1]
+            relpath = path
         else:
-            relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
-
-        os.system(f'chmod -R a+rwx {path}*')
-        if os.path.exists(f'{filepath}file.raw'):
-            os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
-                      f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
-                      f't/{accnr}/{filename}/ -f=1 -m=1')
+            relpath = f'{os.getcwd()}{path}'
+        os.system(f'mono ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
+        # dockerls = subprocess.check_output('docker image ls', shell=True)
+        # try:
+        #     if not 'thermorawparser' in str(dockerls):
+        #         if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
+        #             os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
+        #             os.system(
+        #                 f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
+        #             os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+        #                       '../MassSpecPipeline/')
+        #         else:
+        #             os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+        #                       '../MassSpecPipeline/')
+        # except:
+        #     if not multithread:
+        #         print('Docker issues')
+        #     return
+        #
+        # if path[0] == '/':
+        #     relpath = path[:-1]
+        # else:
+        #     relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
+        #
+        # os.system(f'chmod -R a+rwx {path}*')
+        # if os.path.exists(f'{filepath}file.raw'):
+        #     os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
+        #               f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_input/{accnr}/{filename}/ -f=1 -m=1')
         else:
             if not multithread:
                 print('No raw file, cannot format')
