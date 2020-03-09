@@ -56,8 +56,8 @@ def filter(path, file):
             #         outfile.write(json.dumps(data) + '\n')
         outfile.close()
 
-    elif file == 'accession':
-        if os.path.exists(f'{path}accession_filtered.json'):
+    elif file == 'accessions':
+        if os.path.exists(f'{path}{str(file)}_filtered.json'):
             print('Removing old filtered version')
             os.remove(f'{path}{str(file)}_filtered.json')
 
@@ -73,7 +73,7 @@ def filter(path, file):
                 outfile.write(json.dumps(data) + '\n')
         outfile.close()
     else:
-        print('nobueno')
+        print('no bueno')
         quit()
 
 
