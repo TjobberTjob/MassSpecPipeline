@@ -125,7 +125,7 @@ def formatFile(accnr, filename, path, filepath):
             relpath = path
         else:
             relpath = f'{os.getcwd()}{path}'
-        os.system(f'mono /opt/conda/envs/thermo/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
+        os.system(f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
         # dockerls = subprocess.check_output('docker image ls', shell=True)
         # try:
         #     if not 'thermorawparser' in str(dockerls):
