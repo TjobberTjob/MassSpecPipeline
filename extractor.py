@@ -110,7 +110,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         for rawfile in rawfiles:
             if filename in rawfile or len(rawfiles) == 1:
-                os.system(f'wget -q -c -O {filepath}file.raw -c {rawfile}')
+                print(f'wget -q -c -O {filepath}file.raw -c {rawfile}')
                 break
 
     return df2, filepath
