@@ -121,43 +121,53 @@ def formatFile(accnr, filename, path, filepath):
 
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        if path[0] == '/':
-            relpath = path
-        else:
-            relpath = f'{os.getcwd()}{path}'
-        os.system(f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
-        # dockerls = subprocess.check_output('docker image ls', shell=True)
-        # try:
-        #     if not 'thermorawparser' in str(dockerls):
-        #         if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
-        #             os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
-        #             os.system(
-        #                 f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
-        #             os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-        #                       '../MassSpecPipeline/')
-        #         else:
-        #             os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-        #                       '../MassSpecPipeline/')
-        # except:
-        #     if not multithread:
-        #         print('Docker issues')
-        #     return
-        #
-        # if path[0] == '/':
-        #     relpath = path[:-1]
-        # else:
-        #     relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
-        #
-        # os.system(f'chmod -R a+rwx {path}*')
-        # if os.path.exists(f'{filepath}file.raw'):
-        #     os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
-        #               f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_input/{accnr}/{filename}/ -f=1 -m=1')
-        if not multithread:
-            print('No raw file, cannot format')
-        return
+        if not os.path.exists(f'{filepath}File.raw'):
+            if not multithread:
+                print(f'No raw file, cannot format')
+            return
+        formatusing = 'conda'
+        # formatusing = 'docker'
 
-        os.remove(f'{filepath}file-metadata.txt')
-        os.remove(f'{filepath}file.raw')
+        if formatusing == 'conda':
+            if path[0] == '/':
+                relpath = path
+            else:
+                relpath = f'{os.getcwd()}{path}'
+
+            os.system(f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
+
+            os.remove(f'{filepath}file-metadata.txt')
+            os.remove(f'{filepath}file.raw')
+
+        else:
+            dockerls = subprocess.check_output('docker image ls', shell=True)
+            try:
+                if not 'thermorawparser' in str(dockerls):
+                    if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
+                        os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
+                        os.system(
+                            f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
+                        os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                                  '../MassSpecPipeline/')
+                    else:
+                        os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                                  '../MassSpecPipeline/')
+            except:
+                if not multithread:
+                    print('Docker issues')
+                return
+
+            if path[0] == '/':
+                relpath = path[:-1]
+            else:
+                relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
+
+            os.system(f'chmod -R a+rwx {path}*')
+            if os.path.exists(f'{filepath}file.raw'):
+                os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
+                          f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_input/{accnr}/{filename}/ -f=1 -m=1')
+            os.remove(f'{filepath}file-metadata.txt')
+            os.remove(f'{filepath}file.raw')
 
 
 def process_ms1(spectrum):
@@ -526,7 +536,7 @@ def partTwo(accnr, filename, path, mpath, filepath, df2):
     endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
 
 
-def partOne(accnr, maxquant_file, path, mpath):
+def partOne(accnr, maxquant_file, path, mpath, multithread):
     print(f'\nAccessions: {accnr}')
     # Find all zip files
     output = filefinder(accnr, path)
@@ -696,7 +706,7 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
-            partOne(str(accession), pepfile, datapath, metapath)
+            partOne(str(accession), pepfile, datapath, metapath, multithread)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         if multithread:
@@ -708,12 +718,12 @@ if __name__ == '__main__':
             for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
-                partOne(str(accession), pepfile, datapath, metapath)
+                partOne(str(accession), pepfile, datapath, metapath, multithread)
 
 
     else:  # For single accessions usage
         accession = sysinput
-        partOne(str(accession), pepfile, datapath, metapath)
+        partOne(str(accession), pepfile, datapath, metapath, multithread)
 
 # python3 extractor.py PXD004732
 # python3 extractor.py PXD010595
