@@ -122,7 +122,7 @@ def formatFile(accnr, filename, path, filepath):
 
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        if not os.path.exists(f'{filepath}File.raw'):
+        if not os.path.exists(f'{filepath}file.raw'):
             if not multithread:
                 print(f'No raw file, cannot format')
             return
