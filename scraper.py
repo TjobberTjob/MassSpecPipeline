@@ -74,7 +74,7 @@ def accessions_metadata(file_list, path,identify_maxquant=True):
             filesjson = requests.get(files).json()
             filetypes = []
             for f in filesjson['list']:
-                filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
+                filetype = f['fileName'].split('.')[-1]
                 if filetype not in filetypes:
                     filetypes.append(filetype)
             metafile['filetypes'] = filetypes
@@ -86,7 +86,7 @@ def accessions_metadata(file_list, path,identify_maxquant=True):
             if metafile['maxquant'] and 'zip' in metafile['filetypes']:
                 try:
                     for f in filesjson['list']:
-                        filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
+                        filetype = f['fileName'].split('.')[-1]
                         if f['fileType'] == 'SEARCH' and filetype == 'zip':
                             zipfile = f['downloadLink']
                             break
@@ -125,6 +125,7 @@ def update_metadata(mpath):
     had_accessions = [json.loads(line)['accession'] for line in open(f'{mpath}{metadata}') if
                       'accession' in json.loads(line)]
     missing_accessions = [f for f in all_accessions if f not in had_accessions]
+    print(missing_accessions)
 
     accessions_metadata(missing_accessions, mpath)
 

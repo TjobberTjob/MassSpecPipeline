@@ -14,6 +14,7 @@ from keras.utils import plot_model
 
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio, test_accessions):
+    print('Data fetching')
     imgfiles = os.listdir(imgpath)
     with open(f'{imgpath}{imgfiles[0]}', "rb") as pa:
         image = pickle.load(pa)
@@ -85,6 +86,8 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
         partition['test'] = list(chain.from_iterable(partition['test']))
+        for f in testlabels2:
+            print(f'Test data - {f}: {len(testlabels2[f])}')
 
     return partition, labels, imagelen, pixellen, testlabels
 
@@ -150,9 +153,9 @@ class DataGenerator(keras.utils.Sequence):
 
 
 # Developing the neural network
-def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath):
+def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience):
     input = Input(shape=(imglen, pixellen, n_channels,))
-    x = Conv2D(16, kernel_size=(3, 3), activation='relu', padding='same')(input)
+    x = Conv2D(16, kernel_size=(5, 5), activation='relu', padding='same')(input)
     x = MaxPooling2D(pool_size=(2, 2))(x)
     # x = Concatenate()([x, x1, x2])
     x = Flatten()(x)
@@ -180,7 +183,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     else:
         checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_mse',
                                                      save_best_only=True)
-    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=6)
+    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience)
     callbacks_list = [checkpoint, early_stopping]
 
     return model, callbacks_list
@@ -201,6 +204,9 @@ if __name__ == '__main__':
     n_channels = config['n_channels']
     batch_size = config['batch_size']
     epochs = config['epochs']
+    patience = config['early_stopping']
+    TFversion = config['TF']
+
 
     # Cmd inputs
     classification = sys.argv[1] == 'T'
@@ -217,7 +223,7 @@ if __name__ == '__main__':
     testlabels = output[4]
 
     if classification:
-        classes = [json.loads(line)['Seq_class'] for line in open(f'{metapath}subimage_filtered.json', 'r') if 'Seq_class' in json.loads(line)]
+        classes = [json.loads(line)[imageclass] for line in open(f'{metapath}subimage_filtered.json', 'r') if str(imageclass) in json.loads(line)]
         n_classes = len(np.unique(classes))
     else:
         n_classes = 1
@@ -231,7 +237,7 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath)
+    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath, patience)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
@@ -242,17 +248,18 @@ if __name__ == '__main__':
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
     else:
         plt.plot(history.history['mse'])
         plt.plot(history.history['val_mse'])
         plt.title('model accuracy')
-        plt.ylabel('Mean squared errpr')
+        plt.ylabel('Mean squared error')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
 
+    print('Creating and running model')
     model = load_model(f'{metapath}Best-{imageclass}.h5')
     test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
     testaccuracy = model.evaluate_generator(test_generator)

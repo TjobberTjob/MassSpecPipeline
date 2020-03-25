@@ -3,12 +3,12 @@ import gzip
 import json
 import math
 import os
-from pathlib import Path
 import pickle
-import re
 import shutil
 import subprocess
 import sys
+from multiprocessing.dummy import Pool as ThreadPool
+from pathlib import Path
 from zipfile import ZipFile
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -27,24 +27,29 @@ def get_lower_bound(haystack, needle):
 
 
 def filefinder(accnr, path):
-    url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}'
-    urljson = requests.get(url).json()
-    zipfiles = []
-    rawfiles = []
+    url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
+    try:
+        urljson = requests.get(url).json()
+        zipfiles = []
+        rawfiles = []
 
-    # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
-    for f in urljson['list']:
-        filetype = f['fileName'][re.search('\.', f['fileName']).span()[1]:]
-        if f['fileType'] == 'SEARCH' and filetype == 'zip':
-            zipfiles.append(f['downloadLink'])
-        if f['fileType'] == 'RAW' and filetype == 'raw':
-            rawfiles.append(f['downloadLink'])
+        # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
+        for jsonelem in urljson['list']:
+            filetype = jsonelem['fileName'].split('.')[-1]
+            if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip':
+                zipfiles.append(jsonelem['downloadLink'])
+            if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
+                rawfiles.append(jsonelem['downloadLink'])
+    except:
+        if not multithread:
+            print("API connection issue")
+        return [], [], []
 
     if not os.path.exists(f'{path}{accnr}/'):
         os.mkdir(f'{path}{accnr}/')
 
-
-    allCheck = ['allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/') if len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
+    allCheck = ['allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/') if
+                len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
     if False in allCheck or allCheck == []:
         haveallMQF = False
     else:
@@ -55,13 +60,15 @@ def filefinder(accnr, path):
 
 def zipfile_downloader(zipfile, path, maxquant_file):
     # Handle spaces in urls
-    zipfile = zipfile.replace(' ', '%20')
-    zipfilename = zipfile[63:]
+    zipfileurl = zipfile.replace(' ', '%20')
+    zipfilename = zipfile.replace(' ', '-')[63:].replace('(', '-').replace(')', '-')
 
     # Download zip file
     if os.path.exists(f'{path}{zipfilename}'):
         os.remove(f'{path}{zipfilename}')
-    os.system(f'wget -q --show-progress -O  {path}{zipfilename} {zipfile}')
+    if not multithread:
+        print('Downloading zip file                                                    ', end='\r')
+    os.system(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
 
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
@@ -98,48 +105,73 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
         pd.DataFrame.to_csv(df2, f'{filepath}{maxquant_file}')
 
     # Download the raw file
-    print('Downloading raw file                                                    ', end='\r')
+    if not multithread:
+        print('Downloading raw file                                                    ', end='\r')
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        if os.path.exists(f'{filepath}file.raw'):
-            if os.path.getsize(f'{filepath}file.raw') == 0:  # If this is an empty file with nothing in it, remove it
-                # (causes problems with download)
-                os.remove(f'{filepath}file.raw')
-        for f in rawfiles:
-            if filename in f or len(rawfiles) == 1:
-                os.system(f'wget -q --show-progress -O {filepath}/file.raw -c {f}')
+        for rawfile in rawfiles:
+            if filename in rawfile or len(rawfiles) == 1:
+                os.system(f'wget -q -c -O {filepath}file.raw -c {rawfile}')
                 break
 
     return df2, filepath
 
 
 def formatFile(accnr, filename, path, filepath):
-    print('Formatting file to mzML										', end='\r')
+    if not multithread:
+        print('Formatting file to mzML										', end='\r')
+
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        dockerls = subprocess.check_output('docker image ls', shell=True)
-        if not 'thermorawparser' in str(dockerls):
-            if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
-                os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
-                os.system(
-                    f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
-                os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                          '../MassSpecPipeline/')
+        if not os.path.exists(f'{filepath}file.raw'):
+            if not multithread:
+                print(f'No raw file, cannot format')
+            return
+        formatusing = 'conda'
+        # formatusing = 'docker'
+
+        if formatusing == 'conda':
+            if path[0] == '/':
+                relpath = path
             else:
-                os.system('cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
-                          '../MassSpecPipeline/')
+                relpath = f'{os.getcwd()}{path}'
 
-        if path[0] == '/':
-            relpath = path[:-1]
+            os.system(
+                f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
+
+            os.remove(f'{filepath}file-metadata.txt')
+            os.remove(f'{filepath}file.raw')
+
         else:
-            relpath = f'{os.getcwd()}{path[:-1]}'
+            dockerls = subprocess.check_output('docker image ls', shell=True)
+            try:
+                if not 'thermorawparser' in str(dockerls):
+                    if not os.path.exists(f'{Path(os.getcwd()).parent}/ThermoRawFileParser'):
+                        os.mkdir(f'{Path(os.getcwd()).parent}/ThermoRawFileParser')
+                        os.system(
+                            f'git clone https://github.com/compomics/ThermoRawFileParser.git {Path(os.getcwd()).parent}/ThermoRawFileParser')
+                        os.system(
+                            'cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                            '../MassSpecPipeline/')
+                    else:
+                        os.system(
+                            'cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
+                            '../MassSpecPipeline/')
+            except:
+                if not multithread:
+                    print('Docker issues')
+                return
 
-        os.system(f'chmod -R a+rwx {path}*')
-        os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
-              f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_inpu'
-              f't/{accnr}/{filename}/ -f=1 -m=1')
+            if path[0] == '/':
+                relpath = path[:-1]
+            else:
+                relpath = f'{os.getcwd()}{path[:-1]}'  # Either gives path as root path or have data as a sub folder to the one the code is in
 
-        os.remove(f'{filepath}file-metadata.txt')
-        os.remove(f'{filepath}file.raw')
+            os.system(f'chmod -R a+rwx {path}*')
+            if os.path.exists(f'{filepath}file.raw'):
+                os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
+                          f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_input/{accnr}/{filename}/ -f=1 -m=1')
+            os.remove(f'{filepath}file-metadata.txt')
+            os.remove(f'{filepath}file.raw')
 
 
 def process_ms1(spectrum):
@@ -153,27 +185,58 @@ def process_ms1(spectrum):
     return {'scan_time': scan_time, 'intensity': intensity.tolist(), 'mz': mz.tolist()}
 
 
+# def process_ms2(spectrum):
+#     # Fish out the precursors.
+#     precursors = spectrum['precursorList']
+#     if precursors['count'] != 1:
+#         if not multithread:
+#             print("Number of precursors different than 1, not designed for that")
+#         quit()
+#     ion = precursors['precursor'][0]['selectedIonList']
+#     if ion['count'] != 1:
+#         if not multithread:
+#             print("More then one selected ions, not designed for that")
+#         quit()
+#
+#     ion = ion['selectedIon'][0]['selected ion m/z']
+#     ms1_scan = int(precursors['precursor'][0]['spectrumRef'].split('scan=')[1])
+#
+#     # Fish out the scan index
+#     scan_index = spectrum['index']
+#
+#     return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion}
+
+
 def internalmzML(path):
     # Extract the data from the mzml, if we havnt already
     if not os.path.exists(f'{path}mzML.json'):
-        print('Extracting data from mzML                                                    ', end='\r')
+        if not multithread:
+            print('Extracting data from mzML                                                    ', end='\r')
         data = mzml.MzML(f'{path}file.mzML')
 
         # Extracted data
-        extracted = {'ms1': {}}
-        i = 0
+        extracted = {'ms1': {}}  # , 'ms2': {}}
         # Extract the necessary data from spectra
         for spectrum in data:
+            if spectrum['ms level'] == 1:
+                # Scan id
+                scan_id = int(spectrum['id'].split('scan=')[1])
 
-            if spectrum['ms level'] != 1:
-                continue
-            # Scan id
-            scan_id = int(spectrum['id'].split('scan=')[1])
-
-            # Deal with ms level 1 spectra
-            ms1_spectrum = process_ms1(spectrum)
-            extracted['ms1'][scan_id] = {'mz': ms1_spectrum['mz'], 'intensity': ms1_spectrum['intensity'],
-                                         'scan_time': ms1_spectrum['scan_time']}
+                # Deal with ms level 1 spectra
+                ms1_spectrum = process_ms1(spectrum)
+                extracted['ms1'][scan_id] = {'mz': ms1_spectrum['mz'], 'intensity': ms1_spectrum['intensity'],
+                                             'scan_time': ms1_spectrum['scan_time']}
+            else:
+                pass
+            # elif spectrum['ms level'] == 2:
+            #     # Scan id
+            #     scan_id = int(spectrum['id'].split('scan=')[1])
+            #
+            #     # Deal with ms level 1 spectra
+            #     ms1_spectrum = process_ms1(spectrum)
+            #     extracted['ms1'][scan_id] = {'mz': process_ms2['precursor_scan'],
+            #                                  'intensity': process_ms2['precursor_ion'],
+            #                                  'scan_time': process_ms2['scan_index']}
 
         with gzip.GzipFile(f'{path}mzML.json', 'w') as fout:
             fout.write(json.dumps(extracted).encode('utf-8'))
@@ -182,9 +245,10 @@ def internalmzML(path):
 
 
 def preparameters(filepath):
-    print('Preparing parameter for image creation                                                    ', end='\r')
+    if not multithread:
+        print('Preparing parameter for image creation                                                    ', end='\r')
     with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
-            mzml = json.loads(fin.read().decode('utf-8'))
+        mzml = json.loads(fin.read().decode('utf-8'))
 
     mzlist = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
     rtlist = [mzml['ms1'][f]['scan_time'] for f in mzml['ms1']]
@@ -279,8 +343,9 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
     image = []
     for y_i in range(0, resolution['y']):
         if y_i % 25 == 0:
-            print('Creating full image: {:2.1%}                                                    '.format(
-                y_i / resolution['y']), end='\r')  # Print how far we are
+            if not multithread:
+                print('Creating full image: {:2.1%}                                                    '.format(
+                    y_i / resolution['y']), end='\r')  # Print how far we are
         row = []
         for x_i in range(0, resolution['x']):
             _key = (x_i, y_i)
@@ -296,7 +361,8 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
                 pixelpoint = [0, 0, 0, 0]
             row.append(pixelpoint)
         image.append(row)
-    print('Saving image files                                                    ', end='\r')
+    if not multithread:
+        print('Saving image files                                                    ', end='\r')
     # image.reverse()
     imagedata = [image, nonzero_counter, total_datapoints]
     # Save as txt file
@@ -330,7 +396,7 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, image, bounds, savepng):
+def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, filename, image, bounds, savepng):
     mz_bin = bins[0]
     rt_bin = bins[1]
     mzrangelist = [interval['mz']['min'] + i * mz_bin for i in range(int(resolution['x']))]
@@ -340,14 +406,13 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
     if not os.path.exists(imgpath):
         os.mkdir(imgpath)
 
-    metapath = f'{path}metadata/'
-    if not os.path.exists(metapath):
-        os.mkdir(metapath)
+    if not os.path.exists(mpath):
+        os.mkdir(mpath)
 
     lowbound = bounds[0]
     highbound = bounds[1]
 
-    outfile = open(f'{metapath}subimage.json', 'a')  # The metadata file
+    outfile = open(f'{mpath}subimage.json', 'a')  # The metadata file
 
     outbound = 0
     inbound = 0
@@ -355,8 +420,9 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
         if (index + 1) % int(df.shape[0] / 40) == 0:
-            print('Creating subimages: {:2.1%}                                                    '.format(
-                (index + 1) / df.shape[0]), end='\r')  # Print how far we are
+            if not multithread:
+                print('Creating subimages: {:2.1%}                                                    '.format(
+                    (index + 1) / df.shape[0]), end='\r')  # Print how far we are
 
         if rows['Retention time'] - subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time'] + \
                 subimage_interval['rt'] > interval['rt']['max'] or rows['m/z'] - subimage_interval['mz'] < \
@@ -378,7 +444,6 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
         mzupper = int(get_lower_bound(mzrangelist, rows['m/z']) + mzlen)
         rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen)
         rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
-
         subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
         subimage2 = np.array(subimage)
 
@@ -401,11 +466,12 @@ def subimgs(interval, bins, resolution, path, df, subimage_interval, filename, i
         outfile.write(json.dumps(new_metadata) + '\n')
     outfile.close()
 
-    return [inbound, outbound, inmzbound], metapath
+    return [inbound, outbound, inmzbound]
 
 
 def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath):
-    print('Calculating end statistics:                                                    ', end='\r')
+    if not multithread:
+        print('Calculating end statistics:                                                    ', end='\r')
     mzlist = inputlists[0]
     rtlist = inputlists[1]
 
@@ -430,10 +496,11 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
     outfile = open(f'{mpath}sub_statistics.json', 'a')
     outfile.write(json.dumps(end_stats) + '\n')
     outfile.close()
-    print('Done!                                                    ')
+    if not multithread:
+        print('Done!                                                    ')
 
 
-def partTwo(accnr, filename, path, filepath, df2):
+def partTwo(accnr, filename, path, mpath, filepath, df2):
     formatFile(accnr, filename, path, filepath)
     internalmzML(filepath)
 
@@ -453,7 +520,8 @@ def partTwo(accnr, filename, path, filepath, df2):
         total_datapoints = output[2]
     # Retrieve if exist already
     else:
-        print('Loading image data                                                    ', end='\r')
+        if not multithread:
+            print('Loading image data                                                    ', end='\r')
         with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "rb") as pa:
             output = pickle.load(pa)
         image = output[0]
@@ -466,58 +534,145 @@ def partTwo(accnr, filename, path, filepath, df2):
     subimage_interval['mz'] = config['mz_interval']
     subimage_interval['rt'] = config['rt_interval']
 
+    inorout = subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds,
+                      savepng=False)
 
-    output = subimgs(interval, bins, resolution, path, df2, subimage_interval, filename, image, bounds,
-                     savepng=False)
-    inorout = output[0]
-    metapath = output[1]
-
-    endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, metapath)
+    endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
 
 
-def partOne(accnr, maxquant_file, path):
-    # Skip this special case. Something wrong... dont know, dont care
-    not_working = ['01625b_GA1-TUM_first_pool_1_01_01-2xIT_2xHCD-1h-R1',
-                   '01790a_BE1-TUM_second_pool_71_01_01-3xHCD-1h-R1',
-                   '01709a_GD2-TUM_first_pool_110_01_01-2xIT_2xHCD-1h-R1']
-
+def partOne(accnr, maxquant_file, path, mpath, multithread):
+    print(f'\nAccessions: {accnr}')
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
     allRaw = output[1]
     haveallMQF = output[2]
 
+    # skip files if skip-incomplete or acquire_only_new is true
+    if haveallMQF:
+        if acquire_only_new:
+            brokenfiles = 'skip'
+            if not multithread:
+                print('acquire_only_new is True - Continuing')
+            return brokenfiles
+    else:
+        if skip_incomplete:
+            brokenfiles = 'skip'
+            if not multithread:
+                print('skip_incomplete is True - Continuing')
+            return brokenfiles
+
+    if filterbroken:
+        # Makes broken.json if it doesnt exists
+        if not os.path.exists(f'{metapath}broken.json'):
+            open(f'{metapath}broken.json', 'a').close()
+        # load broken zipfiles into list
+        for accessionsnumbers in open(f'{mpath}broken.json'):
+            zipfiles = json.loads(accessionsnumbers)
+            if accnr in zipfiles:
+                nonworkingzips = zipfiles[accnr]
+                break
+        if not "nonworkingzips" in globals():
+            nonworkingzips = []
+            brokenfiles = []
+
     for zips in reversed(allZip):
-        # finds raw files for this zip file
-        if not haveallMQF:
-            continue
-            output = zipfile_downloader(zips, path, maxquant_file)
-            rawfiles = output[0]
-            df = output[1]
+        if filterbroken:
+            if zips in nonworkingzips:
+                if not multithread:
+                    print('Zipfile in broken.json - going to next zipfile')
+                continue
+        try:
+            if not haveallMQF:  # if skip incomplete is true
+                output = zipfile_downloader(zips, path, maxquant_file)
+                rawfiles = output[0]
+                df = output[1]
 
-            for raws in rawfiles:
-                filename = str(raws)
-                if filename in not_working:
-                    continue
+                for raws in rawfiles:
+                    filename = str(raws)
+                    if not multithread:
+                        print(f'file: {accnr}/{filename}                                               ')
 
-                print(f'\nfile: {accnr}/{filename}                                               ')
+                    output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                    df2 = output[0]
+                    filepath = output[1]
+                    partTwo(accnr, filename, path, mpath, filepath, df2)
+            else:  # if skipe incomplete is false
+                for raws in allRaw:
+                    filename = str(raws[63:-4])
+                    if not multithread:
+                        print(f'\nfile: {accnr}/{filename}                                               ')
 
-                output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                df2 = output[0]
-                filepath = output[1]
+                    filepath = f'{path}{accnr}/{filename}/'
+                    df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
+                    partTwo(accnr, filename, path, mpath, filepath, df2)
 
-                partTwo(accnr, filename, path, filepath, df2)
+        except Exception as error:
+            # if not multithread:
+            print(error)  # 'issue occoured, going to next zipfile')
+            if filterbroken:
+                if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
+                    os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
+
+                brokenfiles.append(zips.replace(' ', '%20'))
+            pass
+        if filterbroken:
+            # Create list of broken zip files
+            listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
+            brokendict = {str(accnr): brokenfiles}
+            if accnr not in listofaccnr:
+                with open(f'{mpath}broken.json', 'a') as outfile:
+                    outfile.write(json.dumps(brokendict) + '\n')
+            outfile.close()
+
+
+def offline(path, filename, mpath):
+    maxquant_file = 'allPeptides.txt'
+    filepath = f'{sysinput}{filename}/'
+    accnr = sysinput.split('/')[-2:-1][0]
+    print(f'\nfile: {accnr}/{filename}')
+
+    for file in os.listdir(f'{filepath}'):
+        if file.endswith('.zip'):
+            zipfile = file
+    for file in os.listdir(f'{filepath}'):
+        if file.endswith('.raw'):
+            rawfile = file
+    if os.path.exists(f'{filepath}{maxquant_file}'):
+        allPep = True
+    else:
+        allPep = False
+
+    if 'rawfile' in locals() and (allPep or 'zipfile' in locals()):
+        if not os.path.exists(f'{filepath}{maxquant_file}'):
+            # Get a list of files with directories from zip file
+            with ZipFile(f'{filepath}{zipfile}', 'r') as zipped:
+                ziplist = zipped.namelist()
+
+            # Extract the peptide file from the zipfile
+            for a in ziplist:
+                if maxquant_file in a:
+                    with ZipFile(f'{filepath}{zipfile}') as z:
+                        with z.open(a) as zf, open(f'{filepath}allPeptides.txt', 'wb') as zfg:
+                            shutil.copyfileobj(zf, zfg)
+                        break
+
+            df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+            df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
+            df = df.loc[df['Raw file'] == rawfile,]
+            pd.DataFrame.to_csv(df, f'{filepath}{maxquant_file}')
         else:
-            for raws in allRaw:
-                filename = str(raws[63:-4])
-                if filename in not_working:
-                    continue
+            df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
 
-                print(f'\nfile: {accnr}/{filename}                                               ')
-
-                filepath = f'{path}{accnr}/{filename}/'
-                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                partTwo(accnr, filename, path, filepath, df2)
+        partTwo(accnr, filename, path, mpath, filepath, df)
+    else:
+        try:
+            os.system('rm /data/ProteomeToolsRaw/*.*')
+        except:
+            pass
+        if not multithread:
+            print(f'Necessary files dont exist in {f}')
+        quit()
 
 
 if __name__ == '__main__':
@@ -527,20 +682,16 @@ if __name__ == '__main__':
 
     datapath = data['path']
     metapath = f'{datapath}metadata/'
-
-    for f in os.listdir(datapath):
-        if '.' in f:
-            os.system(f'rm {datapath}*.*')
-            break
-
-    if os.path.exists(f'{metapath}brokenlinks.txt'):
-        with open(f'{metapath}brokenlinks.txt', "rb") as pa:
-            brokenlinks = pickle.load(pa)
+    acquire_only_new = data['acquire_only_new'] == 'True'
+    skip_incomplete = data['skip_incomplete'] == 'True'
+    multithread = data['multithread'] == 'True'
+    nr_threads = data['nr_threads']
+    filterbroken = data['filterbroken'] == 'True'
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
     sysinput = sys.argv[1]
-    if str(sysinput) == 'reset':
+    if str(sysinput) == 'reset':  # Reset files and folders if you want to remake all images in another setting
         try:
             shutil.rmtree(f'{datapath}images/')
             os.remove(f'{metapath}subimage.json')
@@ -550,55 +701,42 @@ if __name__ == '__main__':
         except:
             pass
 
-    elif str(sysinput) == 'complete':
-        listofowned = [f for f in os.listdir(datapath) if os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
-        print(listofowned)
-        quit()
+    elif str(sysinput)[0] == '/':  # For local fine purposes.
+        dirsinpath = os.listdir(sysinput)
+        for f in dirsinpath:
+            offline(datapath, f, metapath)
+
+    elif str(sysinput) == 'complete':  # For re-creating images from already downloaded and parsed files
+        listofowned = [f for f in os.listdir(datapath) if
+                       os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
-            if 'brokenlinks' in globals() and accession in brokenlinks:
-                print('Accession is broken')
-                continue
-            try:
-                partOne(str(accession), pepfile, datapath)
-            except:
-                print(f'Problem occured with: {accession}. unable to proceed at this time')
-                os.system(f'rm {datapath}*.*')
-                pass
+            partOne(str(accession), pepfile, datapath, metapath, multithread)
 
-    elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':
-        for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
-            data = json.loads(line)
-            accession = data['accession']
-            debuggerFile = open(f'{metapath}debugger.txt', 'a')
-            if 'brokenlinks' in globals() and accession in brokenlinks:
-                print('Accession is broken')
-                continue
-            try:
-                partOne(str(accession), pepfile, datapath)
-                debuggerlist = [accession, 'No error']
-                debuggerFile.write(f'{debuggerlist}\n')
-                debuggerFile.close()
-            except Exception as e:
-                print(f'Problem occured with: {accession}. unable to proceed at this time')
-                os.system(f'rm {datapath}*.*')
-                debuggerlist = [accession, e]
-                debuggerFile.write(f'{debuggerlist}\n')
-                debuggerFile.close()
-                pass
+    elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
+        if multithread:
+            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath) for linez in
+                          reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez)]
+            pool = ThreadPool(nr_threads)
+            pool.starmap(partOne, accessions)
+        else:
+            for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
+                data = json.loads(line)
+                accession = data['accession']
+                partOne(str(accession), pepfile, datapath, metapath, multithread)
 
-    else:
+
+    else:  # For single accessions usage
         accession = sysinput
-        if 'brokenlinks' in globals() and accession in brokenlinks:
-            print('Accession is broken')
-            quit()
-        partOne(str(accession), pepfile, datapath)
+        partOne(str(accession), pepfile, datapath, metapath, multithread)
 
 # python3 extractor.py PXD004732
 # python3 extractor.py PXD010595
 # python3 extractor.py accessions_filtered
 # python3 extractor.py owned
+# python3 extractor.py /mnt/c/Users/TobiaGC/Dropbox/Universitet/CompBiomed/Speciale/MassSpecPipeline/Data/PXD010595/
 
-#Seq_class (4)  val_loss: 0.0092 - val_accuracy: 0.9775
-#Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
-#m/z val_mse: 4000
-#Length val_accuracy: 0.5160
+
+# Seq_class (4)  val_loss: 0.0092 - val_accuracy: 0.9775
+# Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
+# m/z val_mse: 4000
+# Length val_accuracy: 0.5160
