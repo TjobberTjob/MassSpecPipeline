@@ -8,7 +8,7 @@ import os
 import pickle
 import sys
 
-continue
+
 def get_accessions(path):
 
     '''
@@ -23,8 +23,9 @@ def get_accessions(path):
     soup = BeautifulSoup(page, 'html.parser')
     # Level 1 - Getting the years
     for level1 in soup.find_all('a', href=True):
+        
         if '20' not in level1['href']:
-            continue  # To avoid the non years
+            continue  # To avoid the non years as the earliest year is 2005 and we wont hit 21** anytisme soon
         page_2 = requests.get(f'{url}{level1["href"]}').text
         soup_2 = BeautifulSoup(page_2, 'html.parser')
         # Level 2 - year subfolders
@@ -42,6 +43,8 @@ def get_accessions(path):
                 accession = level3['href'].replace('/', '')
                 if len(accession) == len('PRD000000'):
                     all_accessions.append(accession)
+                else:
+                    print('skipping '+accession)
 
     with open(f'{path}{accessions}', "wb") as pa:
         pickle.dump(all_accessions, pa)
@@ -50,14 +53,14 @@ def get_accessions(path):
 def accessions_metadata(file_list, path,identify_maxquant=True):
 
     '''
-    Download the accessions for each of the PRIDE accessions
+    Download the metadata for each of the PRIDE accessions
     '''
   
     metafile = 'accessions.json'
     outfile = open(join(metapath, metafile), 'a')
     for i, f in enumerate(file_list):
         try:
-            print('Progress {:2.1%}                                       '.format(i / len(file_list)), end='\r')
+            print('Progress {:2.1%}                                       '.format(i / len(file_list)), )#end='\r')
             api = f'https://www.ebi.ac.uk/pride/ws/archive/project/{f}'
             apijson = requests.get(api).json()
 
@@ -72,16 +75,17 @@ def accessions_metadata(file_list, path,identify_maxquant=True):
 
             files = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{f}'
             filesjson = requests.get(files).json()
+           
             filetypes = []
             for f in filesjson['list']:
                 filetype = f['fileName'].split('.')[-1]
                 if filetype not in filetypes:
                     filetypes.append(filetype)
             metafile['filetypes'] = filetypes
+            metafile['files'] = filesjson
 
             outfile.write(json.dumps(metafile) + '\n')
-            if identify_maxquant == False:
-                continue 
+            '''
             print('Looking for maxquant in'+metafile['filetypes'])
             if metafile['maxquant'] and 'zip' in metafile['filetypes']:
                 try:
@@ -104,6 +108,7 @@ def accessions_metadata(file_list, path,identify_maxquant=True):
                     metafile['allpeptides'] = False
             else:
                 metafile['allpeptides'] = False
+            '''
 
 
         except:
