@@ -8,8 +8,13 @@ import os
 import pickle
 import sys
 
-
+continue
 def get_accessions(path):
+
+    '''
+    Retrieve all accessions currently available in PRIDE, store them in Data/metadata/accessions.txt as a pickled file
+    '''
+
     all_accessions = []
     accessions = 'accessions.txt'
 
@@ -42,7 +47,12 @@ def get_accessions(path):
         pickle.dump(all_accessions, pa)
 
 
-def accessions_metadata(file_list, path):
+def accessions_metadata(file_list, path,identify_maxquant=True):
+
+    '''
+    Download the accessions for each of the PRIDE accessions
+    '''
+  
     metafile = 'accessions.json'
     outfile = open(join(metapath, metafile), 'a')
     for i, f in enumerate(file_list):
@@ -69,6 +79,10 @@ def accessions_metadata(file_list, path):
                     filetypes.append(filetype)
             metafile['filetypes'] = filetypes
 
+            outfile.write(json.dumps(metafile) + '\n')
+            if identify_maxquant == False:
+                continue 
+            print('Looking for maxquant in'+metafile['filetypes'])
             if metafile['maxquant'] and 'zip' in metafile['filetypes']:
                 try:
                     for f in filesjson['list']:
@@ -91,7 +105,7 @@ def accessions_metadata(file_list, path):
             else:
                 metafile['allpeptides'] = False
 
-            outfile.write(json.dumps(metafile) + '\n')
+
         except:
             pass
 
@@ -116,6 +130,10 @@ def update_metadata(mpath):
 
 
 def validated_input(prompt, valid_values):
+
+    '''
+    Helper function designed to facilitate interaction with the command line user. 
+    '''
     valid_input = False
     while not valid_input:
         value = input(prompt + ' | ' + ' / '.join(valid_values) + "\n")
