@@ -41,7 +41,7 @@ def filter(path, file):
         for line in open(f'{path}{str(file)}.json', 'r'):
             data = json.loads(line)
 
-            if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen and line not in lines_seen:
+            # if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen and line not in lines_seen:
                 # data['Seq_class'] = Seen.index(data['Sequence'])
                 # lines_seen.add(line)
                 # outfile.write(json.dumps(data) + '\n')
