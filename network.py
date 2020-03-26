@@ -86,8 +86,11 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
         partition['train'] = list(chain.from_iterable(partition['train']))
         partition['validation'] = list(chain.from_iterable(partition['validation']))
         partition['test'] = list(chain.from_iterable(partition['test']))
-        for f in testlabels2:
-            print(f'Test data - {f}: {len(testlabels2[f])}')
+
+        for f in partition:
+            print(f'Datapoint in {f}: {len(partition[f])}')
+        # for f in testlabels2:
+        #     print(f'Test data - {f}: {len(testlabels2[f])}')
 
     return partition, labels, imagelen, pixellen, testlabels
 
@@ -268,3 +271,4 @@ if __name__ == '__main__':
 # python3 network.py F m/z 0.8
 # python3 network.py T Length 0.8
 # python3 network.py T Seq_class 0.8
+# python3 network.py T Modi_class 0.8
