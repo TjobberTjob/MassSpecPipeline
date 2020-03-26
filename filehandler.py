@@ -24,11 +24,12 @@ def filter(path, file):
         seen = defaultdict(list)
         for line in open(f'{path}subimage.json'):
             if 'Modifications' in json.loads(line):
-                if json.loads(line)['Modifications'] == 'Oxidiation (M)':
-                    seen[1].append(json.loads(line)['image'])
-                else:
+                if not json.loads(line)['Modifications'] == 'Oxidiation (M)':
                     seen[0].append(json.loads(line)['image'])
+                else:
+                    seen[1].append(json.loads(line)['image'])
         amounts = [len(seen[f]) for f in seen]
+        print(amounts)
         Seen = defaultdict(list)
         for f in seen:
             random.shuffle(seen[f])
@@ -103,5 +104,6 @@ if __name__ == '__main__':
         moveserver(path, tarpath, ssh)
 
 # python3 filehandler.py filter accessions
+# python3 filehandler.py filter subimage
 # python3 filehandler.py move /data/ProteomeToolsRaw/images/ /home/tochr15/images/ tochr15@yeast.imada.sdu.dk
 # python3 filehandler.py move /data/ProteomeToolsRaw/metadata/ /home/tochr15/metadata/ tochr15@yeast.imada.sdu.dk
