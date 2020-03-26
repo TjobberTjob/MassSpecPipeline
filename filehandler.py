@@ -24,8 +24,7 @@ def filter(path, file):
         seen = defaultdict(list)
         for line in open(f'{path}subimage.json'):
             if 'Modifications' in json.loads(line):
-                if not json.loads(line)['Modifications'] == 'Unmodified':
-                    print(json.loads(line)['Modifications'])
+                if not json.loads(line)['Modifications'] == 'Oxidation (M)':
                     seen[0].append(json.loads(line)['image'])
                 else:
                     seen[1].append(json.loads(line)['image'])
