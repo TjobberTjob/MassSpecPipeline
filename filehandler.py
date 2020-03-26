@@ -29,8 +29,6 @@ def filter(path, file):
                 else:
                     seen[1].append(json.loads(line)['image'])
         amounts = [len(seen[f]) for f in seen]
-        print(seen[1])
-        quit()
         Seen = defaultdict(list)
         for f in seen:
             random.shuffle(seen[f])
