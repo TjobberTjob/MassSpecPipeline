@@ -267,3 +267,4 @@ if __name__ == '__main__':
 
 # python3 network.py F m/z 0.8
 # python3 network.py T Length 0.8
+# python3 network.py T Seq_class 0.8
