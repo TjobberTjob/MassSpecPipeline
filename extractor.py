@@ -612,7 +612,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread):
 
         except Exception as error:
             # if not multithread:
-            print(error)  # 'issue occoured, going to next zipfile')
+            print(accnr, error)  # 'issue occoured, going to next zipfile')
             if filterbroken:
                 if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                     os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
