@@ -116,7 +116,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     return df2, filepath
 
 
-def formatFile(accnr, filename, path, filepath):
+def formatFile(accnr, filename, path, filepath, formatusing):
     if not multithread:
         print('Formatting file to mzML										', end='\r')
 
@@ -126,8 +126,6 @@ def formatFile(accnr, filename, path, filepath):
             if not multithread:
                 print(f'No raw file, cannot format')
             return
-        formatusing = 'conda'
-        # formatusing = 'docker'
 
         if formatusing == 'conda':
             if path[0] == '/':
@@ -136,7 +134,7 @@ def formatFile(accnr, filename, path, filepath):
                 relpath = f'{os.getcwd()}{path}'
 
             os.system(
-                f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1')
+                f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1 >/dev/null 2>&1')
 
             os.remove(f'{filepath}file-metadata.txt')
             os.remove(f'{filepath}file.raw')
@@ -500,8 +498,8 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
         print('Done!                                                    ')
 
 
-def partTwo(accnr, filename, path, mpath, filepath, df2):
-    formatFile(accnr, filename, path, filepath)
+def partTwo(accnr, filename, path, mpath, filepath, df2, formatusing):
+    formatFile(accnr, filename, path, filepath, formatusing)
     internalmzML(filepath)
 
     output = preparameters(filepath)
@@ -540,7 +538,7 @@ def partTwo(accnr, filename, path, mpath, filepath, df2):
     endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
 
 
-def partOne(accnr, maxquant_file, path, mpath, multithread):
+def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
     if not multithread:
         print(f'\nAccessions: {accnr}')
 
@@ -602,7 +600,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread):
                     output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                     df2 = output[0]
                     filepath = output[1]
-                    partTwo(accnr, filename, path, mpath, filepath, df2)
+                    partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
             else:  # if skipe incomplete is false
                 for raws in allRaw:
                     filename = str(raws[63:-4])
@@ -611,7 +609,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread):
 
                     filepath = f'{path}{accnr}/{filename}/'
                     df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                    partTwo(accnr, filename, path, mpath, filepath, df2)
+                    partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
             print(f'Accession: {accnr}: ✔')
         except Exception as error:
             # if not multithread:
@@ -693,6 +691,7 @@ if __name__ == '__main__':
     multithread = data['multithread'] == 'True'
     nr_threads = data['nr_threads']
     filterbroken = data['filterbroken'] == 'True'
+    formatusing = data['formatsoftware']
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
@@ -716,11 +715,11 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
-            partOne(str(accession), pepfile, datapath, metapath, multithread)
+            partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         if multithread:
-            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread) for linez in
+            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread, formatusing) for linez in
                           reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez)]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
@@ -728,7 +727,7 @@ if __name__ == '__main__':
             for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
-                partOne(str(accession), pepfile, datapath, metapath, multithread)
+                partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
 
 
     else:  # For single accessions usage
