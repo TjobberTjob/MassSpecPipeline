@@ -541,10 +541,9 @@ def partTwo(accnr, filename, path, mpath, filepath, df2):
 
 
 def partOne(accnr, maxquant_file, path, mpath, multithread):
-    if multithread:
-        print(f'Accessions: {accnr}')
-    else:
+    if not multithread:
         print(f'\nAccessions: {accnr}')
+
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
@@ -609,10 +608,10 @@ def partOne(accnr, maxquant_file, path, mpath, multithread):
                     filepath = f'{path}{accnr}/{filename}/'
                     df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                     partTwo(accnr, filename, path, mpath, filepath, df2)
-
+            print(f'Accession: {accnr}: ✔')
         except Exception as error:
             # if not multithread:
-            print(accnr, error)  # 'issue occoured, going to next zipfile')
+            print(f'Accession: {accnr}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
             if filterbroken:
                 if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                     os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
