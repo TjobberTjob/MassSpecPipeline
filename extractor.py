@@ -715,8 +715,8 @@ if __name__ == '__main__':
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         if multithread:
             accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath) for linez in
-                          reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez)]
-            accessions.append(ThreadPool(nr_threads))
+                          reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez), multithread]
+            pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
         else:
             for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
