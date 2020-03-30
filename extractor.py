@@ -541,7 +541,10 @@ def partTwo(accnr, filename, path, mpath, filepath, df2):
 
 
 def partOne(accnr, maxquant_file, path, mpath, multithread):
-    print(f'\nAccessions: {accnr}')
+    if multithread:
+        print(f'Accessions: {accnr}')
+    else:
+        print(f'\nAccessions: {accnr}')
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
