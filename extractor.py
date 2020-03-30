@@ -556,12 +556,16 @@ def partOne(accnr, maxquant_file, path, mpath, multithread):
             brokenfiles = 'skip'
             if not multithread:
                 print('acquire_only_new is True - Continuing')
+            else:
+                print(f'Accession: {accnr}: ✔')
             return brokenfiles
     else:
         if skip_incomplete:
             brokenfiles = 'skip'
             if not multithread:
                 print('skip_incomplete is True - Continuing')
+            else:
+                print(f'Accession: {accnr}: ✔')
             return brokenfiles
 
     if filterbroken:
