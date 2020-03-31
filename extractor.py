@@ -136,9 +136,6 @@ def formatFile(accnr, filename, path, filepath, formatusing):
             os.system(
                 f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1 >/dev/null 2>&1')
 
-            os.remove(f'{filepath}file-metadata.txt')
-            os.remove(f'{filepath}file.raw')
-
         else:
             dockerls = subprocess.check_output('docker image ls', shell=True)
             try:
@@ -168,7 +165,10 @@ def formatFile(accnr, filename, path, filepath, formatusing):
             if os.path.exists(f'{filepath}file.raw'):
                 os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
                           f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_input/{accnr}/{filename}/ -f=1 -m=1')
+
+        if os.path.exists(f'{filepath}file-metadata.txt'):
             os.remove(f'{filepath}file-metadata.txt')
+        if os.path.exists(f'{filepath}file.raw'):
             os.remove(f'{filepath}file.raw')
 
 
@@ -732,7 +732,7 @@ if __name__ == '__main__':
 
     else:  # For single accessions usage
         accession = sysinput
-        partOne(str(accession), pepfile, datapath, metapath, multithread)
+        partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
 
 # python3 extractor.py PXD004732
 # python3 extractor.py PXD010595
