@@ -539,6 +539,7 @@ def partTwo(accnr, filename, path, mpath, filepath, df2, formatusing):
 
 
 def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
+    global brokenfiles, nonworkingzips
     if not multithread:
         print(f'\nAccessions: {accnr}')
 
@@ -631,6 +632,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
 
 
 def offline(path, filename, mpath):
+    global zipfile, rawfile
     maxquant_file = 'allPeptides.txt'
     filepath = f'{sysinput}{filename}/'
     accnr = sysinput.split('/')[-2:-1][0]
@@ -719,7 +721,8 @@ if __name__ == '__main__':
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         if multithread:
-            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread, formatusing) for linez in
+            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread, formatusing) for
+                          linez in
                           reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez)]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
@@ -728,7 +731,6 @@ if __name__ == '__main__':
                 data = json.loads(line)
                 accession = data['accession']
                 partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
-
 
     else:  # For single accessions usage
         accession = sysinput
