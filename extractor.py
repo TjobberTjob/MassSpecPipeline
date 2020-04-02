@@ -735,9 +735,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     else:
         allCheck = True
     if allCheck:
-        print(f'{accnr}: ✔ - {workingrawfiles / (workingrawfiles + nonworkingrawfiles)}')
+        print(f'{accnr}: ✔ - {workingrawfiles / (workingrawfiles + nonworkingrawfiles)} Rawfiles extracted')
     else:
-        print(f'{accnr}: ✖ - {workingrawfiles / (workingrawfiles + nonworkingrawfiles)}')
+        print(f'{accnr}: ✖ - {workingrawfiles / (workingrawfiles + nonworkingrawfiles)} Rawfiles extracted')
 
 
 if __name__ == '__main__':
