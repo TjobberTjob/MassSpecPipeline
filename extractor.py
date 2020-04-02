@@ -639,11 +639,12 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                     filepath = f'{path}{accnr}/{filename}/'
                     df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                     partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
-            print(f'Accession: {accnr}: ✔')
+            if not multithread:
+                print(f'{zips}: ✔')
 
         except Exception as error:
-            # if not multithread:
-            print(f'Accession: {accnr}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
+            if not multithread:
+                print(f'{zips}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
             if filterbroken:
                 if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                     os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
@@ -658,6 +659,18 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                 with open(f'{mpath}broken.json', 'a') as outfile:
                     outfile.write(json.dumps(brokendict) + '\n')
             outfile.close()
+
+    allCheck = ['allPeptides.txt' in os.listdir(f'{datapath}{accnr}/{files}/') for files in
+                os.listdir(f'{path}{accnr}/') if
+                len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
+    if False in allCheck or allCheck == []:
+        allCheck = False
+    else:
+        allCheck = True
+    if allCheck:
+        print(f'{accnr}: ✔ - All files downloaded and extracted')
+    else:
+        print(f'{accnr}: ✖ - Error with some or all files')
 
 
 def offline(path, filename, mpath):
@@ -759,6 +772,7 @@ if __name__ == '__main__':
                           'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
+
         else:
             for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
                 data = json.loads(line)
