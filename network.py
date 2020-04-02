@@ -163,15 +163,8 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
     x1 = MaxPooling2D(pool_size=(2, 2))(x1)
     x2 = Conv2D(124, kernel_size=(2, 2), activation='relu', padding='same')(input)
-    x2 = MaxPooling2D(pool_size=(2, 2))(x2)
+    x2 = AveragePooling2D(pool_size=(2, 2))(x2)
     x = Concatenate()([x, x1, x2])
-    x1 = Conv2D(64, kernel_size=(5, 5), activation='relu', padding='same')(x)
-    x1 = AveragePooling2D(pool_size=(2, 2))(x)
-    x2 = Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same')(x)
-    x2 = AveragePooling2D(pool_size=(2, 2))(x1)
-    x3 = Conv2D(64, kernel_size=(2, 2), activation='relu', padding='same')(x)
-    x3 = AveragePooling2D(pool_size=(2, 2))(x2)
-    x = Concatenate()([x1, x2, x3])
     x = Flatten()(x)
     x = Dropout(rate=0.25)(x)
     x = Dense(128, activation='relu')(x)
@@ -181,6 +174,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     else:
         output = Dense(n_classes, activation='softmax')(x)
     model = keras.Model(input, output)
+    print(model.summary())
     plot_model(model, to_file="model.png")
 
     if classification:
