@@ -616,21 +616,31 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                         print('Zipfile in broken.json - going to next zipfile')
                     continue
 
-            output = zipfile_downloader(zips, path, maxquant_file)
-            allRaw = output[0]
-            df = output[1]
 
-            try: #TRY ALL RAWS IN ZIP
-                for raws in allRaw:
-                    filename = str(raws)
+            if not haveallMQF:
+                output = zipfile_downloader(zips, path, maxquant_file)
+                rawfiles = output[0]
+                df = output[1]
+
+                try:  # TRY ALL RAWS IN ZIP
+                    for raws in rawfiles:
+                        filename = str(raws)
+                        if not multithread:
+                            print(f'file: {accnr}/{filename}                                               ')
+
+                        output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                        df2 = output[0]
+                        filepath = output[1]
+                        partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
+                        if not multithread:
+                            print(f'{raws.split("/")[-1]}: ✔')
+                except Exception as error:
                     if not multithread:
-                        print(f'file: {accnr}/{filename}                                               ')
+                        print(f'{raws.split("/")[-1]}: ✖ | {error}')
+                    pass
 
-                    output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                    df2 = output[0]
-                    filepath = output[1]
-                    partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
-                else:  # if skipe incomplete is false
+            else:  # if skipe incomplete is false
+                try:  # TRY ALL RAWS IN ZIP
                     for raws in allRaw:
                         filename = str(raws[63:-4])
                         if not multithread:
@@ -639,31 +649,30 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                         filepath = f'{path}{accnr}/{filename}/'
                         df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                         partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
-                if not multithread:
-                    print(f'{raws.split("/")[-1]}: ✔')
+                        if not multithread:
+                            print(f'{raws.split("/")[-1]}: ✔')
+                except Exception as error:
+                    if not multithread:
+                        print(f'{raws.split("/")[-1]}: ✖ | {error}')
+                    pass
 
-            except Exception as error:
-                if not multithread:
-                    print(f'{raws.split("/")[-1]}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
-                if filterbroken:
-                    if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
-                        os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
-
-                    brokenfiles.append(zips.replace(' ', '%20'))
-                pass
-
-            if filterbroken:
-                # Create list of broken zip files
-                listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
-                brokendict = {str(accnr): brokenfiles}
-                if accnr not in listofaccnr:
-                    with open(f'{mpath}broken.json', 'a') as outfile:
-                        outfile.write(json.dumps(brokendict) + '\n')
-                outfile.close()
     except Exception as error:
         if not multithread:
-            print(f'{zips.split["/"][-1]}: ✖ | {error}')
+            print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
+        if filterbroken:
+            if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
+                os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
+            brokenfiles.append(zips.replace(' ', '%20'))
         pass
+
+    if filterbroken:
+        # Create list of broken zip files
+        listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
+        brokendict = {str(accnr): brokenfiles}
+        if accnr not in listofaccnr:
+            with open(f'{mpath}broken.json', 'a') as outfile:
+                outfile.write(json.dumps(brokendict) + '\n')
+        outfile.close()
 
     allCheck = ['allPeptides.txt' in os.listdir(f'{datapath}{accnr}/{files}/') for files in
                 os.listdir(f'{path}{accnr}/') if
