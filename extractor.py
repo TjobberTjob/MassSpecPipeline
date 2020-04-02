@@ -785,8 +785,8 @@ if __name__ == '__main__':
     elif str(sysinput) == 'pride' or str(sysinput) == 'pridefiltered':  # Going through the metadata
         if multi:
             multiprocessing = True
-            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multiprocessing, formatusing) for
-                          linez in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if
+            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multiprocessing, formatusing)
+                          for linez in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if
                           'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
