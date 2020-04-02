@@ -773,8 +773,14 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
-            multithread = False
-            partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
+            if multi:
+                multithread = True
+                accessions = [(f, pepfile, datapath, metapath, multithread, formatusing) for f in listofowned]
+                pool = ThreadPool(nr_threads)
+                pool.starmap(partOne, accessions)
+            else:
+                multithread = False
+                partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
         if multi:
