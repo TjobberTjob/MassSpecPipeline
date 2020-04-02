@@ -523,7 +523,57 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
     outfile.close()
 
 
-def partTwo(accnr, filename, path, mpath, filepath, df2, formatusing):
+def offline(path, filename, mpath):
+    global zipfile, rawfile
+    maxquant_file = 'allPeptides.txt'
+    filepath = f'{sysinput}{filename}/'
+    accnr = sysinput.split('/')[-2:-1][0]
+    print(f'\nfile: {accnr}/{filename}')
+
+    for file in os.listdir(f'{filepath}'):
+        if file.endswith('.zip'):
+            zipfile = file
+    for file in os.listdir(f'{filepath}'):
+        if file.endswith('.raw'):
+            rawfile = file
+    if os.path.exists(f'{filepath}{maxquant_file}'):
+        allPep = True
+    else:
+        allPep = False
+
+    if 'rawfile' in locals() and (allPep or 'zipfile' in locals()):
+        if not os.path.exists(f'{filepath}{maxquant_file}'):
+            # Get a list of files with directories from zip file
+            with ZipFile(f'{filepath}{zipfile}', 'r') as zipped:
+                ziplist = zipped.namelist()
+
+            # Extract the peptide file from the zipfile
+            for a in ziplist:
+                if maxquant_file in a:
+                    with ZipFile(f'{filepath}{zipfile}') as z:
+                        with z.open(a) as zf, open(f'{filepath}allPeptides.txt', 'wb') as zfg:
+                            shutil.copyfileobj(zf, zfg)
+                        break
+
+            df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+            df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
+            df = df.loc[df['Raw file'] == rawfile,]
+            pd.DataFrame.to_csv(df, f'{filepath}{maxquant_file}')
+        else:
+            df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
+
+        submain(accnr, filename, path, mpath, filepath, df)
+    else:
+        try:
+            os.system('rm /data/ProteomeToolsRaw/*.*')
+        except:
+            pass
+        if not multiprocessing:
+            print(f'Necessary files dont exist in {f}')
+        quit()
+
+
+def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
     formatFile(accnr, filename, path, filepath, formatusing)
     internalmzML(filepath)
 
@@ -563,7 +613,7 @@ def partTwo(accnr, filename, path, mpath, filepath, df2, formatusing):
     endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
 
 
-def partOne(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
+def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     global brokenfiles, nonworkingzips
     if not multiprocessing:
         print(f'\nAccessions: {accnr}')
@@ -606,6 +656,8 @@ def partOne(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             nonworkingzips = []
             brokenfiles = []
 
+    workingrawfiles = 0
+    nonworkingrawfiles = 0
     try:  # TRY ALL ZIPS
         for zips in reversed(allZip):
             if filterbroken:
@@ -628,12 +680,14 @@ def partOne(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                         df2 = output[0]
                         filepath = output[1]
-                        partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
+                        submain(accnr, filename, path, mpath, filepath, df2, formatusing)
                         if not multiprocessing:
                             print(f'{raws.split("/")[-1]}: ✔                         ')
+                        workingrawfiles += 1
                 except Exception as error:
                     if not multiprocessing:
                         print(f'{raws.split("/")[-1]}: ✖ | {error}')
+                    nonworkingrawfiles += 1
                     pass
 
             else:  # if skipe incomplete is false
@@ -645,12 +699,14 @@ def partOne(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
 
                         filepath = f'{path}{accnr}/{filename}/'
                         df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                        partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
+                        submain(accnr, filename, path, mpath, filepath, df2, formatusing)
                         if not multiprocessing:
                             print(f'{raws.split("/")[-1]}: ✔                         ')
+                        workingrawfiles += 1
                 except Exception as error:
                     if not multiprocessing:
                         print(f'{raws.split("/")[-1]}: ✖ | {error}')
+                    nonworkingrawfiles += 1
                     pass
 
     except Exception as error:
@@ -679,59 +735,9 @@ def partOne(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     else:
         allCheck = True
     if allCheck:
-        print(f'{accnr}: ✔ - All files downloaded and extracted')
+        print(f'{accnr}: ✔ - {workingrawfiles / (workingrawfiles + nonworkingrawfiles)}')
     else:
-        print(f'{accnr}: ✖ - Error with some or all files')
-
-
-def offline(path, filename, mpath):
-    global zipfile, rawfile
-    maxquant_file = 'allPeptides.txt'
-    filepath = f'{sysinput}{filename}/'
-    accnr = sysinput.split('/')[-2:-1][0]
-    print(f'\nfile: {accnr}/{filename}')
-
-    for file in os.listdir(f'{filepath}'):
-        if file.endswith('.zip'):
-            zipfile = file
-    for file in os.listdir(f'{filepath}'):
-        if file.endswith('.raw'):
-            rawfile = file
-    if os.path.exists(f'{filepath}{maxquant_file}'):
-        allPep = True
-    else:
-        allPep = False
-
-    if 'rawfile' in locals() and (allPep or 'zipfile' in locals()):
-        if not os.path.exists(f'{filepath}{maxquant_file}'):
-            # Get a list of files with directories from zip file
-            with ZipFile(f'{filepath}{zipfile}', 'r') as zipped:
-                ziplist = zipped.namelist()
-
-            # Extract the peptide file from the zipfile
-            for a in ziplist:
-                if maxquant_file in a:
-                    with ZipFile(f'{filepath}{zipfile}') as z:
-                        with z.open(a) as zf, open(f'{filepath}allPeptides.txt', 'wb') as zfg:
-                            shutil.copyfileobj(zf, zfg)
-                        break
-
-            df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
-            df = df.loc[df['Sequence'] != ' ',]  # Remove empty sequences
-            df = df.loc[df['Raw file'] == rawfile,]
-            pd.DataFrame.to_csv(df, f'{filepath}{maxquant_file}')
-        else:
-            df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
-
-        partTwo(accnr, filename, path, mpath, filepath, df)
-    else:
-        try:
-            os.system('rm /data/ProteomeToolsRaw/*.*')
-        except:
-            pass
-        if not multiprocessing:
-            print(f'Necessary files dont exist in {f}')
-        quit()
+        print(f'{accnr}: ✖ - {workingrawfiles / (workingrawfiles + nonworkingrawfiles)}')
 
 
 if __name__ == '__main__':
@@ -755,14 +761,17 @@ if __name__ == '__main__':
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
     sysinput = sys.argv[1]
+
+    #Options#
     if str(sysinput) == 'reset':  # Reset files and folders if you want to remake all images in another setting
-        try:
+        if os.path.exists(f'{datapath}images/'):
             shutil.rmtree(f'{datapath}images/')
+        if os.path.exists(f'{metapath}subimage.json'):
             os.remove(f'{metapath}subimage.json')
+        if os.path.exists(f'{metapath}subimage_filtered.json'):
             os.remove(f'{metapath}subimage_filtered.json')
+        if os.path.exists(f'{metapath}sub_statistics.json'):
             os.remove(f'{metapath}sub_statistics.json')
-        except:
-            pass
 
     elif str(sysinput)[0] == '/':  # For local fine purposes.
         dirsinpath = os.listdir(sysinput)
@@ -777,10 +786,10 @@ if __name__ == '__main__':
                 multiprocessing = True
                 accessions = [(f, pepfile, datapath, metapath, multiprocessing, formatusing) for f in listofowned]
                 pool = ThreadPool(nr_processes)
-                pool.starmap(partOne, accessions)
+                pool.starmap(main, accessions)
             else:
                 multiprocessing = False
-                partOne(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
+                main(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
 
     elif str(sysinput) == 'pride' or str(sysinput) == 'pridefiltered':  # Going through the metadata
         if str(sysinput) == 'pride':
@@ -794,19 +803,19 @@ if __name__ == '__main__':
                           for linez in reversed(list(open(f'{metapath}{pridefile}.json'))) if
                           'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_processes)
-            pool.starmap(partOne, accessions)
+            pool.starmap(main, accessions)
 
         else:
             multiprocessing = False
             for line in reversed(list(open(f'{metapath}{pridefile}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
-                partOne(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
+                main(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
 
-    elif str(sysinput)[0:3] == 'PRD' or str(sysinput)[0:3] == 'PXD' :  # For single accessions usage
+    elif str(sysinput)[0:3] == 'PRD' or str(sysinput)[0:3] == 'PXD':  # For single accessions usage
         accession = sysinput
         multiprocessing = False
-        partOne(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
+        main(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
 
     else:
         print('Input not recognized. Check readme file for all possible inputs')
