@@ -748,7 +748,7 @@ if __name__ == '__main__':
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
     multi = data['multiprocessing'] == 'True'
-    nr_threads = data['nr_threads']
+    nr_processes = data['nr_processes']
     filterbroken = data['filterbroken'] == 'True'
     formatusing = data['formatsoftware']
 
@@ -776,7 +776,7 @@ if __name__ == '__main__':
             if multi:
                 multiprocessing = True
                 accessions = [(f, pepfile, datapath, metapath, multiprocessing, formatusing) for f in listofowned]
-                pool = ThreadPool(nr_threads)
+                pool = ThreadPool(nr_processes)
                 pool.starmap(partOne, accessions)
             else:
                 multiprocessing = False
@@ -788,7 +788,7 @@ if __name__ == '__main__':
             accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multiprocessing, formatusing)
                           for linez in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if
                           'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
-            pool = ThreadPool(nr_threads)
+            pool = ThreadPool(nr_processes)
             pool.starmap(partOne, accessions)
 
         else:
