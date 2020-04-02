@@ -9,7 +9,7 @@ import keras
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.engine.saving import load_model
-from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D
+from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
 from keras.utils import plot_model
 from tensorflow_core.python.keras.layers import Concatenate
 
