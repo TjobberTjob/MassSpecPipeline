@@ -6,6 +6,16 @@ matplotlib
 tensorflow (CPU or GPU)
 keras
 pydot
+pandas
+lxml
+
+Optinal conda installations:
+conda install -c bioconda thermorawfileparser                               #This will get installed automatically first time you run the program (if conda is selected)
+conda install -y tensorflow-gpu=2.1.0                                       #Conda installation of tensorflow GPU version
+conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch      #tensorflow GPU associated package for CUDA.
+
+Optional docker installations:
+docker build --no-cache -t thermorawparser .                                #This will get installed automatically first time you run the program (if docker is selected)
 
 TOOL is a connector between MS and AI, downloading, handling, formatting and extracting data from raw MS files into singular image files with metadata.
 Before we go into examples of usage, first step is to change config.json file

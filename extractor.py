@@ -199,26 +199,26 @@ def process_ms1(spectrum):
     return {'scan_time': scan_time, 'intensity': intensity.tolist(), 'mz': mz.tolist()}
 
 
-# def process_ms2(spectrum):
-#     # Fish out the precursors.
-#     precursors = spectrum['precursorList']
-#     if precursors['count'] != 1:
-#         if not multithread:
-#             print("Number of precursors different than 1, not designed for that")
-#         quit()
-#     ion = precursors['precursor'][0]['selectedIonList']
-#     if ion['count'] != 1:
-#         if not multithread:
-#             print("More then one selected ions, not designed for that")
-#         quit()
-#
-#     ion = ion['selectedIon'][0]['selected ion m/z']
-#     ms1_scan = int(precursors['precursor'][0]['spectrumRef'].split('scan=')[1])
-#
-#     # Fish out the scan index
-#     scan_index = spectrum['index']
-#
-#     return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion}
+def process_ms2(spectrum):
+    # Fish out the precursors.
+    precursors = spectrum['precursorList']
+    if precursors['count'] != 1:
+        if not multithread:
+            print("Number of precursors different than 1, not designed for that")
+        quit()
+    ion = precursors['precursor'][0]['selectedIonList']
+    if ion['count'] != 1:
+        if not multithread:
+            print("More then one selected ions, not designed for that")
+        quit()
+
+    ion = ion['selectedIon'][0]['selected ion m/z']
+    ms1_scan = int(precursors['precursor'][0]['spectrumRef'].split('scan=')[1])
+
+    # Fish out the scan index
+    scan_index = spectrum['index']
+
+    return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion}
 
 
 def internalmzML(path):
