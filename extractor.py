@@ -123,10 +123,10 @@ def formatFile(accnr, filename, path, filepath, formatusing):
 
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        if not os.path.exists(f'{filepath}file.raw'):
-            if not multithread:
-                print(f'No raw file, cannot format')
-            return
+        # if not os.path.exists(f'{filepath}file.raw'):
+        #     if not multithread:
+        #         print(f'No raw file, cannot format')
+        #     return
 
         if formatusing == 'conda':
             if path[0] == '/':
@@ -521,8 +521,6 @@ def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_co
     outfile = open(f'{mpath}sub_statistics.json', 'a')
     outfile.write(json.dumps(end_stats) + '\n')
     outfile.close()
-    if not multithread:
-        print('Done!                                                    ')
 
 
 def partTwo(accnr, filename, path, mpath, filepath, df2, formatusing):
