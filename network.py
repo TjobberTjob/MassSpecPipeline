@@ -170,7 +170,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     x4 = MaxPooling2D(pool_size=(2, 2))(x4)
     x5 = Conv2D(124, kernel_size=(2, 2), activation='relu', padding='same')(input)
     x5 = AveragePooling2D(pool_size=(2, 2))(x5)
-    x = Concatenate()([x, x1, x2, x4, x5])
+    x = Concatenate()([x, x1, x2, x3, x4, x5])
     x = Flatten()(x)
     x = Dropout(rate=0.25)(x)
     x = Dense(128, activation='relu')(x)
