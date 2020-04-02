@@ -29,16 +29,15 @@ rt_bin: Size of retention time bins used for large image - Defaults to 0.06
 mz_interval: m/z interval used for subimages around the peptides - Defaults to +-25
 rt_interval: rt interval used for subimages around the peptides - Defaults to +-5
 acquire_only_new: A boolean value for skipping PRIDE projects if you have already created all images - Defaults to "True"
-skip_incomplete: A boolean value for skipping PRIDE projects where all necessary files arent in local directories - Defaults to "False"
-multithread: A Boolean value for running the extraction multithreaded (reduces error messages)- Defaults to "False"
-nr_threads: Amount of threads used for multi threading - Defaults to 4
+multithread: A Boolean value for running the extraction multithreaded (reduces error messages)- Defaults to "True"
+nr_threads: Amount of threads used for multi threading - Defaults to 10
 filterbroken: A method to skip PRIDE projects that has problems with them - Defaults to "False"
 formatsoftware: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
 ### networkattributes ###
-batch_size: Size of batches for stochastic gradient descent - Defaults to 124
+batch_size: Size of batches for stochastic gradient descent - Defaults to 64
 epochs: Max epochs used for neural network training - Defaults to 100
 n_channels: Number of information channels used in neural network training - Defaults to 4
-test_accessions: Number of accession projects set aside to testing (not validation) - Defaults to 1
+test_accessions: Number of accession projects set aside to testing (not validation) - Defaults to 3
 early_stopping: Number of epochs with no improvement before stopping - Defaults to 10}}
 #NOTE: Values given as "True" and "False" needs to be in quotes.
 

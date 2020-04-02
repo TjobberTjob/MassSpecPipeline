@@ -631,7 +631,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             if not multiprocessing:
                 print('acquire_only_new is True - Continuing')
             else:
-                print(f'Accession: {accnr}: ✔ - {len(allRaw)}/{len(allRaw)}')
+                print(f'{accnr}: ✔ - {len(allRaw)}/{len(allRaw)}')
             return brokenfiles
     else:
         if skip_incomplete:
