@@ -1,10 +1,8 @@
 import json
 import os
-import pickle
-import sys
-from collections import Counter, defaultdict
 import random
-import numpy as np
+import sys
+from collections import defaultdict
 
 
 def filter(path, file):

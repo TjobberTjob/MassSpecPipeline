@@ -133,10 +133,18 @@ def formatFile(accnr, filename, path, filepath, formatusing):
             else:
                 relpath = f'{os.getcwd()}{path}'
 
+            condalist = subprocess.check_output('conda list', shell=True)
+            if not 'thermorawfileparser' in str(condalist):
+                os.system('conda install -c bioconda thermorawfileparser')
+
+            if not 'thermorawfileparser' in str(condalist):
+                print('Conda issue. Cannot install thermorawfileparser, try re-installing conda')
+                quit()
+
             os.system(
                 f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1 >/dev/null 2>&1')
 
-        else:
+        elif formatusing == 'docker':
             dockerls = subprocess.check_output('docker image ls', shell=True)
             try:
                 if not 'thermorawparser' in str(dockerls):
@@ -152,9 +160,13 @@ def formatFile(accnr, filename, path, filepath, formatusing):
                             'cd .. && cd ThermoRawFileParser/ && docker build --no-cache -t thermorawparser . && cd '
                             '../MassSpecPipeline/')
             except:
-                if not multithread:
-                    print('Docker issues')
+                print('Docker issue. Cannot install thermorawfileparser, try re-installing docker')
+                quit()
                 return
+
+            if not 'thermorawparser' in str(dockerls):
+                print('Docker issue. Cannot install thermorawfileparser, try re-installing docker')
+                quit()
 
             if path[0] == '/':
                 relpath = path[:-1]
@@ -165,6 +177,10 @@ def formatFile(accnr, filename, path, filepath, formatusing):
             if os.path.exists(f'{filepath}file.raw'):
                 os.system(f'docker run -v "{relpath}:/data_input" -i -t thermorawparser mono '
                           f'bin/x64/Debug/ThermoRawFileParser.exe -i=/data_input/{accnr}/{filename}/file.raw -o=/data_input/{accnr}/{filename}/ -f=1 -m=1')
+
+        else:
+            print('format software not specified in config.json. Choices are "conda" or "docker"')
+            quit()
 
         if os.path.exists(f'{filepath}file-metadata.txt'):
             os.remove(f'{filepath}file-metadata.txt')
@@ -726,7 +742,8 @@ if __name__ == '__main__':
         if multithread:
             accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread, formatusing) for
                           linez in
-                          reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
+                          reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if
+                          'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
         else:

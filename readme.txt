@@ -1,4 +1,11 @@
-# Disclaimer! Currently only works for MS files analyzed by MaxQuant.
+# Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
+
+Required python packages:
+pyteomics
+matplotlib
+tensorflow (CPU or GPU)
+keras
+pydot
 
 TOOL is a connector between MS and AI, downloading, handling, formatting and extracting data from raw MS files into singular image files with metadata.
 Before we go into examples of usage, first step is to change config.json file
