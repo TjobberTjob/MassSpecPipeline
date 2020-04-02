@@ -783,6 +783,11 @@ if __name__ == '__main__':
                 partOne(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
 
     elif str(sysinput) == 'pride' or str(sysinput) == 'pridefiltered':  # Going through the metadata
+        if str(sysinput) == 'pride':
+            pridefile = 'accessions'
+        else:
+            pridefile = 'accessions_filtered'
+
         if multi:
             multiprocessing = True
             accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multiprocessing, formatusing)
