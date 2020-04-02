@@ -36,9 +36,8 @@ def filefinder(accnr, path):
         # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
         for jsonelem in urljson['list']:
             filetype = jsonelem['fileName'].split('.')[-1]
-            if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip' and jsonelem[
-                                                                                                                   'downloadLink'][
-                                                                                                               -9:] != "Fasta.zip":
+            if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip' and \
+                    jsonelem['downloadLink'][-9:] != "Fasta.zip":
                 zipfiles.append(jsonelem['downloadLink'])
             if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
                 rawfiles.append(jsonelem['downloadLink'])
@@ -609,19 +608,21 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
             nonworkingzips = []
             brokenfiles = []
 
-    for zips in reversed(allZip):
-        if filterbroken:
-            if zips in nonworkingzips:
-                if not multithread:
-                    print('Zipfile in broken.json - going to next zipfile')
-                continue
-        try:
+    try: #TRY ALL ZIPS
+        for zips in reversed(allZip):
+            if filterbroken:
+                if zips in nonworkingzips:
+                    if not multithread:
+                        print('Zipfile in broken.json - going to next zipfile')
+                    continue
+
             if not haveallMQF:  # if skip incomplete is true
                 output = zipfile_downloader(zips, path, maxquant_file)
-                rawfiles = output[0]
+                allRaw = output[0]
                 df = output[1]
 
-                for raws in rawfiles:
+            try: #TRY ALL RAWS IN ZIP
+                for raws in allRaw:
                     filename = str(raws)
                     if not multithread:
                         print(f'file: {accnr}/{filename}                                               ')
@@ -630,35 +631,40 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                     df2 = output[0]
                     filepath = output[1]
                     partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
-            else:  # if skipe incomplete is false
-                for raws in allRaw:
-                    filename = str(raws[63:-4])
-                    if not multithread:
-                        print(f'\nfile: {accnr}/{filename}                                               ')
+                else:  # if skipe incomplete is false
+                    for raws in allRaw:
+                        filename = str(raws[63:-4])
+                        if not multithread:
+                            print(f'\nfile: {accnr}/{filename}                                               ')
 
-                    filepath = f'{path}{accnr}/{filename}/'
-                    df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                    partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
-            if not multithread:
-                print(f'{zips.split("/")[-1]}: ✔')
+                        filepath = f'{path}{accnr}/{filename}/'
+                        df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
+                        partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
+                if not multithread:
+                    print(f'{raws.split("/")[-1]}: ✔')
 
-        except Exception as error:
-            if not multithread:
-                print(f'{zips.split("/")[-1]}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
+            except Exception as error:
+                if not multithread:
+                    print(f'{raws.split("/")[-1]}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
+                if filterbroken:
+                    if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
+                        os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
+
+                    brokenfiles.append(zips.replace(' ', '%20'))
+                pass
+
             if filterbroken:
-                if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
-                    os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
-
-                brokenfiles.append(zips.replace(' ', '%20'))
-            pass
-        if filterbroken:
-            # Create list of broken zip files
-            listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
-            brokendict = {str(accnr): brokenfiles}
-            if accnr not in listofaccnr:
-                with open(f'{mpath}broken.json', 'a') as outfile:
-                    outfile.write(json.dumps(brokendict) + '\n')
-            outfile.close()
+                # Create list of broken zip files
+                listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
+                brokendict = {str(accnr): brokenfiles}
+                if accnr not in listofaccnr:
+                    with open(f'{mpath}broken.json', 'a') as outfile:
+                        outfile.write(json.dumps(brokendict) + '\n')
+                outfile.close()
+    except Exception as error:
+        if not multithread:
+            print(f'{zips.split["/"][-1]}: ✖ | {error}')
+        pass
 
     allCheck = ['allPeptides.txt' in os.listdir(f'{datapath}{accnr}/{files}/') for files in
                 os.listdir(f'{path}{accnr}/') if
@@ -671,6 +677,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
         print(f'{accnr}: ✔ - All files downloaded and extracted')
     else:
         print(f'{accnr}: ✖ - Error with some or all files')
+
 
 
 def offline(path, filename, mpath):
