@@ -1,13 +1,14 @@
 # Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
+git clone https://github.com/TjobberTjob/MassSpecPipeline
 
 Required python packages:
-pyteomics
-matplotlib
+pip install pyteomics
+pip install matplotlib
+pip install keras
+pip install pydot
+pip install pandas
+pip install lxml
 tensorflow (CPU or GPU)
-keras
-pydot
-pandas
-lxml
 
 Optinal conda installations:
 conda install -c bioconda thermorawfileparser                               #This will get installed automatically first time you run the program (if conda is selected)
@@ -15,8 +16,8 @@ conda install -y tensorflow-gpu=2.1.0                                       #Con
 conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch      #tensorflow GPU associated package for CUDA.
 
 Optional docker installations:
-git clone https://github.com/compomics/ThermoRawFileParser.git
-docker build --no-cache -t thermorawparser .                                #This will get installed automatically first time you run the program (if docker is selected)
+git clone https://github.com/compomics/ThermoRawFileParser.git              #Clone the git repo with ThermoRawFileParser dockerized version on it.
+docker build --no-cache -t thermorawparser /ThermoRawFileParser             #This will get installed automatically first time you run the program (if docker is selected)
 
 TOOL is a connector between MS and AI, downloading, handling, formatting and extracting data from raw MS files into singular image files with metadata.
 Before we go into examples of usage, first step is to change config.json file
