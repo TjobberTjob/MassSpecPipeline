@@ -220,7 +220,7 @@ def process_ms2(spectrum):
     scan_index = spectrum['index']
 
     scan_info = spectrum['scanList']
-    #m/z and intensity arrays
+    # m/z and intensity arrays
     mz = spectrum['m/z array']
     intensity = spectrum['intensity array']
 
@@ -606,14 +606,13 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
             nonworkingzips = []
             brokenfiles = []
 
-    try: #TRY ALL ZIPS
+    try:  # TRY ALL ZIPS
         for zips in reversed(allZip):
             if filterbroken:
                 if zips in nonworkingzips:
                     if not multithread:
                         print('Zipfile in broken.json - going to next zipfile')
                     continue
-
 
             if not haveallMQF:
                 output = zipfile_downloader(zips, path, maxquant_file)
@@ -683,7 +682,6 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
         print(f'{accnr}: ✔ - All files downloaded and extracted')
     else:
         print(f'{accnr}: ✖ - Error with some or all files')
-
 
 
 def offline(path, filename, mpath):
