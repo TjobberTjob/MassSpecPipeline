@@ -616,10 +616,9 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                         print('Zipfile in broken.json - going to next zipfile')
                     continue
 
-            if not haveallMQF:  # if skip incomplete is true
-                output = zipfile_downloader(zips, path, maxquant_file)
-                allRaw = output[0]
-                df = output[1]
+            output = zipfile_downloader(zips, path, maxquant_file)
+            allRaw = output[0]
+            df = output[1]
 
             try: #TRY ALL RAWS IN ZIP
                 for raws in allRaw:
@@ -668,7 +667,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
 
     allCheck = ['allPeptides.txt' in os.listdir(f'{datapath}{accnr}/{files}/') for files in
                 os.listdir(f'{path}{accnr}/') if
-                len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
+                len(os.listdir(f'{path}{accnr}/')) == len(allRaw)]
     if False in allCheck or allCheck == []:
         allCheck = False
     else:
