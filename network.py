@@ -216,13 +216,14 @@ if __name__ == '__main__':
     patience = config['early_stopping']
 
     # Cmd inputs
-    classification = sys.argv[1] == 'C'
-    imageclass = sys.argv[2]
-    splitratio = sys.argv[3]
-
+    classification = sys.argv[1]
     if not classification == 'C' or classification == 'R':
         print('classification or regression problem not input correctly.')
         quit()
+    imageclass = sys.argv[2]
+    splitratio = sys.argv[3]
+    classification = classification == 'C'
+
 
     nameofclass = imageclass.replace('/', '')
 
