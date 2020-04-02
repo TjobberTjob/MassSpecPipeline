@@ -640,11 +640,11 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                     df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                     partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
             if not multithread:
-                print(f'{zips}: ✔')
+                print(f'{zips.split("/")[-1]}: ✔')
 
         except Exception as error:
             if not multithread:
-                print(f'{zips}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
+                print(f'{zips.split("/")[-1]}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
             if filterbroken:
                 if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                     os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
