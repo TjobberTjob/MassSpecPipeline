@@ -159,9 +159,9 @@ class DataGenerator(keras.utils.Sequence):
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience):
     input = Input(shape=(imglen, pixellen, n_channels,))
     x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
-    x = MaxPooling2D(pool_size=(5, 5))(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
     x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
-    x1 = MaxPooling2D(pool_size=(3, 3))(x1)
+    x1 = MaxPooling2D(pool_size=(2, 2))(x1)
     x2 = Conv2D(124, kernel_size=(2, 2), activation='relu', padding='same')(input)
     x2 = MaxPooling2D(pool_size=(2, 2))(x2)
     x = Concatenate()([x, x1, x2])
