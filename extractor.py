@@ -36,7 +36,9 @@ def filefinder(accnr, path):
         # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
         for jsonelem in urljson['list']:
             filetype = jsonelem['fileName'].split('.')[-1]
-            if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip':
+            if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip' and jsonelem[
+                                                                                                                   'downloadLink'][
+                                                                                                               -9:] != "Fasta.zip":
                 zipfiles.append(jsonelem['downloadLink'])
             if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
                 rawfiles.append(jsonelem['downloadLink'])
@@ -218,7 +220,12 @@ def process_ms2(spectrum):
     # Fish out the scan index
     scan_index = spectrum['index']
 
-    return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion}
+    scan_info = spectrum['scanList']
+    #m/z and intensity arrays
+    mz = spectrum['m/z array']
+    intensity = spectrum['intensity array']
+
+    return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion, 'm/z': mz, 'rt': intensity}
 
 
 def internalmzML(path):
@@ -229,7 +236,7 @@ def internalmzML(path):
         data = mzml.MzML(f'{path}file.mzML')
 
         # Extracted data
-        extracted = {'ms1': {}}  # , 'ms2': {}}
+        extracted = {'ms1': {}, 'ms2': {}}
         # Extract the necessary data from spectra
         for spectrum in data:
             if spectrum['ms level'] == 1:
@@ -238,19 +245,24 @@ def internalmzML(path):
 
                 # Deal with ms level 1 spectra
                 ms1_spectrum = process_ms1(spectrum)
-                extracted['ms1'][scan_id] = {'mz': ms1_spectrum['mz'], 'intensity': ms1_spectrum['intensity'],
+                extracted['ms1'][scan_id] = {'mz': ms1_spectrum['mz'],
+                                             'intensity': ms1_spectrum['intensity'],
                                              'scan_time': ms1_spectrum['scan_time']}
+
+            elif spectrum['ms level'] == 2:
+                # Scan id
+                scan_id = int(spectrum['id'].split('scan=')[1])
+
+                # Deal with ms level 1 spectra
+                ms2_spectrum = process_ms2(spectrum)
+                extracted['ms2'][scan_id] = {'scan_index': ms2_spectrum['scan_index'],
+                                             'precursor_scan': ms2_spectrum['precursor_scan'],
+                                             'precursor_ion': ms2_spectrum['precursor_ion'],
+                                             'm/z_array': ms2_spectrum['m/z'],
+                                             'rt_array': ms2_spectrum['rt']}
+
             else:
                 pass
-            # elif spectrum['ms level'] == 2:
-            #     # Scan id
-            #     scan_id = int(spectrum['id'].split('scan=')[1])
-            #
-            #     # Deal with ms level 1 spectra
-            #     ms1_spectrum = process_ms1(spectrum)
-            #     extracted['ms1'][scan_id] = {'mz': process_ms2['precursor_scan'],
-            #                                  'intensity': process_ms2['precursor_ion'],
-            #                                  'scan_time': process_ms2['scan_index']}
 
         with gzip.GzipFile(f'{path}mzML.json', 'w') as fout:
             fout.write(json.dumps(extracted).encode('utf-8'))
@@ -628,6 +640,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                     df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                     partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
             print(f'Accession: {accnr}: ✔')
+
         except Exception as error:
             # if not multithread:
             print(f'Accession: {accnr}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
