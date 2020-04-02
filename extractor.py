@@ -793,10 +793,14 @@ if __name__ == '__main__':
                 accession = data['accession']
                 partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
 
-    else:  # For single accessions usage
+    elif str(sysinput)[0:3] == 'PRD' or str(sysinput)[0:3] == 'PXD' :  # For single accessions usage
         accession = sysinput
         multithread = False
         partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
+
+    else:
+        print('Input not recognized. Check readme file for all possible inputs')
+        quit()
 
 # python3 extractor.py PXD004732
 # python3 extractor.py PXD010595
