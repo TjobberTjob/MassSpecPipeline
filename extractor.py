@@ -736,7 +736,7 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
-    multithread = data['multithread'] == 'True'
+    multi = data['multithread'] == 'True'
     nr_threads = data['nr_threads']
     filterbroken = data['filterbroken'] == 'True'
     formatusing = data['formatsoftware']
@@ -762,10 +762,12 @@ if __name__ == '__main__':
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
+            multithread = False
             partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
 
     elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
-        if multithread:
+        if multi:
+            multithread = True
             accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread, formatusing) for
                           linez in
                           reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if
@@ -774,6 +776,7 @@ if __name__ == '__main__':
             pool.starmap(partOne, accessions)
 
         else:
+            multithread = False
             for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
@@ -781,6 +784,7 @@ if __name__ == '__main__':
 
     else:  # For single accessions usage
         accession = sysinput
+        multithread = False
         partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
 
 # python3 extractor.py PXD004732
