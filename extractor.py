@@ -818,15 +818,3 @@ if __name__ == '__main__':
 # Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
 # m/z val_mse: 4000
 # Length val_accuracy: 0.5160
-
-def countz(x):
-    for whocares in range(x):
-        try:
-            asdsad
-        except:
-            print('x')
-            pass
-
-a = [2,3,4]
-pool = ThreadPool(2)
-pool.starmap(countz, a)
