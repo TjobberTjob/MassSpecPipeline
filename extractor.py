@@ -631,7 +631,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             if not multiprocessing:
                 print('acquire_only_new is True - Continuing')
             else:
-                print(f'Accession: {accnr}: ✔')
+                print(f'Accession: {accnr}: ✔ - {len(allRaw)}/{len(allRaw)}')
             return brokenfiles
     else:
         if skip_incomplete:
@@ -735,9 +735,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     else:
         allCheck = True
     if allCheck:
-        print(f'{accnr}: ✔ - {workingrawfiles / (workingrawfiles + nonworkingrawfiles)} Rawfiles extracted')
+        print(f'{accnr}: ✔ - {workingrawfiles}/{workingrawfiles + nonworkingrawfiles} Rawfiles extracted')
     else:
-        print(f'{accnr}: ✖ - {workingrawfiles / (workingrawfiles + nonworkingrawfiles)} Rawfiles extracted')
+        print(f'{accnr}: ✖ - {workingrawfiles}/{workingrawfiles + nonworkingrawfiles} Rawfiles extracted')
 
 
 if __name__ == '__main__':
@@ -752,11 +752,11 @@ if __name__ == '__main__':
 
     metapath = f'{datapath}metadata/'
     acquire_only_new = data['acquire_only_new'] == 'True'
-    skip_incomplete = data['skip_incomplete'] == 'True'
     multi = data['multiprocessing'] == 'True'
     nr_processes = data['nr_processes']
     filterbroken = data['filterbroken'] == 'True'
     formatusing = data['formatsoftware']
+    skip_incomplete = False
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
@@ -781,6 +781,7 @@ if __name__ == '__main__':
     elif str(sysinput) == 'complete':  # For re-creating images from already downloaded and parsed files
         listofowned = [f for f in os.listdir(datapath) if
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
+        skip_incomplete = True
         for accession in listofowned:
             if multi:
                 multiprocessing = True
