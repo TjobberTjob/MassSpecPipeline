@@ -798,7 +798,7 @@ if __name__ == '__main__':
 
         else:
             multiprocessing = False
-            for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
+            for line in reversed(list(open(f'{metapath}{pridefile}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
                 partOne(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
