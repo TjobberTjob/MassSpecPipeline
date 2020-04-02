@@ -92,7 +92,7 @@ python3 extractor.py PXD000000
 (2): Usage for all accession in a filtered or unfiltered version of the metadata. Goes through all accessions,
 skips if there's a problem with some of them (and there will be)
 Example:
-python3 extractor.py accessions OR python3 extractor.py accessions_filtered
+python3 extractor.py pride OR python3 extractor.py pridefiltered
 
 (3): Usage for all accession currently in your local directory that has all informations.
 Used if you change a parameter for subimages and you need to rerun everything faster.

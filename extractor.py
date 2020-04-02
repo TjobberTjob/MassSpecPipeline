@@ -782,12 +782,11 @@ if __name__ == '__main__':
                 multithread = False
                 partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
 
-    elif str(sysinput) == 'accessions' or str(sysinput) == 'accessions_filtered':  # Going through the metadata
+    elif str(sysinput) == 'pride' or str(sysinput) == 'pridefiltered':  # Going through the metadata
         if multi:
             multithread = True
             accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread, formatusing) for
-                          linez in
-                          reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if
+                          linez in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if
                           'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
@@ -819,3 +818,15 @@ if __name__ == '__main__':
 # Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
 # m/z val_mse: 4000
 # Length val_accuracy: 0.5160
+
+def countz(x):
+    for whocares in range(x):
+        try:
+            asdsad
+        except:
+            print('x')
+            pass
+
+a = [2,3,4]
+pool = ThreadPool(2)
+pool.starmap(countz, a)
