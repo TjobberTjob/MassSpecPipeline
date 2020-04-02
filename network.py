@@ -214,8 +214,6 @@ if __name__ == '__main__':
     batch_size = config['batch_size']
     epochs = config['epochs']
     patience = config['early_stopping']
-    TFversion = config['TF']
-
 
     # Cmd inputs
     classification = sys.argv[1] == 'C'
