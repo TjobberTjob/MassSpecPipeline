@@ -11,6 +11,7 @@ import numpy as np
 from keras.engine.saving import load_model
 from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D
 from keras.utils import plot_model
+from tensorflow_core.python.keras.layers import Concatenate
 
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio, test_accessions):
@@ -158,11 +159,16 @@ class DataGenerator(keras.utils.Sequence):
 # Developing the neural network
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience):
     input = Input(shape=(imglen, pixellen, n_channels,))
-    x = Conv2D(16, kernel_size=(5, 5), activation='relu', padding='same')(input)
+    x = Conv2D(32, kernel_size=(5, 5), activation='relu', padding='same')(input)
     x = MaxPooling2D(pool_size=(2, 2))(x)
-    # x = Concatenate()([x, x1, x2])
+    x1 = Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same')(input)
+    x1 = MaxPooling2D(pool_size=(2, 2))(x1)
+    x2 = Conv2D(32, kernel_size=(2, 2), activation='relu', padding='same')(input)
+    x2 = MaxPooling2D(pool_size=(2, 2))(x2)
+    x = Concatenate()([x, x1, x2])
     x = Flatten()(x)
     x = Dropout(rate=0.25)(x)
+    x = Dense(128, activation='relu')(x)
     x = Dense(64, activation='relu')(x)
     if not classification:
         output = Dense(1, activation='linear')(x)
