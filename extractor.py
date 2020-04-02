@@ -42,7 +42,7 @@ def filefinder(accnr, path):
             if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
                 rawfiles.append(jsonelem['downloadLink'])
     except:
-        if not multithread:
+        if not multiprocessing:
             print("API connection issue")
         return [], [], []
 
@@ -67,7 +67,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     # Download zip file
     if os.path.exists(f'{path}{zipfilename}'):
         os.remove(f'{path}{zipfilename}')
-    if not multithread:
+    if not multiprocessing:
         print('Downloading zip file                                                    ', end='\r')
     os.system(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
 
@@ -106,7 +106,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
         pd.DataFrame.to_csv(df2, f'{filepath}{maxquant_file}')
 
     # Download the raw file
-    if not multithread:
+    if not multiprocessing:
         print('Downloading raw file                                                    ', end='\r')
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         for rawfile in rawfiles:
@@ -118,13 +118,13 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
 
 
 def formatFile(accnr, filename, path, filepath, formatusing):
-    if not multithread:
+    if not multiprocessing:
         print('Formatting file to mzML										', end='\r')
 
     # Check whether the docker file is implemented or not
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         # if not os.path.exists(f'{filepath}file.raw'):
-        #     if not multithread:
+        #     if not multiprocessing:
         #         print(f'No raw file, cannot format')
         #     return
 
@@ -204,12 +204,12 @@ def process_ms2(spectrum):
     # Fish out the precursors.
     precursors = spectrum['precursorList']
     if precursors['count'] != 1:
-        if not multithread:
+        if not multiprocessing:
             print("Number of precursors different than 1, not designed for that")
         quit()
     ion = precursors['precursor'][0]['selectedIonList']
     if ion['count'] != 1:
-        if not multithread:
+        if not multiprocessing:
             print("More then one selected ions, not designed for that")
         quit()
 
@@ -230,7 +230,7 @@ def process_ms2(spectrum):
 def internalmzML(path):
     # Extract the data from the mzml, if we havnt already
     if not os.path.exists(f'{path}mzML.json'):
-        if not multithread:
+        if not multiprocessing:
             print('Extracting data from mzML                                                    ', end='\r')
         data = mzml.MzML(f'{path}file.mzML')
 
@@ -270,7 +270,7 @@ def internalmzML(path):
 
 
 def preparameters(filepath):
-    if not multithread:
+    if not multiprocessing:
         print('Preparing parameter for image creation                                                    ', end='\r')
     with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
         mzml = json.loads(fin.read().decode('utf-8'))
@@ -368,7 +368,7 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
     image = []
     for y_i in range(0, resolution['y']):
         if y_i % 25 == 0:
-            if not multithread:
+            if not multiprocessing:
                 print('Creating full image: {:2.1%}                                                    '.format(
                     y_i / resolution['y']), end='\r')  # Print how far we are
         row = []
@@ -386,7 +386,7 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
                 pixelpoint = [0, 0, 0, 0]
             row.append(pixelpoint)
         image.append(row)
-    if not multithread:
+    if not multiprocessing:
         print('Saving image files                                                    ', end='\r')
     # image.reverse()
     imagedata = [image, nonzero_counter, total_datapoints]
@@ -445,7 +445,7 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
         if (index + 1) % int(df.shape[0] / 40) == 0:
-            if not multithread:
+            if not multiprocessing:
                 print('Creating subimages: {:2.1%}                                                    '.format(
                     (index + 1) / df.shape[0]), end='\r')  # Print how far we are
 
@@ -495,7 +495,7 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
 
 
 def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath):
-    if not multithread:
+    if not multiprocessing:
         print('Calculating end statistics:                                                    ', end='\r')
     mzlist = inputlists[0]
     rtlist = inputlists[1]
@@ -543,7 +543,7 @@ def partTwo(accnr, filename, path, mpath, filepath, df2, formatusing):
         total_datapoints = output[2]
     # Retrieve if exist already
     else:
-        if not multithread:
+        if not multiprocessing:
             print('Loading image data                                                    ', end='\r')
         with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "rb") as pa:
             output = pickle.load(pa)
@@ -563,9 +563,9 @@ def partTwo(accnr, filename, path, mpath, filepath, df2, formatusing):
     endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
 
 
-def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
+def partOne(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     global brokenfiles, nonworkingzips
-    if not multithread:
+    if not multiprocessing:
         print(f'\nAccessions: {accnr}')
 
     # Find all zip files
@@ -578,7 +578,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
     if haveallMQF:
         if acquire_only_new:
             brokenfiles = 'skip'
-            if not multithread:
+            if not multiprocessing:
                 print('acquire_only_new is True - Continuing')
             else:
                 print(f'Accession: {accnr}: ✔')
@@ -586,7 +586,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
     else:
         if skip_incomplete:
             brokenfiles = 'skip'
-            if not multithread:
+            if not multiprocessing:
                 print('skip_incomplete is True - Continuing')
             else:
                 print(f'Accession: {accnr}: ✔')
@@ -610,7 +610,7 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
         for zips in reversed(allZip):
             if filterbroken:
                 if zips in nonworkingzips:
-                    if not multithread:
+                    if not multiprocessing:
                         print('Zipfile in broken.json - going to next zipfile')
                     continue
 
@@ -622,17 +622,17 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                 try:  # TRY ALL RAWS IN ZIP
                     for raws in rawfiles:
                         filename = str(raws)
-                        if not multithread:
+                        if not multiprocessing:
                             print(f'file: {accnr}/{filename}                                               ')
 
                         output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                         df2 = output[0]
                         filepath = output[1]
                         partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
-                        if not multithread:
+                        if not multiprocessing:
                             print(f'{raws.split("/")[-1]}: ✔                         ')
                 except Exception as error:
-                    if not multithread:
+                    if not multiprocessing:
                         print(f'{raws.split("/")[-1]}: ✖ | {error}')
                     pass
 
@@ -640,21 +640,21 @@ def partOne(accnr, maxquant_file, path, mpath, multithread, formatusing):
                 try:  # TRY ALL RAWS IN ZIP
                     for raws in allRaw:
                         filename = str(raws[63:-4])
-                        if not multithread:
+                        if not multiprocessing:
                             print(f'\nfile: {accnr}/{filename}                                               ')
 
                         filepath = f'{path}{accnr}/{filename}/'
                         df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
                         partTwo(accnr, filename, path, mpath, filepath, df2, formatusing)
-                        if not multithread:
+                        if not multiprocessing:
                             print(f'{raws.split("/")[-1]}: ✔                         ')
                 except Exception as error:
-                    if not multithread:
+                    if not multiprocessing:
                         print(f'{raws.split("/")[-1]}: ✖ | {error}')
                     pass
 
     except Exception as error:
-        if not multithread:
+        if not multiprocessing:
             print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | {error}')  # 'issue occoured, going to next zipfile')
         if filterbroken:
             if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
@@ -729,7 +729,7 @@ def offline(path, filename, mpath):
             os.system('rm /data/ProteomeToolsRaw/*.*')
         except:
             pass
-        if not multithread:
+        if not multiprocessing:
             print(f'Necessary files dont exist in {f}')
         quit()
 
@@ -747,7 +747,7 @@ if __name__ == '__main__':
     metapath = f'{datapath}metadata/'
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
-    multi = data['multithread'] == 'True'
+    multi = data['multiprocessing'] == 'True'
     nr_threads = data['nr_threads']
     filterbroken = data['filterbroken'] == 'True'
     formatusing = data['formatsoftware']
@@ -774,34 +774,34 @@ if __name__ == '__main__':
                        os.path.isdir(f'{datapath}{f}') and f[0:3] == 'PRD' or f[0:3] == 'PXD']
         for accession in listofowned:
             if multi:
-                multithread = True
-                accessions = [(f, pepfile, datapath, metapath, multithread, formatusing) for f in listofowned]
+                multiprocessing = True
+                accessions = [(f, pepfile, datapath, metapath, multiprocessing, formatusing) for f in listofowned]
                 pool = ThreadPool(nr_threads)
                 pool.starmap(partOne, accessions)
             else:
-                multithread = False
-                partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
+                multiprocessing = False
+                partOne(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
 
     elif str(sysinput) == 'pride' or str(sysinput) == 'pridefiltered':  # Going through the metadata
         if multi:
-            multithread = True
-            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread, formatusing) for
+            multiprocessing = True
+            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multiprocessing, formatusing) for
                           linez in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if
                           'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
 
         else:
-            multithread = False
+            multiprocessing = False
             for line in reversed(list(open(f'{metapath}{sys.argv[1]}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
-                partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
+                partOne(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
 
     elif str(sysinput)[0:3] == 'PRD' or str(sysinput)[0:3] == 'PXD' :  # For single accessions usage
         accession = sysinput
-        multithread = False
-        partOne(str(accession), pepfile, datapath, metapath, multithread, formatusing)
+        multiprocessing = False
+        partOne(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
 
     else:
         print('Input not recognized. Check readme file for all possible inputs')
