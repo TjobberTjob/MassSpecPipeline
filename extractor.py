@@ -687,6 +687,10 @@ if __name__ == '__main__':
         data = json.load(json_file)
 
     datapath = data['path']
+    if not os.path.exists(datapath):
+        print('Path given in config.json doesn\'t exist. Please specify working path.')
+        quit()
+
     metapath = f'{datapath}metadata/'
     acquire_only_new = data['acquire_only_new'] == 'True'
     skip_incomplete = data['skip_incomplete'] == 'True'
@@ -704,7 +708,6 @@ if __name__ == '__main__':
             os.remove(f'{metapath}subimage.json')
             os.remove(f'{metapath}subimage_filtered.json')
             os.remove(f'{metapath}sub_statistics.json')
-            os.remove(f'{metapath}debugger.txt')
         except:
             pass
 
@@ -723,7 +726,7 @@ if __name__ == '__main__':
         if multithread:
             accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multithread, formatusing) for
                           linez in
-                          reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez)]
+                          reversed(list(open(f'{metapath}{sys.argv[1]}.json'))) if 'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_threads)
             pool.starmap(partOne, accessions)
         else:

@@ -77,11 +77,6 @@ def filter(path, file):
         quit()
 
 
-def moveserver(path, tarpath, ssh):
-    os.chdir(path)
-    os.system(f'tar -c . | ssh {ssh} "tar -xvf - -C  {tarpath}"')
-
-
 if __name__ == '__main__':
     # Read datapath from config file
     with open('config.json') as json_file:

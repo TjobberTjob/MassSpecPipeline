@@ -212,9 +212,13 @@ if __name__ == '__main__':
 
 
     # Cmd inputs
-    classification = sys.argv[1] == 'T'
+    classification = sys.argv[1] == 'C'
     imageclass = sys.argv[2]
     splitratio = sys.argv[3]
+
+    if not classification == 'C' or classification == 'R':
+        print('classification or regression problem not input correctly.')
+        quit()
 
     nameofclass = imageclass.replace('/', '')
 
@@ -268,7 +272,7 @@ if __name__ == '__main__':
     testaccuracy = model.evaluate_generator(test_generator)
     print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
 
-# python3 network.py F m/z 0.8
-# python3 network.py T Length 0.8
-# python3 network.py T Seq_class 0.8
-# python3 network.py T Modi_class 0.8
+# python3 network.py R m/z 0.8
+# python3 network.py C Length 0.8
+# python3 network.py C Seq_class 0.8
+# python3 network.py C Modi_class 0.8
