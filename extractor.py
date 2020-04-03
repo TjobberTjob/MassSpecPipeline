@@ -842,10 +842,3 @@ if __name__ == '__main__':
 # Seq_class (10) val_loss: 0.7285 - val_accuracy: 0.8244
 # m/z val_mse: 4000
 # Length val_accuracy: 0.5160
-
-try:
-    for f in range(5):
-        print('hey')
-        accessisdasd
-except:
-    continue
