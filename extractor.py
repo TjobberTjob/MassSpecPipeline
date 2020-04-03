@@ -71,7 +71,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
         os.remove(f'{path}{zipfilename}')
     if not multiprocessing:
         print('Downloading zip file                                                    ', end='\r')
-    print(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
+    os.system(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
 
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
