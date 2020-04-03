@@ -224,7 +224,6 @@ if __name__ == '__main__':
     splitratio = sys.argv[3]
     classification = classification == 'C'
 
-
     nameofclass = imageclass.replace('/', '')
 
     output = datafetcher(metapath, imagepath, classification, imageclass, splitratio, test_accessions)
