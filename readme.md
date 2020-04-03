@@ -1,4 +1,4 @@
-#Read ME 
+#Readme
 ####Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
 #####git clone https://github.com/TjobberTjob/MassSpecPipeline
 
@@ -11,38 +11,61 @@ pip install pandas
 pip install lxml
 tensorflow (CPU or GPU)
 
-Optinal conda installations:
+####Optinal conda installations:
+
 conda install -c bioconda thermorawfileparser                               #This will get installed automatically first time you run the program (if conda is selected)
+
 conda install -y tensorflow-gpu=2.1.0                                       #Conda installation of tensorflow GPU version
+
 conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch      #tensorflow GPU associated package for CUDA.
 
-Optional docker installations:
+####Optional docker installations:
 git clone https://github.com/compomics/ThermoRawFileParser.git              #Clone the git repo with ThermoRawFileParser dockerized version on it.
+
 docker build --no-cache -t thermorawparser /ThermoRawFileParser             #This will get installed automatically first time you run the program (if docker is selected)
 
+
+###config file
+####extraction attributes:
 TOOL is a connector between MS and AI, downloading, handling, formatting and extracting data from raw MS files into singular image files with metadata.
 Before we go into examples of usage, first step is to change config.json file
 
 The only MUST CHANGE is the path. Change this to the desired path. Everything else is explained here but not necessary to change.
-path: Where all data gets put to - Need for large storage (end path with "/")
-mz_bin: Size of m/z bins used for large image - Defaults to 0.75
-rt_bin: Size of retention time bins used for large image - Defaults to 0.06
-mz_interval: m/z interval used for subimages around the peptides - Defaults to +-25
-rt_interval: rt interval used for subimages around the peptides - Defaults to +-5
-acquire_only_new: A boolean value for skipping PRIDE projects if you have already created all images - Defaults to "True"
-multithread: A Boolean value for running the extraction multithreaded (reduces error messages)- Defaults to "True"
-nr_threads: Amount of threads used for multi threading - Defaults to 10
-filterbroken: A method to skip PRIDE projects that has problems with them - Defaults to "False"
-formatsoftware: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
-networkattributes:
-batch_size: Size of batches for stochastic gradient descent - Defaults to 64
-epochs: Max epochs used for neural network training - Defaults to 100
-n_channels: Number of information channels used in neural network training - Defaults to 4
-test_accessions: Number of accession projects set aside to testing (not validation) - Defaults to 3
-early_stopping: Number of epochs with no improvement before stopping - Defaults to 10}}
-NOTE: Values given as "True" and "False" needs to be in quotes.
 
-#Usage:
+path: Where all data gets put to - Need for large storage (end path with "/")
+
+mz_bin: Size of m/z bins used for large image - Defaults to 0.75
+
+rt_bin: Size of retention time bins used for large image - Defaults to 0.06
+
+mz_interval: m/z interval used for subimages around the peptides - Defaults to +-25
+
+rt_interval: rt interval used for subimages around the peptides - Defaults to +-5
+
+acquire_only_new: A boolean value for skipping PRIDE projects if you have already created all images - Defaults to "True"
+
+multithread: A Boolean value for running the extraction multithreaded (reduces error messages)- Defaults to "True"
+
+nr_threads: Amount of threads used for multi threading - Defaults to 10
+
+filterbroken: A method to skip PRIDE projects that has problems with them - Defaults to "False"
+
+formatsoftware: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
+
+####networkattributes:
+batch_size: Size of batches for stochastic gradient descent - Defaults to 64
+
+epochs: Max epochs used for neural network training - Defaults to 100
+
+n_channels: Number of information channels used in neural network training - Defaults to 4
+
+test_accessions: Number of accession projects set aside to testing (not validation) - Defaults to 3
+
+early_stopping: Number of epochs with no improvement before stopping - Defaults to 10}}
+
+####NOTE: Values given as "True" and "False" needs to be in quotes.
+
+###Usage:
 ####Part - PRIDE Webscraper:
 Starting of we present a method to getting information on all PRIDE projects.
 To begin with we need the accessions numbers for all PRIDE projects. This is gotten by using the scraper.py using the input "accessions".
@@ -66,43 +89,58 @@ python3 scraper update
 ####Part - Metadata handling:
 This is an extra part we added to help with metadata handling.
 It can create a filtered version of either PRIDE metadata or subimage metadata. Two possible use cases.
+
 (1): PRIDE metadata filter.
 This will add a filtered version of PRIDE metadata file, which removes all non maxquant entries, and entries without raw data.
 It also removes any duplicates, if any occoured by error.
+
 Example:
+
 python3 filehandler.py accessions
 
 (2): Subimage metadata filter.
+
 This will add a filtered version of the subimage metadata file created by the extractor.py script.
 This is used as a precurser to neural networks or as extra data or class creation.
 By default it will add a class called Modi_class that's 1 if the peptide is Oxidized, and 0 otherwise.
 If other filters or classes needs to be put in, it has to be done manually in the code, as there are too many possibilities to add them all.
+
 Example:
+
 python3 filehandler.py subimage
 
 
 ####Part - Extracting:
 This will extract everything from either local or PRIDE database raw files.
 This has five use possible use cases:
+
 (1): A single pride accession. This will download all files needed one at a time and run through untill everything is done.
 If a zipfile fails it will proceed to next zipfile.
+
 Example:
+
 python3 extractor.py PXD000000
 
 (2): Usage for all accession in a filtered or unfiltered version of the metadata. Goes through all accessions,
 skips if there's a problem with some of them (and there will be)
+
 Example:
+
 python3 extractor.py pride OR python3 extractor.py pridefiltered
 
 (3): Usage for all accession currently in your local directory that has all informations.
 Used if you change a parameter for subimages and you need to rerun everything faster.
 This will only run if every allPeptides.txt file exists in needed folders.
+
 Example:
+
 python3 extractor.py owned
 
 (4): Used for local rawfiles instead of pride accessions. If you have a local rawfile you want peptides extracted from.
 Has to have raw file and maxquant or zipfile in the folder.
+
 Example:
+
 python3 extractor.py /path/to/folder/
 
 
@@ -110,17 +148,24 @@ python3 extractor.py /path/to/folder/
 This is used if you need to remove all subimages, metadata on subimages, substatistics on files.
 Often only needed if you change subimage parameters and want everything to stay consistent within files.
 If you dont reset you will have multiple of the same name in the subimage metadata file.
+
 Example:
+
 python3 extractor.py reset
 
 
 Part - Neural networks:
 This will automatically use subimage_filtered.json if it exists otherwise it will use subimage.json as it's data source.
 It needs to be given three arguments:
+
 (1) Whether its a classification problem or a regression problem. C for classification and R for regression.
+
 (2) The class or variable the network needs to predict. can be continuous like m/z or a class like length of sequence.
+
 (3) The percentage of training data, given as a fraction (fx 0.5 for 50%).
+
 Example:
+
 python3 network.py C Length 0.8 OR python3 network.py R m/z 0.75
 
 
