@@ -748,7 +748,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 outfile.write(json.dumps(brokendict) + '\n')
         outfile.close()
 
-    allCheck = ['allPeptides.txt' in os.listdir(f'{datapath}{accnr}/{files}/') for files in
+    allCheck = ['mzML.json' in os.listdir(f'{datapath}{accnr}/{files}/') for files in
                 os.listdir(f'{path}{accnr}/') if
                 len(os.listdir(f'{path}{accnr}/')) == len(allRaw)]
     if False in allCheck or allCheck == []:
