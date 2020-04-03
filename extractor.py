@@ -661,6 +661,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     workingrawfiles = 0
     print(allZip)
     try:  # TRY ALL ZIPS
+        print('hey')
         for zips in reversed(allZip):
             if filterbroken:
                 if zips in nonworkingzips:
