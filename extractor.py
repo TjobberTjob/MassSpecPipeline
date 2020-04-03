@@ -631,7 +631,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             if not multiprocessing:
                 print('acquire_only_new is True - Continuing')
             else:
-                print(f'{accnr}: ✔ - {len(allRaw)}/{len(allRaw)}')
+                print(f'{accnr}: ✔ - {len(allRaw)}/{len(allRaw)} Rawfiles extracted')
             return brokenfiles
     else:
         if skip_incomplete:
@@ -657,7 +657,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             brokenfiles = []
 
     workingrawfiles = 0
-    nonworkingrawfiles = 0
     try:  # TRY ALL ZIPS
         for zips in reversed(allZip):
             if filterbroken:
@@ -687,7 +686,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 except Exception as error:
                     if not multiprocessing:
                         print(f'{raws.split("/")[-1]}: ✖ | {error}')
-                    nonworkingrawfiles += 1
                     pass
 
             else:  # if skipe incomplete is false
@@ -706,7 +704,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 except Exception as error:
                     if not multiprocessing:
                         print(f'{raws.split("/")[-1]}: ✖ | {error}')
-                    nonworkingrawfiles += 1
                     pass
 
     except Exception as error:
@@ -735,9 +732,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     else:
         allCheck = True
     if allCheck:
-        print(f'{accnr}: ✔ - {workingrawfiles}/{workingrawfiles + nonworkingrawfiles} Rawfiles extracted')
+        print(f'{accnr}: ✔ - {workingrawfiles}/{len(allRaw)} Rawfiles extracted')
     else:
-        print(f'{accnr}: ✖ - {workingrawfiles}/{workingrawfiles + nonworkingrawfiles} Rawfiles extracted')
+        print(f'{accnr}: ✖ - {workingrawfiles}/{len(allRaw)} Rawfiles extracted')
 
 
 if __name__ == '__main__':
