@@ -7,10 +7,10 @@ import pickle
 import shutil
 import subprocess
 import sys
-import traceback
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from zipfile import ZipFile
+
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
@@ -709,9 +709,10 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                     pass
 
     except Exception as error:
-        exc_type, exc_tb = sys.exc_info()
+        exc_type, exc_obj, exc_tb = sys.exc_info()
         if not multiprocessing:
             print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | {exc_type} | {error} | {exc_tb.tb_lineno}')  # 'issue occoured, going to next zipfile')
+        del(exc_type, exc_obj, exc_tb)
         if filterbroken:
             if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                 os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
