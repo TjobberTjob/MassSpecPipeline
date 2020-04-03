@@ -218,7 +218,7 @@ if __name__ == '__main__':
     # Cmd inputs
     classification = sys.argv[1]
     print(classification)
-    if not classification == 'c' or classification == 'r':
+    if not (classification == 'c' or classification == 'r'):
         print('classification or regression problem not input correctly.')
         quit()
     imageclass = sys.argv[2]
