@@ -39,19 +39,19 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
 
     for f in partition:
         print(f'Datapoint in {f}: {len(partition[f])}')
-    #
-    # labels = {}
-    # testlabels = {}
-    # if os.path.exists(f'{path}subimage_filtered.json'):
-    #     for line in open(f'{path}subimage_filtered.json'):
-    #         imagedata = json.loads(line)
-    #
-    #         if f'{imagedata["image"]}.txt' not in testfiles:
-    #             name = f'{imagedata["image"]}.txt'
-    #             labels[name] = imagedata[imageclass]
-    #         else:
-    #             name = f'{imagedata["image"]}.txt'
-    #             testlabels[name] = imagedata[imageclass]
+
+    labels = {}
+    testlabels = {}
+    if os.path.exists(f'{path}subimage_filtered.json'):
+        for line in open(f'{path}subimage_filtered.json'):
+            imagedata = json.loads(line)
+
+            if f'{imagedata["image"]}.txt' not in testfiles:
+                name = f'{imagedata["image"]}.txt'
+                labels[name] = imagedata[imageclass]
+            else:
+                name = f'{imagedata["image"]}.txt'
+                testlabels[name] = imagedata[imageclass]
     #
     # if not classification:  # Single output networks
     #     names = []
