@@ -21,76 +21,108 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
     imagelen = len(image)
     pixellen = len(image[0])
 
-    if not classification:  # Single output networks
-        names = []
-        labels = {}
-        if os.path.exists(f'{path}subimage_filtered.json'):
-            for line in open(f'{path}subimage_filtered.json'):
-                data = json.loads(line)
-                name = f'{data["image"]}.txt'
-                names.append(name)
-                labels[name] = data[imageclass]
-        else:
-            print('No metadata for images exists')
-        splits = round(len(names) * float(splitratio))
-        random.shuffle(names)
-        trainlist = names[0:splits]
-        vallist = names[splits:]
-        partition = {'train': trainlist, 'validation': vallist}
+    accs = [json.loads(acc)['accession'] for acc in open(f'{path}subimage_filtered.json') if
+            'accession' in json.loads(acc)]
+    random.shuffle(accs)
+    test_accs = accs[0:test_accessions]
+    testfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}subimage_filtered.json')
+                 if 'accession' in json.loads(acc) and json.loads(acc)['accession'] in test_accs]
 
-    else:  # Multiple output classifier
-        accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json') if
-                      'accession' in json.loads(line)]
-        random.shuffle(accessions)
-        testlist = [f'{json.loads(line)["image"]}.txt' for line in open(f'{path}subimage_filtered.json') if
-                    json.loads(line)['accession'] in accessions[0:test_accessions]]
+    trainvalfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}subimage_filtered.json')
+                     if 'accession' in json.loads(acc) and json.loads(acc)['accession'] not in test_accs]
+    random.shuffle(trainvalfiles)
+    splits = round(len(trainvalfiles) * float(splitratio))
+    trainfiles = trainvalfiles[:splits]
+    validationfiles = trainvalfiles[splits:]
 
-        labels = {}
-        testlabels = {}
-        if os.path.exists(f'{path}subimage_filtered.json'):
-            for line in open(f'{path}subimage_filtered.json'):
-                data = json.loads(line)
+    partition = {'train': trainfiles, 'validation': validationfiles, 'test': testfiles}
 
-                if f'{data["image"]}.txt' not in testlist:
-                    name = f'{data["image"]}.txt'
-                    labels[name] = data[imageclass]
-                else:
-                    name = f'{data["image"]}.txt'
-                    testlabels[name] = data[imageclass]
-        else:
-            print('No metadata for images exists')
-
-        # Make train and validation data
-        labels2 = defaultdict(list)
-        for k, v in labels.items():
-            labels2[v].append(k)
-
-        partition = defaultdict(list)
-        for f in labels2:
-            random.shuffle(labels2[f])  # Shuffles to get random images into training and validation
-            splits = round(len(labels2[f]) * float(splitratio))
-            trainlist = (labels2[f][0:splits])
-            vallist = (labels2[f][splits:])
-            partition['train'].append(trainlist)
-            partition['validation'].append(vallist)
-
-        # Make test data
-        testlabels2 = defaultdict(list)
-        for k, v in testlabels.items():
-            testlabels2[v].append(k)
-
-        for f in testlabels2:
-            testlist = testlabels2[f]
-            partition['test'].append(testlist)
-
-        partition['train'] = list(chain.from_iterable(partition['train']))
-        partition['validation'] = list(chain.from_iterable(partition['validation']))
-        partition['test'] = list(chain.from_iterable(partition['test']))
-
-        for f in partition:
-            print(f'Datapoint in {f}: {len(partition[f])}')
-        # for f in testlabels2:
-        #     print(f'Test data - {f}: {len(testlabels2[f])}')
+    for f in partition:
+        print(f'Datapoint in {f}: {len(partition[f])}')
+    #
+    # labels = {}
+    # testlabels = {}
+    # if os.path.exists(f'{path}subimage_filtered.json'):
+    #     for line in open(f'{path}subimage_filtered.json'):
+    #         imagedata = json.loads(line)
+    #
+    #         if f'{imagedata["image"]}.txt' not in testfiles:
+    #             name = f'{imagedata["image"]}.txt'
+    #             labels[name] = imagedata[imageclass]
+    #         else:
+    #             name = f'{imagedata["image"]}.txt'
+    #             testlabels[name] = imagedata[imageclass]
+    #
+    # if not classification:  # Single output networks
+    #     names = []
+    #     labels = {}
+    #     if os.path.exists(f'{path}subimage_filtered.json'):
+    #         for line in open(f'{path}subimage_filtered.json'):
+    #             data = json.loads(line)
+    #             name = f'{data["image"]}.txt'
+    #             names.append(name)
+    #             labels[name] = data[imageclass]
+    #     else:
+    #         print('No metadata for images exists')
+    #     splits = round(len(names) * float(splitratio))
+    #     random.shuffle(names)
+    #     trainlist = names[0:splits]
+    #     vallist = names[splits:]
+    #     partition = {'train': trainlist, 'validation': vallist}
+    #
+    # else:  # Multiple output classifier
+    #     accessions = [json.loads(line)['accession'] for line in open(f'{path}subimage_filtered.json') if
+    #                   'accession' in json.loads(line)]
+    #     random.shuffle(accessions)
+    #     testlist = [f'{json.loads(line)["image"]}.txt' for line in open(f'{path}subimage_filtered.json') if
+    #                 json.loads(line)['accession'] in accessions[0:test_accessions]]
+    #
+    #     labels = {}
+    #     testlabels = {}
+    #     if os.path.exists(f'{path}subimage_filtered.json'):
+    #         for line in open(f'{path}subimage_filtered.json'):
+    #             data = json.loads(line)
+    #
+    #             if f'{data["image"]}.txt' not in testlist:
+    #                 name = f'{data["image"]}.txt'
+    #                 labels[name] = data[imageclass]
+    #             else:
+    #                 name = f'{data["image"]}.txt'
+    #                 testlabels[name] = data[imageclass]
+    #     else:
+    #         print('No metadata for images exists')
+    #
+    #     # Make train and validation data
+    #     labels2 = defaultdict(list)
+    #     for k, v in labels.items():
+    #         labels2[v].append(k)
+    #
+    #     partition = defaultdict(list)
+    #     for f in labels2:
+    #         random.shuffle(labels2[f])  # Shuffles to get random images into training and validation
+    #         splits = round(len(labels2[f]) * float(splitratio))
+    #         trainlist = (labels2[f][0:splits])
+    #         vallist = (labels2[f][splits:])
+    #         partition['train'].append(trainlist)
+    #         partition['validation'].append(vallist)
+    #
+    #     # Make test data
+    #     testlabels2 = defaultdict(list)
+    #     for k, v in testlabels.items():
+    #         testlabels2[v].append(k)
+    #
+    #     for f in testlabels2:
+    #         testlist = testlabels2[f]
+    #         partition['test'].append(testlist)
+    #
+    #     partition['train'] = list(chain.from_iterable(partition['train']))
+    #     partition['validation'] = list(chain.from_iterable(partition['validation']))
+    #     partition['test'] = list(chain.from_iterable(partition['test']))
+    #
+    #     for f in partition:
+    #         print(f'Datapoint in {f}: {len(partition[f])}')
+    #     # for f in testlabels2:
+    #     #     print(f'Test data - {f}: {len(testlabels2[f])}')
 
     return partition, labels, imagelen, pixellen, testlabels
 
@@ -214,6 +246,10 @@ if __name__ == '__main__':
     batch_size = config['batch_size']
     epochs = config['epochs']
     patience = config['early_stopping']
+    setseed = config['setseed'] == 'True'
+
+    if setseed:
+        random.seed(1)
 
     # Cmd inputs
     classification = sys.argv[1]
@@ -234,7 +270,8 @@ if __name__ == '__main__':
     testlabels = output[4]
 
     if classification:
-        classes = [json.loads(line)[imageclass] for line in open(f'{metapath}subimage_filtered.json', 'r') if str(imageclass) in json.loads(line)]
+        classes = [json.loads(line)[imageclass] for line in open(f'{metapath}subimage_filtered.json', 'r') if
+                   str(imageclass) in json.loads(line)]
         n_classes = len(np.unique(classes))
     else:
         n_classes = 1
