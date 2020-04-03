@@ -1,4 +1,5 @@
-# Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
+#
+#Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
 git clone https://github.com/TjobberTjob/MassSpecPipeline
 
 Required python packages:
@@ -33,7 +34,7 @@ multithread: A Boolean value for running the extraction multithreaded (reduces e
 nr_threads: Amount of threads used for multi threading - Defaults to 10
 filterbroken: A method to skip PRIDE projects that has problems with them - Defaults to "False"
 formatsoftware: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
-### networkattributes ###
+networkattributes:
 batch_size: Size of batches for stochastic gradient descent - Defaults to 64
 epochs: Max epochs used for neural network training - Defaults to 100
 n_channels: Number of information channels used in neural network training - Defaults to 4
@@ -41,8 +42,8 @@ test_accessions: Number of accession projects set aside to testing (not validati
 early_stopping: Number of epochs with no improvement before stopping - Defaults to 10}}
 #NOTE: Values given as "True" and "False" needs to be in quotes.
 
-Usage:
-Part - PRIDE Webscraper:
+#Usage:
+#Part - PRIDE Webscraper:
 Starting of we present a method to getting information on all PRIDE projects.
 To begin with we need the accessions numbers for all PRIDE projects. This is gotten by using the scraper.py using the input "accessions".
 This will create, if it doesnt already exists, the metadata folder and create a txt file with all accession numbers from pride
@@ -62,7 +63,7 @@ Example:
 python3 scraper update
 
 
-Part - Metadata handling:
+#Part - Metadata handling:
 This is an extra part we added to help with metadata handling.
 It can create a filtered version of either PRIDE metadata or subimage metadata. Two possible use cases.
 (1): PRIDE metadata filter.
@@ -80,7 +81,7 @@ Example:
 python3 filehandler.py subimage
 
 
-Part - Extracting:
+#Part - Extracting:
 This will extract everything from either local or PRIDE database raw files.
 This has five use possible use cases:
 (1): A single pride accession. This will download all files needed one at a time and run through untill everything is done.
