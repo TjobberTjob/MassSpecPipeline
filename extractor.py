@@ -668,11 +668,10 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         print('Zipfile in broken.json - going to next zipfile')
                     continue
 
-            if not haveallMQF: #If we have all needed files, we dont need to get them from the API
+            if not haveallMQF:  # If we have all needed files, we dont need to get them from the API
                 output = zipfile_downloader(zips, path, maxquant_file)
                 rawfiles = output[0]
                 df = output[1]
-
 
                 for raws in rawfiles:
                     try:  # TRY ALL RAWS IN ZIP
@@ -690,12 +689,16 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                     except Exception as error:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         if not multiprocessing:
-                            print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} | Error: {error} '
-                                  f'| Line: {exc_tb.tb_lineno}')
-                        del (exc_type, exc_obj, exc_tb)
+                            if errormessages:
+                                print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                                      f' Error: {error} | Line: {exc_tb.tb_lineno}')
+                                del (exc_type, exc_obj, exc_tb)
+                            else:
+                                print(
+                                    f'Rawfile error. {raws.split("/")[-1]}: ✖')
                         pass
 
-            else: #If we dont have all needed files, we need to get them from the API
+            else:  # If we dont have all needed files, we need to get them from the API
                 for raws in allRaw:
                     try:  # TRY ALL RAWS IN ZIP
                         filename = str(raws[63:-4])
@@ -711,16 +714,25 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                     except Exception as error:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         if not multiprocessing:
-                            print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} | Error: {error} '
-                                  f'| Line: {exc_tb.tb_lineno}')
-                        del (exc_type, exc_obj, exc_tb)
+                            if errormessages:
+                                print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                                      f' Error: {error} | Line: {exc_tb.tb_lineno}')
+                                del (exc_type, exc_obj, exc_tb)
+                            else:
+                                print(
+                                    f'Rawfile error. {raws.split("/")[-1]}: ✖')
                         pass
 
         except Exception as error:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             if not multiprocessing:
-                print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | Error Class: {exc_type} | Error: {error} | Line: {exc_tb.tb_lineno}')  # 'issue occoured, going to next zipfile')
-            del(exc_type, exc_obj, exc_tb)
+                if errormessages:
+                    print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                          f' Error: {error} | Line: {exc_tb.tb_lineno}')  # 'issue occoured, going to next zipfile')
+                    del (exc_type, exc_obj, exc_tb)
+                else:
+                    print(f'Zipfile error. {zips.split("/")[-1]}: ✖')
+
             if filterbroken:
                 if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                     os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
@@ -765,13 +777,14 @@ if __name__ == '__main__':
     nr_processes = data['nr_processes']
     filterbroken = data['filterbroken'] == 'True'
     formatusing = data['formatsoftware']
+    errormessages = data['errormessages'] == 'True'
     skip_incomplete = False
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
     sysinput = sys.argv[1]
 
-    #Options#
+    # Options#
     if str(sysinput) == 'reset':  # Reset files and folders if you want to remake all images in another setting
         if os.path.exists(f'{datapath}images/'):
             shutil.rmtree(f'{datapath}images/')
