@@ -659,6 +659,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             brokenfiles = []
 
     workingrawfiles = 0
+    print(allZip)
     try:  # TRY ALL ZIPS
         for zips in reversed(allZip):
             if filterbroken:
@@ -686,9 +687,11 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                             print(f'{raws.split("/")[-1]}: ✔                         ')
                         workingrawfiles += 1
                 except Exception as error:
-                    exc_type, exc_tb = sys.exc_info()
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
                     if not multiprocessing:
-                        print(f'{raws.split("/")[-1]}: ✖ | {exc_type} | {error} | {exc_tb}')
+                        print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} | Error: {error} '
+                              f'| Line: {exc_tb.tb_lineno}')
+                    del (exc_type, exc_obj, exc_tb)
                     pass
 
             else:  # if skipe incomplete is false
@@ -705,14 +708,17 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                             print(f'{raws.split("/")[-1]}: ✔                         ')
                         workingrawfiles += 1
                 except Exception as error:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
                     if not multiprocessing:
-                        print(f'{raws.split("/")[-1]}: ✖ | {error}')
+                        print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} | Error: {error} '
+                              f'| Line: {exc_tb.tb_lineno}')
+                    del (exc_type, exc_obj, exc_tb)
                     pass
 
     except Exception as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         if not multiprocessing:
-            print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | {exc_type} | {error} | {exc_tb.tb_lineno}')  # 'issue occoured, going to next zipfile')
+            print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | Error Class: {exc_type} | Error: {error} | Line: {exc_tb.tb_lineno}')  # 'issue occoured, going to next zipfile')
         del(exc_type, exc_obj, exc_tb)
         if filterbroken:
             if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
