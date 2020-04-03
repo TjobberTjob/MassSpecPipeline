@@ -684,8 +684,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                             print(f'{raws.split("/")[-1]}: ✔                         ')
                         workingrawfiles += 1
                 except Exception as error:
+                    exc_type, exc_tb = sys.exc_info()
                     if not multiprocessing:
-                        print(f'{raws.split("/")[-1]}: ✖ | {error}')
+                        print(f'{raws.split("/")[-1]}: ✖ | {exc_type} | {error} | {exc_tb}')
                     pass
 
             else:  # if skipe incomplete is false
