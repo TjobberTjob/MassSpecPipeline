@@ -621,8 +621,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     # Find all zip files
     output = filefinder(accnr, path)
     allZip = output[0]
-    print(allZip)
-    quit()
     allRaw = output[1]
     haveallMQF = output[2]
 
