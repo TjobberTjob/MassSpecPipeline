@@ -7,6 +7,7 @@ import pickle
 import shutil
 import subprocess
 import sys
+import traceback
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from zipfile import ZipFile
