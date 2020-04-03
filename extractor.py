@@ -710,7 +710,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     except Exception as error:
         exc_type, exc_tb = sys.exc_info()
         if not multiprocessing:
-            print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | {exc_type} | {error} | {exc_tb}')  # 'issue occoured, going to next zipfile')
+            print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | {exc_type} | {error} | {exc_tb.tb_lineno}')  # 'issue occoured, going to next zipfile')
         if filterbroken:
             if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                 os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
