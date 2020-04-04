@@ -3,12 +3,23 @@
 #####git clone https://github.com/TjobberTjob/MassSpecPipeline
 
 Required python packages:
+
 pip install pyteomics
+
 pip install matplotlib
+
 pip install keras
+
 pip install pydot
+
 pip install pandas
+
 pip install lxml
+
+sudo apt-get update
+
+sudo apt-get install graphviz (for tensorflow)
+
 tensorflow (CPU or GPU)
 
 ####Optinal conda installations:

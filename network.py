@@ -11,6 +11,7 @@ import numpy as np
 from keras.engine.saving import load_model
 from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate, AveragePooling2D
 from keras.utils import plot_model
+from keras import backend as K
 
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio, test_accessions):
@@ -138,13 +139,18 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     print(model.summary())
     plot_model(model, to_file="model.png")
 
+    def coeff_determination(y_true, y_pred):
+        SS_res = K.sum(K.square(y_true - y_pred))
+        SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
+        return (1 - SS_res / (SS_tot + K.epsilon()))
+
     if classification:
         if n_classes == 2:
             model.compile(loss='binary_crossentropy', metrics=['accuracy'], optimizer='adam')
         else:
             model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
     else:
-        model.compile(loss='mse', metrics=['mse'], optimizer='rmsprop')
+        model.compile(loss='mse', metrics=['mse',coeff_determination], optimizer='rmsprop')
 
     # Create callbacks
     if classification:
