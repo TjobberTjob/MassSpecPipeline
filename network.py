@@ -116,13 +116,6 @@ class DataGenerator(keras.utils.Sequence):
             return X, y
 
 
-def r2(y_true, y_pred):
-    from keras import backend as K
-    SS_res = K.sum(K.square(y_true - y_pred))
-    SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
-    return 1 - SS_res / (SS_tot + K.epsilon())
-
-
 # Developing the neural network
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience):
     input = Input(shape=(imglen, pixellen, n_channels,))
@@ -144,6 +137,12 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     model = keras.Model(input, output)
     print(model.summary())
     plot_model(model, to_file="model.png")
+
+    def r2(y_true, y_pred):
+        from keras import backend as K
+        SS_res = K.sum(K.square(y_true - y_pred))
+        SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
+        return 1 - (SS_res / (SS_tot + K.epsilon()))
 
     if classification:
         if n_classes == 2:
