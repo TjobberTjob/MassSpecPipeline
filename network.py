@@ -3,6 +3,7 @@ import os
 import pickle
 import random
 import sys
+import sklearn
 from collections import defaultdict
 from itertools import chain
 import keras
@@ -141,7 +142,6 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     def r2(y_true, y_pred):
         r_sq = sklearn.metrics.r2_score(y_true, y_pred)
         return r_sq
-
 
     if classification:
         if n_classes == 2:
