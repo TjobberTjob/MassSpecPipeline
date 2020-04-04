@@ -139,7 +139,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     print(model.summary())
     plot_model(model, to_file="model.png")
 
-    def coeff_determination(y_true, y_pred):
+    def r_squared(y_true, y_pred):
         SS_res = K.sum(K.square(y_true - y_pred))
         SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
         return (1 - SS_res / (SS_tot + K.epsilon()))
@@ -150,7 +150,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
         else:
             model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
     else:
-        model.compile(loss='mse', metrics=['mse',coeff_determination], optimizer='rmsprop')
+        model.compile(loss='mse', metrics=['mse', r_squared], optimizer='rmsprop')
 
     # Create callbacks
     if classification:
