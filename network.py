@@ -139,10 +139,9 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     plot_model(model, to_file="model.png")
 
     def r2(y_true, y_pred):
-        from keras import backend as K
-        SS_res = K.sum(K.square(y_true - y_pred))
-        SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
-        return 1 - (SS_res / SS_tot)
+        r_sq = sklearn.metrics.r2_score(y_true, y_pred)
+        return r_sq
+
 
     if classification:
         if n_classes == 2:
