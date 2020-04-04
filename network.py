@@ -247,8 +247,10 @@ if __name__ == '__main__':
     model = load_model(f'{metapath}Best-{imageclass}.h5')
     test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
     testaccuracy = model.evaluate_generator(test_generator)
-    print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
-
+    if classification:
+        print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
+    else:
+        print(f'Accuracy on test data. Loss: {testaccuracy[0]}. R^2: {testaccuracy[1]}')
 # python3 network.py R m/z 0.8
 # python3 network.py C Length 0.8
 # python3 network.py C Seq_class 0.8
