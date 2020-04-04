@@ -142,7 +142,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     def r2(y_true, y_pred):
         SS_res = K.sum(K.square(y_true - y_pred))
         SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
-        return (1 - SS_res / (SS_tot + K.epsilon()))
+        return 1 - SS_res / (SS_tot + K.epsilon())
 
     if classification:
         if n_classes == 2:
