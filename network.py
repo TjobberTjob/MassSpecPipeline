@@ -11,7 +11,6 @@ import numpy as np
 from keras.engine.saving import load_model
 from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate, AveragePooling2D
 from keras.utils import plot_model
-from keras import backend as K
 
 
 def datafetcher(path, imgpath, classification, imageclass, splitratio, test_accessions):
@@ -118,6 +117,7 @@ class DataGenerator(keras.utils.Sequence):
 
 
 def r2(y_true, y_pred):
+    from keras import backend as K
     SS_res = K.sum(K.square(y_true - y_pred))
     SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
     return 1 - SS_res / (SS_tot + K.epsilon())
