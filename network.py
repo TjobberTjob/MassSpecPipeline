@@ -227,6 +227,8 @@ if __name__ == '__main__':
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
                                   callbacks=callbacks_list)
+    print(history.history.keys())
+    quit()
     if classification:
         plt.plot(history.history['accuracy'])
         plt.plot(history.history['val_accuracy'])
