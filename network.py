@@ -117,6 +117,13 @@ class DataGenerator(keras.utils.Sequence):
             return X, y
 
 
+def r2(y_true, y_pred):
+    from keras import backend as K
+    SS_res = K.sum(K.square(y_true - y_pred))
+    SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
+    return 1 - SS_res / (SS_tot + K.epsilon())
+
+
 # Developing the neural network
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience):
     input = Input(shape=(imglen, pixellen, n_channels,))
@@ -136,14 +143,8 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     else:
         output = Dense(n_classes, activation='softmax')(x)
     model = keras.Model(input, output)
-    print(model.summary())
+    # print(model.summary())
     plot_model(model, to_file="model.png")
-
-    def r2(y_true, y_pred):
-        from keras import backend as K
-        SS_res = K.sum(K.square(y_true - y_pred))
-        SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
-        return 1 - SS_res / (SS_tot + K.epsilon())
 
     if classification:
         if n_classes == 2:
@@ -158,7 +159,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
         checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_accuracy',
                                                      save_best_only=True)
     else:
-        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_mse',
+        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_r2',
                                                      save_best_only=True)
     early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience)
     callbacks_list = [checkpoint, early_stopping]
@@ -235,8 +236,8 @@ if __name__ == '__main__':
         plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
     else:
-        plt.plot(history.history['mse'])
-        plt.plot(history.history['val_mse'])
+        plt.plot(history.history['r2'])
+        plt.plot(history.history['val_r2'])
         plt.title('model accuracy')
         plt.ylabel('Mean squared error')
         plt.xlabel('epoch')
