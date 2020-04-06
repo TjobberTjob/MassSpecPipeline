@@ -237,8 +237,8 @@ if __name__ == '__main__':
         plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
     else:
-        plt.plot(history.history['loss'])
-        plt.plot(history.history['val_loss'])
+        plt.plot(history.metrics.r2)
+        plt.plot(history.metrics.val_r2)
         plt.title('R-squared of training')
         plt.ylabel('r^2')
         plt.xlabel('epoch')
@@ -249,7 +249,7 @@ if __name__ == '__main__':
     dependencies = {
         'r2': r2
     }
-    model = load_model(f'{metapath}Best-{imageclass}.h5')
+    model = load_model(f'{metapath}Best-{imageclass}.h5', custom_objects=dependencies)
     test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
     testaccuracy = model.evaluate_generator(test_generator)
     if classification:
