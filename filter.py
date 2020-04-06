@@ -84,7 +84,6 @@ def filter(path, file):
 
                 if 'size' in data and data['size'] == [166, 66, 4] and 'Charge' in data and data['Charge'] in Seen \
                         and line not in lines_seen:
-                    data['Seq_class'] = Seen.index(data['Sequence'])
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
             outfile.close()
