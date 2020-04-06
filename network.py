@@ -246,6 +246,9 @@ if __name__ == '__main__':
         plt.savefig(f'{metapath}{imageclass}.png')
 
     print('Creating and running model')
+    dependencies = {
+        'r2': r2
+    }
     model = load_model(f'{metapath}Best-{imageclass}.h5')
     test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
     testaccuracy = model.evaluate_generator(test_generator)
