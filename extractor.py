@@ -733,10 +733,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 else:
                     print(f'Zipfile error. {zips.split("/")[-1]}: ✖')
 
-            if filterbroken:
-                if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
-                    os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
-                brokenfiles.append(zips.replace(' ', '%20'))
+            if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
+                os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
+            brokenfiles.append(zips.replace(' ', '%20'))
             pass
 
     if filterbroken:
