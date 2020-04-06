@@ -237,8 +237,8 @@ if __name__ == '__main__':
         plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
     else:
-        plt.plot(history.metrics.r2)
-        plt.plot(history.metrics.val_r2)
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
         plt.title('R-squared of training')
         plt.ylabel('r^2')
         plt.xlabel('epoch')
