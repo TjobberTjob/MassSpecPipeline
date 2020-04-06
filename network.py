@@ -3,14 +3,11 @@ import os
 import pickle
 import random
 import sys
-from sklearn.metrics import r2_score
-from collections import defaultdict
-from itertools import chain
 import keras
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.engine.saving import load_model
-from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate, AveragePooling2D
+from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
 from keras.utils import plot_model
 
 
