@@ -17,6 +17,17 @@ import pandas as pd
 import requests
 from pyteomics import mzml
 
+# Read datapath from config file
+with open('config.json') as json_file:
+ data = json.load(json_file)
+
+datapath = data['path']
+metapath = f'{datapath}metadata/'
+acquire_only_new = data['acquire_only_new'] == 'True'
+skip_incomplete = data['skip_incomplete'] == 'True'
+multithread = data['multithread'] == 'True'
+nr_threads = data['nr_threads']
+filterbroken = data['filterbroken'] == 'True'
 
 def get_lower_bound(haystack, needle):
     idx = bisect.bisect(haystack, needle)
@@ -676,17 +687,7 @@ def offline(path, filename, mpath):
 
 
 if __name__ == '__main__':
-    # Read datapath from config file
-    with open('config.json') as json_file:
-        data = json.load(json_file)
-
-    datapath = data['path']
-    metapath = f'{datapath}metadata/'
-    acquire_only_new = data['acquire_only_new'] == 'True'
-    skip_incomplete = data['skip_incomplete'] == 'True'
-    multithread = data['multithread'] == 'True'
-    nr_threads = data['nr_threads']
-    filterbroken = data['filterbroken'] == 'True'
+    
 
     # Assigning accession number and maxquant output file name
     pepfile = 'allPeptides.txt'
