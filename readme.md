@@ -1,28 +1,32 @@
-#Readme
-####Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
-#####git clone https://github.com/TjobberTjob/MassSpecPipeline
+# Readme
+#### Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
+##### git clone https://github.com/TjobberTjob/MassSpecPipeline
+
+# Requirements.
+
+This repository was coded and tested using python 3.6.8.
 
 Required python packages:
 
-pip install pyteomics
+`pip install pyteomics`
 
-pip install matplotlib
+`pip install matplotlib`
 
-pip install keras
+`pip install keras`
 
-pip install pydot
+`pip install pydot`
 
-pip install pandas
+`pip install pandas`
 
-pip install lxml
+`pip install lxml`
 
-sudo apt-get update
+`sudo apt-get update`
 
-sudo apt-get install graphviz (for tensorflow)
+`sudo apt-get install graphviz (for tensorflow)`
 
-tensorflow (CPU or GPU)
+`tensorflow (CPU or GPU)`
 
-####Optinal conda installations:
+#### Optional conda installations:
 
 conda install -c bioconda thermorawfileparser                               #This will get installed automatically first time you run the program (if conda is selected)
 
