@@ -43,8 +43,8 @@ git clone https://github.com/compomics/ThermoRawFileParser.git              #Clo
 docker build --no-cache -t thermorawparser /ThermoRawFileParser             #This will get installed automatically first time you run the program (if docker is selected)
 
 
-###config file
-####extraction attributes:
+### config file
+#### extraction attributes:
 TOOL is a connector between MS and AI, downloading, handling, formatting and extracting data from raw MS files into singular image files with metadata.
 Before we go into examples of usage, first step is to change config.json file
 
@@ -70,7 +70,7 @@ filterbroken: A method to skip PRIDE projects that has problems with them - Defa
 
 formatsoftware: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
 
-####networkattributes:
+#### networkattributes:
 batch_size: Size of batches for stochastic gradient descent - Defaults to 64
 
 epochs: Max epochs used for neural network training - Defaults to 100
@@ -81,10 +81,10 @@ test_accessions: Number of accession projects set aside to testing (not validati
 
 early_stopping: Number of epochs with no improvement before stopping - Defaults to 10}}
 
-####NOTE: Values given as "True" and "False" needs to be in quotes.
+#### NOTE: Values given as "True" and "False" needs to be in quotes.
 
-###Usage:
-####Part - PRIDE Webscraper:
+### Usage:
+#### Part - PRIDE Webscraper:
 Starting of we present a method to getting information on all PRIDE projects.
 To begin with we need the accessions numbers for all PRIDE projects. This is gotten by using the scraper.py using the input "accessions".
 This will create, if it doesnt already exists, the metadata folder and create a txt file with all accession numbers from pride

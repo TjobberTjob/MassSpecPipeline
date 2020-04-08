@@ -132,7 +132,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     x2 = MaxPooling2D(pool_size=(2, 2))(x2)
     x = Concatenate()([x, x1, x2])
     x = Flatten()(x)
-    x = Dropout(rate=0.25)(x)
+    # x = Dropout(rate=0.1)(x)
     x = Dense(128, activation='relu')(x)
     x = Dense(64, activation='relu')(x)
     if not classification:
