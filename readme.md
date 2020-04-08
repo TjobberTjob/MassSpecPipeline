@@ -1,6 +1,6 @@
-#Readme
-####Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
-#####git clone https://github.com/TjobberTjob/MassSpecPipeline
+# Readme
+#### Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
+##### git clone https://github.com/TjobberTjob/MassSpecPipeline
 
 Required python packages:
 
@@ -16,13 +16,11 @@ pip install pandas
 
 pip install lxml
 
-sudo apt-get update
-
-sudo apt-get install graphviz (for tensorflow)
-
 tensorflow (CPU or GPU)
 
-####Optinal conda installations:
+#### Optinal conda installations:
+
+conda install -c anaconda graphviz                                          #Install graphviz for tensorflow
 
 conda install -c bioconda thermorawfileparser                               #This will get installed automatically first time you run the program (if conda is selected)
 
@@ -30,7 +28,7 @@ conda install -y tensorflow-gpu=2.1.0                                       #Con
 
 conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch      #tensorflow GPU associated package for CUDA.
 
-####Optional docker installations:
+#### Optional docker installations:
 git clone https://github.com/compomics/ThermoRawFileParser.git              #Clone the git repo with ThermoRawFileParser dockerized version on it.
 
 docker build --no-cache -t thermorawparser /ThermoRawFileParser             #This will get installed automatically first time you run the program (if docker is selected)
