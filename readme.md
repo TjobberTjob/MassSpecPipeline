@@ -1,34 +1,43 @@
-# Readme
+# Mass Spectrometry Pipeline.
+
+Code aimed at facilitating downloading mass spectrometry datasets for repurposing.
+
 #### Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
 ##### git clone https://github.com/TjobberTjob/MassSpecPipeline
 
+## Requirements.
+
+This repository was coded and tested using python 3.6.8.
+
 Required python packages:
 
-pip install pyteomics
+`pip install pyteomics`
 
-pip install matplotlib
+`pip install matplotlib`
 
-pip install keras
+`pip install keras`
 
-pip install pydot
+`pip install pydot`
 
-pip install pandas
+`pip install pandas`
 
-pip install lxml
+`pip install lxml`
 
-tensorflow (CPU or GPU)
+`sudo apt-get update`
 
-#### Optinal conda installations:
+`sudo apt-get install graphviz (for tensorflow)`
 
-conda install -c anaconda graphviz                                          #Install graphviz for tensorflow
+`tensorflow (CPU or GPU)`
 
-conda install -c bioconda thermorawfileparser                               #This will get installed automatically first time you run the program (if conda is selected)
+Optional conda installations:
 
-conda install -y tensorflow-gpu=2.1.0                                       #Conda installation of tensorflow GPU version
+`conda install -c bioconda thermorawfileparser`                               #This will get installed automatically first time you run the program (if conda is selected)
 
-conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch      #tensorflow GPU associated package for CUDA.
+`conda install -y tensorflow-gpu=2.1.0`                                    #Conda installation of tensorflow GPU version
 
-#### Optional docker installations:
+`conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch`      #tensorflow GPU associated package for CUDA.
+
+Optional docker installations:
 git clone https://github.com/compomics/ThermoRawFileParser.git              #Clone the git repo with ThermoRawFileParser dockerized version on it.
 
 docker build --no-cache -t thermorawparser /ThermoRawFileParser             #This will get installed automatically first time you run the program (if docker is selected)
