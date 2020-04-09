@@ -684,7 +684,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 df = output[1]
 
                 for raws in rawfiles:
-                    try:  # TRY ALL RAWS IN ZIP
+                    # try:  # TRY ALL RAWS IN ZIP
                         filename = str(raws)
                         if not multiprocessing:
                             print(f'file: {accnr}/{filename}                                               ')
@@ -696,17 +696,17 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         if not multiprocessing:
                             print(f'{raws.split("/")[-1]}: ✔                         ')
                         workingrawfiles += 1
-                    except Exception as error:
-                        exc_type, exc_obj, exc_tb = sys.exc_info()
-                        if not multiprocessing:
-                            if errormessages:
-                                print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
-                                      f' Error: {error} | Line: {exc_tb.tb_lineno}')
-                                del (exc_type, exc_obj, exc_tb)
-                            else:
-                                print(
-                                    f'Rawfile error. {raws.split("/")[-1]}: ✖')
-                        pass
+                    # except Exception as error:
+                    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+                    #     if not multiprocessing:
+                    #         if errormessages:
+                    #             print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                    #                   f' Error: {error} | Line: {exc_tb.tb_lineno}')
+                    #             del (exc_type, exc_obj, exc_tb)
+                    #         else:
+                    #             print(
+                    #                 f'Rawfile error. {raws.split("/")[-1]}: ✖')
+                    #     pass
 
             else:  # If we dont have all needed files, we need to get them from the API
                 for raws in allRaw:
