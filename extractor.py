@@ -30,23 +30,25 @@ def get_lower_bound(haystack, needle):
 
 def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
-    try:
-        urljson = requests.get(url).json()
-        zipfiles = []
-        rawfiles = []
+    # workingAPI = True
+    # try:
+    urljson = requests.get(url).json()
+    zipfiles = []
+    rawfiles = []
 
-        # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
-        for jsonelem in urljson['list']:
-            filetype = jsonelem['fileName'].split('.')[-1]
-            if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip' and \
-                    jsonelem['downloadLink'][-9:] != "Fasta.zip":
-                zipfiles.append(jsonelem['downloadLink'])
-            if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
-                rawfiles.append(jsonelem['downloadLink'])
-    except:
-        if not multiprocessing:
-            print("API connection issue")
-        return [], [], []
+    # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
+    for jsonelem in urljson['list']:
+        filetype = jsonelem['fileName'].split('.')[-1]
+        if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip' and \
+                jsonelem['downloadLink'][-9:] != "Fasta.zip":
+            zipfiles.append(jsonelem['downloadLink'])
+        if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
+            rawfiles.append(jsonelem['downloadLink'])
+    # except:
+    #     if not multiprocessing:
+    #         print("API connection issue")
+    #     workingAPI = False
+    #     return [], [], []
 
     allCheck = [('mzML.json' in os.listdir(f'{path}{accnr}/{files}/') and 'allPeptides.txt' in os.listdir(
         f'{path}{accnr}/{files}/')) for files in os.listdir(f'{path}{accnr}/') if
