@@ -599,11 +599,11 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
 
     if serverissue:
         if errormessages:
-            print(f'{accnr}: ✔ - {0}/{len(allRaw)} PRIDE Servers cannot be reached')
+            print(f'{accnr}: ✔ - 0/{len(allRaw)} PRIDE Servers cannot be reached')
         return
     if restrictedissue:
         if errormessages:
-            print(f'{accnr}: ✔ - {0}/{len(allRaw)} Restricted PRIDE project')
+            print(f'{accnr}: ✔ - 0/{len(allRaw)} Restricted PRIDE project')
         return
 
     # skip files if skip-incomplete or acquire_only_new is true
