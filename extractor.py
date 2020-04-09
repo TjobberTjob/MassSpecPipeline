@@ -97,8 +97,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
 
 
 def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
-    accessionpath = f'{path}{accnr}/'
-    filepath = f'{accessionpath}{filename}/'
+    filepath = f'{path}{accnr}/{filename}/'
     # Make the file directory if it doesnt exist
     if not os.path.exists(filepath):
         os.mkdir(filepath)
@@ -643,7 +642,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         df2 = output[0]
                         filepath = output[1]
                         rawfilefound = output[2]
-                        if not rawfilefound:
+                        if rawfilefound:
                             missingraws += 1
                             pass
 
