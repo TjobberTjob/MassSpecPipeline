@@ -458,7 +458,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             outbound += 1  # Check if this image can be created in our range or not
             continue
         inbound += 1
-        if os.path.exists(f'{imgpath}{filename}-{str(index + 1)}.txt'):
+        if os.path.exists(f'{imgpath}{filename}-{rows["MS/MS IDs"]}.json'):
             continue
 
         # if not 450 < rows['m/z'] < 455:  # Filter
