@@ -713,7 +713,6 @@ if __name__ == '__main__':
     acquire_only_new = data['acquire_only_new'] == 'True'
     multi = data['multiprocessing'] == 'True'
     nr_processes = data['nr_processes']
-    filterbroken = data['filterbroken'] == 'True'
     formatusing = data['formatsoftware']
     errormessages = data['errormessages'] == 'True'
     skip_incomplete = False
