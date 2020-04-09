@@ -260,8 +260,8 @@ def internalmzML(path):
                 extracted['ms2'][scan_id] = {'scan_index': ms2_spectrum['scan_index'],
                                              'precursor_scan': ms2_spectrum['precursor_scan'],
                                              'precursor_ion': ms2_spectrum['precursor_ion'],
-                                             'm/z_array': [f for f in ms2_spectrum['m/z']],
-                                             'rt_array': [f for f in ms2_spectrum['rt']]}
+                                             'm/z_array': [mz for mz in ms2_spectrum['m/z']],
+                                             'rt_array': [rt for rt in ms2_spectrum['rt']]}
 
             else:
                 pass
