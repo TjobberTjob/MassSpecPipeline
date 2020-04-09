@@ -275,7 +275,7 @@ def internalmzML(path):
 def preparameters(filepath):
     if not multiprocessing:
         print('Preparing parameter for image creation                                                    ', end='\r')
-    with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
+    with gzip.GzipFile(f'mzML.json', 'r') as fin:
         mzml = json.loads(fin.read().decode('utf-8'))
 
     mzlist = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
@@ -478,15 +478,12 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
             mzml = json.loads(fin.read().decode('utf-8'))
 
-        mzml['ms2'][rows['MS/MS IDs']]
+        ms2info = [mzml['ms2'][rows['MS/MS IDs']]['m/z_array'], mzml['ms2'][rows['MS/MS IDs']]['rt_array']]
+        fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
-        # outfile  = {'ms1': subimage, 'ms2': }
-
-
-
-        # Save image as txt file
-        with open(f'{imgpath}{filename}-{str(index + 1)}.txt', 'wb') as imagefile:
-            pickle.dump(subimage, imagefile)
+        # Save image as json file
+        with gzip.GzipFile(f'{imgpath}{filename}-{str(index + 1)}.json', 'w') as fout:
+            fout.write(json.dumps(fullsubimage).encode('utf-8'))
 
         if savepng:  # save subimages to png
             subpng(subimage, imgpath, filename, index, lowbound, highbound)
@@ -495,6 +492,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         new_metadata['image'] = f'{filename}-{str(index + 1)}'
         new_metadata['accession'] = accession
         new_metadata['size'] = subimage2.shape
+        new_metadata['ms2arraylength'] = len(mzml['ms2'][rows['MS/MS IDs']]['m/z_array'])
         for ele in df.columns:
             if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
                 continue
@@ -619,7 +617,8 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
     subimage_interval['mz'] = config['mz_interval']
     subimage_interval['rt'] = config['rt_interval']
 
-    inorout = subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds,
+    inorout = subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image,
+                      bounds,
                       savepng=False)
 
     endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
