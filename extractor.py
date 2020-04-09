@@ -250,17 +250,23 @@ def internalmzML(path):
                                              'intensity': ms1_spectrum['intensity'],
                                              'scan_time': ms1_spectrum['scan_time']}
 
-            # elif spectrum['ms level'] == 2:
-            #     # Scan id
-            #     scan_id = int(spectrum['id'].split('scan=')[1])
-            #
-            #     # Deal with ms level 1 spectra
-            #     ms2_spectrum = process_ms2(spectrum)
-            #     extracted['ms2'][scan_id] = {'scan_index': ms2_spectrum['scan_index'],
-            #                                  'precursor_scan': ms2_spectrum['precursor_scan'],
-            #                                  'precursor_ion': ms2_spectrum['precursor_ion'],
-            #                                  'm/z_array': ms2_spectrum['m/z'],
-            #                                  'rt_array': ms2_spectrum['rt']}
+            elif spectrum['ms level'] == 2:
+                # Scan id
+                scan_id = int(spectrum['id'].split('scan=')[1])
+
+                # Deal with ms level 1 spectra
+                ms2_spectrum = process_ms2(spectrum)
+                print(ms2_spectrum['scan_index'])
+                print(ms2_spectrum['precursor_scan'])
+                print(ms2_spectrum['precursor_ion'])
+                print(ms2_spectrum['m/z'])
+                print(ms2_spectrum['rt'])
+                quit()
+                extracted['ms2'][scan_id] = {'scan_index': ms2_spectrum['scan_index'],
+                                             'precursor_scan': ms2_spectrum['precursor_scan'],
+                                             'precursor_ion': ms2_spectrum['precursor_ion'],
+                                             'm/z_array': ms2_spectrum['m/z'],
+                                             'rt_array': ms2_spectrum['rt']}
 
             else:
                 pass
@@ -268,7 +274,7 @@ def internalmzML(path):
         with gzip.GzipFile(f'{path}mzML.json', 'w') as fout:
             fout.write(json.dumps(extracted).encode('utf-8'))
         fout.close()
-        os.remove(f'{path}file.mzML')
+        # os.remove(f'{path}file.mzML')
 
 
 def preparameters(filepath):
