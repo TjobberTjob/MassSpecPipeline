@@ -477,7 +477,8 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
 
         with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
             mzml = json.loads(fin.read().decode('utf-8'))
-
+        print(rows['MS/MS IDs'])
+        print(mzml['ms2'][1680])
         ms2info = [mzml['ms2'][rows['MS/MS IDs']]['m/z_array'], mzml['ms2'][rows['MS/MS IDs']]['rt_array']]
         print(ms2info)
         quit()
@@ -721,17 +722,17 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 if not multiprocessing:
                     print(f'{raws.split("/")[-1]}: ✔                         ')
                 workingrawfiles += 1
-                    # except Exception as error:
-                    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-                    #     if not multiprocessing:
-                    #         if errormessages:
-                    #             print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
-                    #                   f' Error: {error} | Line: {exc_tb.tb_lineno}')
-                    #             del (exc_type, exc_obj, exc_tb)
-                    #         else:
-                    #             print(
-                    #                 f'Rawfile error. {raws.split("/")[-1]}: ✖')
-                    #     pass
+                # except Exception as error:
+                #     exc_type, exc_obj, exc_tb = sys.exc_info()
+                #     if not multiprocessing:
+                #         if errormessages:
+                #             print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                #                   f' Error: {error} | Line: {exc_tb.tb_lineno}')
+                #             del (exc_type, exc_obj, exc_tb)
+                #         else:
+                #             print(
+                #                 f'Rawfile error. {raws.split("/")[-1]}: ✖')
+                #     pass
 
         # except Exception as error:
         #     exc_type, exc_obj, exc_tb = sys.exc_info()
