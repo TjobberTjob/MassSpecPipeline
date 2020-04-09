@@ -54,8 +54,8 @@ def filefinder(accnr, path):
             serverIssue = True
         return privacyIssue, serverIssue, []
 
-    allCheck = ['allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/')) for files in os.listdir(f'{path}{accnr}/')
-        if len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
+    allCheck = ['allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/')
+                if len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
     if False in allCheck or allCheck == []:
         haveallMQF = False
     else:
