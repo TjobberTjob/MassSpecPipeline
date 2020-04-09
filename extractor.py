@@ -577,10 +577,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
 
     with open('config.json') as json_file:
         config = json.load(json_file)
-    subimage_interval = {}
-    subimage_interval['mz'] = config['mz_interval']
-    subimage_interval['rt'] = config['rt_interval']
-
+    subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
     subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds, savepng=False)
 
 
@@ -626,8 +623,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
         nonworkingzips = []
         brokenfiles = []
 
-    workingrawfiles = 0
-
     for zips in reversed(allZip):
         try:  # TRY ALL ZIPS
             if filterbroken:
@@ -653,7 +648,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         submain(accnr, filename, path, mpath, filepath, df2, formatusing)
                         if not multiprocessing:
                             print(f'{raws.split("/")[-1]}: ✔                         ')
-                            workingrawfiles += 1
+
                     except Exception as error:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         if not multiprocessing:
@@ -678,7 +673,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         submain(accnr, filename, path, mpath, filepath, df2, formatusing)
                         if not multiprocessing:
                             print(f'{raws.split("/")[-1]}: ✔                         ')
-                        workingrawfiles += 1
+
                     except Exception as error:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         if not multiprocessing:
@@ -715,17 +710,11 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 outfile.write(json.dumps(brokendict) + '\n')
         outfile.close()
 
-    allCheck = ['mzML.json' in os.listdir(f'{datapath}{accnr}/{files}/') for files in
-                os.listdir(f'{path}{accnr}/') if
-                len(os.listdir(f'{path}{accnr}/')) == len(allRaw)]
-    if False in allCheck or allCheck == []:
-        allCheck = False
+    allCheck = [files for files in os.listdir(f'{path}{accnr}/') if 'mzML.json' in os.listdir(f'{path}{accnr}/{files}')]
+    if len(allCheck) == len(allRaw):
+        print(f'{accnr}: ✔ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
     else:
-        allCheck = True
-    if allCheck:
-        print(f'{accnr}: ✔ - {workingrawfiles}/{len(allRaw)} Rawfiles extracted')
-    else:
-        print(f'{accnr}: ✖ - {workingrawfiles}/{len(allRaw)} Rawfiles extracted')
+        print(f'{accnr}: ✖ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
 
 
 if __name__ == '__main__':
