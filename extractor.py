@@ -485,7 +485,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             subpng(subimage, imgpath, filename, index, lowbound, highbound)
 
         new_metadata = {}
-        new_metadata['image'] = f'{filename}-{str(index + 1)}'
+        new_metadata['image'] = f'{filename}-{rows["MS/MS IDs"]}.json'
         new_metadata['accession'] = accession
         new_metadata['size'] = subimage2.shape
         new_metadata['ms2arraylength'] = len(mzml['ms2'][rows['MS/MS IDs']]['m/z_array'])
