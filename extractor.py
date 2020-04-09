@@ -596,10 +596,10 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
         serverissue = allZip
         restrictedissue = allRaw
 
-    if serverissue in globals() and serverissue:
+    if "serverissue" in globals() and serverissue:
         print(f'{accnr}: ✔ - 0/{len(allRaw)} PRIDE Servers cannot be reached')
         return
-    if restrictedissue in globals() and restrictedissue:
+    if "restrictedissue" in globals() and restrictedissue:
         print(f'{accnr}: ✔ - 0/{len(allRaw)} Restricted PRIDE project')
         return
 
