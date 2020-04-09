@@ -477,7 +477,9 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
 
         with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
             mzml = json.loads(fin.read().decode('utf-8'))
-        scanid = mzml['ms2'][f"'{rows['MS/MS IDs']}'"]
+        print(mzml['ms2'][{rows['1680']}])
+        scanid = mzml['ms2'][{rows['MS/MS IDs']}]
+
         ms2info = [mzml['ms2'][scanid]['m/z_array'], mzml['ms2'][scanid]['rt_array']]
         print(ms2info)
         quit()
