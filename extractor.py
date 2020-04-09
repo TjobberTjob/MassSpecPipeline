@@ -607,16 +607,11 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     # skip files if skip-incomplete or acquire_only_new is true
     if haveallMQF:
         if acquire_only_new:
-            brokenfiles = 'skip'
             print(f'{accnr}: ✔ - {len(allRaw)}/{len(allRaw)} Rawfiles extracted')
             return
     else:
         if skip_incomplete:
-            brokenfiles = 'skip'
-            if not multiprocessing:
-                print('skip_incomplete is True - Continuing')
-            else:
-                print(f'Accession: {accnr}: ✔ - Skipping')
+            print(f'Accession: {accnr}: ✔ - Skipping')
             return
 
     # Makes broken.json if it doesnt exists
