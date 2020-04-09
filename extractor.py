@@ -620,34 +620,34 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
 
                 missingraws = 0
                 for raws in rawfiles:
-                    try:  # TRY ALL RAWS IN ZIP
-                        filename = str(raws)
-                        if not multiprocessing:
-                            print(f'file: {accnr}/{filename}                                               ')
+                    # try:  # TRY ALL RAWS IN ZIP
+                    filename = str(raws)
+                    if not multiprocessing:
+                        print(f'file: {accnr}/{filename}                                               ')
 
-                        output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                        df2 = output[0]
-                        filepath = output[1]
-                        rawfilefound = output[2]
-                        if rawfilefound:
-                            missingraws += 1
-                            pass
-
-                        submain(accnr, filename, path, mpath, filepath, df2, formatusing)
-                        if not multiprocessing:
-                            print(f'{raws.split("/")[-1]}: ✔                         ')
-
-                    except Exception as error:
-                        exc_type, exc_obj, exc_tb = sys.exc_info()
-                        if not multiprocessing:
-                            if errormessages:
-                                print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
-                                      f' Error: {error} | Line: {exc_tb.tb_lineno}')
-                                del (exc_type, exc_obj, exc_tb)
-                            else:
-                                print(
-                                    f'Rawfile error. {raws.split("/")[-1]}: ✖')
+                    output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                    df2 = output[0]
+                    filepath = output[1]
+                    rawfilefound = output[2]
+                    if rawfilefound:
+                        missingraws += 1
                         pass
+
+                    submain(accnr, filename, path, mpath, filepath, df2, formatusing)
+                    if not multiprocessing:
+                        print(f'{raws.split("/")[-1]}: ✔                         ')
+
+                    # except Exception as error:
+                    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+                    #     if not multiprocessing:
+                    #         if errormessages:
+                    #             print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                    #                   f' Error: {error} | Line: {exc_tb.tb_lineno}')
+                    #             del (exc_type, exc_obj, exc_tb)
+                    #         else:
+                    #             print(
+                    #                 f'Rawfile error. {raws.split("/")[-1]}: ✖')
+                    #     pass
 
             else:  # If we have all needed files, we dont need to get them from the API
                 for raws in allRaw:
