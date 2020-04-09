@@ -37,8 +37,8 @@ def filefinder(accnr, path):
     rawfiles = []
 
     # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
+    print(urljson)
     for jsonelem in urljson['list']:
-        print(jsonelem)
         filetype = jsonelem['fileName'].split('.')[-1]
         if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip' and \
                 jsonelem['downloadLink'][-9:] != "Fasta.zip":
