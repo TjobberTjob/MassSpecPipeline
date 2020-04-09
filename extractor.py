@@ -479,7 +479,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
 
         mzml['ms2'][rows['MS/MS IDs']]
 
-        outfile  = {'ms1': subimage, 'ms2': }
+        # outfile  = {'ms1': subimage, 'ms2': }
 
 
 
