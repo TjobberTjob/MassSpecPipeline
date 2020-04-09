@@ -117,8 +117,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         for fileraw in rawfiles:
             if filename in fileraw or len(rawfiles) == 1:
-                print(f'wget -q -c -O {filepath}file.raw -c {fileraw}')
-                quit()
+                os.system(f'wget -q -c -O {filepath}file.raw -c {fileraw}')
                 rawfilefound = False
                 break
 
@@ -694,7 +693,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     if len(allCheck) == len(allRaw):
         print(f'{accnr}: ✔ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
     else:
-        if missingraws > 0 and errormessages:
+        if missingraws > 0:
             print(f'{accnr}: ✖ - {len(allCheck)}/{len(allRaw)} MaxQuant file names do not match PRIDE file names')
         print(f'{accnr}: ✖ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
 
