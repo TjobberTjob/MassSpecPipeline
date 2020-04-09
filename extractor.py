@@ -475,7 +475,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             ms2info = [mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'], mzml['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
             datacollected = 'both'
         except:
-            ms2info = []
+            ms2info = [[],[]]
             datacollected = 'ms1'
 
 
@@ -492,7 +492,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         new_metadata['image'] = f'{filename}-{rows["MS/MS IDs"]}.json'
         new_metadata['accession'] = accession
         new_metadata['size'] = np.array(subimage).shape
-        new_metadata['ms2arraylength'] = len(mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'])
+        new_metadata['ms2arraylength'] = len(ms2info[0])
         new_metadata['datacollected'] = datacollected
         for ele in df.columns:
             if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
