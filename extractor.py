@@ -581,7 +581,6 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
-    global brokenfiles, nonworkingzips
     if not multiprocessing:
         print(f'\nAccessions: {accnr}')
 
@@ -597,10 +596,10 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
         serverissue = allZip
         restrictedissue = allRaw
 
-    if serverissue and serverissue in globals():
+    if serverissue in globals() and serverissue:
         print(f'{accnr}: ✔ - 0/{len(allRaw)} PRIDE Servers cannot be reached')
         return
-    if restrictedissue and restrictedissue in globals():
+    if restrictedissue in globals() and restrictedissue:
         print(f'{accnr}: ✔ - 0/{len(allRaw)} Restricted PRIDE project')
         return
 
@@ -623,8 +622,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
         if accnr in zipfiles:
             nonworkingzips = zipfiles[accnr]
             break
-    if not "nonworkingzips" in globals():
+    if "nonworkingzips" not in globals():
         nonworkingzips = []
+    if "brokenfiles" not in globals():
         brokenfiles = []
 
     for zips in reversed(allZip):
