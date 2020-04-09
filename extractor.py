@@ -457,7 +457,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         if os.path.exists(f'{imgpath}{filename}-{rows["MS/MS IDs"]}.json'):
             continue
 
-        # if not 450 < rows['m/z'] < 455:  # Filter
+        # if not 450 < rows['m/z'] < 455:  # Filter for when storage is limited
         #     continue
 
         mzlen = int(subimage_interval['mz'] / mz_bin)
