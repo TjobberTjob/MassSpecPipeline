@@ -479,8 +479,6 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             mzml = json.loads(fin.read().decode('utf-8'))
 
         ms2info = [mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'], mzml['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
-        print(ms2info)
-        quit()
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
         # Save image as json file
