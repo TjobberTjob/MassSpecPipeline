@@ -257,17 +257,11 @@ def internalmzML(path):
 
                 # Deal with ms level 1 spectra
                 ms2_spectrum = process_ms2(spectrum)
-                print(ms2_spectrum['scan_index'])
-                print(ms2_spectrum['precursor_scan'])
-                print(ms2_spectrum['precursor_ion'])
-                print([f for f in ms2_spectrum['m/z']])
-                print([f for f in ms2_spectrum['rt']])
-                quit()
                 extracted['ms2'][scan_id] = {'scan_index': ms2_spectrum['scan_index'],
                                              'precursor_scan': ms2_spectrum['precursor_scan'],
                                              'precursor_ion': ms2_spectrum['precursor_ion'],
-                                             'm/z_array': ms2_spectrum['m/z'],
-                                             'rt_array': ms2_spectrum['rt']}
+                                             'm/z_array': [f for f in ms2_spectrum['m/z']],
+                                             'rt_array': [f for f in ms2_spectrum['rt']]}
 
             else:
                 pass
