@@ -482,7 +482,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
         # Save image as json file
-        with gzip.GzipFile(f'{imgpath}{filename}-{str(index + 1)}.json', 'w') as fout:
+        with gzip.GzipFile(f'{imgpath}{filename}-{rows["MS/MS IDs"]}.json', 'w') as fout:
             fout.write(json.dumps(fullsubimage).encode('utf-8'))
 
         if savepng:  # save subimages to png

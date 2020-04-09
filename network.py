@@ -1,32 +1,41 @@
 import json
 import os
-import pickle
 import random
 import sys
 import keras
+from itertools import chain
 import matplotlib.pyplot as plt
 import numpy as np
+import gzip
 from keras.engine.saving import load_model
 from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
 from keras.utils import plot_model
 
 
-def datafetcher(path, imgpath, classification, imageclass, splitratio, test_accessions):
+def datafetcher(path, imgpath, imageclass, splitratio, test_accessions, whichMS):
     print('Data fetching')
     imgfiles = os.listdir(imgpath)
-    with open(f'{imgpath}{imgfiles[0]}', "rb") as pa:
-        image = pickle.load(pa)
+    with gzip.GzipFile(f'{imgpath}{imgfiles[0]}', 'r') as fin:
+        fullinfoimage = json.loads(fin.read().decode('utf-8'))
+    image = fullinfoimage['ms1']
     imagelen = len(image)
     pixellen = len(image[0])
 
-    accs = [json.loads(acc)['accession'] for acc in open(f'{path}subimage_filtered.json') if
+    if whichMS == 'both' and os.path.exists(f'{path}subimage_filtered_network.json'):
+        filetosuse = 'subimage_filtered_network.json'
+    elif os.path.exists(f'{path}subimage_filtered.json'):
+        filetosuse = 'subimage_filtered.json'
+    else:
+        filetosuse = 'subimage.json'
+
+    accs = [json.loads(acc)['accession'] for acc in open(f'{path}{filetosuse}') if
             'accession' in json.loads(acc)]
     random.shuffle(accs)
     test_accs = accs[0:test_accessions]
-    testfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}subimage_filtered.json')
+    testfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}{filetosuse}')
                  if 'accession' in json.loads(acc) and json.loads(acc)['accession'] in test_accs]
 
-    trainvalfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}subimage_filtered.json')
+    trainvalfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}{filetosuse}')
                      if 'accession' in json.loads(acc) and json.loads(acc)['accession'] not in test_accs]
     random.shuffle(trainvalfiles)
     splits = round(len(trainvalfiles) * float(splitratio))
@@ -40,16 +49,14 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
 
     labels = {}
     testlabels = {}
-    if os.path.exists(f'{path}subimage_filtered.json'):
-        for line in open(f'{path}subimage_filtered.json'):
-            imagedata = json.loads(line)
-
-            if f'{imagedata["image"]}.txt' not in testfiles:
-                name = f'{imagedata["image"]}.txt'
-                labels[name] = imagedata[imageclass]
-            else:
-                name = f'{imagedata["image"]}.txt'
-                testlabels[name] = imagedata[imageclass]
+    for line in open(f'{path}{filetosuse}'):
+        imagedata = json.loads(line)
+        if f'{imagedata["image"]}.txt' not in testfiles:
+            name = f'{imagedata["image"]}.txt'
+            labels[name] = imagedata[imageclass]
+        else:
+            name = f'{imagedata["image"]}.txt'
+            testlabels[name] = imagedata[imageclass]
 
     return partition, labels, imagelen, pixellen, testlabels
 
@@ -58,7 +65,7 @@ def datafetcher(path, imgpath, classification, imageclass, splitratio, test_acce
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
 
-    def __init__(self, path, list_IDs, labels, batch_size, size, n_channels, n_classes, shuffle):
+    def __init__(self, path, list_IDs, labels, batch_size, size, n_channels, n_classes, shuffle, MS, mslen):
         'Initialization'
         self.size = size
         self.path = path
@@ -68,6 +75,8 @@ class DataGenerator(keras.utils.Sequence):
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
+        self.MS = MS
+        self.mslen = mslen
         self.on_epoch_end()
 
     def __len__(self):
@@ -94,24 +103,32 @@ class DataGenerator(keras.utils.Sequence):
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'
         # Initialization
-        X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
-        y = np.empty((self.batch_size), dtype=float)
+        X   = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
+        if self.MS == 'both':
+            X2  = np.empty((self.batch_size, self.mslen))
+        y   = np.empty((self.batch_size), dtype=float)
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            with open(f'{imagepath}{ID}', "rb") as pa:
-                image = pickle.load(pa)
+            with gzip.GzipFile(f'{imagepath}{ID}', 'r') as fin:
+                fullinfoimage = json.loads(fin.read().decode('utf-8'))
+            image = fullinfoimage['ms1']
             image = np.array(image)
             image = image[:, :, 0:self.n_channels]
             X[i,] = image
+
+            if self.MS == 'both':
+                mz_array = fullinfoimage['ms2'][ID.split('-')[-1]]['m/z_array']
+                rt_array = fullinfoimage['ms2'][ID.split('-')[-1]]['rt_array']
+                X2[i,] = list(chain.from_iterable([mz_array,rt_array]))
+
             y[i] = self.labels[ID]
 
         if classification:
             y = keras.utils.to_categorical(y, num_classes=self.n_classes)
-            return X, y
-        else:
-            return X, y
+
+        return X, X2, y
 
 
 def r2(y_true, y_pred):
@@ -184,6 +201,20 @@ if __name__ == '__main__':
     epochs = config['epochs']
     patience = config['early_stopping']
     setseed = config['setseed'] == 'True'
+    whichMS = config['MS']
+    lenMS2 = config['lenms2']
+
+    if whichMS == 'both':
+        if lenMS2 == 'max':
+            lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}subimage.json')
+                      if 'ms2arraylength' in json.loads(line)])
+        else:
+            outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
+            for line in open(f'{metapath}subimage_filtered.json', 'r'):
+                data = json.loads(line)
+                if data['ms2arraylength'] >= lenMS2:
+                    outfile.write(json.dumps(data) + '\n')
+            outfile.close()
 
     if setseed:
         random.seed(1)
@@ -199,7 +230,7 @@ if __name__ == '__main__':
 
     nameofclass = imageclass.replace('/', '')
 
-    output = datafetcher(metapath, imagepath, classification, imageclass, splitratio, test_accessions)
+    output = datafetcher(metapath, imagepath, classification, imageclass, splitratio, test_accessions, whichMS)
     partition = output[0]
     labels = output[1]
     imglen = output[2]
@@ -217,7 +248,9 @@ if __name__ == '__main__':
               'batch_size': batch_size,
               'n_classes': n_classes,
               'n_channels': n_channels,
-              'shuffle': True}
+              'shuffle': True,
+              'MS': whichMS,
+              'mslen': lenMS2}
 
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
