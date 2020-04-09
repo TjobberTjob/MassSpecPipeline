@@ -461,8 +461,8 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         if os.path.exists(f'{imgpath}{filename}-{str(index + 1)}.txt'):
             continue
 
-        if not 450 < rows['m/z'] < 455:  # Filter
-            continue
+        # if not 450 < rows['m/z'] < 455:  # Filter
+        #     continue
         inmzbound += 1
 
         mzlen = int(subimage_interval['mz'] / mz_bin)
