@@ -51,7 +51,7 @@ def filefinder(accnr, path):
     if not os.path.exists(f'{path}{accnr}/'):
         os.mkdir(f'{path}{accnr}/')
 
-    allCheck = ['mzML.json' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/') if
+    allCheck = [('mzML.json' in os.listdir(f'{path}{accnr}/{files}/') and 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/')) for files in os.listdir(f'{path}{accnr}/') if
                 len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
     if False in allCheck or allCheck == []:
         haveallMQF = False
