@@ -140,6 +140,7 @@ def formatFile(accnr, filename, path, filepath, formatusing):
             if not 'thermorawfileparser' in str(condalist):
                 os.system('conda install -c bioconda thermorawfileparser')
 
+            condalist = subprocess.check_output('conda list', shell=True)
             if not 'thermorawfileparser' in str(condalist):
                 print('Conda issue. Cannot install thermorawfileparser, try re-installing conda')
                 quit()
@@ -259,8 +260,8 @@ def internalmzML(path):
                 print(ms2_spectrum['scan_index'])
                 print(ms2_spectrum['precursor_scan'])
                 print(ms2_spectrum['precursor_ion'])
-                print(ms2_spectrum['m/z'])
-                print(ms2_spectrum['rt'])
+                print([f for f in ms2_spectrum['m/z']])
+                print([f for f in ms2_spectrum['rt']])
                 quit()
                 extracted['ms2'][scan_id] = {'scan_index': ms2_spectrum['scan_index'],
                                              'precursor_scan': ms2_spectrum['precursor_scan'],
