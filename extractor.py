@@ -366,8 +366,6 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
                 ms1_array[_key] = [intensity_val]
 
     # Create the final image.
-    nonzero_counter = 0  # How many pixels have non-zero values
-    total_datapoints = 0  # How many datapoints does the file contain.
     image = []
     for y_i in range(0, resolution['y']):
         if y_i % 25 == 0:
@@ -383,8 +381,6 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
                 maxintensity = max(ms1_array[_key])
                 inputpoints = len(ms1_array[_key])  # Amount of inputs into this point
                 pixelpoint = [meanintensity, minintensity, maxintensity, inputpoints]
-                total_datapoints += (len(ms1_array[_key]))
-                nonzero_counter += 1
             except KeyError:
                 pixelpoint = [0, 0, 0, 0]
             row.append(pixelpoint)
@@ -392,7 +388,7 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
     if not multiprocessing:
         print('Saving image files                                                    ', end='\r')
     # image.reverse()
-    imagedata = [image, nonzero_counter, total_datapoints]
+    imagedata = image
     # Save as txt file
     with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "wb") as pa:
         pickle.dump(imagedata, pa)
@@ -402,7 +398,7 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
     if savepng:  # save full image to png
         fullpng(image, filepath, resolution, interval, lowbound, highbound)
 
-    return imagedata
+    return image
 
 
 def subpng(subimage, imgpath, filename, index, lowbound, highbound):
@@ -563,17 +559,13 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
     if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt'):
         output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
         image = output[0]
-        nonzero_counter = output[1]
-        total_datapoints = output[2]
+
     # Retrieve if exist already
     else:
         if not multiprocessing:
             print('Loading image data                                                    ', end='\r')
         with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "rb") as pa:
-            output = pickle.load(pa)
-        image = output[0]
-        nonzero_counter = output[1]
-        total_datapoints = output[2]
+            image = pickle.load(pa)
 
     with open('config.json') as json_file:
         config = json.load(json_file)
