@@ -30,26 +30,29 @@ def get_lower_bound(haystack, needle):
 
 def filefinder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
-    # workingAPI = True
-    # try:
-    urljson = requests.get(url).json()
-    zipfiles = []
-    rawfiles = []
+    serverIssue = False
+    privacyIssue = False
+    try:
+        urljson = requests.get(url).json()
+        zipfiles = []
+        rawfiles = []
 
-    # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
-    print(urljson)
-    for jsonelem in urljson['list']:
-        filetype = jsonelem['fileName'].split('.')[-1]
-        if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip' and \
-                jsonelem['downloadLink'][-9:] != "Fasta.zip":
-            zipfiles.append(jsonelem['downloadLink'])
-        if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
-            rawfiles.append(jsonelem['downloadLink'])
-    # except:
-    #     if not multiprocessing:
-    #         print("API connection issue")
-    #     workingAPI = False
-    #     return [], [], []
+        # If zipfiles have the same name as rawfiles and we have the allpeptides, dont download
+        for jsonelem in urljson['list']:
+            filetype = jsonelem['fileName'].split('.')[-1]
+            if (jsonelem['fileType'] == 'SEARCH' or jsonelem['fileType'] == 'OTHER') and filetype == 'zip' and \
+                    jsonelem['downloadLink'][-9:] != "Fasta.zip":
+                zipfiles.append(jsonelem['downloadLink'])
+            if jsonelem['fileType'] == 'RAW' and filetype == 'raw':
+                rawfiles.append(jsonelem['downloadLink'])
+    except:
+        if not multiprocessing:
+            print("API connection issue")
+        if 'status' in urljson.keys() and urljson['status'] == 'UNAUTHORIZED':
+            privacyIssue = True
+        else:
+            serverIssue = True
+        return privacyIssue, serverIssue, []
 
     allCheck = [('mzML.json' in os.listdir(f'{path}{accnr}/{files}/') and 'allPeptides.txt' in os.listdir(
         f'{path}{accnr}/{files}/')) for files in os.listdir(f'{path}{accnr}/') if
@@ -590,6 +593,18 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     allZip = output[0]
     allRaw = output[1]
     haveallMQF = output[2]
+    if isinstance(allZip, bool) or isinstance(allRaw, bool):
+        serverissue = allZip
+        restrictedissue = allRaw
+
+    if serverissue:
+        if errormessages:
+            print(f'{accnr}: ✔ - {0}/{len(allRaw)} PRIDE Servers cannot be reached')
+        return
+    if restrictedissue:
+        if errormessages:
+            print(f'{accnr}: ✔ - {0}/{len(allRaw)} Restricted PRIDE project')
+        return
 
     # skip files if skip-incomplete or acquire_only_new is true
     if haveallMQF:
@@ -599,15 +614,15 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 print('acquire_only_new is True - Continuing')
             else:
                 print(f'{accnr}: ✔ - {len(allRaw)}/{len(allRaw)} Rawfiles extracted')
-            return brokenfiles
+            return
     else:
         if skip_incomplete:
             brokenfiles = 'skip'
             if not multiprocessing:
                 print('skip_incomplete is True - Continuing')
             else:
-                print(f'Accession: {accnr}: ✔')
-            return brokenfiles
+                print(f'Accession: {accnr}: ✔ - Skipping')
+            return
 
     # Makes broken.json if it doesnt exists
     if not os.path.exists(f'{metapath}broken.json'):
