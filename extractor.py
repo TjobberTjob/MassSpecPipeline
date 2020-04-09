@@ -472,7 +472,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
         subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
         subimage2 = np.array(subimage)
-
+        print(mzml['ms2']['334'])
         ms2info = [mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'], mzml['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
