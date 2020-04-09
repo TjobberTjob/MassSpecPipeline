@@ -275,7 +275,7 @@ def internalmzML(path):
 def preparameters(filepath):
     if not multiprocessing:
         print('Preparing parameter for image creation                                                    ', end='\r')
-    with gzip.GzipFile(f'mzML.json', 'r') as fin:
+    with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
         mzml = json.loads(fin.read().decode('utf-8'))
 
     mzlist = np.unique(sorted([item for f in mzml['ms1'] for item in mzml['ms1'][f]['mz']]))
