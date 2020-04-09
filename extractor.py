@@ -715,7 +715,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     if len(allCheck) == len(allRaw):
         print(f'{accnr}: ✔ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
     else:
-        if missingraws > 0:
+        if missingraws > 0 and errormessages:
             print(f'{accnr}: ✖ - {len(allCheck)}/{len(allRaw)} MaxQuant file names do not match PRIDE file names')
         print(f'{accnr}: ✖ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
 
