@@ -51,7 +51,8 @@ def filefinder(accnr, path):
     if not os.path.exists(f'{path}{accnr}/'):
         os.mkdir(f'{path}{accnr}/')
 
-    allCheck = [('mzML.json' in os.listdir(f'{path}{accnr}/{files}/') and 'allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/')) for files in os.listdir(f'{path}{accnr}/') if
+    allCheck = [('mzML.json' in os.listdir(f'{path}{accnr}/{files}/') and 'allPeptides.txt' in os.listdir(
+        f'{path}{accnr}/{files}/')) for files in os.listdir(f'{path}{accnr}/') if
                 len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
     if False in allCheck or allCheck == []:
         haveallMQF = False
@@ -110,13 +111,15 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     # Download the raw file
     if not multiprocessing:
         print('Downloading raw file                                                    ', end='\r')
+    rawfilefound = True
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         for fileraw in rawfiles:
             if filename in fileraw or len(rawfiles) == 1:
                 os.system(f'wget -q -c -O {filepath}file.raw -c {fileraw}')
+                rawfilefound = False
                 break
 
-    return df2, filepath
+    return df2, filepath, rawfilefound
 
 
 def formatFile(accnr, filename, path, filepath, formatusing):
@@ -570,7 +573,8 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
     with open('config.json') as json_file:
         config = json.load(json_file)
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds, savepng=False)
+    subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds,
+            savepng=False)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
@@ -628,6 +632,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 rawfiles = output[0]
                 df = output[1]
 
+                missingraws = 0
                 for raws in rawfiles:
                     try:  # TRY ALL RAWS IN ZIP
                         filename = str(raws)
@@ -637,6 +642,11 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         output = filehandling(accnr, filename, path, pepfile, df, allRaw)
                         df2 = output[0]
                         filepath = output[1]
+                        rawfilefound = output[2]
+                        if not rawfilefound:
+                            missingraws += 1
+                            pass
+
                         submain(accnr, filename, path, mpath, filepath, df2, formatusing)
                         if not multiprocessing:
                             print(f'{raws.split("/")[-1]}: ✔                         ')
@@ -706,6 +716,8 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     if len(allCheck) == len(allRaw):
         print(f'{accnr}: ✔ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
     else:
+        if missingraws > 0:
+            print(f'{accnr}: ✖ - MaxQuant file names do not match PRIDE file names')
         print(f'{accnr}: ✖ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
 
 
