@@ -581,9 +581,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
     subimage_interval['mz'] = config['mz_interval']
     subimage_interval['rt'] = config['rt_interval']
 
-    inorout = subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image,
-                      bounds,
-                      savepng=False)
+    subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds, savepng=False)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
