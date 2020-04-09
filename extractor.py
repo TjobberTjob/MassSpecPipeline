@@ -613,28 +613,8 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             print(f'Accession: {accnr}: ✔ - Skipping')
             return
 
-    # Makes broken.json if it doesnt exists
-    if not os.path.exists(f'{metapath}broken.json'):
-        open(f'{metapath}broken.json', 'a').close()
-    # load broken zipfiles into list
-    for accessionsnumbers in open(f'{mpath}broken.json'):
-        zipfiles = json.loads(accessionsnumbers)
-        if accnr in zipfiles:
-            nonworkingzips = zipfiles[accnr]
-            break
-    if "nonworkingzips" not in globals():
-        nonworkingzips = []
-    if "brokenfiles" not in globals():
-        brokenfiles = []
-
     for zips in reversed(allZip):
         try:  # TRY ALL ZIPS
-            if filterbroken:
-                if zips in nonworkingzips:
-                    if not multiprocessing:
-                        print('Zipfile in broken.json - going to next zipfile')
-                    continue
-
             if not haveallMQF:  # If we have all needed files, we dont need to get them from the API
                 output = zipfile_downloader(zips, path, maxquant_file)
                 rawfiles = output[0]
@@ -708,17 +688,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
 
             if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
                 os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
-            brokenfiles.append(zips.replace(' ', '%20'))
             pass
-
-    if filterbroken:
-        # Create list of broken zip files
-        listofaccnr = [accnrs for accnrs in open(f'{mpath}broken.json')]
-        brokendict = {str(accnr): brokenfiles}
-        if accnr not in listofaccnr:
-            with open(f'{mpath}broken.json', 'a') as outfile:
-                outfile.write(json.dumps(brokendict) + '\n')
-        outfile.close()
 
     allCheck = [files for files in os.listdir(f'{path}{accnr}/') if 'mzML.json' in os.listdir(f'{path}{accnr}/{files}')]
     if len(allCheck) == len(allRaw):
