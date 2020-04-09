@@ -425,6 +425,8 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
 
 
 def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_interval, filename, image, bounds, savepng):
+    lowbound = bounds[0]
+    highbound = bounds[1]
     mz_bin = bins[0]
     rt_bin = bins[1]
     mzrangelist = [interval['mz']['min'] + i * mz_bin for i in range(int(resolution['x']))]
@@ -439,9 +441,6 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
 
     with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
         mzml = json.loads(fin.read().decode('utf-8'))
-
-    lowbound = bounds[0]
-    highbound = bounds[1]
 
     outfile = open(f'{mpath}subimage.json', 'a')  # The metadata file
 
@@ -471,9 +470,15 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen)
         rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
         subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
-        subimage2 = np.array(subimage)
-        print(mzml['ms2']['334'])
-        ms2info = [mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'], mzml['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
+
+        try:
+            ms2info = [mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'], mzml['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
+            datacollected = 'both'
+        except:
+            ms2info = []
+            datacollected = 'ms1'
+
+
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
         # Save image as json file
@@ -486,8 +491,9 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         new_metadata = {}
         new_metadata['image'] = f'{filename}-{rows["MS/MS IDs"]}.json'
         new_metadata['accession'] = accession
-        new_metadata['size'] = subimage2.shape
+        new_metadata['size'] = np.array(subimage).shape
         new_metadata['ms2arraylength'] = len(mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'])
+        new_metadata['datacollected'] = datacollected
         for ele in df.columns:
             if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
                 continue
