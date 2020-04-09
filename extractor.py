@@ -598,22 +598,17 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
         restrictedissue = allRaw
 
     if serverissue:
-        if errormessages:
-            print(f'{accnr}: ✔ - 0/{len(allRaw)} PRIDE Servers cannot be reached')
+        print(f'{accnr}: ✔ - 0/{len(allRaw)} PRIDE Servers cannot be reached')
         return
     if restrictedissue:
-        if errormessages:
-            print(f'{accnr}: ✔ - 0/{len(allRaw)} Restricted PRIDE project')
+        print(f'{accnr}: ✔ - 0/{len(allRaw)} Restricted PRIDE project')
         return
 
     # skip files if skip-incomplete or acquire_only_new is true
     if haveallMQF:
         if acquire_only_new:
             brokenfiles = 'skip'
-            if not multiprocessing:
-                print('acquire_only_new is True - Continuing')
-            else:
-                print(f'{accnr}: ✔ - {len(allRaw)}/{len(allRaw)} Rawfiles extracted')
+            print(f'{accnr}: ✔ - {len(allRaw)}/{len(allRaw)} Rawfiles extracted')
             return
     else:
         if skip_incomplete:
