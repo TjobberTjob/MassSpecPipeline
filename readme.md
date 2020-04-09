@@ -31,16 +31,18 @@ Required python packages:
 
 Optional conda installations:
 
-`conda install -c bioconda thermorawfileparser`                               #This will get installed automatically first time you run the program (if conda is selected)
+`conda install -c anaconda graphviz`
 
-`conda install -y tensorflow-gpu=2.1.0`                                    #Conda installation of tensorflow GPU version
+`conda install -c bioconda thermorawfileparser`                                 #This will get installed automatically first time you run the program (if conda is selected)
 
-`conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch`      #tensorflow GPU associated package for CUDA.
+`conda install -y tensorflow-gpu=2.1.0`                                         #Conda installation of tensorflow GPU version
+
+`conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch`        #tensorflow GPU associated package for CUDA.
 
 Optional docker installations:
-git clone https://github.com/compomics/ThermoRawFileParser.git              #Clone the git repo with ThermoRawFileParser dockerized version on it.
+git clone https://github.com/compomics/ThermoRawFileParser.git                  #Clone the git repo with ThermoRawFileParser dockerized version on it.
 
-docker build --no-cache -t thermorawparser /ThermoRawFileParser             #This will get installed automatically first time you run the program (if docker is selected)
+`docker build --no-cache -t thermorawparser /ThermoRawFileParser`               #This will get installed automatically first time you run the program (if docker is selected)
 
 
 ### config file

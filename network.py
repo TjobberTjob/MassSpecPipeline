@@ -135,8 +135,11 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     # x = Dropout(rate=0.1)(x)
     x = Dense(128, activation='relu')(x)
     x = Dense(64, activation='relu')(x)
-    if not classification:
-        output = Dense(1, activation='linear')(x)
+    if classification:
+        if n_classes == 2:
+            output = Dense(1, activation='sigmoid')(x)
+        else:
+            output = Dense(1, activation='linear')(x)
     else:
         output = Dense(n_classes, activation='softmax')(x)
     model = keras.Model(input, output)

@@ -1,5 +1,5 @@
 {"path": "Data/", "mz_bin": 0.75, "rt_bin": 0.06, "mz_interval": 25, "rt_interval": 5,
-  "acquire_only_new": "True", "multiprocessing": "True", "nr_processes": 10,
+  "acquire_only_new": "True", "multiprocessing": "False", "nr_processes": 10,
   "filterbroken": "False", "formatsoftware": "conda" , "errormessages": "True",
   "networkattributes": {"batch_size": 64, "epochs": 100, "n_channels": 4, "test_accessions": 3, "early_stopping": 10, "setseed": "True"}}
 

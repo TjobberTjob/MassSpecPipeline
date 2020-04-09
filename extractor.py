@@ -51,7 +51,7 @@ def filefinder(accnr, path):
     if not os.path.exists(f'{path}{accnr}/'):
         os.mkdir(f'{path}{accnr}/')
 
-    allCheck = ['allPeptides.txt' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/') if
+    allCheck = ['mzML.json' in os.listdir(f'{path}{accnr}/{files}/') for files in os.listdir(f'{path}{accnr}/') if
                 len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
     if False in allCheck or allCheck == []:
         haveallMQF = False
@@ -423,7 +423,7 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, filename, image, bounds, savepng):
+def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_interval, filename, image, bounds, savepng):
     mz_bin = bins[0]
     rt_bin = bins[1]
     mzrangelist = [interval['mz']['min'] + i * mz_bin for i in range(int(resolution['x']))]
@@ -473,6 +473,15 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
         rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
         subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
         subimage2 = np.array(subimage)
+
+        with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
+            mzml = json.loads(fin.read().decode('utf-8'))
+
+        mzml['ms2'][rows['MS/MS IDs']]
+
+        outfile  = {'ms1': subimage, 'ms2': }
+
+
 
         # Save image as txt file
         with open(f'{imgpath}{filename}-{str(index + 1)}.txt', 'wb') as imagefile:
@@ -609,7 +618,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
     subimage_interval['mz'] = config['mz_interval']
     subimage_interval['rt'] = config['rt_interval']
 
-    inorout = subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds,
+    inorout = subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds,
                       savepng=False)
 
     endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
@@ -644,19 +653,18 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 print(f'Accession: {accnr}: ✔')
             return brokenfiles
 
-    if filterbroken:
-        # Makes broken.json if it doesnt exists
-        if not os.path.exists(f'{metapath}broken.json'):
-            open(f'{metapath}broken.json', 'a').close()
-        # load broken zipfiles into list
-        for accessionsnumbers in open(f'{mpath}broken.json'):
-            zipfiles = json.loads(accessionsnumbers)
-            if accnr in zipfiles:
-                nonworkingzips = zipfiles[accnr]
-                break
-        if not "nonworkingzips" in globals():
-            nonworkingzips = []
-            brokenfiles = []
+    # Makes broken.json if it doesnt exists
+    if not os.path.exists(f'{metapath}broken.json'):
+        open(f'{metapath}broken.json', 'a').close()
+    # load broken zipfiles into list
+    for accessionsnumbers in open(f'{mpath}broken.json'):
+        zipfiles = json.loads(accessionsnumbers)
+        if accnr in zipfiles:
+            nonworkingzips = zipfiles[accnr]
+            break
+    if not "nonworkingzips" in globals():
+        nonworkingzips = []
+        brokenfiles = []
 
     workingrawfiles = 0
 
