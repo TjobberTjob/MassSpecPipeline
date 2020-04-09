@@ -103,10 +103,10 @@ class DataGenerator(keras.utils.Sequence):
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'
         # Initialization
-        X   = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
+        X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
         if self.MS == 'both':
-            X2  = np.empty((self.batch_size, self.mslen))
-        y   = np.empty((self.batch_size), dtype=float)
+            X2 = np.empty((self.batch_size, self.mslen))
+        y = np.empty((self.batch_size), dtype=float)
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
@@ -119,9 +119,9 @@ class DataGenerator(keras.utils.Sequence):
             X[i,] = image
 
             if self.MS == 'both':
-                mz_array = fullinfoimage['ms2'][ID.split('-')[-1]]['m/z_array']
-                rt_array = fullinfoimage['ms2'][ID.split('-')[-1]]['rt_array']
-                X2[i,] = list(chain.from_iterable([mz_array,rt_array]))
+                mz_array = fullinfoimage['ms2'][0]
+                rt_array = fullinfoimage['ms2'][1]
+                X2[i,] = list(chain.from_iterable([mz_array, rt_array]))
 
             y[i] = self.labels[ID]
 
@@ -207,7 +207,7 @@ if __name__ == '__main__':
     if whichMS == 'both':
         if lenMS2 == 'max':
             lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}subimage.json')
-                      if 'ms2arraylength' in json.loads(line)])
+                          if 'ms2arraylength' in json.loads(line)])
         else:
             outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
             for line in open(f'{metapath}subimage_filtered.json', 'r'):
