@@ -442,9 +442,6 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
 
     outfile = open(f'{mpath}subimage.json', 'a')  # The metadata file
 
-    outbound = 0
-    inbound = 0
-    inmzbound = 0
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
         if (index + 1) % int(df.shape[0] / 40) == 0:
@@ -455,15 +452,13 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         if rows['Retention time'] - subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time'] + \
                 subimage_interval['rt'] > interval['rt']['max'] or rows['m/z'] - subimage_interval['mz'] < \
                 interval['mz']['min'] or rows['m/z'] + subimage_interval['mz'] > interval['mz']['max']:
-            outbound += 1  # Check if this image can be created in our range or not
             continue
-        inbound += 1
+
         if os.path.exists(f'{imgpath}{filename}-{rows["MS/MS IDs"]}.json'):
             continue
 
         # if not 450 < rows['m/z'] < 455:  # Filter
         #     continue
-        inmzbound += 1
 
         mzlen = int(subimage_interval['mz'] / mz_bin)
         rtlen = int(subimage_interval['rt'] / rt_bin)
@@ -499,37 +494,6 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             else:
                 new_metadata[str(ele)] = str(rows[ele])
         outfile.write(json.dumps(new_metadata) + '\n')
-    outfile.close()
-
-    return [inbound, outbound, inmzbound]
-
-
-def endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath):
-    if not multiprocessing:
-        print('Calculating end statistics:                                                    ', end='\r')
-    mzlist = inputlists[0]
-    rtlist = inputlists[1]
-
-    mzlist_inrange = [i for i in mzlist if interval['mz']['min'] < i < interval['mz']['max']]
-    rtlist_inrange = [i for i in rtlist if interval['rt']['min'] < i < interval['rt']['max']]
-
-    inbound = inorout[0]
-    outbound = inorout[1]
-    inmzbound = inorout[2]
-
-    end_stats = {}
-    end_stats['accession'] = accnr
-    end_stats['filename'] = filename
-    end_stats['unique mz'] = len(mzlist_inrange)
-    end_stats['unique rt'] = len(rtlist_inrange)
-    end_stats['datapoints'] = total_datapoints
-    end_stats['data per pixel'] = total_datapoints / nonzero_counter
-    end_stats['In bounds'] = inbound
-    end_stats['Out of bounds'] = outbound
-    end_stats['in mz range'] = inmzbound
-
-    outfile = open(f'{mpath}sub_statistics.json', 'a')
-    outfile.write(json.dumps(end_stats) + '\n')
     outfile.close()
 
 
@@ -620,8 +584,6 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
     inorout = subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image,
                       bounds,
                       savepng=False)
-
-    endstats(inputlists, interval, accnr, filename, total_datapoints, nonzero_counter, inorout, mpath)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
