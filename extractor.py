@@ -48,9 +48,6 @@ def filefinder(accnr, path):
             print("API connection issue")
         return [], [], []
 
-    if not os.path.exists(f'{path}{accnr}/'):
-        os.mkdir(f'{path}{accnr}/')
-
     allCheck = [('mzML.json' in os.listdir(f'{path}{accnr}/{files}/') and 'allPeptides.txt' in os.listdir(
         f'{path}{accnr}/{files}/')) for files in os.listdir(f'{path}{accnr}/') if
                 len(os.listdir(f'{path}{accnr}/')) == len(rawfiles)]
@@ -581,6 +578,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     global brokenfiles, nonworkingzips
     if not multiprocessing:
         print(f'\nAccessions: {accnr}')
+
+    if not os.path.exists(f'{path}{accnr}/'):
+        os.mkdir(f'{path}{accnr}/')
 
     # Find all zip files
     output = filefinder(accnr, path)
