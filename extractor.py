@@ -669,82 +669,82 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
     workingrawfiles = 0
 
     for zips in reversed(allZip):
-        # try:  # TRY ALL ZIPS
-        if filterbroken:
-            if zips in nonworkingzips:
-                if not multiprocessing:
-                    print('Zipfile in broken.json - going to next zipfile')
-                continue
+        try:  # TRY ALL ZIPS
+            if filterbroken:
+                if zips in nonworkingzips:
+                    if not multiprocessing:
+                        print('Zipfile in broken.json - going to next zipfile')
+                    continue
 
-        if not haveallMQF:  # If we have all needed files, we dont need to get them from the API
-            output = zipfile_downloader(zips, path, maxquant_file)
-            rawfiles = output[0]
-            df = output[1]
+            if not haveallMQF:  # If we have all needed files, we dont need to get them from the API
+                output = zipfile_downloader(zips, path, maxquant_file)
+                rawfiles = output[0]
+                df = output[1]
 
-            for raws in rawfiles:
-                # try:  # TRY ALL RAWS IN ZIP
-                filename = str(raws)
-                if not multiprocessing:
-                    print(f'file: {accnr}/{filename}                                               ')
+                for raws in rawfiles:
+                    try:  # TRY ALL RAWS IN ZIP
+                        filename = str(raws)
+                        if not multiprocessing:
+                            print(f'file: {accnr}/{filename}                                               ')
 
-                output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                df2 = output[0]
-                filepath = output[1]
-                submain(accnr, filename, path, mpath, filepath, df2, formatusing)
-                if not multiprocessing:
-                    print(f'{raws.split("/")[-1]}: ✔                         ')
-                    workingrawfiles += 1
-                # except Exception as error:
-                #     exc_type, exc_obj, exc_tb = sys.exc_info()
-                #     if not multiprocessing:
-                #         if errormessages:
-                #             print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
-                #                   f' Error: {error} | Line: {exc_tb.tb_lineno}')
-                #             del (exc_type, exc_obj, exc_tb)
-                #         else:
-                #             print(
-                #                 f'Rawfile error. {raws.split("/")[-1]}: ✖')
-                #     pass
+                        output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                        df2 = output[0]
+                        filepath = output[1]
+                        submain(accnr, filename, path, mpath, filepath, df2, formatusing)
+                        if not multiprocessing:
+                            print(f'{raws.split("/")[-1]}: ✔                         ')
+                            workingrawfiles += 1
+                    except Exception as error:
+                        exc_type, exc_obj, exc_tb = sys.exc_info()
+                        if not multiprocessing:
+                            if errormessages:
+                                print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                                      f' Error: {error} | Line: {exc_tb.tb_lineno}')
+                                del (exc_type, exc_obj, exc_tb)
+                            else:
+                                print(
+                                    f'Rawfile error. {raws.split("/")[-1]}: ✖')
+                        pass
 
-        else:  # If we dont have all needed files, we need to get them from the API
-            for raws in allRaw:
-                # try:  # TRY ALL RAWS IN ZIP
-                filename = str(raws[63:-4])
-                if not multiprocessing:
-                    print(f'\nfile: {accnr}/{filename}                                               ')
+            else:  # If we dont have all needed files, we need to get them from the API
+                for raws in allRaw:
+                    try:  # TRY ALL RAWS IN ZIP
+                        filename = str(raws[63:-4])
+                        if not multiprocessing:
+                            print(f'\nfile: {accnr}/{filename}                                               ')
 
-                filepath = f'{path}{accnr}/{filename}/'
-                df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-                submain(accnr, filename, path, mpath, filepath, df2, formatusing)
-                if not multiprocessing:
-                    print(f'{raws.split("/")[-1]}: ✔                         ')
-                workingrawfiles += 1
-                # except Exception as error:
-                #     exc_type, exc_obj, exc_tb = sys.exc_info()
-                #     if not multiprocessing:
-                #         if errormessages:
-                #             print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
-                #                   f' Error: {error} | Line: {exc_tb.tb_lineno}')
-                #             del (exc_type, exc_obj, exc_tb)
-                #         else:
-                #             print(
-                #                 f'Rawfile error. {raws.split("/")[-1]}: ✖')
-                #     pass
+                        filepath = f'{path}{accnr}/{filename}/'
+                        df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
+                        submain(accnr, filename, path, mpath, filepath, df2, formatusing)
+                        if not multiprocessing:
+                            print(f'{raws.split("/")[-1]}: ✔                         ')
+                        workingrawfiles += 1
+                    except Exception as error:
+                        exc_type, exc_obj, exc_tb = sys.exc_info()
+                        if not multiprocessing:
+                            if errormessages:
+                                print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                                      f' Error: {error} | Line: {exc_tb.tb_lineno}')
+                                del (exc_type, exc_obj, exc_tb)
+                            else:
+                                print(
+                                    f'Rawfile error. {raws.split("/")[-1]}: ✖')
+                        pass
 
-        # except Exception as error:
-        #     exc_type, exc_obj, exc_tb = sys.exc_info()
-        #     if not multiprocessing:
-        #         if errormessages:
-        #             print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
-        #                   f' Error: {error} | Line: {exc_tb.tb_lineno}')  # 'issue occoured, going to next zipfile')
-        #             del (exc_type, exc_obj, exc_tb)
-        #         else:
-        #             print(f'Zipfile error. {zips.split("/")[-1]}: ✖')
-        #
-        #     if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
-        #         os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
-        #     brokenfiles.append(zips.replace(' ', '%20'))
-        #     pass
+        except Exception as error:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            if not multiprocessing:
+                if errormessages:
+                    print(f'Zipfile error. {zips.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                          f' Error: {error} | Line: {exc_tb.tb_lineno}')  # 'issue occoured, going to next zipfile')
+                    del (exc_type, exc_obj, exc_tb)
+                else:
+                    print(f'Zipfile error. {zips.split("/")[-1]}: ✖')
+
+            if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
+                os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
+            brokenfiles.append(zips.replace(' ', '%20'))
+            pass
 
     if filterbroken:
         # Create list of broken zip files
