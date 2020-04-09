@@ -487,7 +487,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         new_metadata['image'] = f'{filename}-{rows["MS/MS IDs"]}.json'
         new_metadata['accession'] = accession
         new_metadata['size'] = subimage2.shape
-        new_metadata['ms2arraylength'] = len(mzml['ms2'][rows['MS/MS IDs']]['m/z_array'])
+        new_metadata['ms2arraylength'] = len(mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'])
         for ele in df.columns:
             if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
                 continue
