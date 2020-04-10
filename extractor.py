@@ -631,13 +631,13 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 output = zipfile_downloader(zips, path, maxquant_file)
                 rawfiles = output[0]
                 df = output[1]
-                print(rawfiles)
-                quit()
+
                 knownrawfiles = []
                 for filenames in rawfiles:
                     if filenames in allRaw:
                         knownrawfiles.append(filenames)
-
+                print(knownrawfiles)
+                quit()
                 for filename in knownrawfiles:
                     try:  # TRY ALL RAWS IN ZIP
                         if not multiprocessing:
@@ -648,6 +648,8 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         filepath = output[1]
 
                         submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
+                        if not multiprocessing:
+                            print(f'{filename}: ✔                         ')
 
                     except Exception as error:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -660,9 +662,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                                 print(
                                     f'Rawfile error. {filename}: ✖')
                         pass
-
-                if not multiprocessing:
-                    print(f'{filename}: ✔                         ')
 
             else:  # If we have all needed files, we dont need to get them from the API
 
