@@ -8,6 +8,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from zipfile import ZipFile
@@ -74,6 +75,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
         os.remove(f'{path}{zipfilename}')
     if not multiprocessing:
         print('Downloading zip file                                                    ', end='\r')
+    time.sleep(2)
     os.system(f'wget -O {path}{zipfilename} {zipfileurl}')
     # os.system(f'curl {zipfileurl} --output {path}{zipfilename}')
 
