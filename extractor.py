@@ -714,7 +714,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                     print(f'Zipfile error. {zips.split("/")[-1]}: ✖')
 
             if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
-                # os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
+                os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
             pass
 
     allCheck = [files for files in os.listdir(f'{path}{accnr}/') if 'mzML.json' in os.listdir(f'{path}{accnr}/{files}')]
