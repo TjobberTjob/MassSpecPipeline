@@ -75,7 +75,10 @@ def zipfile_downloader(zipfile, path, maxquant_file):
         os.remove(f'{path}{zipfilename}')
     if not multiprocessing:
         print('Downloading zip file                                                    ', end='\r')
-    os.system(f'wget -O {path}{zipfilename} {zipfileurl}')
+    while not os.path.exists(f'{path}{zipfilename}'):
+        os.system(f'wget -O {path}{zipfilename} {zipfileurl}')
+        print('file no bueno')
+
     # os.system(f'curl {zipfileurl} --output {path}{zipfilename}')
 
     # Get a list of files with directories from zip file
@@ -632,8 +635,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 if filenames in allRaw:
                     knownrawfiles.append(filenames)
             if knownrawfiles == []:
-                print('somefuckinghowmadeithere')
-                quit()
 
             for filename in knownrawfiles:
                 # try:  # TRY ALL RAWS IN ZIP
