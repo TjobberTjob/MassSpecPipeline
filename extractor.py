@@ -76,7 +76,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
         print('Downloading zip file                                                    ', end='\r')
     os.system(f'wget -O {path}{zipfilename} {zipfileurl}')
     # os.system(f'curl {zipfileurl} --output {path}{zipfilename}')
-    quit()
+
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
         ziplist = zipped.namelist()
