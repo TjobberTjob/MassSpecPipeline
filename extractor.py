@@ -672,12 +672,12 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         if not multiprocessing:
                             if errormessages:
-                                print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                                print(f'Rawfile error. {filename}: ✖ | Error Class: {exc_type} |'
                                       f' Error: {error} | Line: {exc_tb.tb_lineno}')
                                 del (exc_type, exc_obj, exc_tb)
                             else:
                                 print(
-                                    f'Rawfile error. {raws.split("/")[-1]}: ✖')
+                                    f'Rawfile error. {filename}: ✖')
                         pass
 
         except Exception as error:
