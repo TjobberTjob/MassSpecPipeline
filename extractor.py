@@ -70,8 +70,8 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     zipfilename = zipfile.replace(' ', '-')[63:].replace('(', '-').replace(')', '-')
 
     # Download zip file
-    if os.path.exists(f'{path}{zipfilename}'):
-        os.remove(f'{path}{zipfilename}')
+    # if os.path.exists(f'{path}{zipfilename}'):
+    #     os.remove(f'{path}{zipfilename}')
     if not multiprocessing:
         print('Downloading zip file                                                    ', end='\r')
     print(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
