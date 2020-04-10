@@ -76,8 +76,10 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     if not multiprocessing:
         print('Downloading zip file                                                    ', end='\r')
     while not os.path.exists(f'{path}{zipfilename}'):
-        time.sleep(5)
         os.system(f'wget -O {path}{zipfilename} {zipfileurl}')
+        if os.stat(f'{path}{zipfilename}').st_size == 0:
+            os.remove(f'{path}{zipfilename}')
+        time.sleep(5)
 
 
     # os.system(f'curl {zipfileurl} --output {path}{zipfilename}')
