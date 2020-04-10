@@ -709,7 +709,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
 
     allCheck = [files for files in os.listdir(f'{path}{accnr}/') if 'mzML.json' in os.listdir(f'{path}{accnr}/{files}')]
     if len(allCheck) == len(allRaw):
-        print(f'{accnr}: ✔ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
+        print(f'{accnr}: ✔ - {len(allCheck)}/{len(allRaw)} All rawfiles extracted')
     else:
         if len(knownrawfiles) != len(allRaw):
             print(f'{accnr}: ✖ - {len(knownrawfiles)}/{len(allRaw)} Some or all MaxQuant file names do not '
