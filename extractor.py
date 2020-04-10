@@ -77,7 +77,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
         print('Downloading zip file                                                    ', end='\r')
     while not os.path.exists(f'{path}{zipfilename}'):
         os.system(f'wget -O {path}{zipfilename} {zipfileurl}')
-        print('file no bueno')
+
 
     # os.system(f'curl {zipfileurl} --output {path}{zipfilename}')
 
@@ -634,7 +634,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             for filenames in rawfiles:
                 if filenames in allRaw:
                     knownrawfiles.append(filenames)
-            if knownrawfiles == []:
 
             for filename in knownrawfiles:
                 # try:  # TRY ALL RAWS IN ZIP
