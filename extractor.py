@@ -632,6 +632,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 if filenames in allRaw:
                     knownrawfiles.append(filenames)
             if knownrawfiles == []:
+                print('somefuckinghowmadeithere')
                 quit()
 
             for filename in knownrawfiles:
