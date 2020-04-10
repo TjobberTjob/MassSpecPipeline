@@ -624,6 +624,13 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 rawfiles = output[0]
                 df = output[1]
 
+                knownrawfiles = []
+                for filenames in rawfiles:
+                    if filenames in allRaw:
+                        knownrawfiles.append(filenames)
+                print(knownrawfiles)
+                quit()
+
                 missingraws = 0
                 for filename in str(rawfiles):
                     try:  # TRY ALL RAWS IN ZIP
