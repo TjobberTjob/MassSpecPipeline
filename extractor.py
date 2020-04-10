@@ -626,29 +626,70 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
             return
 
     for zips in reversed(allZip):
-        # try:  # TRY ALL ZIPS
-        if not haveallMQF:  # If we dont have all needed files, we need to get them from the API
-            output = zipfile_downloader(zips, path, maxquant_file)
-            rawfiles = output[0]
-            df = output[1]
+        try:  # TRY ALL ZIPS
+            if not haveallMQF:  # If we dont have all needed files, we need to get them from the API
+                output = zipfile_downloader(zips, path, maxquant_file)
+                rawfiles = output[0]
+                df = output[1]
 
-            knownrawfiles = []
-            for filenames in rawfiles:
-                if filenames in allRaw:
-                    knownrawfiles.append(filenames)
+                knownrawfiles = []
+                for filenames in rawfiles:
+                    if filenames in allRaw:
+                        knownrawfiles.append(filenames)
 
-            for filename in knownrawfiles:
-                try:  # TRY ALL RAWS IN ZIP
-                    if not multiprocessing:
-                        print(f'file: {accnr}/{filename}                                               ')
+                for filename in knownrawfiles:
+                    try:  # TRY ALL RAWS IN ZIP
+                        if not multiprocessing:
+                            print(f'file: {accnr}/{filename}                                               ')
 
-                    output = filehandling(accnr, filename, path, pepfile, df, allRaw)
-                    df2 = output[0]
-                    filepath = output[1]
+                        output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                        df2 = output[0]
+                        filepath = output[1]
 
-                    submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
-                    if not multiprocessing:
-                        print(f'{filename}: ✔                         ')
+                        submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
+                        if not multiprocessing:
+                            print(f'{filename}: ✔                         ')
+
+                        except Exception as error:
+                            exc_type, exc_obj, exc_tb = sys.exc_info()
+                            if not multiprocessing:
+                                if errormessages:
+                                    print(f'Rawfile error. {filename}: ✖ | Error Class: {exc_type} |'
+                                          f' Error: {error} | Line: {exc_tb.tb_lineno}')
+                                    del (exc_type, exc_obj, exc_tb)
+                                else:
+                                    print(
+                                        f'Rawfile error. {filename}: ✖')
+                            pass
+
+            else:  # If we have all needed files, we dont need to get them from the API
+
+                rawfiles = os.listdir(f'{path}{accnr}')
+                knownrawfiles = []
+                for filenames in rawfiles:
+                    if filenames in allRaw:
+                        knownrawfiles.append(filenames)
+
+                for filename in knownrawfiles:
+                    try:  # TRY ALL RAWS IN ZIP
+                        if not multiprocessing:
+                            print(f'\nfile: {accnr}/{filename}                                               ')
+
+                        # set path and import allpeptides
+                        filepath = f'{path}{accnr}/{filename}/'
+                        df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
+
+                        # Download raw file
+                        if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
+                            for rawfiles in allRaw:
+                                if filename in rawfiles:
+                                    os.system(f'wget -q -c -O {filepath}file.raw {rawfiles}')
+                                    # os.system(f'curl {fileraw} --output {filepath}file.raw')
+                                    break
+
+                        submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
+                        if not multiprocessing:
+                            print(f'{filename}: ✔                         ')
 
                     except Exception as error:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -662,47 +703,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                                     f'Rawfile error. {filename}: ✖')
                         pass
 
-        else:  # If we have all needed files, we dont need to get them from the API
-
-            rawfiles = os.listdir(f'{path}{accnr}')
-            knownrawfiles = []
-            for filenames in rawfiles:
-                if filenames in allRaw:
-                    knownrawfiles.append(filenames)
-
-            for filename in knownrawfiles:
-                try:  # TRY ALL RAWS IN ZIP
-                    if not multiprocessing:
-                        print(f'\nfile: {accnr}/{filename}                                               ')
-
-                    # set path and import allpeptides
-                    filepath = f'{path}{accnr}/{filename}/'
-                    df2 = pd.read_csv(f'{filepath}{maxquant_file}', sep=',', low_memory=False)
-
-                    # Download raw file
-                    if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-                        for rawfiles in allRaw:
-                            if filename in rawfiles:
-                                os.system(f'wget -q -c -O {filepath}file.raw {rawfiles}')
-                                # os.system(f'curl {fileraw} --output {filepath}file.raw')
-                                break
-
-                    submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
-                    if not multiprocessing:
-                        print(f'{filename}: ✔                         ')
-
-                except Exception as error:
-                    exc_type, exc_obj, exc_tb = sys.exc_info()
-                    if not multiprocessing:
-                        if errormessages:
-                            print(f'Rawfile error. {filename}: ✖ | Error Class: {exc_type} |'
-                                  f' Error: {error} | Line: {exc_tb.tb_lineno}')
-                            del (exc_type, exc_obj, exc_tb)
-                        else:
-                            print(
-                                f'Rawfile error. {filename}: ✖')
-                    pass
-
         except Exception as error:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             if not multiprocessing:
@@ -714,7 +714,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                     print(f'Zipfile error. {zips.split("/")[-1]}: ✖')
 
             if os.path.exists(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}'):
-                os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
+                # os.remove(f'{path}{zips.replace(" ", "-")[63:].replace("(", "-").replace(")", "-")}')
             pass
 
     allCheck = [files for files in os.listdir(f'{path}{accnr}/') if 'mzML.json' in os.listdir(f'{path}{accnr}/{files}')]
