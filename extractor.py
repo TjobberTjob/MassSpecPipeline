@@ -625,9 +625,8 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 df = output[1]
 
                 missingraws = 0
-                for raws in rawfiles:
+                for filename in str(rawfiles):
                     try:  # TRY ALL RAWS IN ZIP
-                        filename = str(raws)
                         if not multiprocessing:
                             print(f'file: {accnr}/{filename}                                               ')
 
@@ -642,13 +641,13 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
 
                         submain(accnr, filename, path, mpath, filepath, df2, formatusing)
                         if not multiprocessing:
-                            print(f'{raws.split("/")[-1]}: ✔                         ')
+                            print(f'{filename}: ✔                         ')
 
                     except Exception as error:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         if not multiprocessing:
                             if errormessages:
-                                print(f'Rawfile error. {raws.split("/")[-1]}: ✖ | Error Class: {exc_type} |'
+                                print(f'Rawfile error. {filename}: ✖ | Error Class: {exc_type} |'
                                       f' Error: {error} | Line: {exc_tb.tb_lineno}')
                                 del (exc_type, exc_obj, exc_tb)
                             else:
