@@ -631,7 +631,8 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                 output = zipfile_downloader(zips, path, maxquant_file)
                 rawfiles = output[0]
                 df = output[1]
-
+                print(rawfiles)
+                quit()
                 knownrawfiles = []
                 for filenames in rawfiles:
                     if filenames in allRaw:
