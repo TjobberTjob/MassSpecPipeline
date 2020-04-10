@@ -117,7 +117,8 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         for fileraw in rawfiles:
             if filename in fileraw:
-                os.system(f'wget -q -c -O {filepath}file.raw -c {fileraw}')
+                os.system(f'wget -q -c -O {filepath}file.raw {fileraw}')
+                # os.system(f'curl {fileraw} --output {filepath}file.raw')
                 break
 
     return df2, filepath
@@ -676,7 +677,8 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
                         for rawfiles in allRaw:
                             if filename in rawfiles:
-                                os.system(f'wget -q -c -O {filepath}file.raw -c {rawfiles}')
+                                os.system(f'wget -q -c -O {filepath}file.raw {rawfiles}')
+                                # os.system(f'curl {fileraw} --output {filepath}file.raw')
                                 break
 
                     submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
