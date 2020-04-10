@@ -74,7 +74,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
         os.remove(f'{path}{zipfilename}')
     if not multiprocessing:
         print('Downloading zip file                                                    ', end='\r')
-    os.system(f'curl {zipfileurl} --output {path}{zipfilename} --silent')
+    print(f'curl {zipfileurl} --output {path}{zipfilename} --silent')
 
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
