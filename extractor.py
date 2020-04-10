@@ -216,27 +216,34 @@ def process_ms1(spectrum):
 
 def process_ms2(spectrum):
     # Fish out the precursors.
-    precursors = spectrum['precursorList']
-    if precursors['count'] != 1:
-        if not multiprocessing:
-            print("Number of precursors different than 1, not designed for that")
-        quit()
-    ion = precursors['precursor'][0]['selectedIonList']
-    if ion['count'] != 1:
-        if not multiprocessing:
-            print("More then one selected ions, not designed for that")
-        quit()
+    try:
+        precursors = spectrum['precursorList']
+        if precursors['count'] != 1:
+            if not multiprocessing:
+                print("Number of precursors different than 1, not designed for that")
+            quit()
+        ion = precursors['precursor'][0]['selectedIonList']
+        if ion['count'] != 1:
+            if not multiprocessing:
+                print("More then one selected ions, not designed for that")
+            quit()
 
-    ion = ion['selectedIon'][0]['selected ion m/z']
-    ms1_scan = int(precursors['precursor'][0]['spectrumRef'].split('scan=')[1])
+        ion = ion['selectedIon'][0]['selected ion m/z']
+        ms1_scan = int(precursors['precursor'][0]['spectrumRef'].split('scan=')[1])
 
-    # Fish out the scan index
-    scan_index = spectrum['index']
+        # Fish out the scan index
+        scan_index = spectrum['index']
 
-    scan_info = spectrum['scanList']
-    # m/z and intensity arrays
-    mz = spectrum['m/z array']
-    intensity = spectrum['intensity array']
+        scan_info = spectrum['scanList']
+        # m/z and intensity arrays
+        mz = spectrum['m/z array']
+        intensity = spectrum['intensity array']
+    except:
+        scan_index = []
+        ion = []
+        ms1_scan = []
+        mz = []
+        intensity = []
 
     return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion, 'm/z': mz, 'rt': intensity}
 
