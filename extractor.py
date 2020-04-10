@@ -634,8 +634,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
 
                 knownrawfiles = []
                 for filenames in rawfiles:
-                    if filenames in allRaw:
-                        knownrawfiles.append(filenames)
+                    for onlinenames in allRaw:
+                        if filenames in onlinenames:
+                            knownrawfiles.append(filenames)
                 print(knownrawfiles)
                 quit()
                 for filename in knownrawfiles:
