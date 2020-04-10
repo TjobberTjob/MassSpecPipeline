@@ -70,16 +70,16 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     zipfilename = zipfile.replace(' ', '-')[63:].replace('(', '-').replace(')', '-')
 
     # Download zip file
-    # if os.path.exists(f'{path}{zipfilename}'):
-    #     os.remove(f'{path}{zipfilename}')
+    if os.path.exists(f'{path}{zipfilename}'):
+        os.remove(f'{path}{zipfilename}')
     if not multiprocessing:
         print('Downloading zip file                                                    ', end='\r')
-    print(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
+    os.system(f'wget -q -O  {path}{zipfilename} {zipfileurl}')
 
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
         ziplist = zipped.namelist()
-    quit()
+
     # Extract the peptide file from the zipfile
     for a in ziplist:
         if maxquant_file in a:
