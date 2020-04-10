@@ -87,6 +87,8 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     # Get a list of files with directories from zip file
     with ZipFile(f'{path}{zipfilename}', 'r') as zipped:
         ziplist = zipped.namelist()
+    print(ziplist)
+    quit()
 
     # Extract the peptide file from the zipfile
     for a in ziplist:
