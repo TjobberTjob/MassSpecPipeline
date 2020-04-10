@@ -657,9 +657,8 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         pass
 
             else:  # If we have all needed files, we dont need to get them from the API
-                for raws in allRaw:
+                for filename in os.listdir(f'{path}{accnr}'):
                     try:  # TRY ALL RAWS IN ZIP
-                        filename = str(raws[63:-4])
                         if not multiprocessing:
                             print(f'\nfile: {accnr}/{filename}                                               ')
 
