@@ -552,7 +552,7 @@ def offline(path, filename, mpath):
         quit()
 
 
-def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
+def submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing):
     formatFile(accnr, filename, path, filepath, formatusing)
     internalmzML(filepath)
 
@@ -579,7 +579,8 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing):
     with open('config.json') as json_file:
         config = json.load(json_file)
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds,
+    if not multiprocessing:
+        subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds,
             savepng=False)
 
 
@@ -637,7 +638,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                     df2 = output[0]
                     filepath = output[1]
 
-                    submain(accnr, filename, path, mpath, filepath, df2, formatusing)
+                    submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
                     if not multiprocessing:
                         print(f'{filename}: ✔                         ')
 
@@ -677,7 +678,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                                 os.system(f'wget -q -c -O {filepath}file.raw -c {rawfiles}')
                                 break
 
-                    submain(accnr, filename, path, mpath, filepath, df2, formatusing)
+                    submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
                     if not multiprocessing:
                         print(f'{filename}: ✔                         ')
 
@@ -748,8 +749,6 @@ if __name__ == '__main__':
             os.remove(f'{metapath}subimage.json')
         if os.path.exists(f'{metapath}subimage_filtered.json'):
             os.remove(f'{metapath}subimage_filtered.json')
-        if os.path.exists(f'{metapath}sub_statistics.json'):
-            os.remove(f'{metapath}sub_statistics.json')
 
     elif str(sysinput)[0] == '/':  # For local fine purposes.
         dirsinpath = os.listdir(sysinput)
