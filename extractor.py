@@ -647,8 +647,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         filepath = output[1]
 
                         submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
-                        if not multiprocessing:
-                            print(f'{filename}: ✔                         ')
 
                     except Exception as error:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -661,6 +659,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                                 print(
                                     f'Rawfile error. {filename}: ✖')
                         pass
+
+                if not multiprocessing:
+                    print(f'{filename}: ✔                         ')
 
             else:  # If we have all needed files, we dont need to get them from the API
 
