@@ -112,12 +112,12 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     # Download the raw file
     if not multiprocessing:
         print('Downloading raw file                                                    ', end='\r')
-    rawfilefound = True
+    rawfilefound = False
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         for fileraw in rawfiles:
             if filename in fileraw or len(rawfiles) == 1:
                 os.system(f'wget -q -c -O {filepath}file.raw -c {fileraw}')
-                rawfilefound = False
+                rawfilefound = True
                 break
 
     return df2, filepath, rawfilefound
@@ -635,8 +635,9 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         df2 = output[0]
                         filepath = output[1]
                         rawfilefound = output[2]
-                        if rawfilefound:
+                        if not rawfilefound:
                             missingraws += 1
+                            print('pass boi')
                             pass
 
                         submain(accnr, filename, path, mpath, filepath, df2, formatusing)
