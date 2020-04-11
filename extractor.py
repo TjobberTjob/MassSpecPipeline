@@ -461,8 +461,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
     for index, rows in df.iterrows():
         if (index + 1) % int(df.shape[0] / 40) == 0:
             if not multiprocessing:
-                print('Creating subimages: {:2.1%}                                                    '.format(
-                    (index + 1) / df.shape[0]), end='\r')  # Print how far we are
+                print(f'Creating subimages: {int((index + 1) / df.shape[0])}         ', end='\r')  # Print how far we are
 
         if rows['Retention time'] - subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time'] + \
                 subimage_interval['rt'] > interval['rt']['max'] or rows['m/z'] - subimage_interval['mz'] < \
