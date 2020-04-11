@@ -519,6 +519,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         filewritten = True
 
     while not filewritten:
+        print(f'Writing images to file                                     ', end='\r')
         try:
             fcntl.flock(open(f'{mpath}subimage.json', 'a'), fcntl.LOCK_EX)
             outfile = open(f'{mpath}subimage.json', 'a')
