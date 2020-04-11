@@ -519,7 +519,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         filewritten = True
 
     if not multiprocessing:
-        (f'Writing images to file                                     ', end='\r')
+        print(f'Writing images to file                                     ', end='\r')
     while not filewritten:
         try:
             fcntl.flock(open(f'{mpath}subimage.json', 'a'), fcntl.LOCK_EX)
