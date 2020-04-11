@@ -521,18 +521,12 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
 
     while not filewritten:
         try:
+            fcntl.flock(open(f'{mpath}subimage.json', 'a'), fcntl.LOCK_EX)
             outfile = open(f'{mpath}subimage.json', 'a')
-            print('hey1')
-            fcntl.flock(outfile, fcntl.LOCK_EX)
-            print('hey2')
             for imagedata in filemetadata:
-                print(imagedata)
                 outfile.write(json.dumps(imagedata) + '\n')
-            print('hey3')
             outfile.close()
-            print('hey4')
-            fcntl.flock(outfile, fcntl.LOCK_UN)
-            print('hey5')
+            fcntl.flock(open(f'{mpath}subimage.json', 'a'), fcntl.LOCK_UN)
             filewritten = True
         except:
             time.sleep(1)
