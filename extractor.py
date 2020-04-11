@@ -4,6 +4,7 @@ import json
 import math
 import os
 import pickle
+import fcntl
 import re
 import shutil
 import subprocess
@@ -12,7 +13,6 @@ import time
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from zipfile import ZipFile
-
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
@@ -456,8 +456,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
     with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
         mzml = json.loads(fin.read().decode('utf-8'))
 
-    outfile = open(f'{mpath}subimage.json', 'a')  # The metadata file
-
+    filemetadata = []
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
         if (index + 1) % int(df.shape[0] / 40) == 0:
@@ -513,8 +512,22 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
                 continue
             else:
                 new_metadata[str(ele)] = str(rows[ele])
-        outfile.write(json.dumps(new_metadata) + '\n')
-    outfile.close()
+        filemetadata.append(new_metadata)
+
+    filewritten = False
+    while not filewritten:
+        try:
+            with open(f'{mpath}subimage.json', 'a') as g:
+                fcntl.flock(g, fcntl.LOCK_EX)
+                for imagedata in filemetadata:
+                    g.write(json.dumps(imagedata) + '\n')
+                g.close()
+                fcntl.flock(g, fcntl.LOCK_UN)
+            filewritten = True
+        except:
+            time.sleep(2)
+
+
 
 
 def offline(path, filename, mpath):
