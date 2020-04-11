@@ -513,8 +513,12 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             else:
                 new_metadata[str(ele)] = str(rows[ele])
         filemetadata.append(new_metadata)
-    print('done')
-    filewritten = False
+
+    if not filemate == []:
+        filewritten = False
+    else:
+        filewritten = True
+
     while not filewritten:
         try:
             g = open(f'{mpath}subimage.json', 'a')
