@@ -529,7 +529,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
                 print(imagedata)
                 outfile.write(json.dumps(imagedata) + '\n')
             print('hey3')
-            g.close()
+            outfile.close()
             print('hey4')
             fcntl.flock(outfile, fcntl.LOCK_UN)
             print('hey5')
