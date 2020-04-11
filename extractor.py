@@ -513,7 +513,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             else:
                 new_metadata[str(ele)] = str(rows[ele])
         filemetadata.append(new_metadata)
-
+    print('done')
     filewritten = False
     while not filewritten:
         try:
