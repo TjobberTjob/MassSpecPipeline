@@ -529,7 +529,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             fcntl.flock(g, fcntl.LOCK_UN)
             filewritten = True
         except:
-            time.sleep(2)
+            time.sleep(1)
 
 
 
