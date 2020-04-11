@@ -438,7 +438,7 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_interval, filename, image, bounds, savepng, multiprocessing):
+def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_interval, filename, image, bounds, multiprocessing, savepng):
     lowbound = bounds[0]
     highbound = bounds[1]
     mz_bin = bins[0]
@@ -612,8 +612,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiproce
     with open('config.json') as json_file:
         config = json.load(json_file)
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds,
-            savepng=False, multiprocessing)
+    subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds, multiprocessing, savepng=False)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
