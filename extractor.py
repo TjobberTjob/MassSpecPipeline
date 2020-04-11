@@ -459,7 +459,7 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
     filemetadata = []
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
-        if (index + 1) % int(df.shape[0] / 40) == 0:
+        if int((index + 1) / int(df.shape[0]) * 100) % 5 == 0:
             if not multiprocessing:
                 print(f'Creating subimages: {int(((index + 1) / df.shape[0])*100)}%         ', end='\r')  # Print how far we are
 
@@ -531,7 +531,6 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             filewritten = True
         except:
             time.sleep(1)
-
 
 
 
