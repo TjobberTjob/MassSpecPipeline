@@ -594,6 +594,10 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
         bins = imagedata[2]
         resolution = imagedata[3]
         bounds = imagedata[4]
+
+        with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
+            mzml = json.loads(fin.read().decode('utf-8'))
+
         with open('config.json') as json_file:
             config = json.load(json_file)
         mz_bin = float(config['mz_bin'])
