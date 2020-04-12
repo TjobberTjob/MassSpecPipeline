@@ -130,17 +130,15 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     return df2, filepath
 
 
-def formatFile(accnr, filename, path, filepath, formatusing):
+def formatFile(accnr, filename, path, filepath):
     if not multiprocessing:
         print('Formatting file to mzML										', end='\r')
 
-    # Check whether the docker file is implemented or not
-    if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
-        # if not os.path.exists(f'{filepath}file.raw'):
-        #     if not multiprocessing:
-        #         print(f'No raw file, cannot format')
-        #     return
+    with open('config.json') as json_file:
+        config = json.load(json_file)
+    formatusing = config['formatsoftware']
 
+    if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         if formatusing == 'conda':
             if path[0] == '/':
                 relpath = path
@@ -160,6 +158,7 @@ def formatFile(accnr, filename, path, filepath, formatusing):
                 f'mono /opt/conda/bin/ThermoRawFileParser.exe -i={relpath}{accnr}/{filename}/file.raw -o={relpath}{accnr}/{filename}/ -f=1 -m=1 >/dev/null 2>&1')
 
         elif formatusing == 'docker':
+            # Check whether the docker file is implemented or not
             dockerls = subprocess.check_output('docker image ls', shell=True)
             try:
                 if not 'thermorawparser' in str(dockerls):
@@ -582,39 +581,43 @@ def offline(path, filename, mpath):
         quit()
 
 
-def submain(accnr, filename, path, mpath, filepath, df2, formatsoftware, multiprocessing):
-    formatFile(accnr, filename, path, filepath, formatsoftware)
+def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
+    formatFile(accnr, filename, path, filepath)
     internalmzML(filepath)
 
-    imfiles = glob.glob(f'{path}{accnr}/{filename}/*x*.txt')
-    print(imfiles)
-    quit()
-    imagefile = subprocess.check_output(f'ls {path}{accnr}/{filename}/*x*.txt', shell=True)
-    print(str(imagefile).split('/')[-1])
-    quit()
-    output = preparameters(filepath)
-    mzml = output[0]
-    bounds = output[1]
-    interval = output[2]
-    bins = output[3]
-    resolution = output[4]
-
-    # Make the image
-    if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt'):
-        output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
-        image = output[0]
-
-    # Retrieve if exist already
-    else:
-        if not multiprocessing:
-            print('Loading image data                                                    ', end='\r')
-        with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "rb") as pa:
+    imagefile = glob.glob(f'{path}{accnr}/{filename}/*x*.txt')
+    if not imagefile == []:
+        with open(imagefile[0], "rb") as pa:
             imagedata = pickle.load(pa)
         image = imagedata[0]
         interval = imagedata[1]
         bins = imagedata[2]
         resolution = imagedata[3]
         bounds = imagedata[4]
+        with open('config.json') as json_file:
+            config = json.load(json_file)
+        mz_bin = float(config['mz_bin'])
+        rt_bin = float(config['rt_bin'])
+
+        if not bins[0] == mz_bin and not bins[1] == rt_bin:
+            output = preparameters(filepath)
+            mzml = output[0]
+            bounds = output[1]
+            interval = output[2]
+            bins = output[3]
+            resolution = output[4]
+    else:
+        output = preparameters(filepath)
+        mzml = output[0]
+        bounds = output[1]
+        interval = output[2]
+        bins = output[3]
+        resolution = output[4]
+
+    # Make the image if we didnt retrieve it already
+    if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt'):
+        output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
+        image = output[0]
 
     with open('config.json') as json_file:
         config = json.load(json_file)
@@ -623,7 +626,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatsoftware, multipr
             savepng=False)
 
 
-def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
+def main(accnr, maxquant_file, path, mpath, multiprocessing):
     if not multiprocessing:
         print(f'\nAccessions: {accnr}')
 
@@ -678,7 +681,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                         df2 = output[0]
                         filepath = output[1]
 
-                        submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
+                        submain(accnr, filename, path, mpath, filepath, df2, multiprocessing)
                         if not multiprocessing:
                             print(f'{filename}: ✔                         ')
 
@@ -720,7 +723,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
                                     # os.system(f'curl {fileraw} --output {filepath}file.raw')
                                     break
 
-                        submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing)
+                        submain(accnr, filename, path, mpath, filepath, df2, multiprocessing)
                         if not multiprocessing:
                             print(f'{filename}: ✔                         ')
 
@@ -775,7 +778,6 @@ if __name__ == '__main__':
     acquire_only_new = data['acquire_only_new'] == 'True'
     multi = data['multiprocessing'] == 'True'
     nr_processes = data['nr_processes']
-    formatusing = data['formatsoftware']
     errormessages = data['errormessages'] == 'True'
     skip_incomplete = False
 
@@ -803,13 +805,15 @@ if __name__ == '__main__':
         skip_incomplete = True
         for accession in listofowned:
             if multi:
+
                 multiprocessing = True
-                accessions = [(f, pepfile, datapath, metapath, multiprocessing, formatusing) for f in listofowned]
+                accessions = [(f, pepfile, datapath, metapath, multiprocessing) for f in listofowned]
                 pool = ThreadPool(nr_processes)
                 pool.starmap(main, accessions)
+
             else:
                 multiprocessing = False
-                main(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
+                main(str(accession), pepfile, datapath, metapath, multiprocessing)
 
     elif str(sysinput) == 'pride' or str(sysinput) == 'pridefiltered':  # Going through the metadata
         if str(sysinput) == 'pride':
@@ -819,7 +823,7 @@ if __name__ == '__main__':
 
         if multi:
             multiprocessing = True
-            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multiprocessing, formatusing)
+            accessions = [(json.loads(linez)['accession'], pepfile, datapath, metapath, multiprocessing)
                           for linez in reversed(list(open(f'{metapath}{pridefile}.json'))) if
                           'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_processes)
@@ -830,12 +834,12 @@ if __name__ == '__main__':
             for line in reversed(list(open(f'{metapath}{pridefile}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
-                main(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
+                main(str(accession), pepfile, datapath, metapath, multiprocessing)
 
     elif str(sysinput)[0:3] == 'PRD' or str(sysinput)[0:3] == 'PXD':  # For single accessions usage
         accession = sysinput
         multiprocessing = False
-        main(str(accession), pepfile, datapath, metapath, multiprocessing, formatusing)
+        main(str(accession), pepfile, datapath, metapath, multiprocessing)
 
     else:
         print('Input not recognized. Check readme file for all possible inputs')
