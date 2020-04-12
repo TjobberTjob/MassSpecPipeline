@@ -589,7 +589,8 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
     binsmatch = False
     if not imagefiles == []:
         for imagefile in imagefiles:
-            print(f'Fetching image files                                               ', end='\r')
+            if not multiprocessing:
+                print(f'Fetching image files                                               ', end='\r')
             with open(imagefile, "rb") as pa:
                 imagedata = pickle.load(pa)
             image = imagedata[0]
