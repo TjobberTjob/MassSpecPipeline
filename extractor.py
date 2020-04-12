@@ -603,16 +603,12 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
             mz_bin = float(config['mz_bin'])
             rt_bin = float(config['rt_bin'])
 
-            if bins[0] == mz_bin and not bins[1] == rt_bin:
-                print('hey')
+            if bins[0] == mz_bin and bins[1] == rt_bin:
                 with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
                     mzml = json.loads(fin.read().decode('utf-8'))
                 binsmatch = True
                 break
-    print(binsmatch)
-    print(bins)
-    print(mz_bin)
-    print(rt_bin)
+
     if not binsmatch:
         output = preparameters(filepath)
         mzml = output[0]
