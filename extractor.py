@@ -1,4 +1,5 @@
 import bisect
+import glob
 import gzip
 import json
 import math
@@ -585,6 +586,9 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatsoftware, multipr
     formatFile(accnr, filename, path, filepath, formatsoftware)
     internalmzML(filepath)
 
+    imfiles = glob.glob(f'{path}{accnr}/{filename}/*x*.txt')
+    print(imfiles)
+    quit()
     imagefile = subprocess.check_output(f'ls {path}{accnr}/{filename}/*x*.txt', shell=True)
     print(str(imagefile).split('/')[-1])
     quit()
