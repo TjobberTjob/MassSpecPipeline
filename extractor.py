@@ -4,8 +4,6 @@ import json
 import math
 import os
 import pickle
-import fcntl
-import re
 import shutil
 import subprocess
 import sys
@@ -13,6 +11,7 @@ import time
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from zipfile import ZipFile
+import fcntl
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
@@ -316,7 +315,7 @@ def preparameters(filepath):
 
     resolution = {'x': int((max(mzlist) - min(mzlist)) / mz_bin), 'y': int((max(rtlist) - min(rtlist)) / rt_bin)}
 
-    return mzml, [mzlist, rtlist, intlist], [lowbound, highbound], interval, [mz_bin, rt_bin], resolution
+    return mzml, [lowbound, highbound], interval, [mz_bin, rt_bin], resolution
 
 
 def fullpng(image, filepath, resolution, interval, lowbound, highbound):
@@ -405,8 +404,9 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
         image.append(row)
     if not multiprocessing:
         print('Saving image files                                                    ', end='\r')
-    # image.reverse()
-    imagedata = image
+
+    imagedata = [image, interval, bins, resolution, bounds]
+
     # Save as txt file
     with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "wb") as pa:
         pickle.dump(imagedata, pa)
@@ -415,7 +415,6 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
 
     if savepng:  # save full image to png
         fullpng(image, filepath, resolution, interval, lowbound, highbound)
-
     return image
 
 
@@ -438,7 +437,8 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_interval, filename, image, bounds, multiprocessing, savepng):
+def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, filename, image, bounds, multiprocessing,
+            mzmlfile, savepng):
     lowbound = bounds[0]
     highbound = bounds[1]
     mz_bin = bins[0]
@@ -453,15 +453,13 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
     if not os.path.exists(mpath):
         os.mkdir(mpath)
 
-    with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
-        mzml = json.loads(fin.read().decode('utf-8'))
-
     filemetadata = []
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
         if int((index + 1) / int(df.shape[0]) * 100) % 5 == 0:
             if not multiprocessing:
-                print(f'Creating subimages: {int(((index + 1) / df.shape[0])*100)}%         ', end='\r')  # Print how far we are
+                print(f'Creating subimages: {int(((index + 1) / df.shape[0]) * 100)}%         ',
+                      end='\r')  # Print how far we are
 
         if rows['Retention time'] - subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time'] + \
                 subimage_interval['rt'] > interval['rt']['max'] or rows['m/z'] - subimage_interval['mz'] < \
@@ -484,8 +482,8 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
         subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
 
         try:
-            ms2info = [mzml['ms2'][str(rows['MS/MS IDs'])]['m/z_array'],
-                       mzml['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
+            ms2info = [mzmlfile['ms2'][str(rows['MS/MS IDs'])]['m/z_array'],
+                       mzmlfile['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
             datacollected = 'both'
         except:
             ms2info = [[], []]
@@ -515,11 +513,11 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
 
     if not filemetadata == []:
         filewritten = False
+        if not multiprocessing:
+            print(f'Writing images to file                                     ', end='\r')
     else:
         filewritten = True
 
-    if not multiprocessing:
-        print(f'Writing images to file                                     ', end='\r')
     while not filewritten:
         try:
             fcntl.flock(open(f'{mpath}subimage.json', 'a'), fcntl.LOCK_EX)
@@ -531,7 +529,6 @@ def subimgs(interval, bins, resolution, path, mpath, filepath, df, subimage_inte
             filewritten = True
         except:
             time.sleep(1)
-
 
 
 def offline(path, filename, mpath):
@@ -584,17 +581,19 @@ def offline(path, filename, mpath):
         quit()
 
 
-def submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiprocessing):
-    formatFile(accnr, filename, path, filepath, formatusing)
+def submain(accnr, filename, path, mpath, filepath, df2, formatsoftware, multiprocessing):
+    formatFile(accnr, filename, path, filepath, formatsoftware)
     internalmzML(filepath)
 
+    imagefile = subprocess.check_output(f'ls {path}{accnr}/{filename}/*x*.txt', shell=True)
+    print(imagefile)
+    quit()
     output = preparameters(filepath)
     mzml = output[0]
-    inputlists = output[1]
-    bounds = output[2]
-    interval = output[3]
-    bins = output[4]
-    resolution = output[5]
+    bounds = output[1]
+    interval = output[2]
+    bins = output[3]
+    resolution = output[4]
 
     # Make the image
     if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt'):
@@ -606,12 +605,18 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatusing, multiproce
         if not multiprocessing:
             print('Loading image data                                                    ', end='\r')
         with open(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt', "rb") as pa:
-            image = pickle.load(pa)
+            imagedata = pickle.load(pa)
+        image = imagedata[0]
+        interval = imagedata[1]
+        bins = imagedata[2]
+        resolution = imagedata[3]
+        bounds = imagedata[4]
 
     with open('config.json') as json_file:
         config = json.load(json_file)
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, filepath, df2, subimage_interval, filename, image, bounds, multiprocessing, savepng=False)
+    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing,
+            savepng=False)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing, formatusing):
