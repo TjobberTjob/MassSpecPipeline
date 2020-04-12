@@ -585,32 +585,31 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
     formatFile(accnr, filename, path, filepath)
     internalmzML(filepath)
 
-    imagefile = glob.glob(f'{path}{accnr}/{filename}/*x*.txt')
-    if not imagefile == []:
-        with open(imagefile[0], "rb") as pa:
-            imagedata = pickle.load(pa)
-        image = imagedata[0]
-        interval = imagedata[1]
-        bins = imagedata[2]
-        resolution = imagedata[3]
-        bounds = imagedata[4]
+    imagefiles = glob.glob(f'{path}{accnr}/{filename}/*x*.txt')
+    binsmatch = False
+    if not imagefiles == []:
+        for imagefile in imagefiles:
+            print(f'Fetching image files                                               ')
+            with open(imagefile[0], "rb") as pa:
+                imagedata = pickle.load(pa)
+            image = imagedata[0]
+            interval = imagedata[1]
+            bins = imagedata[2]
+            resolution = imagedata[3]
+            bounds = imagedata[4]
 
-        with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
-            mzml = json.loads(fin.read().decode('utf-8'))
+            with open('config.json') as configjson:
+                config = json.load(configjson)
+            mz_bin = float(config['mz_bin'])
+            rt_bin = float(config['rt_bin'])
 
-        with open('config.json') as json_file:
-            config = json.load(json_file)
-        mz_bin = float(config['mz_bin'])
-        rt_bin = float(config['rt_bin'])
+            if bins[0] == mz_bin and not bins[1] == rt_bin:
+                with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
+                    mzml = json.loads(fin.read().decode('utf-8'))
+                binsmatch = True
+                break
 
-        if not bins[0] == mz_bin and not bins[1] == rt_bin:
-            output = preparameters(filepath)
-            mzml = output[0]
-            bounds = output[1]
-            interval = output[2]
-            bins = output[3]
-            resolution = output[4]
-    else:
+    if not binsmatch:
         output = preparameters(filepath)
         mzml = output[0]
         bounds = output[1]
@@ -623,8 +622,8 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
         output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
         image = output[0]
 
-    with open('config.json') as json_file:
-        config = json.load(json_file)
+    with open('config.json') as configjson:
+        config = json.load(configjson)
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
     subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing, mzml,
             savepng=False)
