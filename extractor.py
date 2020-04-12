@@ -604,6 +604,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
             rt_bin = float(config['rt_bin'])
 
             if bins[0] == mz_bin and not bins[1] == rt_bin:
+                print('hey')
                 with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
                     mzml = json.loads(fin.read().decode('utf-8'))
                 binsmatch = True
