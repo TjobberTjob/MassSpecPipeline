@@ -586,7 +586,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, formatsoftware, multipr
     internalmzML(filepath)
 
     imagefile = subprocess.check_output(f'ls {path}{accnr}/{filename}/*x*.txt', shell=True)
-    print(imagefile)
+    print(imagefile.split('/')[-1])
     quit()
     output = preparameters(filepath)
     mzml = output[0]
