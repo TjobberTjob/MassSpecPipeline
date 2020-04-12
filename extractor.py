@@ -622,7 +622,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
     with open('config.json') as json_file:
         config = json.load(json_file)
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing,
+    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing, mzml,
             savepng=False)
 
 
