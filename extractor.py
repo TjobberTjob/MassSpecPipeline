@@ -608,7 +608,10 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
                     mzml = json.loads(fin.read().decode('utf-8'))
                 binsmatch = True
                 break
-
+    print(binsmatch)
+    print(bins)
+    print(mz_bin)
+    print(rt_bin)
     if not binsmatch:
         output = preparameters(filepath)
         mzml = output[0]
