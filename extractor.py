@@ -609,6 +609,10 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
                 binsmatch = True
                 break
 
+    with open('config.json') as configjson:
+        config = json.load(configjson)
+    savepng = config['savepng'] == 'True'
+
     if not binsmatch:
         output = preparameters(filepath)
         mzml = output[0]
@@ -617,16 +621,11 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
         bins = output[3]
         resolution = output[4]
 
-    # Make the image if we didnt retrieve it already
-    if not os.path.exists(f'{filepath}{str(resolution["x"])}x{str(resolution["y"])}.txt'):
-        output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng=False)
+        output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng)
         image = output[0]
 
-    with open('config.json') as configjson:
-        config = json.load(configjson)
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing, mzml,
-            savepng=False)
+    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing, mzml, savepng)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing):
