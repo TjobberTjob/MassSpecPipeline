@@ -586,6 +586,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
     internalmzML(filepath)
 
     imagefiles = glob.glob(f'{path}{accnr}/{filename}/*x*.txt')
+    print(imagefiles)
     binsmatch = False
     if not imagefiles == []:
         for imagefile in imagefiles:
