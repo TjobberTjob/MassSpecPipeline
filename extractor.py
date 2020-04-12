@@ -590,7 +590,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
     if not imagefiles == []:
         for imagefile in imagefiles:
             print(f'Fetching image files                                               ')
-            with open(imagefile[0], "rb") as pa:
+            with open(imagefile, "rb") as pa:
                 imagedata = pickle.load(pa)
             image = imagedata[0]
             interval = imagedata[1]
