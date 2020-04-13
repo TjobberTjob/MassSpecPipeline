@@ -1,7 +1,9 @@
+import glob
 import json
 import os
 import numpy as np
 import random
+import glob
 import sys
 from collections import defaultdict, Counter
 
@@ -11,6 +13,14 @@ def filter(path, file):
         if os.path.exists(f'{path}subimage_filtered.json'):
             print('Removing old filtered version')
             os.remove(f'{path}{str(file)}_filtered.json')
+
+        if sys.argv[2] == 'combine':
+            outfile = open(f'{path}subimage.json', 'a')
+            for imagejson in glob.glob(f'{datapath}subimage-*.json'):
+                for line in open(imagejson, 'r'):
+                    outfile.write(json.dumps(line) + '\n')
+            outfile.close()
+
         lines_seen = set()
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
