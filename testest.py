@@ -12,9 +12,11 @@ with open('config.json') as json_file:
     data = json.load(json_file)
 path = f'{data["path"]}metadata/'
 i = 0
+lines_seen =  []
 for line in open(f'{path}accessions.json'):
     data = json.loads(line)
-    if data['maxquant'] and 'filetypes' in data and 'raw' in data['filetypes']:
+    if data['maxquant'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:
+        lines_seen.append(line)
         i += 1
 print(i)
 #
