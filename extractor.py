@@ -470,7 +470,7 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
                 interval['mz']['min'] or rows['m/z'] + subimage_interval['mz'] > interval['mz']['max']:
             continue
 
-        if os.path.exists(f'{imgpath}{filename}-{rows["MS/MS IDs"]}.json'):
+        if os.path.exists(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json'):
             continue
 
         # if not 450 < rows['m/z'] < 455:  # Filter for when storage is limited
@@ -496,14 +496,14 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
         # Save image as json file
-        with gzip.GzipFile(f'{imgpath}{filename}-{rows["MS/MS IDs"]}.json', 'w') as fout:
+        with gzip.GzipFile(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json', 'w') as fout:
             fout.write(json.dumps(fullsubimage).encode('utf-8'))
 
         if savepng:  # save subimages to png
             subpng(subimage, imgpath, filename, index, lowbound, highbound)
 
         new_metadata = {}
-        new_metadata['image'] = f'{filename}-{rows["MS/MS IDs"]}.json'
+        new_metadata['image'] = f'{accnr}-{filename}-{rows["MS/MS IDs"]}.json'
         new_metadata['accession'] = accession
         new_metadata['size'] = np.array(subimage).shape
         new_metadata['ms2arraylength'] = len(ms2info[0])
