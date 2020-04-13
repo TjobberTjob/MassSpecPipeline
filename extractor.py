@@ -518,7 +518,6 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
     outfile.close()
 
 
-
 def offline(path, filename, mpath):
     global zipfile, rawfile
     maxquant_file = 'allPeptides.txt'
@@ -614,7 +613,8 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
         image = output[0]
 
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing, mzml, savepng, accnr)
+    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing,
+            mzml, savepng, accnr)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing):
