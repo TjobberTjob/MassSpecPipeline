@@ -19,6 +19,7 @@ for line in open(f'{path}accessions.json'):
         lines_seen.add(line)
         i += 1
 print(i)
+print(len(lines_seen))
 #
 # seen = []
 # leng = []
