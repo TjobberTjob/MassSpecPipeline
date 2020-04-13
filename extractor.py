@@ -438,7 +438,7 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
 
 
 def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, filename, image, bounds, multiprocessing,
-            mzmlfile, savepng):
+            mzmlfile, savepng, accnr):
     lowbound = bounds[0]
     highbound = bounds[1]
     mz_bin = bins[0]
@@ -512,23 +512,18 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
         filemetadata.append(new_metadata)
 
     if not filemetadata == []:
-        filewritten = False
+        print(f'Writing images to file                                     ', end='\r')
         if not multiprocessing:
-            print(f'Writing images to file                                     ', end='\r')
-    else:
-        filewritten = True
-
-    while not filewritten:
-        try:
-            fcntl.flock(open(f'{mpath}subimage.json', 'a'), fcntl.LOCK_EX)
             outfile = open(f'{mpath}subimage.json', 'a')
             for imagedata in filemetadata:
                 outfile.write(json.dumps(imagedata) + '\n')
             outfile.close()
-            fcntl.flock(open(f'{mpath}subimage.json', 'a'), fcntl.LOCK_UN)
-            filewritten = True
-        except:
-            time.sleep(1)
+
+        else:
+            outfile = open(f'{mpath}subimage-{accnr}.json', 'a')
+            for imagedata in filemetadata:
+                outfile.write(json.dumps(imagedata) + '\n')
+            outfile.close()
 
 
 def offline(path, filename, mpath):
@@ -626,7 +621,7 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
         image = output[0]
 
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing, mzml, savepng)
+    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing, mzml, savepng, accnr)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing):
