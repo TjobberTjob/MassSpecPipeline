@@ -16,7 +16,7 @@ lines_seen = set()
 for line in open(f'{path}accessions.json'):
     data = json.loads(line)
     if data['maxquant'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:
-        lines_seen.append(line)
+        lines_seen.add(line)
         i += 1
 print(i)
 #
