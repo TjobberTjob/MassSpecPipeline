@@ -72,6 +72,10 @@ filterbroken: A method to skip PRIDE projects that has problems with them - Defa
 
 formatsoftware: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
 
+Errormessage: If files fail, whether to just skip them or skip them and get the error message. Used for debugging - Defaults to "False"
+
+savepng: Whether or not to save images as png files or only txt - Dafults to "False"
+
 #### networkattributes:
 batch_size: Size of batches for stochastic gradient descent - Defaults to 64
 
@@ -81,7 +85,15 @@ n_channels: Number of information channels used in neural network training - Def
 
 test_accessions: Number of accession projects set aside to testing (not validation) - Defaults to 3
 
-early_stopping: Number of epochs with no improvement before stopping - Defaults to 10}}
+early_stopping: Number of epochs with no improvement before stopping - Defaults to 10
+
+setseed: Makes sure that it always initializes files in the same training and test groupings. Defaults to "True"
+
+MS: Whether to use just ms1 or ms1 and ms2 data for the neural networks - Defaults to "ms1" ("both" is the other option)
+
+lenms2: The length of the MS2 data used. This is needed because of the size of the neural network for MS2 data. 
+ Has two options, a numerical value where all data points with less data are filtered away, or "max" where it takes the
+ n highest values from all ms2 data, where n is the shortest ms2 data in a single datapoint. Only used if MS is "both" - Defualts to "max"
 
 #### NOTE: Values given as "True" and "False" needs to be in quotes.
 

@@ -453,7 +453,11 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
     if not os.path.exists(mpath):
         os.mkdir(mpath)
 
-    filemetadata = []
+    if not multiprocessing:
+        outfile = open(f'{mpath}subimage.json', 'a')
+    else:
+        outfile = open(f'{mpath}subimage-{accnr}.json', 'a')
+
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
         if int((index + 1) / int(df.shape[0]) * 100) % 5 == 0:
@@ -509,21 +513,10 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
                 continue
             else:
                 new_metadata[str(ele)] = str(rows[ele])
-        filemetadata.append(new_metadata)
 
-    if not filemetadata == []:
-        print(f'Writing images to file                                     ', end='\r')
-        if not multiprocessing:
-            outfile = open(f'{mpath}subimage.json', 'a')
-            for imagedata in filemetadata:
-                outfile.write(json.dumps(imagedata) + '\n')
-            outfile.close()
+        outfile.write(json.dumps(new_metadata) + '\n')
+    outfile.close()
 
-        else:
-            outfile = open(f'{mpath}subimage-{accnr}.json', 'a')
-            for imagedata in filemetadata:
-                outfile.write(json.dumps(imagedata) + '\n')
-            outfile.close()
 
 
 def offline(path, filename, mpath):
