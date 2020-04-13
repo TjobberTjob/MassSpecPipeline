@@ -14,7 +14,7 @@ path = f'{data["path"]}metadata/'
 i = 0
 for line in open(f'{path}accessions.json'):
     data = json.loads(line)
-    if data['maxquant']:
+    if data['maxquant'] and 'filetypes' in data and 'raw' in data['filetypes']:
         i += 1
 print(i)
 #
