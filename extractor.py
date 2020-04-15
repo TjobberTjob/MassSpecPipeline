@@ -513,7 +513,7 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
                 continue
             else:
                 new_metadata[str(ele)] = str(rows[ele])
-
+        print('hey', new_metadata)
         outfile.write(json.dumps(new_metadata) + '\n')
     outfile.close()
 
