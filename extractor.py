@@ -510,7 +510,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
                 continue
             else:
                 new_metadata[str(ele)] = str(rows[ele])
-        print(new_metadata)
+
         with imgfile as outfile:
             outfile.write(json.dumps(new_metadata) + '\n')
 
