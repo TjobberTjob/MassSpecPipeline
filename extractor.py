@@ -518,7 +518,6 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
             outfile.write(json.dumps(new_metadata) + '\n')
 
 
-
 def offline(path, filename, mpath):
     global zipfile, rawfile
     maxquant_file = 'allPeptides.txt'
