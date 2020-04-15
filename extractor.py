@@ -457,7 +457,6 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
         outfile = open(f'{mpath}subimage.json', 'a')
     else:
         outfile = open(f'{mpath}subimage-{accnr}.json', 'a')
-    print('outfile written')
 
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
@@ -473,7 +472,7 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
 
         if os.path.exists(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json'):
             continue
-        print('past filters')
+
         # if not 450 < rows['m/z'] < 455:  # Filter for when storage is limited
         #     continue
 
@@ -495,7 +494,7 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
             datacollected = 'ms1'
 
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
-        print('image written')
+
         # Save image as json file
         with gzip.GzipFile(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json', 'w') as fout:
             fout.write(json.dumps(fullsubimage).encode('utf-8'))
@@ -505,20 +504,16 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
 
         new_metadata = {}
         new_metadata['image'] = f'{accnr}-{filename}-{rows["MS/MS IDs"]}.json'
-        print('name')
-        new_metadata['accession'] = accession
-        print('acc')
+        new_metadata['accession'] = accnr
         new_metadata['size'] = np.array(subimage).shape
-        print('size')
         new_metadata['ms2arraylength'] = len(ms2info[0])
-        print('array')
         new_metadata['datacollected'] = datacollected
         for ele in df.columns:
             if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
                 continue
             else:
                 new_metadata[str(ele)] = str(rows[ele])
-        print('metadata created')
+
         outfile.write(json.dumps(new_metadata) + '\n')
     outfile.close()
 
