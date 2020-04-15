@@ -453,10 +453,7 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
     if not os.path.exists(mpath):
         os.mkdir(mpath)
 
-    if not multiprocessing:
-        imgfile = open(f'{mpath}subimage.json', 'a')
-    else:
-        imgfile = open(f'{mpath}subimage-{accnr}.json', 'a')
+    imgfile = open(f'{mpath}subimage-{accnr}.json', 'a')
 
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
