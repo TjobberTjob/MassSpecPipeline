@@ -11,14 +11,14 @@ from collections import defaultdict, Counter
 def filter(path, file):
     if file == 'subimage':
         if sys.argv[2] == 'combine':
-            outfile = open(f'{path}subimage.json', 'a')
-            for imagejson in glob.glob(f'{path}subimage-*.json'):
-                for line in open(imagejson, 'r'):
-                    print(line)
-                    print(type(line))
-                    outfile.write(json.dumps(line) + '\n')
-                # os.remove(imagejson)
-            outfile.close()
+            with open(f'{path}subimage.json', 'a') as outfile:
+                allimgs = [json.loads(line)['image'] for line in outfile]
+                for imagejson in glob.glob(f'{path}subimage-*.json'):
+                    for line in open(imagejson, 'r'):
+                        data = json.loads(line)
+                        if data['image'] not in allimgs:
+                            outfile.write(json.dumps(data) + '\n')
+                    # os.remove(imagejson)
             quit()
 
         if os.path.exists(f'{path}subimage_filtered.json'):
