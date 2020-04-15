@@ -12,7 +12,7 @@ def filter(path, file):
     if file == 'subimage':
         if sys.argv[2] == 'combine':
             with open(f'{path}subimage.json', 'a') as outfile:
-                allimgs = [json.loads(line)['image'] for line in outfile]
+                allimgs = [json.loads(line)['image'] for line in outfile if 'image' in json.loads(line)]
                 for imagejson in glob.glob(f'{path}subimage-*.json'):
                     for line in open(imagejson, 'r'):
                         data = json.loads(line)
