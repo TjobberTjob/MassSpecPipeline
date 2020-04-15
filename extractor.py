@@ -776,10 +776,8 @@ if __name__ == '__main__':
     if str(sysinput) == 'reset':  # Reset files and folders if you want to remake all images in another setting
         if os.path.exists(f'{datapath}images/'):
             shutil.rmtree(f'{datapath}images/')
-        if os.path.exists(f'{metapath}subimage.json'):
-            os.remove(f'{metapath}subimage.json')
-        if os.path.exists(f'{metapath}subimage_filtered.json'):
-            os.remove(f'{metapath}subimage_filtered.json')
+        for imagejson in glob.glob(f'{metapath}subimage*.json'):
+            os.remove(imagejson)
 
     elif str(sysinput)[0] == '/':  # For local fine purposes.
         dirsinpath = os.listdir(sysinput)
