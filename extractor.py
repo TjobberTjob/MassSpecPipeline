@@ -437,8 +437,8 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, filename, image, bounds, multiprocessing,
-            mzmlfile, savepng, accnr):
+def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mpath, df, subimage_interval, filename, multiprocessing,
+             savepng):
     lowbound = bounds[0]
     highbound = bounds[1]
     mz_bin = bins[0]
@@ -510,7 +510,7 @@ def subimgs(interval, bins, resolution, path, mpath, df, subimage_interval, file
                 continue
             else:
                 new_metadata[str(ele)] = str(rows[ele])
-
+        print(new_metadata)
         with imgfile as outfile:
             outfile.write(json.dumps(new_metadata) + '\n')
 
@@ -610,8 +610,8 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
         image = output[0]
 
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(interval, bins, resolution, path, mpath, df2, subimage_interval, filename, image, bounds, multiprocessing,
-            mzml, savepng, accnr)
+    subimgs(accnr, interval, bins, image, bounds, resolution, mzml, path, mpath, df2, subimage_interval, filename, multiprocessing,
+             savepng)
 
 
 def main(accnr, maxquant_file, path, mpath, multiprocessing):
@@ -686,7 +686,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
                         pass
 
             else:  # If we have all needed files, we dont need to get them from the API
-
                 rawfiles = os.listdir(f'{path}{accnr}')
                 knownrawfiles = []
                 for filenames in rawfiles:
