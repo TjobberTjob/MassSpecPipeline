@@ -453,7 +453,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
     if not os.path.exists(mpath):
         os.mkdir(mpath)
 
-    imgfile = open(f'{mpath}subimage-{accnr}.json', 'a')
+    outfile = open(f'{mpath}subimage-{accnr}.json', 'a')
 
     df.reset_index(drop=True, inplace=True)
     for index, rows in df.iterrows():
@@ -510,9 +510,8 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
                 continue
             else:
                 new_metadata[str(ele)] = str(rows[ele])
-
-        with imgfile as outfile:
-            outfile.write(json.dumps(new_metadata) + '\n')
+        outfile.write(json.dumps(new_metadata) + '\n')
+    outfile.close()
 
 
 def offline(path, filename, mpath):
