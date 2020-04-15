@@ -14,8 +14,9 @@ def filter(path, file):
             outfile = open(f'{path}subimage.json', 'a')
             for imagejson in glob.glob(f'{datapath}subimage-*.json'):
                 for line in open(imagejson, 'r'):
-                    a = line
-                    outfile.write(json.dumps(a) + '\n')
+                    print(line)
+                    type(line)
+                    outfile.write(json.dumps(line) + '\n')
                 # os.remove(imagejson)
             outfile.close()
             quit()
