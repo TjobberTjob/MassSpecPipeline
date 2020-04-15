@@ -456,62 +456,62 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
     imgfile = open(f'{mpath}subimage-{accnr}.json', 'a')
 
     df.reset_index(drop=True, inplace=True)
-    with imgfile as outfile:
-        for index, rows in df.iterrows():
-            if int((index + 1) / int(df.shape[0]) * 100) % 5 == 0:
-                if not multiprocessing:
-                    print(f'Creating subimages: {int(((index + 1) / df.shape[0]) * 100)}%         ',
-                          end='\r')  # Print how far we are
+    for index, rows in df.iterrows():
+        if int((index + 1) / int(df.shape[0]) * 100) % 5 == 0:
+            if not multiprocessing:
+                print(f'Creating subimages: {int(((index + 1) / df.shape[0]) * 100)}%         ',
+                      end='\r')  # Print how far we are
 
-            if rows['Retention time'] - subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time'] + \
-                    subimage_interval['rt'] > interval['rt']['max'] or rows['m/z'] - subimage_interval['mz'] < \
-                    interval['mz']['min'] or rows['m/z'] + subimage_interval['mz'] > interval['mz']['max']:
+        if rows['Retention time'] - subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time'] + \
+                subimage_interval['rt'] > interval['rt']['max'] or rows['m/z'] - subimage_interval['mz'] < \
+                interval['mz']['min'] or rows['m/z'] + subimage_interval['mz'] > interval['mz']['max']:
+            continue
+
+        if os.path.exists(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json'):
+            continue
+
+        # if not 450 < rows['m/z'] < 455:  # Filter for when storage is limited
+        #     continue
+
+        mzlen = int(subimage_interval['mz'] / mz_bin)
+        rtlen = int(subimage_interval['rt'] / rt_bin)
+
+        mzlower = int(get_lower_bound(mzrangelist, rows['m/z']) - mzlen)
+        mzupper = int(get_lower_bound(mzrangelist, rows['m/z']) + mzlen)
+        rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen)
+        rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
+        subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
+
+        try:
+            ms2info = [mzmlfile['ms2'][str(rows['MS/MS IDs'])]['m/z_array'],
+                       mzmlfile['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
+            datacollected = 'both'
+        except:
+            ms2info = [[], []]
+            datacollected = 'ms1'
+
+        fullsubimage = {'ms1': subimage, 'ms2': ms2info}
+
+        # Save image as json file
+        with gzip.GzipFile(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json', 'w') as fout:
+            fout.write(json.dumps(fullsubimage).encode('utf-8'))
+
+        if savepng:  # save subimages to png
+            subpng(subimage, imgpath, filename, index, lowbound, highbound)
+
+        new_metadata = {}
+        new_metadata['image'] = f'{accnr}-{filename}-{rows["MS/MS IDs"]}.json'
+        new_metadata['accession'] = accnr
+        new_metadata['size'] = np.array(subimage).shape
+        new_metadata['ms2arraylength'] = len(ms2info[0])
+        new_metadata['datacollected'] = datacollected
+        for ele in df.columns:
+            if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
                 continue
+            else:
+                new_metadata[str(ele)] = str(rows[ele])
 
-            if os.path.exists(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json'):
-                continue
-
-            # if not 450 < rows['m/z'] < 455:  # Filter for when storage is limited
-            #     continue
-
-            mzlen = int(subimage_interval['mz'] / mz_bin)
-            rtlen = int(subimage_interval['rt'] / rt_bin)
-
-            mzlower = int(get_lower_bound(mzrangelist, rows['m/z']) - mzlen)
-            mzupper = int(get_lower_bound(mzrangelist, rows['m/z']) + mzlen)
-            rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen)
-            rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
-            subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
-
-            try:
-                ms2info = [mzmlfile['ms2'][str(rows['MS/MS IDs'])]['m/z_array'],
-                           mzmlfile['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
-                datacollected = 'both'
-            except:
-                ms2info = [[], []]
-                datacollected = 'ms1'
-
-            fullsubimage = {'ms1': subimage, 'ms2': ms2info}
-
-            # Save image as json file
-            with gzip.GzipFile(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json', 'w') as fout:
-                fout.write(json.dumps(fullsubimage).encode('utf-8'))
-
-            if savepng:  # save subimages to png
-                subpng(subimage, imgpath, filename, index, lowbound, highbound)
-
-            new_metadata = {}
-            new_metadata['image'] = f'{accnr}-{filename}-{rows["MS/MS IDs"]}.json'
-            new_metadata['accession'] = accnr
-            new_metadata['size'] = np.array(subimage).shape
-            new_metadata['ms2arraylength'] = len(ms2info[0])
-            new_metadata['datacollected'] = datacollected
-            for ele in df.columns:
-                if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
-                    continue
-                else:
-                    new_metadata[str(ele)] = str(rows[ele])
-
+        with imgfile as outfile:
             outfile.write(json.dumps(new_metadata) + '\n')
 
 
