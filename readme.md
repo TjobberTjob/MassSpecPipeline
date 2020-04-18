@@ -89,7 +89,7 @@ early_stopping: Number of epochs with no improvement before stopping - Defaults 
 
 setseed: Makes sure that it always initializes files in the same training and test groupings. Defaults to "True"
 
-MS: Whether to use just ms1 or ms1 and ms2 data for the neural networks - Defaults to "ms1" ("both" is the other option)
+MS: Whether to use just ms1, ms2 or ms1 and ms2 data for the neural networks - Defaults to "ms1" ("both" and "ms2" are the other option)
 
 lenms2: The length of the MS2 data used. This is needed because of the size of the neural network for MS2 data. 
  Has two options, a numerical value where all data points with less data are filtered away, or "max" where it takes the

@@ -103,9 +103,16 @@ class DataGenerator(keras.utils.Sequence):
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'
         # Initialization
-        X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
-        if self.MS == 'both':
+        if self.MS == 'ms1':
+            X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
+
+        elif self.MS == 'ms2':
+            X = np.empty((self.batch_size, self.mslen))
+
+        else:
+            X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
             X2 = np.empty((self.batch_size, self.mslen))
+
         y = np.empty((self.batch_size), dtype=float)
 
         # Generate data
@@ -113,14 +120,25 @@ class DataGenerator(keras.utils.Sequence):
             # Store sample
             with gzip.GzipFile(f'{imagepath}{ID}', 'r') as fin:
                 fullinfoimage = json.loads(fin.read().decode('utf-8'))
-            image = fullinfoimage['ms1']
-            image = np.array(image)
-            image = image[:, :, 0:self.n_channels]
-            X[i,] = image
+            ms1 = fullinfoimage['ms1']
+            ms2 = fullinfoimage['ms2']
+            if self.MS == 'ms1':
+                image = np.array(ms1)
+                image = image[:, :, 0:self.n_channels]
+                X[i,] = image
 
-            if self.MS == 'both':
-                mz_array = fullinfoimage['ms2'][0]
-                rt_array = fullinfoimage['ms2'][1]
+            elif self.MS == 'ms2':
+                mz_array = ms2[0]
+                rt_array = ms2[1]
+                X[i,] = list(chain.from_iterable([mz_array, rt_array]))
+
+            else:
+                image = np.array(ms1)
+                image = image[:, :, 0:self.n_channels]
+                X[i,] = image
+
+                mz_array = ms2[0]
+                rt_array = ms2[1]
                 X2[i,] = list(chain.from_iterable([mz_array, rt_array]))
 
             y[i] = self.labels[ID]
@@ -128,7 +146,10 @@ class DataGenerator(keras.utils.Sequence):
         if classification:
             y = keras.utils.to_categorical(y, num_classes=self.n_classes)
 
-        return X, X2, y
+        if self.MS == 'both':
+            return X, y
+        else:
+            return [X, X2], y
 
 
 def r2(y_true, y_pred):
@@ -139,19 +160,35 @@ def r2(y_true, y_pred):
 
 
 # Developing the neural network
-def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience):
-    input = Input(shape=(imglen, pixellen, n_channels,))
-    x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
-    x1 = MaxPooling2D(pool_size=(2, 2))(x1)
-    x2 = Conv2D(124, kernel_size=(2, 2), activation='relu', padding='same')(input)
-    x2 = MaxPooling2D(pool_size=(2, 2))(x2)
-    x = Concatenate()([x, x1, x2])
-    x = Flatten()(x)
-    # x = Dropout(rate=0.1)(x)
-    x = Dense(128, activation='relu')(x)
-    x = Dense(64, activation='relu')(x)
+def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience, whichMS, lenMS2):
+    if whichMS == 'ms1' or whichMS == 'both':  # MS1
+        input = Input(shape=(imglen, pixellen, n_channels,))
+        x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
+        x = MaxPooling2D(pool_size=(2, 2))(x)
+        x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
+        x1 = MaxPooling2D(pool_size=(2, 2))(x1)
+        x2 = Conv2D(124, kernel_size=(2, 2), activation='relu', padding='same')(input)
+        x2 = MaxPooling2D(pool_size=(2, 2))(x2)
+        x = Concatenate()([x, x1, x2])
+        x = Flatten()(x)
+
+    if whichMS == 'ms2':  # MS2
+        input = Input(shape=(lenMS2,))
+        x = Dense(128, activation='relu')(input)
+        x = Dense(64, activation='relu')(x)
+        x = Dense(32, activation='relu')(x)
+
+    elif whichMS == 'both':  # create MS2 and combine
+        input2 = Input(shape=(lenMS2,))
+        x3 = Dense(128, activation='relu')(input)
+        x3 = Dense(64, activation='relu')(x3)
+        x3 = Dense(32, activation='relu')(x3)
+        x = Concatenate()([x, x3])
+
+    if whichMS == 'ms1' or whichMS == 'both':  # After combining
+        x = Dense(128, activation='relu')(x)
+        x = Dense(64, activation='relu')(x)
+
     if classification:
         if n_classes == 2:
             output = Dense(1, activation='sigmoid')(x)
@@ -159,7 +196,10 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
             output = Dense(1, activation='linear')(x)
     else:
         output = Dense(n_classes, activation='softmax')(x)
-    model = keras.Model(input, output)
+    if whichMS == 'ms1' or whichMS == 'ms2':
+        model = keras.Model(inputs=input, outputs=output)
+    else:
+        model = keras.Model(inputs=[input, input2], outputs=output)
     # print(model.summary())
     plot_model(model, to_file="model.png")
 
@@ -204,7 +244,7 @@ if __name__ == '__main__':
     whichMS = config['MS']
     lenMS2 = config['lenms2']
 
-    if whichMS == 'both':
+    if whichMS == 'both' or whichMS == 'ms2':
         if lenMS2 == 'max':
             lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}subimage.json')
                           if 'ms2arraylength' in json.loads(line)])
@@ -255,7 +295,8 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath, patience)
+    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath, patience, whichMS,
+                     lenMS2)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
@@ -272,24 +313,22 @@ if __name__ == '__main__':
     else:
         plt.plot(history.history['loss'])
         plt.plot(history.history['val_loss'])
-        plt.title('R-squared of training')
-        plt.ylabel('r^2')
+        plt.title('MSE over time')
+        plt.ylabel('MSE')
         plt.xlabel('epoch')
         plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
 
     print('Creating and running model')
-    dependencies = {
-        'r2': r2
-    }
-    model = load_model(f'{metapath}Best-{imageclass}.h5', custom_objects=dependencies)
+    model = load_model(f'{metapath}Best-{imageclass}.h5')
     test_generator = DataGenerator(imagepath, partition['test'], testlabels, **params)
     testaccuracy = model.evaluate_generator(test_generator)
     if classification:
         print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
     else:
         print(f'Accuracy on test data. Loss: {testaccuracy[0]}. R^2: {testaccuracy[1]}')
-# python3 network.py R m/z 0.8
-# python3 network.py C Length 0.8
-# python3 network.py C Seq_class 0.8
-# python3 network.py C Modi_class 0.8
+
+# python3 network.py r m/z 0.8
+# python3 network.py c Length_class 0.8
+# python3 network.py c Seq_class 0.8
+# python3 network.py c Modi_class 0.8

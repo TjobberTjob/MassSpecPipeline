@@ -13,7 +13,8 @@ def filter(path, file):
         if sys.argv[2] == 'combine':
 
             if os.path.exists(f'{path}subimage.json'):
-                allimgs = [json.loads(line)['image'] for line in open(f'{path}subimage.json') if 'image' in json.loads(line)]
+                allimgs = [json.loads(line)['image'] for line in open(f'{path}subimage.json') if
+                           'image' in json.loads(line)]
             else:
                 allimgs = []
 
@@ -34,7 +35,8 @@ def filter(path, file):
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
         if sys.argv[2] == 'Sequence':
-            seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
+            seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if
+                    'Sequence' in json.loads(line)]
             Seen = np.unique(seen)
             a = {}
             for f in Seen:
@@ -57,6 +59,23 @@ def filter(path, file):
                     outfile.write(json.dumps(data) + '\n')
             outfile.close()
 
+
+        elif sys.argv[2] == 'Length':
+            seen = [json.loads(line)['Length'] for line in open(f'{path}subimage.json') if
+                    'Length' in json.loads(line)]
+            Seen = np.unique(seen)
+            Seen = sorted(Seen)
+            for line in open(f'{path}{str(file)}.json', 'r'):
+                data = json.loads(line)
+
+                if 'size' in data and data['size'] == [166, 66, 4] and 'Length' in data and data['Length'] in Seen \
+                        and line not in lines_seen:
+                    data['Length_class'] = Seen.index(data['Length'])
+                    lines_seen.add(line)
+                    outfile.write(json.dumps(data) + '\n')
+            outfile.close()
+
+
         elif sys.argv[2] == 'PTM':
             seen = defaultdict(list)
             for line in open(f'{path}subimage.json'):
@@ -74,7 +93,8 @@ def filter(path, file):
 
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
-                if 'size' in data and data['size'] == [166, 66, 4] and 'Modifications' in data and line not in lines_seen:
+                if 'size' in data and data['size'] == [166, 66,
+                                                       4] and 'Modifications' in data and line not in lines_seen:
                     if data['image'] in Seen[0]:
                         data['Modi_class'] = 0
                         lines_seen.add(line)
@@ -118,7 +138,8 @@ def filter(path, file):
 
         for line in open(f'{path}{str(file)}.json', 'r'):
             data = json.loads(line)
-            if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data['filetypes'] and line not in lines_seen:  ### FILTER HERE ###
+            if 'allpeptides' in data and data['allpeptides'] and 'filetypes' in data and 'raw' in data[
+                'filetypes'] and line not in lines_seen:
                 outfile.write(line)
                 lines_seen.add(line)
 
@@ -138,7 +159,6 @@ if __name__ == '__main__':
 
     filetofilter = sys.argv[1]
     filter(datapath, filetofilter)
-
 
 # python3 filehandler.py filter accessions
 # python3 filehandler.py filter subimage
