@@ -661,6 +661,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
 
                 print(knownrawfiles)
                 print(len(knownrawfiles))
+                print('hey1')
                 quit()
 
                 for filename in knownrawfiles:
@@ -698,6 +699,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
 
                 print(knownrawfiles)
                 print(len(knownrawfiles))
+                print('hey2')
                 quit()
 
                 for filename in knownrawfiles:
