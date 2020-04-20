@@ -48,9 +48,10 @@ def filter(path, file):
         for f in mostcommonsize:
             a[str(f)] = getsizes.count(f)
         for f in Counter(a).most_common(10):
-            if len(f[0]) == 3:
+            if len(f[0]) == 2:
                 mostcommonsize = f[0]
                 break
+        print(mostcommonsize)
 
         if sys.argv[2] == 'Sequence':
             seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if
