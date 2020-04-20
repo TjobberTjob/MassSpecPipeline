@@ -66,14 +66,14 @@ def filter(path, file):
             getabovehere = np.percentile(getscores, 0.9)
 
             seen = [json.loads(line)['Length'] for line in open(f'{path}subimage.json') if
-                    'Length' in json.loads(line) and 'Score' in json.loads(line) and float(json.loads(line)['Score']) > getabovehere]
+                    'Length' in json.loads(line)]
             Seen = np.unique(seen)
             Seen = sorted(Seen)
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
                 if 'size' in data and data['size'] == [166, 66, 4] and 'Length' in data and data['Length'] in Seen \
-                        and line not in lines_seen:
+                        and line not in lines_seen and 'Score' in json.loads(line) and float(json.loads(line)['Score']) > getabovehere:
                     data['Length_class'] = Seen.index(data['Length'])
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
