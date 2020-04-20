@@ -73,7 +73,7 @@ def filter(path, file):
             mostcommonsize = np.unique(getsizes)
             a = {}
             for f in mostcommonsize:
-                a[str(f)] = mostcommonsize.count(f)
+                a[str(f)] = getsizes.count(f)
             print(Counter(a).most_common(1))
             print(getabovehere)
 
