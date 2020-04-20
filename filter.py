@@ -61,8 +61,12 @@ def filter(path, file):
 
 
         elif sys.argv[2] == 'Length':
+            getscores = [json.loads(line)['Score'] for line in open(f'{path}subimage.json') if
+                    'Score' in json.loads(line)]
+            getabovehere = np.percentile(getscores, 0.75)
+
             seen = [json.loads(line)['Length'] for line in open(f'{path}subimage.json') if
-                    'Length' in json.loads(line)]
+                    'Length' in json.loads(line) and 'Score' in json.loads(line) and json.loads(line)['Score'] > getabovehere]
             Seen = np.unique(seen)
             Seen = sorted(Seen)
             for line in open(f'{path}{str(file)}.json', 'r'):
