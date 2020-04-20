@@ -70,8 +70,12 @@ def filter(path, file):
                     getsizes.append(data['size'])
 
             getabovehere = np.percentile(getscores, 0.8)
+            mostcommonsize = np.unique(getsizes)
+            a = {}
+            for f in mostcommonsize:
+                a[str(f)] = mostcommonsize.count(f)
+            print(Counter(a).most_common(1))
             print(getabovehere)
-            print(np.unique(getsizes))
 
             seen = [json.loads(line)['Length'] for line in open(f'{path}subimage.json') if
                     'Length' in json.loads(line)]
