@@ -659,6 +659,10 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
                         if filenames in onlinenames:
                             knownrawfiles.append(filenames)
 
+                print(knownrawfiles)
+                print(len(knownrawfiles))
+                quit()
+
                 for filename in knownrawfiles:
                     try:  # TRY ALL RAWS IN ZIP
                         if not multiprocessing:
@@ -691,6 +695,10 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
                     for onlinenames in allRaw:
                         if filenames in onlinenames:
                             knownrawfiles.append(filenames)
+
+                print(knownrawfiles)
+                print(len(knownrawfiles))
+                quit()
 
                 for filename in knownrawfiles:
                     try:  # TRY ALL RAWS IN ZIP
