@@ -34,6 +34,24 @@ def filter(path, file):
         lines_seen = set()
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
+        getscores = []
+        getsizes = []
+        for lines in open(f'{path}subimage.json'):
+            data = json.loads(lines)
+            if 'Score' in data and 'size' in data:
+                getscores.append(float(data['Score']))
+                getsizes.append(data['size'])
+
+        getabovehere = np.percentile(getscores, 0.8)
+        mostcommonsize = np.unique(getsizes)
+        a = {}
+        for f in mostcommonsize:
+            a[str(f)] = getsizes.count(f)
+        for f in Counter(a).most_common(10):
+            if len(f[0]) == 3:
+                mostcommonsize = f[0]
+                break
+
         if sys.argv[2] == 'Sequence':
             seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if
                     'Sequence' in json.loads(line)]
@@ -61,25 +79,6 @@ def filter(path, file):
 
 
         elif sys.argv[2] == 'Length':
-            getscores = []
-            getsizes = []
-            for lines in open(f'{path}subimage.json'):
-                data = json.loads(lines)
-                if 'Score' in data and 'size' in data:
-                    getscores.append(float(data['Score']))
-                    getsizes.append(data['size'])
-
-            getabovehere = np.percentile(getscores, 0.8)
-            mostcommonsize = np.unique(getsizes)
-            a = {}
-            for f in mostcommonsize:
-                a[str(f)] = getsizes.count(f)
-            for f in Counter(a).most_common(10):
-                if len(f[0]) == 3:
-                    mostcommonsize = f[0]
-                    break
-            print(mostcommonsize)
-            print(getabovehere)
 
             seen = [json.loads(line)['Length'] for line in open(f'{path}subimage.json') if
                     'Length' in json.loads(line)]
@@ -88,7 +87,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == [166, 66, 4] and 'Length' in data and data['Length'] in Seen \
+                if 'size' in data and data['size'] == mostcommonsize and 'Length' in data and data['Length'] in Seen \
                         and 'Score' in data and float(data['Score']) > getabovehere:
                     data['Length_class'] = Seen.index(data['Length'])
                     lines_seen.add(line)
