@@ -659,11 +659,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
                         if filenames in onlinenames:
                             knownrawfiles.append(filenames)
 
-                print(knownrawfiles)
-                print(len(knownrawfiles))
-                print('hey1')
-                quit()
-
                 for filename in knownrawfiles:
                     try:  # TRY ALL RAWS IN ZIP
                         if not multiprocessing:
@@ -696,11 +691,6 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
                     for onlinenames in allRaw:
                         if filenames in onlinenames:
                             knownrawfiles.append(filenames)
-
-                print(knownrawfiles)
-                print(len(knownrawfiles))
-                print('hey2')
-                quit()
 
                 for filename in knownrawfiles:
                     try:  # TRY ALL RAWS IN ZIP
@@ -753,8 +743,8 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
     if len(allCheck) == len(allRaw):
         print(f'{accnr}: ✔ - {len(allCheck)}/{len(allRaw)} All rawfiles extracted')
     else:
-        if len(knownrawfiles) != len(allRaw):
-            print(f'{accnr}: ✖ - {len(knownrawfiles)}/{len(allRaw)} Some or all MaxQuant file names do not '
+        if len(allCheck) != len(allRaw):
+            print(f'{accnr}: ✖ - {len(allCheck)}/{len(allRaw)} Some or all MaxQuant file names do not '
                   f'match PRIDE file names')
         else:
             print(f'{accnr}: ✖ - {len(allCheck)}/{len(allRaw)} Rawfiles extracted')
