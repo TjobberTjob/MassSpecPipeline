@@ -23,10 +23,6 @@ Required python packages:
 
 `pip install lxml`
 
-`sudo apt-get update`
-
-`sudo apt-get install graphviz (for tensorflow)`
-
 `tensorflow (CPU or GPU)`
 
 Optional conda installations:

@@ -270,7 +270,7 @@ if __name__ == '__main__':
 
     nameofclass = imageclass.replace('/', '')
 
-    output = datafetcher(metapath, imagepath, classification, imageclass, splitratio, test_accessions, whichMS)
+    output = datafetcher(metapath, imagepath, imageclass, splitratio, test_accessions, whichMS)
     partition = output[0]
     labels = output[1]
     imglen = output[2]
