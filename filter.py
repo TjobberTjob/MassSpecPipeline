@@ -74,6 +74,9 @@ def filter(path, file):
             a = {}
             for f in mostcommonsize:
                 a[str(f)] = getsizes.count(f)
+            for f in Counter(a).most_common(10):
+                print(f[0])
+                quit()
             print(Counter(a).most_common(3))
             print(getabovehere)
 
