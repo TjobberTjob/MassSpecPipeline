@@ -74,7 +74,7 @@ def filter(path, file):
             a = {}
             for f in mostcommonsize:
                 a[str(f)] = getsizes.count(f)
-            print(Counter(a).most_common(1))
+            print(Counter(a).most_common(3))
             print(getabovehere)
 
             seen = [json.loads(line)['Length'] for line in open(f'{path}subimage.json') if
