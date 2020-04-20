@@ -63,7 +63,7 @@ def filter(path, file):
         elif sys.argv[2] == 'Length':
             getscores = [float(json.loads(line)['Score']) for line in open(f'{path}subimage.json') if
                     'Score' in json.loads(line)]
-            getabovehere = np.percentile(getscores, 0.9)
+            getabovehere = np.percentile(getscores, 0.8)
 
             seen = [json.loads(line)['Length'] for line in open(f'{path}subimage.json') if
                     'Length' in json.loads(line)]
