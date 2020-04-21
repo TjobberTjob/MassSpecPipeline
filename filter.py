@@ -34,15 +34,7 @@ def filter(path, file):
         lines_seen = set()
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 
-        getscores = []
-        getsizes = []
-        for lines in open(f'{path}subimage.json'):
-            data = json.loads(lines)
-            if 'Score' in data and 'size' in data:
-                getscores.append(float(data['Score']))
-                getsizes.append(data['size'])
-
-        getabovehere = np.percentile(getscores, 0.975)
+        getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
         mostcommonsize = np.unique(getsizes)
         a = {}
         for f in mostcommonsize:
@@ -52,7 +44,13 @@ def filter(path, file):
             if len(f2) == 3:
                 mostcommonsize = f[0]
                 break
+
+        getscores = [json.loads(lines)['Score'] for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines)
+                     and 'size' in json.loads(lines) and json.loads(lines)['size'] == mostcommonsize]
+        getabovehere = np.percentile(getscores, 0.975)
+        print(getabovehere)
         print(mostcommonsize, len(mostcommonsize))
+        quit()
 
         if sys.argv[2] == 'Sequence':
             seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if
