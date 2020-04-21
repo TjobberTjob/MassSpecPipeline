@@ -194,7 +194,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
         if n_classes == 2:
             output = Dense(1, activation='sigmoid')(x)
         else:
-            output = Dense(1, activation='linear')(x)
+            output = Dense(n_classes, activation='linear')(x)
     else:
         output = Dense(n_classes, activation='softmax')(x)
     if whichMS == 'ms1' or whichMS == 'ms2':
