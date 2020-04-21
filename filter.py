@@ -52,6 +52,8 @@ def filter(path, file):
             if len(f2) == 3:
                 mostcommonsize = f2
                 break
+        print(mostcommonsize)
+        quit()
 
         if sys.argv[2] == 'Sequence':
             seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if
