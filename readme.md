@@ -34,10 +34,11 @@ Optional conda installations:
 `conda install -y tensorflow-gpu=2.1.0`                                 
 
 `conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch`
-Optional docker installations:
-git clone https://github.com/compomics/ThermoRawFileParser.git                  #Clone the git repo with ThermoRawFileParser dockerized version on it.
 
-`docker build --no-cache -t thermorawparser /ThermoRawFileParser`               #This will get installed automatically first time you run the program (if docker is selected)
+Optional docker installations:
+`git clone https://github.com/compomics/ThermoRawFileParser.git`       
+
+`docker build --no-cache -t thermorawparser /ThermoRawFileParser`         
 
 
 ### config file
