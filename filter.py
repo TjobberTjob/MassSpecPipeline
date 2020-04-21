@@ -89,9 +89,8 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == str(mostcommonsize) and 'Length' in data and data[
-                    'Length'] in Seen \
-                        and 'Score' in data and float(data['Score']) > getabovehere:
+                if 'size' in data and data['size'] == str(mostcommonsize) and 'Length' in data and \
+                        data['Length'] in Seen and 'Score' in data and float(data['Score']) > getabovehere:
                     data['Length_class'] = Seen.index(data['Length'])
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
@@ -143,7 +142,7 @@ def filter(path, file):
                 data = json.loads(line)
 
                 if 'size' in data and data['size'] == mostcommonsize and 'Charge' in data and data['Charge'] in Seen \
-                        and line not in lines_seen:
+                        and 'Score' in data and float(data['Score']) > getabovehere:
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
             outfile.close()
