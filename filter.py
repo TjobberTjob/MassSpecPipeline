@@ -52,7 +52,7 @@ def filter(path, file):
             if len(f2) == 3:
                 mostcommonsize = f2
                 break
-        print(mostcommonsize)
+        print(mostcommonsize, len(mostcommonsize))
         quit()
 
         if sys.argv[2] == 'Sequence':
