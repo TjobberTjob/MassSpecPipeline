@@ -52,7 +52,6 @@ def filter(path, file):
             if len(f2) == 3:
                 mostcommonsize = f2
                 break
-        print(mostcommonsize)
 
         if sys.argv[2] == 'Sequence':
             seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if
@@ -72,7 +71,8 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == [166, 66, 4] and 'Sequence' in data and data['Sequence'] in Seen \
+                if 'size' in data and data['size'] == str(mostcommonsize) and 'Sequence' in data and data[
+                    'Sequence'] in Seen \
                         and line not in lines_seen:
                     data['Seq_class'] = Seen.index(data['Sequence'])
                     lines_seen.add(line)
@@ -89,7 +89,8 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == str(mostcommonsize) and 'Length' in data and data['Length'] in Seen \
+                if 'size' in data and data['size'] == str(mostcommonsize) and 'Length' in data and data[
+                    'Length'] in Seen \
                         and 'Score' in data and float(data['Score']) > getabovehere:
                     data['Length_class'] = Seen.index(data['Length'])
                     lines_seen.add(line)
@@ -114,8 +115,7 @@ def filter(path, file):
 
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
-                if 'size' in data and data['size'] == [166, 66,
-                                                       4] and 'Modifications' in data and line not in lines_seen:
+                if 'size' in data and data['size'] == str(mostcommonsize) and 'Modifications' in data and line not in lines_seen:
                     if data['image'] in Seen[0]:
                         data['Modi_class'] = 0
                         lines_seen.add(line)
@@ -142,7 +142,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == [166, 66, 4] and 'Charge' in data and data['Charge'] in Seen \
+                if 'size' in data and data['size'] == mostcommonsize and 'Charge' in data and data['Charge'] in Seen \
                         and line not in lines_seen:
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
