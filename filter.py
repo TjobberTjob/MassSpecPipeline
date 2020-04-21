@@ -50,7 +50,7 @@ def filter(path, file):
         for f in Counter(a).most_common(2):
             f2 = str(f[0]).replace(" ", "")[1:-1].split(',')
             if len(f2) == 3:
-                mostcommonsize = f2
+                mostcommonsize = f
                 break
         print(mostcommonsize, len(mostcommonsize))
 
@@ -143,7 +143,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == f2 and 'Charge' in data and data['Charge'] in Seen \
+                if 'size' in data and str(data['size']) == mostcommonsize and 'Charge' in data and data['Charge'] in Seen \
                         and 'Score' in data and float(data['Score']) > getabovehere:
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
