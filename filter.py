@@ -48,8 +48,7 @@ def filter(path, file):
 
         getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines)
                      and 'size' in json.loads(lines) and str(json.loads(lines)['size']) == mostcommonsize]
-        getabovehere = np.percentile(getscores, 0.99)
-        print(len(getscores))
+        getabovehere = np.percentile(getscores, 80)
 
 
         if sys.argv[2] == 'Sequence':
@@ -137,7 +136,7 @@ def filter(path, file):
             for f in seen:
                 random.shuffle(seen[f])
                 Seen[f] = seen[f][0:min(amounts)]
-
+            i = 0
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
@@ -145,7 +144,9 @@ def filter(path, file):
                         and 'Score' in data and float(data['Score']) > getabovehere:
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
+                    i += 1
             outfile.close()
+            print(i)
 
 
     elif file == 'accessions':
