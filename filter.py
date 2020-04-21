@@ -48,10 +48,7 @@ def filter(path, file):
         for f in mostcommonsize:
             a[str(f)] = getsizes.count(f)
         for f in Counter(a).most_common(2):
-            print(f[0])
             f2 = str(f[0]).replace(" ", "")[1:-1].split(',')
-            print(f2)
-            quit()
             if len(f2) == 3:
                 mostcommonsize = f2
                 break
