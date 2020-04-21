@@ -143,7 +143,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == mostcommonsize and 'Charge' in data and data['Charge'] in Seen \
+                if 'size' in data and data['size'] == "[166, 66, 4]" and 'Charge' in data and data['Charge'] in Seen \
                         and 'Score' in data and float(data['Score']) > getabovehere:
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
