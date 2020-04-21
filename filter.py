@@ -45,7 +45,7 @@ def filter(path, file):
                 mostcommonsize = f[0]
                 break
 
-        getscores = [json.loads(lines)['Score'] for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines)
+        getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines)
                      and 'size' in json.loads(lines) and json.loads(lines)['size'] == mostcommonsize]
         getabovehere = np.percentile(getscores, 0.975)
         print(getabovehere)
