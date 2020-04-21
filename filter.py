@@ -50,7 +50,7 @@ def filter(path, file):
         for f in Counter(a).most_common(2):
             f2 = str(f[0]).replace(" ", "")[1:-1].split(',')
             if len(f2) == 3:
-                mostcommonsize = f
+                mostcommonsize = f[0]
                 break
         print(mostcommonsize, len(mostcommonsize))
 
