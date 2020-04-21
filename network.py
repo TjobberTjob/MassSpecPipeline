@@ -33,10 +33,10 @@ def datafetcher(path, imgpath, imageclass, splitratio, test_accessions, whichMS)
     accs = np.unique(accs)
     random.shuffle(accs)
     test_accs = accs[0:test_accessions]
-    testfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}{filetosuse}')
+    testfiles = [f'{json.loads(acc)["image"]}' for acc in open(f'{path}{filetosuse}')
                  if 'accession' in json.loads(acc) and json.loads(acc)['accession'] in test_accs]
 
-    trainvalfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}{filetosuse}')
+    trainvalfiles = [f'{json.loads(acc)["image"]}' for acc in open(f'{path}{filetosuse}')
                      if 'accession' in json.loads(acc) and json.loads(acc)['accession'] not in test_accs]
     random.shuffle(trainvalfiles)
     splits = round(len(trainvalfiles) * float(splitratio))
@@ -52,11 +52,11 @@ def datafetcher(path, imgpath, imageclass, splitratio, test_accessions, whichMS)
     testlabels = {}
     for line in open(f'{path}{filetosuse}'):
         imagedata = json.loads(line)
-        if f'{imagedata["image"]}.txt' not in testfiles:
-            name = f'{imagedata["image"]}.txt'
+        if f'{imagedata["image"]}' not in testfiles:
+            name = f'{imagedata["image"]}'
             labels[name] = imagedata[imageclass]
         else:
-            name = f'{imagedata["image"]}.txt'
+            name = f'{imagedata["image"]}'
             testlabels[name] = imagedata[imageclass]
 
     return partition, labels, imagelen, pixellen, testlabels
