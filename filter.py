@@ -42,7 +42,7 @@ def filter(path, file):
                 getscores.append(float(data['Score']))
                 getsizes.append(data['size'])
 
-        getabovehere = np.percentile(getscores, 0.8)
+        getabovehere = np.percentile(getscores, 0.95)
         mostcommonsize = np.unique(getsizes)
         a = {}
         for f in mostcommonsize:
