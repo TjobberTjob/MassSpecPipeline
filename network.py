@@ -148,9 +148,9 @@ class DataGenerator(keras.utils.Sequence):
             y = keras.utils.to_categorical(y, num_classes=self.n_classes)
 
         if self.MS == 'both':
-            return X, y
-        else:
             return [X, X2], y
+        else:
+            return X, y
 
 
 def r2(y_true, y_pred):
