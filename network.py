@@ -30,6 +30,7 @@ def datafetcher(path, imgpath, imageclass, splitratio, test_accessions, whichMS)
 
     accs = [json.loads(acc)['accession'] for acc in open(f'{path}{filetosuse}') if
             'accession' in json.loads(acc)]
+    accs = np.unique(accs)
     random.shuffle(accs)
     test_accs = accs[0:test_accessions]
     testfiles = [f'{json.loads(acc)["image"]}.txt' for acc in open(f'{path}{filetosuse}')
