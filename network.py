@@ -244,13 +244,18 @@ if __name__ == '__main__':
     whichMS = config['MS']
     lenMS2 = config['lenms2']
 
+    if os.path.exists(f'{datapath}subimage_filtered.json'):
+        filetosuse = 'subimage_filtered_network.json'
+    else:
+        filetosuse = 'subimage_filtered.json'
+
     if whichMS == 'both' or whichMS == 'ms2':
         if lenMS2 == 'max':
-            lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}subimage.json')
+            lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}{filetosuse}')
                           if 'ms2arraylength' in json.loads(line)])
         else:
             outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
-            for line in open(f'{metapath}subimage_filtered.json', 'r'):
+            for line in open(f'{metapath}{filetosuse}', 'r'):
                 data = json.loads(line)
                 if data['ms2arraylength'] >= lenMS2:
                     outfile.write(json.dumps(data) + '\n')
