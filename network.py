@@ -253,9 +253,9 @@ if __name__ == '__main__':
     whichMS = config['MS']
     lenMS2 = config['lenms2']
 
-    if os.path.exists(f'{datapath}subimage_filtered.json'):
+    if os.path.exists(f'{metapath}subimage_filtered.json'):
         filetosuse = 'subimage_filtered.json'
-    elif os.path.exists(f'{datapath}subimage_filtered.json'):
+    elif os.path.exists(f'{metapath}subimage_filtered.json'):
         filetosuse = 'subimage.json'
     else:
         print('No datafile exists')
