@@ -187,8 +187,6 @@ class DataGenerator(keras.utils.Sequence):
             return [X, X2], y
 
         else:
-            print(X, y)
-            quit()
             return X, y
 
 
