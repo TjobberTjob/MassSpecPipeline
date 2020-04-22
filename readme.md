@@ -2,7 +2,7 @@
 
 Code aimed at facilitating downloading mass spectrometry datasets for repurposing.
 
-#### Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash.
+#### Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash and python version 3.5 or newer
 ##### git clone https://github.com/TjobberTjob/MassSpecPipeline
 
 ## Requirements.
@@ -81,6 +81,8 @@ n_channels: Number of information channels used in neural network training - Def
 
 test_accessions: Number of accession projects set aside to testing (not validation) - Defaults to 3
 
+training_percentage: The amount of data going to training vs validating - Defaults to 80 (80% train - 20% validation)
+
 early_stopping: Number of epochs with no improvement before stopping - Defaults to 10
 
 setseed: Makes sure that it always initializes files in the same training and test groupings. Defaults to "True"
@@ -99,19 +101,19 @@ Starting of we present a method to getting information on all PRIDE projects.
 To begin with we need the accessions numbers for all PRIDE projects. This is gotten by using the scraper.py using the input "accessions".
 This will create, if it doesnt already exists, the metadata folder and create a txt file with all accession numbers from pride
 Example:
-python3 scraper.py accessions
+python scraper.py accessions
 
 Next we need to get metadata for all accessions in the accession list.
 This is also done using scraper.py using the input "metadata".
 This is a lengthy process as it needs to downloads a lot of files from PRIDE database.
 For this reason we have released the newest version as of April 2020 on the website.
 Example:
-python3 scraper metadata
+python scraper metadata
 
 After running or downloading the metadata, you can utilize the update input to scraper.py aswell.
 This will update the metadata file with all new pride accession numbers.
 Example:
-python3 scraper update
+python scraper update
 
 
 ####Part - Metadata handling:
@@ -124,18 +126,25 @@ It also removes any duplicates, if any occoured by error.
 
 Example:
 
-python3 filehandler.py accessions
+python filter.py accessions
 
 (2): Subimage metadata filter.
 
 This will add a filtered version of the subimage metadata file created by the extractor.py script.
 This is used as a precurser to neural networks or as extra data or class creation.
-By default it will add a class called Modi_class that's 1 if the peptide is Oxidized, and 0 otherwise.
-If other filters or classes needs to be put in, it has to be done manually in the code, as there are too many possibilities to add them all.
+There are a few defaults added at the time of publishing: (all of these sort away the data with wrong filesize, which in a necessary step)
+
+PTM - Gives a class called Modi_class with 0 for no modification and 1 for any modification
+
+Length - Gives a class called Length_class
+
+Sequence - Sort only the x most abundant sequences from the data and creates Sequence_class
+
+Charge - Filters away only the 80 lowest percentiles of scores. meaning the data become cleaner (used when you have multi millions of subimages) 
 
 Example:
 
-python3 filehandler.py subimage
+python filter.py subimage PTM/Length/Sequence/Charge
 
 
 ####Part - Extracting:
@@ -147,14 +156,14 @@ If a zipfile fails it will proceed to next zipfile.
 
 Example:
 
-python3 extractor.py PXD000000
+python extractor.py PXD000000
 
 (2): Usage for all accession in a filtered or unfiltered version of the metadata. Goes through all accessions,
 skips if there's a problem with some of them (and there will be)
 
 Example:
 
-python3 extractor.py pride OR python3 extractor.py pridefiltered
+python extractor.py pride OR python3 extractor.py pridefiltered
 
 (3): Usage for all accession currently in your local directory that has all informations.
 Used if you change a parameter for subimages and you need to rerun everything faster.
@@ -162,14 +171,14 @@ This will only run if every allPeptides.txt file exists in needed folders.
 
 Example:
 
-python3 extractor.py owned
+python extractor.py owned
 
 (4): Used for local rawfiles instead of pride accessions. If you have a local rawfile you want peptides extracted from.
 Has to have raw file and maxquant or zipfile in the folder.
 
 Example:
 
-python3 extractor.py /path/to/folder/
+python extractor.py /path/to/folder/
 
 
 (5): Used to reset everything regarding the subimages
@@ -179,7 +188,7 @@ If you dont reset you will have multiple of the same name in the subimage metada
 
 Example:
 
-python3 extractor.py reset
+python extractor.py reset
 
 
 Part - Neural networks:
@@ -190,11 +199,9 @@ It needs to be given three arguments:
 
 (2) The class or variable the network needs to predict. can be continuous like m/z or a class like length of sequence.
 
-(3) The percentage of training data, given as a fraction (fx 0.5 for 50%).
-
 Example:
 
-python3 network.py C Length 0.8 OR python3 network.py R m/z 0.75
+python network.py c Length & python network.py r m/z 
 
 
 

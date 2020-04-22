@@ -13,7 +13,7 @@ from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, C
 from keras.utils import plot_model
 
 
-def datafetcher(path, imgpath, imageclass, splitratio, test_accessions, whichMS):
+def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     print('Data fetching')
     imgfiles = os.listdir(imgpath)
     with gzip.GzipFile(f'{imgpath}{imgfiles[0]}', 'r') as fin:
@@ -40,6 +40,11 @@ def datafetcher(path, imgpath, imageclass, splitratio, test_accessions, whichMS)
     trainvalfiles = [f'{json.loads(acc)["image"]}' for acc in open(f'{path}{filetosuse}')
                      if 'accession' in json.loads(acc) and json.loads(acc)['accession'] not in test_accs]
     random.shuffle(trainvalfiles)
+
+    with open('config.json') as json_file:
+        config = json.load(json_file)['networkattributes']
+    splitratio = config['training_percentage'] / 100
+
     splits = round(len(trainvalfiles) * float(splitratio))
     trainfiles = trainvalfiles[:splits]
     validationfiles = trainvalfiles[splits:]
@@ -141,7 +146,8 @@ class DataGenerator(keras.utils.Sequence):
 
                 mz_array = ms2[0]
                 # rt_array = ms2[1]
-                rt_array = [math.log(intval) for intval in ms2[1]] # until this gets changed in the image files themselves
+                rt_array = [math.log(intval) for intval in
+                            ms2[1]]  # until this gets changed in the image files themselves
                 X2[i,] = list(chain.from_iterable([mz_array, rt_array]))
 
             y[i] = self.labels[ID]
@@ -248,19 +254,34 @@ if __name__ == '__main__':
     lenMS2 = config['lenms2']
 
     if os.path.exists(f'{datapath}subimage_filtered.json'):
-        filetosuse = 'subimage_filtered_network.json'
-    else:
         filetosuse = 'subimage_filtered.json'
+    elif os.path.exists(f'{datapath}subimage_filtered.json'):
+        filetosuse = 'subimage.json'
+    else:
+        print('No datafile exists')
+        quit()
 
     if whichMS == 'both' or whichMS == 'ms2':
+        print('Creating MS2 data structure')
+
+        outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
+
         if lenMS2 == 'max':
             lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}{filetosuse}')
                           if 'ms2arraylength' in json.loads(line)])
-        else:
-            outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
+
+        if whichMS == 'both':
             for line in open(f'{metapath}{filetosuse}', 'r'):
                 data = json.loads(line)
-                if data['ms2arraylength'] >= lenMS2:
+
+                if data['ms2arraylength'] >= lenMS2 and data['datacollected'] == 'both':
+                    outfile.write(json.dumps(data) + '\n')
+            outfile.close()
+        else:
+            for line in open(f'{metapath}{filetosuse}', 'r'):
+                data = json.loads(line)
+
+                if data['ms2arraylength'] >= lenMS2 and (data['datacollected'] == 'ms2' or data['datacollected'] == 'both'):
                     outfile.write(json.dumps(data) + '\n')
             outfile.close()
 
@@ -268,17 +289,16 @@ if __name__ == '__main__':
         random.seed(1)
 
     # Cmd inputs
-    classification = sys.argv[1]
+    classification = sys.argv[1].lower()
     if not (classification == 'c' or classification == 'r'):
         print('classification or regression problem not input correctly.')
         quit()
     imageclass = sys.argv[2]
-    splitratio = sys.argv[3]
     classification = classification == 'c'
 
     nameofclass = imageclass.replace('/', '')
 
-    output = datafetcher(metapath, imagepath, imageclass, splitratio, test_accessions, whichMS)
+    output = datafetcher(metapath, imagepath, imageclass, test_accessions, whichMS)
     partition = output[0]
     labels = output[1]
     imglen = output[2]
