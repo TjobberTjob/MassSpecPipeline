@@ -27,10 +27,6 @@ def filter(path, file):
                     # os.remove(imagejson)
             quit()
 
-        if os.path.exists(f'{path}subimage_filtered.json'):
-            print('Removing old filtered version')
-            os.remove(f'{path}{str(file)}_filtered.json')
-
         lines_seen = set()
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
 

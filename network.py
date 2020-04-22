@@ -14,6 +14,7 @@ from keras.utils import plot_model
 
 
 def createnetworkfile(lenMS2):
+    print('Creating network files')
     if whichMS == 'both' or whichMS == 'ms2':
         print('Creating MS2 data structure')
 
@@ -186,7 +187,7 @@ class DataGenerator(keras.utils.Sequence):
             return [X, X2], y
 
         else:
-            print(X,y)
+            print(X, y)
             quit()
             return X, y
 
@@ -291,6 +292,7 @@ if __name__ == '__main__':
         print('No datafile exists')
         quit()
 
+    # Creating network files
     createnetworkfile(lenMS2)
 
     if setseed:
