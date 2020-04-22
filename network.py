@@ -13,6 +13,33 @@ from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, C
 from keras.utils import plot_model
 
 
+def createnetworkfile(lenMS2):
+    if whichMS == 'both' or whichMS == 'ms2':
+        print('Creating MS2 data structure')
+
+        outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
+
+        if lenMS2 == 'max':
+            lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}{filetosuse}')
+                          if 'ms2arraylength' in json.loads(line)])
+
+        if whichMS == 'both':
+            for line in open(f'{metapath}{filetosuse}', 'r'):
+                data = json.loads(line)
+
+                if data['ms2arraylength'] >= lenMS2 and data['datacollected'] == 'both':
+                    outfile.write(json.dumps(data) + '\n')
+            outfile.close()
+        else:
+            for line in open(f'{metapath}{filetosuse}', 'r'):
+                data = json.loads(line)
+
+                if data['ms2arraylength'] >= lenMS2 and (
+                        data['datacollected'] == 'ms2' or data['datacollected'] == 'both'):
+                    outfile.write(json.dumps(data) + '\n')
+            outfile.close()
+
+
 def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     print('Data fetching')
     imgfiles = os.listdir(imgpath)
@@ -159,6 +186,8 @@ class DataGenerator(keras.utils.Sequence):
             return [X, X2], y
 
         else:
+            print(X,y)
+            quit()
             return X, y
 
 
@@ -183,7 +212,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
         x = Flatten()(x)
 
     if whichMS == 'ms2':  # MS2
-        input = Input(shape=(lenMS2*2,))
+        input = Input(shape=(lenMS2 * 2,))
         x = Dense(128, activation='relu')(input)
         x = Dense(64, activation='relu')(x)
         x = Dense(32, activation='relu')(x)
@@ -262,34 +291,11 @@ if __name__ == '__main__':
         print('No datafile exists')
         quit()
 
-    if whichMS == 'both' or whichMS == 'ms2':
-        print('Creating MS2 data structure')
-
-        outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
-
-        if lenMS2 == 'max':
-            lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}{filetosuse}')
-                          if 'ms2arraylength' in json.loads(line)])
-
-        if whichMS == 'both':
-            for line in open(f'{metapath}{filetosuse}', 'r'):
-                data = json.loads(line)
-
-                if data['ms2arraylength'] >= lenMS2 and data['datacollected'] == 'both':
-                    outfile.write(json.dumps(data) + '\n')
-            outfile.close()
-        else:
-            for line in open(f'{metapath}{filetosuse}', 'r'):
-                data = json.loads(line)
-
-                if data['ms2arraylength'] >= lenMS2 and (data['datacollected'] == 'ms2' or data['datacollected'] == 'both'):
-                    outfile.write(json.dumps(data) + '\n')
-            outfile.close()
+    createnetworkfile(lenMS2)
 
     if setseed:
         random.seed(1)
 
-    # Cmd inputs
     classification = sys.argv[1].lower()
     if not (classification == 'c' or classification == 'r'):
         print('classification or regression problem not input correctly.')
