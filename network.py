@@ -311,6 +311,7 @@ if __name__ == '__main__':
         n_classes = len(np.unique(classes))
     else:
         n_classes = 1
+    print(n_classes)
 
     params = {'size': (pixellen, imglen),
               'batch_size': batch_size,
