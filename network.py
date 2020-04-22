@@ -157,6 +157,7 @@ class DataGenerator(keras.utils.Sequence):
 
         if self.MS == 'both':
             return [X, X2], y
+
         else:
             return X, y
 
@@ -182,7 +183,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
         x = Flatten()(x)
 
     if whichMS == 'ms2':  # MS2
-        input = Input(shape=(lenMS2,))
+        input = Input(shape=(lenMS2*2,))
         x = Dense(128, activation='relu')(input)
         x = Dense(64, activation='relu')(x)
         x = Dense(32, activation='relu')(x)
