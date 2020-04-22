@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import random
 import sys
@@ -139,7 +140,8 @@ class DataGenerator(keras.utils.Sequence):
                 X[i,] = image
 
                 mz_array = ms2[0]
-                rt_array = ms2[1]
+                # rt_array = ms2[1]
+                rt_array = [math.log(intval) for intval in ms2[1]] # until this gets changed in the image files themselves
                 X2[i,] = list(chain.from_iterable([mz_array, rt_array]))
 
             y[i] = self.labels[ID]

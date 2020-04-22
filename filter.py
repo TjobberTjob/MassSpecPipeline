@@ -42,14 +42,13 @@ def filter(path, file):
         for f in Counter(a).most_common(2):
             f2 = str(f[0]).replace(" ", "")[1:-1].split(',')
             if len(f2) == 3:
-                mostcommonsize = f[0]
+                ms1size = f[0]
                 break
-        print(mostcommonsize)
 
-        getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines)
-                     and 'size' in json.loads(lines) and str(json.loads(lines)['size']) == mostcommonsize]
+        getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if
+                     'Score' in json.loads(lines)
+                     and 'size' in json.loads(lines) and str(json.loads(lines)['size']) == ms1size]
         getabovehere = np.percentile(getscores, 80)
-
 
         if sys.argv[2] == 'Sequence':
             seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if
@@ -69,7 +68,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == str(mostcommonsize) and 'Sequence' in data and data[
+                if 'size' in data and data['size'] == str(ms1size) and 'Sequence' in data and data[
                     'Sequence'] in Seen \
                         and line not in lines_seen:
                     data['Seq_class'] = Seen.index(data['Sequence'])
@@ -87,7 +86,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and data['size'] == str(mostcommonsize) and 'Length' in data and \
+                if 'size' in data and data['size'] == str(ms1size) and 'Length' in data and \
                         data['Length'] in Seen and 'Score' in data and float(data['Score']) > getabovehere:
                     data['Length_class'] = Seen.index(data['Length'])
                     lines_seen.add(line)
@@ -99,7 +98,7 @@ def filter(path, file):
             seen = defaultdict(list)
             for line in open(f'{path}subimage.json'):
                 if 'Modifications' in json.loads(line):
-                    if not json.loads(line)['Modifications'] == 'Oxidation (M)':
+                    if not json.loads(line)['Modifications'] == 'Unmodified':
                         seen[0].append(json.loads(line)['image'])
                     else:
                         seen[1].append(json.loads(line)['image'])
@@ -113,7 +112,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
                 if 'size' in data and data['size'] == str(
-                        mostcommonsize) and 'Modifications' in data and line not in lines_seen:
+                        ms1size) and 'Modifications' in data and line not in lines_seen:
                     if data['image'] in Seen[0]:
                         data['Modi_class'] = 0
                         lines_seen.add(line)
@@ -140,13 +139,13 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and str(data['size']) == mostcommonsize and 'Charge' in data and data['Charge'] in Seen \
+                if 'size' in data and str(data['size']) == ms1size and 'Charge' in data and data['Charge'] in Seen \
                         and 'Score' in data and float(data['Score']) > getabovehere:
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
                     i += 1
             outfile.close()
-            print(i)
+            print(f'Length of filtered file: {i}')
 
 
     elif file == 'accessions':

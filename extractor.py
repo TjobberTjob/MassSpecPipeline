@@ -12,7 +12,6 @@ import time
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from zipfile import ZipFile
-import fcntl
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
@@ -484,7 +483,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
 
         try:
             ms2info = [mzmlfile['ms2'][str(rows['MS/MS IDs'])]['m/z_array'],
-                       mzmlfile['ms2'][str(rows['MS/MS IDs'])]['rt_array']]
+                       [math.log(intval) for intval in mzmlfile['ms2'][str(rows['MS/MS IDs'])]['rt_array']]]
             datacollected = 'both'
         except:
             ms2info = [[], []]
