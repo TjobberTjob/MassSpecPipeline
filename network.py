@@ -198,7 +198,8 @@ def r2(y_true, y_pred):
 
 # Developing the neural network
 def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience, whichMS, lenMS2):
-    if whichMS == 'ms1' or whichMS == 'both':  # MS1
+    # HIDDEN LAYERS
+    if whichMS == 'ms1':  # MS1
         input = Input(shape=(imglen, pixellen, n_channels,))
         x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
         x = MaxPooling2D(pool_size=(2, 2))(x)
@@ -208,24 +209,39 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
         x2 = MaxPooling2D(pool_size=(2, 2))(x2)
         x = Concatenate()([x, x1, x2])
         x = Flatten()(x)
+        x = Dense(64, activation='relu')(x)
+        x = Dense(32, activation='relu')(x)
 
-    if whichMS == 'ms2':  # MS2
+    elif whichMS == 'ms2':  # MS2
         input = Input(shape=(lenMS2 * 2,))
         x = Dense(128, activation='relu')(input)
         x = Dense(64, activation='relu')(x)
         x = Dense(32, activation='relu')(x)
 
-    elif whichMS == 'both':  # create MS2 and combine
-        input2 = Input(shape=(lenMS2,))
-        x3 = Dense(128, activation='relu')(input)
-        x3 = Dense(64, activation='relu')(x3)
-        x3 = Dense(32, activation='relu')(x3)
-        x = Concatenate()([x, x3])
+    else:  # BOTH
+        input = Input(shape=(imglen, pixellen, n_channels,))  # MS1
+        x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
+        x = MaxPooling2D(pool_size=(2, 2))(x)
+        x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
+        x1 = MaxPooling2D(pool_size=(2, 2))(x1)
+        x2 = Conv2D(124, kernel_size=(2, 2), activation='relu', padding='same')(input)
+        x2 = MaxPooling2D(pool_size=(2, 2))(x2)
+        x = Concatenate()([x, x1, x2])
+        x = Flatten()(x)
+
+        input2 = Input(shape=(lenMS2,))  # MS2
+        x1 = Dense(128, activation='relu')(input2)
+        x1 = Dense(64, activation='relu')(x1)
+        x1 = Dense(32, activation='relu')(x1)
+
+        x = Concatenate()([x, x1])  # Combine
+        x = Dense(64, activation='relu')(x)
+        x = Dense(32, activation='relu')(x)
 
     if whichMS == 'ms1' or whichMS == 'both':  # After combining
         x = Dense(128, activation='relu')(x)
         x = Dense(64, activation='relu')(x)
-
+    # OUTPUT LAYER
     if classification:
         if n_classes == 2:
             output = Dense(1, activation='sigmoid')(x)
@@ -233,6 +249,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
             output = Dense(n_classes, activation='linear')(x)
     else:
         output = Dense(n_classes, activation='softmax')(x)
+    # COMBINE MODEL
     if whichMS == 'ms1' or whichMS == 'ms2':
         model = keras.Model(inputs=input, outputs=output)
     else:
