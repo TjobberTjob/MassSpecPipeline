@@ -14,7 +14,6 @@ from keras.utils import plot_model
 
 
 def createnetworkfile(lenMS2):
-    print('Creating network files')
     if whichMS == 'both' or whichMS == 'ms2':
         print('Creating MS2 data structure')
 
@@ -164,7 +163,8 @@ class DataGenerator(keras.utils.Sequence):
 
             elif self.MS == 'ms2':
                 mz_array = ms2[0]
-                rt_array = ms2[1]
+                # rt_array = ms2[1]
+                rt_array = [math.log(intval) for intval in ms2[1]]
                 X[i,] = list(chain.from_iterable([mz_array, rt_array]))
 
             else:
@@ -174,8 +174,7 @@ class DataGenerator(keras.utils.Sequence):
 
                 mz_array = ms2[0]
                 # rt_array = ms2[1]
-                rt_array = [math.log(intval) for intval in
-                            ms2[1]]  # until this gets changed in the image files themselves
+                rt_array = [math.log(intval) for intval in ms2[1]]
                 X2[i,] = list(chain.from_iterable([mz_array, rt_array]))
 
             y[i] = self.labels[ID]

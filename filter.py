@@ -8,6 +8,23 @@ import sys
 from collections import defaultdict, Counter
 
 
+def mostcommon(x, amount, path):
+    seen = [json.loads(line)[x] for line in open(f'{path}subimage.json') if x in json.loads(line)]
+    Seen = np.unique(seen)
+    a = {}
+    for f in Seen:
+        a[str(f)] = seen.count(f)
+    seen = [f[0] for f in Counter(a).most_common(amount)]
+
+    amounts = [len(seen[f]) for f in Seen]
+    Seen = defaultdict(list)
+    for f in seen:
+        random.shuffle(seen[f])
+        Seen[f] = seen[f][0:min(amounts)]
+
+    return Seen
+
+
 def filter(path, file):
     if file == 'subimage':
         if sys.argv[2] == 'combine':
@@ -47,19 +64,7 @@ def filter(path, file):
         getabovehere = np.percentile(getscores, 80)
 
         if sys.argv[2] == 'Sequence':
-            seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if
-                    'Sequence' in json.loads(line)]
-            Seen = np.unique(seen)
-            a = {}
-            for f in Seen:
-                a[str(f)] = seen.count(f)
-            seen = [f[0] for f in Counter(a).most_common(10)]
-
-            amounts = [len(seen[f]) for f in Seen]
-            Seen = defaultdict(list)
-            for f in seen:
-                random.shuffle(seen[f])
-                Seen[f] = seen[f][0:min(amounts)]
+            Seen = mostcommon('Sequence', 10)
 
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
@@ -107,8 +112,7 @@ def filter(path, file):
 
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
-                if 'size' in data and data['size'] == str(
-                        ms1size) and 'Modifications' in data and line not in lines_seen:
+                if 'size' in data and data['size'] == str(ms1size) and 'Modifications' in data and line not in lines_seen:
                     if data['image'] in Seen[0]:
                         data['Modi_class'] = 0
                         lines_seen.add(line)
