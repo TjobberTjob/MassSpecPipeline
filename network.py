@@ -147,7 +147,7 @@ class DataGenerator(keras.utils.Sequence):
             X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
             X2 = np.empty((self.batch_size, self.mslen))
 
-        y = np.empty((self.batch_size), dtype=float)
+        y = np.empty(self.batch_size, dtype=float)
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
@@ -180,7 +180,11 @@ class DataGenerator(keras.utils.Sequence):
             y[i] = self.labels[ID]
 
         if classification:
-            y = keras.utils.to_categorical(y, num_classes=self.n_classes)
+            try:
+                y = keras.utils.to_categorical(y, num_classes=self.n_classes)
+            except:
+                print(y)
+                quit()
 
         if self.MS == 'both':
             return [X, X2], y
