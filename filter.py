@@ -143,10 +143,12 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if data['image'] in Seen:
-                    lines_seen.add(line)
-                    outfile.write(json.dumps(data) + '\n')
-                    i += 1
+                if charge in data:
+                    charge = data['charge']
+                    if data['image'] in Seen[charge]:
+                        lines_seen.add(line)
+                        outfile.write(json.dumps(data) + '\n')
+                        i += 1
             outfile.close()
             print(f'Length of filtered file: {i}')
 
