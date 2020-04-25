@@ -75,12 +75,16 @@ def filter(path, file):
             line = lines.split(', "')
             for f in line:
                 if 'score' in f.lower() and 'DP' not in f.lower():
-                    print(f)
-                    print(f[9:-1])
-                    print(f[10:-1])
-                    print(f[11:-1])
-                    print(f[12:-1])
-                    getscores.append(float(f[9:-1]))
+                    try:
+                        getscores.append(float(f[9:-1]))
+                    except:
+                        print(f)
+                        print(f[9:-1])
+                        print(f[10:-1])
+                        print(f[11:-1])
+                        print(f[12:-1])
+
+
         end = time.time()
         print(end-start)
         getabovehere = np.percentile(getscores, 60)
