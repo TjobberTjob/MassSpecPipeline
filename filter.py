@@ -72,7 +72,8 @@ def filter(path, file):
                 getscores.append(float(lines[pointA: pointB]))
         start = time.time()
         for lines in open(f'{path}subimage.json'):
-            for cuts in lines:
+            line = lines.split(', "')
+            for cuts in line:
                 if 'score' in cuts:
                     getscores.append(float(cuts[12:-1]))
         end = time.time()
