@@ -61,7 +61,7 @@ def filter(path, file):
         getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if
                      'Score' in json.loads(lines)
                      and 'size' in json.loads(lines) and str(json.loads(lines)['size']) == ms1size]
-        getabovehere = np.percentile(getscores, 80)
+        getabovehere = np.percentile(getscores, 60)
 
         if sys.argv[2] == 'Sequence':
             Seen = mostcommon('Sequence', 10)
@@ -137,17 +137,13 @@ def filter(path, file):
             for f in seen:
                 amounts[f] = len(seen[f])
             minamount = min(f for f in amounts.values() if f >= (0.1 * sum(amounts.values())))
-            print(minamount)
-            quit()
+
             Seen = defaultdict(list)
             for f in seen:
-                if not len(seen[f]) >= minamount:
+                if len(seen[f]) >= minamount:
                     random.shuffle(seen[f])
                     Seen[f] = seen[f][0:minamount]
 
-            for f in Seen:
-                print(f)
-                print(Seen[f][0:10])
 
             i = 0
             for line in open(f'{path}{str(file)}.json', 'r'):
