@@ -65,16 +65,21 @@ def filter(path, file):
                 break
 
         getscores = []
-        for lines in open(f'{path}subimage.json'):
-            if 'score' in lines.lower():
-                pointA = re.search('score', lines.lower()).span()[1] + 4
-                pointB = min(f for f in [m.start() for m in re.finditer(',', lines.lower())] if f > pointA) -1
-                getscores.append(float(lines[pointA: pointB]))
+        # for lines in open(f'{path}subimage.json'):
+        #     if 'score' in lines.lower():
+        #         pointA = re.search('score', lines.lower()).span()[1] + 4
+        #         pointB = min(f for f in [m.start() for m in re.finditer(',', lines.lower())] if f > pointA) -1
+        #         getscores.append(float(lines[pointA: pointB]))
         start = time.time()
         for lines in open(f'{path}subimage.json'):
             line = lines.split(', "')
             for f in line:
                 if 'score' in f.lower() and 'DP' not in f.lower():
+                    print(f)
+                    print(f[9:-1])
+                    print(f[10:-1])
+                    print(f[11:-1])
+                    print(f[12:-1])
                     getscores.append(float(f[9:-1]))
         end = time.time()
         print(end-start)
