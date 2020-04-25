@@ -1,6 +1,9 @@
 import glob
 import json
 import os
+import re
+import time
+
 import numpy as np
 import random
 import glob
@@ -44,10 +47,18 @@ def filter(path, file):
                     # os.remove(imagejson)
             quit()
 
+        # GET MOST COMMON SIZES AND SCORE PERCENTILES
         lines_seen = set()
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
-
+        start = time.time()
+        getsizes = [lines[re.search('size', lines).span()[1] + 3:re.search('size', lines).span()[1] + 11] for lines in open(f'{path}subimage.json')]
+        end = time.time()
+        print(end-start)
+        start = time.time()
         getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
+        end = time.time()
+        print(end - start)
+        quit()
         mostcommonsize = np.unique(getsizes)
         a = {}
         for f in mostcommonsize:
@@ -128,11 +139,25 @@ def filter(path, file):
         elif sys.argv[2] == 'Charge':
             seen = defaultdict(list)
             for line in open(f'{path}subimage.json'):
-                data = json.loads(line)
-                if 'Charge' in data and 'size' in data and str(data['size']) == ms1size and 'Score' in data \
-                        and float(data['Score']) > getabovehere:
-                    charge = json.loads(line)['Charge']
-                    seen[charge].append(json.loads(line)['image'])
+                a = line.split(', "')
+                checklist = []
+                for f in a:
+                    if 'image' in f.lower():
+                        name = f[11:-1]
+                        checklist.append(True)
+                    elif 'charge' in f.lower():
+                        charge = int(f[10:-1])
+                        checklist.append(True)
+                    elif 'size' in f.lower():
+                        size = f[7:]
+                        checklist.append(True)
+                    elif 'score' in f.lower():
+                        score = float(f[9:-1])
+                        checklist.append(True)
+
+                if score >= getabovehere and size == ms1size and len(checklist) == 4:
+                    seen[charge].append(name)
+
             amounts = defaultdict(list)
             for f in seen:
                 amounts[f] = len(seen[f])
@@ -194,6 +219,5 @@ if __name__ == '__main__':
     filter(datapath, filetofilter)
 
 # python3 filehandler.py filter accessions
-# python3 filehandler.py filter subimage
-# python3 filehandler.py move /data/ProteomeToolsRaw/images/ /home/tochr15/images/ tochr15@yeast.imada.sdu.dk
-# python3 filehandler.py move /data/ProteomeToolsRaw/metadata/ /home/tochr15/metadata/ tochr15@yeast.imada.sdu.dk
+# python3 filehandler.py filter subimage PTM/Charge/Sequence/Length
+
