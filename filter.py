@@ -67,7 +67,7 @@ def filter(path, file):
         getscores = []
         for lines in open(f'{path}subimage.json'):
             if 'score' in lines.lower():
-                pointA = re.search('score', lines.lower()).span[1]
+                pointA = re.search('score', lines.lower()).span()[1]
                 pointB = min(f for f in [m.start() for m in re.finditer(',', lines.lower())] if f > pointA)
                 getscores.append(float(lines[pointA: pointB]))
         end = time.time()
