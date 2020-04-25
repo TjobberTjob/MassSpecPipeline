@@ -160,6 +160,7 @@ def filter(path, file):
                         checklist.append(True)
                     elif 'score' in f.lower():
                         print(f)
+                        print(f[12:-1])
                         score = float(f[12:-1])
                         checklist.append(True)
 
