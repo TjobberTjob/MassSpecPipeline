@@ -164,6 +164,7 @@ def filter(path, file):
                     Seen[f] = seen[f][0:minamount]
 
             i = 0
+            namesseen = []
             for line in open(f'{path}{str(file)}.json', 'r'):
                 a = line.split(', "')
                 checklist = []
