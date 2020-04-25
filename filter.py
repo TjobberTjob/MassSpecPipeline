@@ -133,9 +133,12 @@ def filter(path, file):
                         and float(data['Score']) > getabovehere:
                     charge = json.loads(line)['Charge']
                     seen[charge].append(json.loads(line)['image'])
-
-            amounts = [len(seen[f]) for f in seen]
-            minamount = min([f for f in amounts if f < 0.1 * sum(amounts)])
+            amounts = defaultdict(list)
+            for f in seen:
+                amounts[f] = len(seen[f])
+            minamount = min(f for f in amounts.values() if f >= (0.1 * sum(amounts.values())))
+            print(minamount)
+            quit()
             Seen = defaultdict(list)
             for f in seen:
                 if not len(seen[f]) >= minamount:
