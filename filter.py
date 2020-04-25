@@ -47,8 +47,7 @@ def filter(path, file):
                     # os.remove(imagejson)
             quit()
 
-        # GET MOST COMMON SIZES AND SCORE PERCENTILES
-        lines_seen = set()
+        # GET MOST COMMON SIZES AND SCORE PERCENTILES #
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
         getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
         # getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
@@ -68,6 +67,7 @@ def filter(path, file):
                      'Score' in json.loads(lines)
                      and 'size' in json.loads(lines) and str(json.loads(lines)['size']) == ms1size]
         getabovehere = np.percentile(getscores, 60)
+        ###############################################
 
         if sys.argv[2] == 'Sequence':
             Seen = mostcommon('Sequence', 10)
@@ -76,8 +76,7 @@ def filter(path, file):
                 data = json.loads(line)
 
                 if 'size' in data and data['size'] == str(ms1size) and 'Sequence' in data and data[
-                    'Sequence'] in Seen \
-                        and line not in lines_seen:
+                    'Sequence'] in Seen and line not in lines_seen:
                     data['Seq_class'] = Seen.index(data['Sequence'])
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
@@ -166,14 +165,19 @@ def filter(path, file):
 
             i = 0
             for line in open(f'{path}{str(file)}.json', 'r'):
-                data = json.loads(line)
-
-                if 'charge' in data:
-                    charge = data['charge']
-                    if data['image'] in Seen[charge]:
-                        lines_seen.add(line)
-                        outfile.write(json.dumps(data) + '\n')
-                        i += 1
+                a = line.split(', "')
+                checklist = []
+                for f in a:
+                    if 'image' in f.lower():
+                        name = f[11:-1]
+                        checklist.append(True)
+                    elif 'charge' in f.lower():
+                        charge = int(f[10:-1])
+                        checklist.append(True)
+                if name in Seen[charge] and name not in namesseen and len(checklist) == 2:
+                    outfile.write(json.dumps(data) + '\n')
+                    namesseen.append(name)
+                    i += 1
             outfile.close()
             print(f'Length of filtered file: {i}')
 
