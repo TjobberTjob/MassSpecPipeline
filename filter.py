@@ -143,7 +143,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if charge in data:
+                if 'charge' in data:
                     charge = data['charge']
                     if data['image'] in Seen[charge]:
                         lines_seen.add(line)
