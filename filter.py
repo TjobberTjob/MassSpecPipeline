@@ -63,9 +63,11 @@ def filter(path, file):
             if len(size) == 3:
                 ms1size = sizes[0]
                 break
-
+        start = time.time()
         getscores = [float(lines[re.search('score', lines.lower()).span()[1] + 4: min(f for f in [m.start() for m in re.finditer(',', lines.lower())] if f > re.search('score', lines.lower()).span()[1] + 4) - 1])
                      for lines in open(f'{path}subimage.json') if 'score' in lines.lower()]
+        end = time.time()
+        print(end-start)
         getabovehere = np.percentile(getscores, 60)
         ###############################################
         print('Creating filtered version')
