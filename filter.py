@@ -64,20 +64,7 @@ def filter(path, file):
                 ms1size = sizes[0]
                 break
 
-        getscores = []
-        start = time.time()
-        for lines in open(f'{path}subimage.json'):
-            line = lines.split(', "')
-            for f in line:
-                if 'score' in f.lower() and 'dp' not in f.lower():
-                    getscores.append(float(f[9:-1]))
-        end = time.time()
-        print(end-start)
-
-        start = time.time()
-        getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "')if 'score' in line.lower() and 'dp' not in line.lower()]
-        end = time.time()
-        print(end - start)
+        getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower()]
         getabovehere = np.percentile(getscores, 60)
         ###############################################
         print('Creating filtered version')
@@ -158,7 +145,7 @@ def filter(path, file):
                     elif 'size' in f.lower():
                         size = f[7:]
                         checklist.append(True)
-                    elif 'score' in f.lower() and 'DP' not in f.lower():
+                    elif 'score' in f.lower() and 'dp' not in f.lower():
                         score = float(f[9:-1])
                         checklist.append(True)
 
