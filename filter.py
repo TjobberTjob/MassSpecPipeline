@@ -135,12 +135,17 @@ def filter(path, file):
                     seen[charge].append(json.loads(line)['image'])
 
             amounts = [len(seen[f]) for f in seen]
-            print(amounts)
-            quit()
+            minamount = min([f for f in amounts if f < 0.1 * sum(amounts)])
             Seen = defaultdict(list)
             for f in seen:
-                random.shuffle(seen[f])
-                Seen[f] = seen[f][0:min(amounts)]
+                if not len(seen[f]) >= minamount:
+                    random.shuffle(seen[f])
+                    Seen[f] = seen[f][0:minamount]
+
+            for f in Seen:
+                print(f)
+                print(Seen[f][0:10])
+
             i = 0
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
