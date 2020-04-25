@@ -165,7 +165,7 @@ def filter(path, file):
 
             i = 0
             namesseen = []
-            for line in open(f'{path}{str(file)}.json', 'r'):
+            for line in open(f'{path}subimage.json', 'r'):
                 a = line.split(', "')
                 checklist = []
                 for f in a:
