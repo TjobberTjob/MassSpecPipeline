@@ -164,9 +164,6 @@ def filter(path, file):
                     random.shuffle(seen[f])
                     Seen[f] = seen[f][0:minamount]
 
-            for f in Seen:
-                print(f, Seen[f][0:3])
-            quit()
             i = 0
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
