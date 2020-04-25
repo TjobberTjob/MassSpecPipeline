@@ -132,10 +132,14 @@ def filter(path, file):
 
         elif sys.argv[2] == 'Charge':
             seen = defaultdict(list)
+            start = time.time()
             for line in open(f'{path}subimage.json'):
                 a = line.split(', "')
                 checklist = []
                 for f in a:
+                    if len(checklist == 4):
+                        break
+
                     if 'image' in f.lower():
                         name = f[11:-1]
                         checklist.append(True)
@@ -151,7 +155,10 @@ def filter(path, file):
 
                 if score >= getabovehere and size == ms1size and len(checklist) == 4:
                     seen[charge].append(name)
+            end = time.time()
+            print(end - start)
 
+            start = time.time()
             amounts = defaultdict(list)
             for f in seen:
                 amounts[f] = len(seen[f])
@@ -162,7 +169,10 @@ def filter(path, file):
                 if len(seen[f]) >= minamount:
                     random.shuffle(seen[f])
                     Seen[f] = seen[f][0:minamount]
+            end = time.time()
+            print(end - start)
 
+            start = time.time()
             i = 0
             namesseen = []
             for line in open(f'{path}subimage.json', 'r'):
@@ -181,6 +191,8 @@ def filter(path, file):
                     i += 1
             outfile.close()
             print(f'Length of filtered file: {i}')
+            end = time.time()
+            print(end - start)
 
 
     elif file == 'accessions':
