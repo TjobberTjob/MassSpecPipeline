@@ -135,6 +135,8 @@ def filter(path, file):
                     seen[charge].append(json.loads(line)['image'])
 
             amounts = [len(seen[f]) for f in seen]
+            print(amounts)
+            quit()
             Seen = defaultdict(list)
             for f in seen:
                 random.shuffle(seen[f])
