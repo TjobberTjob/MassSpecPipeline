@@ -74,17 +74,8 @@ def filter(path, file):
         for lines in open(f'{path}subimage.json'):
             line = lines.split(', "')
             for f in line:
-                if 'score' in f.lower() and 'DP' not in f.lower():
-                    try:
-                        getscores.append(float(f[9:-1]))
-                    except:
-                        print(f)
-                        print(f[9:-1])
-                        print(f[10:-1])
-                        print(f[11:-1])
-                        print(f[12:-1])
-
-
+                if 'score' in f.lower() and 'dp' not in f.lower():
+                    getscores.append(float(f[9:-1]))
         end = time.time()
         print(end-start)
         getabovehere = np.percentile(getscores, 60)
