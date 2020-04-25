@@ -50,24 +50,18 @@ def filter(path, file):
         # GET MOST COMMON SIZES AND SCORE PERCENTILES
         lines_seen = set()
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
-        start = time.time()
         getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
-        end = time.time()
-        print(end-start)
-        print(np.unique(getsizes))
-        start = time.time()
-        getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
-        end = time.time()
-        print(end - start)
-        quit()
-        mostcommonsize = np.unique(getsizes)
-        a = {}
-        for f in mostcommonsize:
-            a[str(f)] = getsizes.count(f)
-        for f in Counter(a).most_common(2):
-            f2 = str(f[0]).replace(" ", "")[1:-1].split(',')
-            if len(f2) == 3:
-                ms1size = f[0]
+        # getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
+        uniquesizes = np.unique(getsizes)
+
+        sizedict = defaultdict()
+        for sizes in uniquesizes:
+            sizedict[str(sizes)] = getsizes.count(sizes)
+
+        for sizes in Counter(sizedict).most_common():
+            size = str(sizes[0]).replace(" ", "")[1:-1].split(',')
+            if len(size) == 3:
+                ms1size = sizes[0]
                 break
 
         getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if
