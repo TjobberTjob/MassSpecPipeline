@@ -61,11 +61,15 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     accs = np.unique(accs)
     random.shuffle(accs)
     test_accs = accs[0:test_accessions]
-    testfiles = [f'{json.loads(acc)["image"]}' for acc in open(f'{path}{filetosuse}')
-                 if 'accession' in json.loads(acc) and json.loads(acc)['accession'] in test_accs]
 
-    trainvalfiles = [f'{json.loads(acc)["image"]}' for acc in open(f'{path}{filetosuse}')
-                     if 'accession' in json.loads(acc) and json.loads(acc)['accession'] not in test_accs]
+    testfiles = []
+    trainvalfiles = []
+    for acc in open(f'{path}{filetosuse}'):
+        if 'accession' in json.loads(acc) and json.loads(acc)['accession'] in test_accs:
+            testfiles.append(json.loads(acc)["image"])
+        else:
+            trainvalfiles.append(json.loads(acc)["image"])
+
     random.shuffle(trainvalfiles)
 
     with open('config.json') as json_file:

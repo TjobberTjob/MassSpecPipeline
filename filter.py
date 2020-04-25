@@ -126,7 +126,7 @@ def filter(path, file):
         elif sys.argv[2] == 'Charge':
             seen = defaultdict(list)
             for line in open(f'{path}subimage.json'):
-                if 'Charge' in json.loads(line):
+                if 'Charge' in json.loads(line) and 'size' in data and str(data['size']) == ms1size and 'Score' in data and float(data['Score']) > getabovehere:
                     charge = json.loads(line)['Charge']
                     seen[charge].append(json.loads(line)['image'])
 
@@ -139,8 +139,7 @@ def filter(path, file):
             for line in open(f'{path}{str(file)}.json', 'r'):
                 data = json.loads(line)
 
-                if 'size' in data and str(data['size']) == ms1size and 'Charge' in data and data['Charge'] in Seen \
-                        and 'Score' in data and float(data['Score']) > getabovehere:
+                if 'Charge' in data and data['Charge'] in Seen:
                     lines_seen.add(line)
                     outfile.write(json.dumps(data) + '\n')
                     i += 1
