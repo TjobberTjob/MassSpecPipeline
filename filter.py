@@ -179,6 +179,8 @@ def filter(path, file):
                 a = line.split(', "')
                 checklist = []
                 for f in a:
+                    if len(checklist == 2):
+                        break
                     if 'image' in f.lower():
                         name = f[11:-1]
                         checklist.append(True)
