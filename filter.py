@@ -63,19 +63,8 @@ def filter(path, file):
                 ms1size = sizes[0]
                 break
 
-        start = time.time()
-        getscores = []
-        for lines in open(f'{path}subimage.json'):
-            if 'score' in lines.lower():
-                pointA = re.search('score', lines.lower()).span()[1] + 4
-                pointB = min(f for f in [m.start() for m in re.finditer(',', lines.lower())] if f > pointA) - 1
-                getscores.append(float(lines[pointA: pointB]))
-        end = time.time()
-        print(end-start)
-        start = time.time()
-        getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines) and 'size' in json.loads(lines) and str(json.loads(lines)['size']) == ms1size]
-        end = time.time()
-        print(end - start)
+        getscores = [float(lines[re.search('score', lines.lower()).span()[1] + 4: min(f for f in [m.start() for m in re.finditer(',', lines.lower())] if f > re.search('score', lines.lower()).span()[1] + 4) - 1])
+                     for lines in open(f'{path}subimage.json') if 'score' in lines.lower()]
         getabovehere = np.percentile(getscores, 60)
         ###############################################
 
