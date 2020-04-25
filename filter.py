@@ -48,6 +48,7 @@ def filter(path, file):
             quit()
 
         # GET MOST COMMON SIZES AND SCORE PERCENTILES #
+        print('Getting sizes and scores')
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
         getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
         # getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
@@ -67,6 +68,7 @@ def filter(path, file):
                      for lines in open(f'{path}subimage.json') if 'score' in lines.lower()]
         getabovehere = np.percentile(getscores, 60)
         ###############################################
+        print('Creating filtered version')
 
         if sys.argv[2] == 'Sequence':
             Seen = mostcommon('Sequence', 10)
