@@ -54,6 +54,7 @@ def filter(path, file):
         getsizes = [lines[re.search('size', lines).span()[1] + 3:re.search('size', lines).span()[1] + 11] for lines in open(f'{path}subimage.json')]
         end = time.time()
         print(end-start)
+        print(np.unique(getsizes))
         start = time.time()
         getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
         end = time.time()
