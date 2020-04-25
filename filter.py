@@ -63,9 +63,19 @@ def filter(path, file):
                 ms1size = sizes[0]
                 break
 
-        getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if
-                     'Score' in json.loads(lines)
-                     and 'size' in json.loads(lines) and str(json.loads(lines)['size']) == ms1size]
+        start = time.time()
+        getscores = []
+        for lines in open(f'{path}subimage.json'):
+            if 'score' in lines.lower():
+                pointA = re.search('score', lines.lower()).span[1]
+                pointB = min(f for f in [m.start() for m in re.finditer(',', lines.lower())] if f > pointA)
+                getscores.append(float(lines[pointA: pointB]))
+        end = time.time()
+        print(end-start)
+        start = time.time()
+        getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines) and 'size' in json.loads(lines) and str(json.loads(lines)['size']) == ms1size]
+        end = time.time()
+        print(end - start)
         getabovehere = np.percentile(getscores, 60)
         ###############################################
 
@@ -146,7 +156,7 @@ def filter(path, file):
                         size = f[7:]
                         checklist.append(True)
                     elif 'score' in f.lower():
-                        score = float(f[9:-1])
+                        score = float(f[12:-1])
                         checklist.append(True)
 
                 if score >= getabovehere and size == ms1size and len(checklist) == 4:
