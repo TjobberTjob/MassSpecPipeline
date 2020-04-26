@@ -212,6 +212,20 @@ def filter(path, file):
                         checklist.append(True)
 
                 if name in Seen[charge] and len(checklist) == 2:# and name not in namesseen:
+                    outfile.write(json.dumps(line) + '\n')
+                    # namesseen.append(name)
+                    i += 1
+            outfile.close()
+            print(f'Length of filtered file: {i}')
+            end = time.time()
+            print(end - start)
+
+            start = time.time()
+            i = 0
+            # namesseen = []
+            for line in open(f'{path}subimage.json'):
+                data = json.loads(line)
+                if 'Charge' in data and data['image'] in Seen[data['Charge']]
                     outfile.write(json.dumps(data) + '\n')
                     # namesseen.append(name)
                     i += 1
