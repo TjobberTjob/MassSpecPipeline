@@ -225,7 +225,15 @@ def filter(path, file):
             start = time.time()
             i = 0
             for line in open(f'{path}subimage.json'):
+                a = line.split(', "')
+                for f in a:
+                    if 'image' in f.lower():
+                        name = f[11:-1]
+                        break
+
                 data = json.loads(line)
+                print(name, data['image'], name == data['image'])
+                quit()
                 print(str(data['image']) in Seen[data['Charge']])
                 if 'Charge' in data and data['image'] in Seen[data['Charge']] and data['image'] not in namesseen:
                     outfile.write(json.dumps(data) + '\n')
