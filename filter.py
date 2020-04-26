@@ -116,6 +116,8 @@ def filterlength(path, outfile, getabovehere, ms1size):
 
 
 def filtercharge(path, outfile, getabovehere, ms1size):
+    print('seperating data', end='\r')
+    start = time.time()
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
         a = line.split(', "')
@@ -150,7 +152,10 @@ def filtercharge(path, outfile, getabovehere, ms1size):
         if len(seen[f]) >= minamount:
             random.shuffle(seen[f])
             Seen[f] = seen[f][0:minamount]
+    end = time.time()
+    print(f'seperating data complete - {end - start} sec')
 
+    print('writing to file', end='\r')
     start = time.time()
     namesseen = []
     i = 0
@@ -165,13 +170,13 @@ def filtercharge(path, outfile, getabovehere, ms1size):
                 charge = int(f[10:-1])
                 checklist.append(True)
 
-        print(name in Seen[charge])
         if name in Seen[charge] and len(checklist) == 2:
             outfile.write(line + '\n')
             namesseen.append(name)
             i += 1
 
     outfile.close()
+    print(f'writing to file complete - {end - start} sec')
     print(f'Length of filtered file: {i}')
     end = time.time()
     print(end - start)
