@@ -47,6 +47,32 @@ def filter(path, file):
                     # os.remove(imagejson)
             quit()
 
+        elif sys.argv[2] == 'clear':
+            getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
+                        open(f'{path}subimage.json')]
+            uniquesizes = np.unique(getsizes)
+
+            sizedict = defaultdict()
+            for sizes in uniquesizes:
+                sizedict[str(sizes)] = getsizes.count(sizes)
+
+            for sizes in Counter(sizedict).most_common():
+                size = str(sizes[0]).replace(" ", "")[1:-1].split(',')
+                if len(size) == 3:
+                    ms1size = sizes[0]
+                    break
+
+            outfile = open(f'{path}subimage2.json', 'a')
+            for line in open(f'{path}subimage.json', 'a'):
+                data = json.loads(line)
+                if data['size'] == ms1size:
+                    outfile.write(json.dumps(line) + '\n')
+                else:
+                    os.remove(f'{datapath}/images/{data["image"]}')
+            os.remove(f'{path}subimage.json')
+            os.rename(f'{path}subimage2.json', f'{path}subimage.json')
+
+
         # GET MOST COMMON SIZES AND SCORE PERCENTILES #
         print('Getting sizes and scores')
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
