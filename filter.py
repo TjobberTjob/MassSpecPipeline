@@ -165,12 +165,11 @@ def filtercharge(path, outfile, getabovehere, ms1size):
                 charge = int(f[10:-1])
                 checklist.append(True)
 
+        print(name in Seen[charge])
         if name in Seen[charge] and len(checklist) == 2:
             outfile.write(line + '\n')
             namesseen.append(name)
             i += 1
-            if i % 100 == 0:
-                print(i)
 
     outfile.close()
     print(f'Length of filtered file: {i}')
