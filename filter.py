@@ -195,9 +195,12 @@ def filter(path, file):
                     random.shuffle(seen[f])
                     Seen[f] = seen[f][0:minamount]
 
+            for f in Seen:
+                print(f, len(Seen[f]))
+
             start = time.time()
             i = 0
-            # namesseen = []
+            namesseen = []
             for line in open(f'{path}subimage.json'):
                 a = line.split(', "')
                 checklist = []
@@ -211,9 +214,9 @@ def filter(path, file):
                         charge = int(f[10:-1])
                         checklist.append(True)
 
-                if name in Seen[charge] and len(checklist) == 2:# and name not in namesseen:
+                if name in Seen[charge] and len(checklist) == 2 and name not in namesseen:
                     outfile.write(line + '\n')
-                    # namesseen.append(name)
+                    namesseen.append(name)
                     i += 1
             outfile.close()
             print(f'Length of filtered file: {i}')
