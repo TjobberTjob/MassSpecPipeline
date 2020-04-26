@@ -55,7 +55,8 @@ def clear(path):
 
 
 def getsizeandscore(path):
-    print('Getting sizes and scores')
+    print('Getting sizes and scores', end='\r')
+    start = time.time()
     getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                 open(f'{path}subimage.json')]
     uniquesizes = np.unique(getsizes)
@@ -73,6 +74,9 @@ def getsizeandscore(path):
     getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
                  'score' in line.lower() and 'dp' not in line.lower()]
     getabovehere = np.percentile(getscores, 50)
+
+    stop = time.time()
+    print(f'Getting sizes and scores complete - {stop-start} sec', end='\r')
     return ms1size, getabovehere
 
 
