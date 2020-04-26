@@ -149,14 +149,14 @@ def filtercharge(path, outfile, getabovehere, ms1size):
             #     score = float(f[11:-1])
             #     checklist.append(True)
 
-        if len(checklist) == 4 and size == ms1size:# and score >= getabovehere :
+        if len(checklist) == 3 and size == ms1size:# and score >= getabovehere :
             seen[charge].append(name)
 
 
     amounts = defaultdict(list)
     for f in seen:
         amounts[f] = len(seen[f])
-    minamount = min(f for f in amounts.values() if f >= (0.25 * sum(amounts.values())))
+    minamount = min(f for f in amounts.values() if f >= 0.25 * sum(amounts.values()))
     for f in amounts:
         if amounts[f] >= minamount:
             print(f'{f}: {amounts[f]}')
