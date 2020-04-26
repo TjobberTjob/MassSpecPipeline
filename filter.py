@@ -212,7 +212,7 @@ def filter(path, file):
                         checklist.append(True)
 
                 if name in Seen[charge] and len(checklist) == 2:# and name not in namesseen:
-                    outfile.write(json.dumps(line) + '\n')
+                    outfile.write(line + '\n')
                     # namesseen.append(name)
                     i += 1
             outfile.close()
