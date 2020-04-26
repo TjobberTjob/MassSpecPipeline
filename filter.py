@@ -208,6 +208,7 @@ def filter(path, file):
                 for f in a:
                     if len(checklist) == 2:
                         break
+
                     if 'image' in f.lower():
                         name = f[11:-1]
                         checklist.append(True)
@@ -215,7 +216,7 @@ def filter(path, file):
                         charge = int(f[10:-1])
                         checklist.append(True)
 
-                if name in Seen[charge] and len(checklist) == 2 and name not in namesseen:
+                if name in Seen[charge] and len(checklist) == 2:
                     outfile.write(line + '\n')
                     namesseen.append(name)
                     i += 1
