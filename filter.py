@@ -10,6 +10,8 @@ import glob
 import sys
 from collections import defaultdict, Counter
 
+import pandas as pd
+
 
 def mostcommon(x, amount, path):
     seen = [json.loads(line)[x] for line in open(f'{path}subimage.json') if x in json.loads(line)]
@@ -30,6 +32,14 @@ def mostcommon(x, amount, path):
 
 def filter(path, file):
     if file == 'subimage':
+        if sys.argv[2] == 'dataframe':
+            for line in open(f'{path}subimage.json'):
+                data = json.loads(line)
+                df = pd.DataFrame.from_dict(data, orient='columns')
+                print(df)
+                quit()
+
+
         if sys.argv[2] == 'combine':
 
             if os.path.exists(f'{path}subimage.json'):
