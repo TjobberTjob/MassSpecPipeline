@@ -11,7 +11,7 @@ from collections import defaultdict, Counter
 import pandas as pd
 
 
-def nextspots(word, string):
+def getclass(word, string):
     if word == '"size"':
         output = string[re.search('\[', string).span()[0]:re.search(']', string).span()[1]]
     else:
@@ -37,8 +37,8 @@ def combine(path):
 
 
 def clear(path):
-    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
-                open(f'{path}subimage.json')]
+    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
+
     uniquesizes = np.unique(getsizes)
 
     sizedict = defaultdict()
@@ -66,7 +66,8 @@ def getsizeandscore(path):
     print('Getting sizes and scores', end='\r')
     start = time.time()
 
-    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
+    # getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
+    getsizes = [getclass('"size"', lines) for lines in open(f'{path}subimage.json')]
     uniquesizes = np.unique(getsizes)
 
     sizedict = defaultdict()
@@ -79,8 +80,8 @@ def getsizeandscore(path):
             ms1size = sizes[0]
             break
 
-    getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
-                 'score' in line.lower() and 'dp' not in line.lower()]
+    # getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower()]
+    getscores = [getclass('"Score"', lines) for lines in open(f'{path}subimage.json')]
     getabovehere = np.percentile(getscores, 50)
 
     stop = time.time()
