@@ -129,7 +129,7 @@ def filtercharge(path, outfile, getabovehere, ms1size):
 
         name = line[re.search('image', line).span()[1] + 4: min(f for f in re.search(',', line).span() if f > re.search('image', line).span()[1]+3) - 1]
         if '"Score"' in line:
-            score = line[re.search('"Score"', line).span()[1]+3: min(f for f in re.search(',', line).span() if f > re.search('"Score"', line).span()[1]+3)]
+            score = float(line[re.search('"Score"', line).span()[1]+3: min(f for f in [m.start() for m in re.finditer(',', line)] if f > re.search('"Score"', line).span()[1]+3)])
         print(name,score)
         quit()
         for f in a:
