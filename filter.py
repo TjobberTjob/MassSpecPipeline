@@ -127,10 +127,10 @@ def filtercharge(path, outfile, getabovehere, ms1size):
         a = line.split(', "')
         checklist = []
 
-        name = line[re.search('image', line).span()[1]+4: min(f for f in re.search(',', line).span() if f > re.search('image', line).span()[1]+3) -1]
-        # if '"Charge"' in line:
-            # charge = line[re.search('Charge', line).span()[1]+3: min(f for f in re.search(',', line).span() if f > re.search('Charge', line).span()[1]+3)]
-        print(name)
+        name = line[re.search('image', line).span()[1] + 4: min(f for f in re.search(',', line).span() if f > re.search('image', line).span()[1]+3) - 1]
+        if '"Score"' in line:
+            score = line[re.search('"Score"', line).span()[1]+3: min(f for f in re.search(',', line).span() if f > re.search('"Score"', line).span()[1]+3)]
+        print(name,score)
         quit()
         for f in a:
             if len(checklist) == 4:
