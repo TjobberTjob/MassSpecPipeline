@@ -175,11 +175,11 @@ def filtercharge(path, outfile, getabovehere, ms1size):
         checklist = []
         a = line.split(',')
         for f in a:
-            if 'image' in f.lower():
+            if 'image' in f:
                 name = f[11:-1]
                 checklist.append(True)
-            elif 'charge' in f.lower():
-                charge = int(f[10:-1])
+            elif 'Charge' in f:
+                charge = int(f[-2:-1])
                 checklist.append(True)
         if len(checklist) == 2 and name in Seen[int(charge)]:
             outfile.write(line + '\n')
