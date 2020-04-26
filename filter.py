@@ -62,7 +62,7 @@ def clear(path):
     os.rename(f'{path}subimage2.json', f'{path}subimage.json')
 
 
-def getsizeandscore(path):
+def getsizeandscore(path, scorecheck):
     print('Getting sizes and scores', end='\r')
     start = time.time()
 
@@ -78,9 +78,11 @@ def getsizeandscore(path):
         if len(size) == 3:
             ms1size = sizes[0]
             break
-
-    getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower() and str(ms1size) in lines.lower()]
-    getabovehere = np.percentile(getscores, 1)
+    if scorecheck:
+        getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower() and str(ms1size) in lines.lower()]
+        getabovehere = np.percentile(getscores, 1)
+    else:
+        getabovehere = 'Fuckthis'
 
     stop = time.time()
     print(f'Getting sizes and scores complete - {stop-start} sec')
@@ -126,13 +128,12 @@ def filterlength(path, outfile, getabovehere, ms1size):
     outfile.close()
 
 
-def filtercharge(path, outfile, getabovehere, ms1size):
+def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
     print('seperating data', end='\r')
     start = time.time()
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
         checklist = []
-        scorecheck = False
         if scorecheck:
             checklen = 4
         else:
@@ -176,6 +177,28 @@ def filtercharge(path, outfile, getabovehere, ms1size):
             Seen[f] = seen[f][0:minamount]
     end = time.time()
     print(f'seperating data complete - {end - start} sec')
+
+    print('writing to file', end='\r')
+    start = time.time()
+    i = 0
+    for line in open(f'{path}subimage.json'):
+        checklist = []
+        a = line.split(', "')
+        for f in a:
+            if 'image' in f:
+                name = f[11:-1]
+                checklist.append(True)
+            elif 'Charge' in f:
+                charge = int(f[-2:-1])
+                checklist.append(True)
+
+        if name in Seen[int(charge)]:
+            outfile.write(line + '\n')
+            i += 1
+    outfile.close()
+    end = time.time()
+    print(f'writing to file complete - {end - start} seconds')
+    print(f'Length of filtered file: {i}')
 
     print('writing to file', end='\r')
     start = time.time()
@@ -239,7 +262,8 @@ def filter(path, file):
             clear(path)
             quit()
 
-        output = getsizeandscore(path)
+        scorecheck = False
+        output = getsizeandscore(path, scorecheck)
         size = output[0]
         scorepercentile = output[1]
 
@@ -257,7 +281,7 @@ def filter(path, file):
             quit()
 
         elif sys.argv[2] == 'Charge':
-            filtercharge(path, outfile, scorepercentile, size)
+            filtercharge(path, outfile, scorepercentile, size, scorecheck)
             quit()
 
 
