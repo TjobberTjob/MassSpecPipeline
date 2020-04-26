@@ -225,6 +225,7 @@ def filter(path, file):
             start = time.time()
             i = 0
             for line in open(f'{path}subimage.json'):
+                data = json.loads(line)
                 if 'Charge' in data and data['image'] in Seen[data['Charge']] and data['image'] not in namesseen:
                     outfile.write(json.dumps(data) + '\n')
                     namesseen.append(data['image'])
