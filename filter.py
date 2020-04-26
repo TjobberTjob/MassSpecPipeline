@@ -160,6 +160,10 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     end = time.time()
     print(f'seperating data complete - {end - start} sec')
 
+    for f in Seen:
+        print(f, Seen[f][1:5])
+
+
     print('writing to file', end='\r')
     start = time.time()
     namesseen = []
@@ -184,20 +188,21 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     print(f'Length of filtered file: {i}')
     end = time.time()
     print(end - start)
-    #
-    # start = time.time()
-    # i = 0
-    # namesseen = []
-    # for line in open(f'{path}subimage.json'):
-    #     data = json.loads(line)
-    #     if 'Charge' in data and data['image'] in Seen[data['Charge']] and data['image'] not in namesseen:
-    #         outfile.write(json.dumps(data) + '\n')
-    #         namesseen.append(data['image'])
-    #         i += 1
-    # outfile.close()
-    # print(f'Length of filtered file: {i}')
-    # end = time.time()
-    # print(end - start)
+
+    start = time.time()
+    i = 0
+    namesseen = []
+    for line in open(f'{path}subimage.json'):
+        data = json.loads(line)
+        charge = data['Charge']
+
+        if 'Charge' in data and data['image'] in Seen[charge]:
+            outfile.write(json.dumps(data) + '\n')
+            i += 1
+    outfile.close()
+    print(f'Length of filtered file: {i}')
+    end = time.time()
+    print(end - start)
 
 
 def filterptm(path, outfile, getabovehere, ms1size):
