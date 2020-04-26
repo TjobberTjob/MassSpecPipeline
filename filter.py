@@ -66,10 +66,7 @@ def getsizeandscore(path):
     print('Getting sizes and scores', end='\r')
     start = time.time()
 
-    # getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
-    getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json')]
-
-    # getsizes = [getclass('"size"', lines) for lines in open(f'{path}subimage.json')]
+    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
     uniquesizes = np.unique(getsizes)
 
     sizedict = defaultdict()
@@ -82,9 +79,7 @@ def getsizeandscore(path):
             ms1size = sizes[0]
             break
 
-    # getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower()]
-    # getscores = [getclass('"Score"', lines) for lines in open(f'{path}subimage.json')]
-    getscores = [float(json.loads(lines)['Score']) for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines)]
+    getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower()]
     getabovehere = np.percentile(getscores, 50)
 
     stop = time.time()
@@ -137,19 +132,22 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
         checklist = []
+        a = line.split(',')
+        for f in a:
+            if 'image' in f.lower():
+                name = f[11:-1]
+                checklist.append(True)
+            elif 'charge' in f.lower():
+                charge = int(f[10:-1])
+                checklist.append(True)
+            elif 'size' in f.lower():
+                size = f[7:]
+                checklist.append(True)
+            elif 'score' in f.lower() and 'dp' not in f.lower():
+                score = float(f[9:-1])
+                checklist.append(True)
 
-        name = nextspots('"image"', line)
-        size = nextspots('"size"', line)
-        if '"Score"' in line:
-            score = float(nextspots('"Score"', line))
-            checklist.append(True)
-        if '"Charge"' in line:
-            charge = int(nextspots('"Charge"', line))
-            checklist.append(True)
-        print(name,size,score,charge)
-        quit()
-
-        if score >= getabovehere and size == ms1size and len(checklist) == 2:
+        if score >= getabovehere and size == ms1size and len(checklist) == 4:
             seen[charge].append(name)
 
 
@@ -170,18 +168,15 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     print('writing to file', end='\r')
     start = time.time()
     i = 0
-    namesseen = []
     for line in open(f'{path}subimage.json'):
         data = json.loads(line)
-        charge = data['Charge']
-
-        if 'Charge' in data and data['image'] in Seen[charge]:
+        if 'Charge' in data and data['image'] in Seen[int(data['Charge'])]:
             outfile.write(json.dumps(data) + '\n')
             i += 1
     outfile.close()
-    print(f'Length of filtered file: {i}')
     end = time.time()
-    print(end - start)
+    print(f'writing to file complete - {end-start} seconds')
+    print(f'Length of filtered file: {i}')
 
 
 def filterptm(path, outfile, getabovehere, ms1size):
