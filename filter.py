@@ -33,11 +33,12 @@ def mostcommon(x, amount, path):
 def filter(path, file):
     if file == 'subimage':
         if sys.argv[2] == 'dataframe':
+            jsonlist = []
             for line in open(f'{path}subimage.json'):
                 data = json.loads(line)
-                df = pd.DataFrame.from_dict(data, orient='columns')
-                print(df)
-                quit()
+                jsonlist.append(data)
+            df = pd.DataFrame(jsonlist)
+            pd.DataFrame.to_csv(df, f'{path}subimage.csv')
 
 
         if sys.argv[2] == 'combine':
