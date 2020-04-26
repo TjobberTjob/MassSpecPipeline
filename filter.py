@@ -78,6 +78,8 @@ def getsizeandscore(path):
         if len(size) == 3:
             ms1size = sizes[0]
             break
+    print(ms1size)
+    quit()
 
     getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower()]
     getabovehere = np.percentile(getscores, 50)
@@ -303,7 +305,9 @@ if __name__ == '__main__':
     datapath = f'{data["path"]}metadata/'
 
     filetofilter = sys.argv[1]
+    begin = time.time()
     filter(datapath, filetofilter)
-
+    finish = time.time()
+    print(f'total time elapsed: {finish - begin}')
 # python3 filehandler.py filter accessions
 # python3 filehandler.py filter subimage PTM/Charge/Sequence/Length
