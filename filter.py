@@ -156,13 +156,19 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     i = 0
     for line in open(f'{path}subimage.json'):
         a = line.split(', "')
-        name = a[0][11:-1]
+        for f in a:
+            if 'image' in f.lower():
+                name = f[11:-1]
+                checklist.append(True)
+            elif 'charge' in f.lower():
+                charge = int(f[10:-1])
+                checklist.append(True)
 
         if name in Seen[charge] and name not in namesseen:
             outfile.write(line + '\n')
             namesseen.append(name)
             i += 1
-            print(i)
+
     outfile.close()
     print(f'Length of filtered file: {i}')
     end = time.time()
