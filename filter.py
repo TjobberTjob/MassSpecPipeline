@@ -139,6 +139,8 @@ def filtercharge(path, outfile, getabovehere, ms1size):
         if '"Charge"' in line:
             charge = int(nextspots('"Charge"', line))
             checklist.append(True)
+        print(name,size,score,charge)
+        quit()
 
         if score >= getabovehere and size == ms1size and len(checklist) == 2:
             seen[charge].append(name)
