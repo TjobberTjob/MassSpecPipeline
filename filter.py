@@ -63,6 +63,7 @@ def filter(path, file):
                         open(f'{path}subimage.json')]
             uniquesizes = np.unique(getsizes)
 
+
             sizedict = defaultdict()
             for sizes in uniquesizes:
                 sizedict[str(sizes)] = getsizes.count(sizes)
@@ -93,12 +94,7 @@ def filter(path, file):
         df = pd.read_csv(f'{path}subimage.csv', low_memory=False)
         sizes = [size for size in df['size']]
         uniquesizes = np.unique(sizes)
-
-        for sizes in Counter(sizes).most_common():
-            if len(sizes) == 3:
-                bestboi = 3
-                break
-        print(bestboi)
+        print(uniquesizes)
         end = time.time()
         print(end-start)
 
@@ -106,6 +102,9 @@ def filter(path, file):
         getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                     open(f'{path}subimage.json')]
         uniquesizes = np.unique(getsizes)
+        print(uniquesizes)
+        end = time.time()
+        print(end - start)
 
         sizedict = defaultdict()
         for sizes in uniquesizes:
@@ -116,9 +115,7 @@ def filter(path, file):
             if len(size) == 3:
                 ms1size = sizes[0]
                 break
-        print(ms1size)
-        end = time.time()
-        print(end - start)
+
         getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
                      'score' in line.lower() and 'dp' not in line.lower()]
         getabovehere = np.percentile(getscores, 50)
