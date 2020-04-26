@@ -12,8 +12,11 @@ import pandas as pd
 
 
 def nextspots(word, string):
-    ab = [f for f in [m.start() for m in re.finditer('"', string)] if f > re.search(word, string).span()[1]]
-    output = string[ab[0]+1: ab[1]]
+    if word == "size":
+        output = string[re.search('\[', string).span()[0]:re.search(']', string).span()[1]]
+    else:
+        ab = [f for f in [m.start() for m in re.finditer('"', string)] if f > re.search(word, string).span()[1]]
+        output = string[ab[0]+1: ab[1]]
     return output
 
 def combine(path):
