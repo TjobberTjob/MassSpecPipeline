@@ -134,7 +134,9 @@ def filtercharge(path, outfile, getabovehere, ms1size):
         checklist = []
         a = line.split(', "')
         for f in a:
-            if '"image"' in f.lower():
+            if len(checklist) == 4:
+                break
+            elif '"image"' in f.lower():
                 name = f[11:-1]
                 checklist.append(True)
             elif '"charge"' in f.lower():
@@ -142,13 +144,12 @@ def filtercharge(path, outfile, getabovehere, ms1size):
                 checklist.append(True)
             elif '"size"' in f.lower():
                 size = f[7:]
-
                 checklist.append(True)
             elif '"score"' in f.lower():
                 score = float(f[11:-1])
                 checklist.append(True)
 
-        if score >= getabovehere and size == ms1size and len(checklist) == 4:
+        if len(checklist) == 4 and score >= getabovehere and size == ms1size:
             seen[charge].append(name)
 
 
