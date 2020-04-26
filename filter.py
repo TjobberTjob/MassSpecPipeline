@@ -75,9 +75,8 @@ def filter(path, file):
 
         # GET MOST COMMON SIZES AND SCORE PERCENTILES #
         print('Getting sizes and scores')
-        # outfile = open(f'{path}{str(file)}_filtered.json', 'w')
+        outfile = open(f'{path}{str(file)}_filtered.json', 'w')
         namesseen = []
-        # lines_seen = set()
 
         getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                     open(f'{path}subimage.json')]
@@ -190,7 +189,7 @@ def filter(path, file):
             amounts = defaultdict(list)
             for f in seen:
                 amounts[f] = len(seen[f])
-            minamount = min(f for f in amounts.values() if f >= (0.1 * sum(amounts.values())))
+            minamount = min(f for f in amounts.values() if f >= (0.5 * sum(amounts.values())))
 
             Seen = defaultdict(list)
             for f in seen:
@@ -203,7 +202,6 @@ def filter(path, file):
 
             start = time.time()
             i = 0
-            namesseen = []
             for line in open(f'{path}subimage.json'):
                 a = line.split(', "')
                 checklist = []
