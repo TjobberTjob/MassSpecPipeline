@@ -198,7 +198,7 @@ def filter(path, file):
                     Seen[f] = seen[f][0:minamount]
 
             for f in Seen:
-                print(f, len(Seen[f]))
+                print(f, Seen[f][0:10]))
 
             start = time.time()
             i = 0
