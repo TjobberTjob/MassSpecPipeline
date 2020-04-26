@@ -80,7 +80,7 @@ def getsizeandscore(path):
             break
 
     # getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
-                 'score' in line.lower() and 'dp' not in line.lower()]
+    #              'score' in line.lower() and 'dp' not in line.lower()]
     getabovehere = np.percentile(getscores, 50)
 
     stop = time.time()
