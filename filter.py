@@ -197,14 +197,13 @@ def filter(path, file):
 
             start = time.time()
             i = 0
-            namesseen = []
-            for line in open(f'{path}subimage.json', 'r'):
+            # namesseen = []
+            for line in open(f'{path}subimage.json'):
                 a = line.split(', "')
                 checklist = []
                 for f in a:
                     if len(checklist) == 2:
                         break
-
                     if 'image' in f.lower():
                         name = f[11:-1]
                         checklist.append(True)
@@ -214,7 +213,7 @@ def filter(path, file):
 
                 if name in Seen[charge] and len(checklist) == 2:# and name not in namesseen:
                     outfile.write(json.dumps(data) + '\n')
-                    namesseen.append(name)
+                    # namesseen.append(name)
                     i += 1
             outfile.close()
             print(f'Length of filtered file: {i}')
