@@ -232,7 +232,7 @@ def filter(path, file):
 
         output = getsizeandscore(path)
         size = output[0]
-        scorepercentile = float(output[0])
+        scorepercentile = output[1]
 
         print('Creating filtered version')
         if sys.argv[2] == 'Sequence':
