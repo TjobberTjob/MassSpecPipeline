@@ -127,7 +127,7 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     for line in open(f'{path}subimage.json'):
         data = json.loads(line)
         if 'Charge' in data and 'Score' in data:
-            if data['Score'] >= getabovehere and str(data['size']) == ms1size:
+            if float(data['Score']) >= getabovehere and str(data['size']) == ms1size:
                 seen[data['Charge']].append(data['image'])
     # for line in open(f'{path}subimage.json'):
     #     a = line.split(', "')
