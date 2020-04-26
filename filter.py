@@ -13,6 +13,7 @@ import pandas as pd
 
 def nextspots(word, string):
     ab = [f for f in [m.start() for m in re.finditer(',', string)] if f > re.search(word, string).span()[1]].sort()
+    print(ab)
     a = ab[0]
     b = ab[1]
     return a, b
