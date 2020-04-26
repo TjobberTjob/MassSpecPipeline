@@ -159,7 +159,7 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     minamount = min(f for f in amounts.values() if f >= (0.25 * sum(amounts.values())))
     for f in amounts:
         if amounts[f] >= minamount:
-            print(f)
+            print(f'{f}: {amounts[f]}')
 
     Seen = defaultdict(list)
     for f in seen:
