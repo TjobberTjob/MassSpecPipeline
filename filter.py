@@ -58,8 +58,15 @@ def getsizeandscore(path):
     print('Getting sizes and scores', end='\r')
     start = time.time()
 
-    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
-                open(f'{path}subimage.json')]
+    getsizes = []
+    getscores = []
+    for lines in open(f'{path}subimage.json'):
+        getsizes.append(json.loads(lines)['size'])
+        if '"Score"' in lines:
+            getscores.append(json.loads(lines)['size'])
+
+    # getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
+    #             open(f'{path}subimage.json')]
     uniquesizes = np.unique(getsizes)
 
     sizedict = defaultdict()
@@ -72,7 +79,7 @@ def getsizeandscore(path):
             ms1size = sizes[0]
             break
 
-    getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
+    # getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
                  'score' in line.lower() and 'dp' not in line.lower()]
     getabovehere = np.percentile(getscores, 50)
 
@@ -129,28 +136,6 @@ def filtercharge(path, outfile, getabovehere, ms1size):
         if 'Charge' in data and 'Score' in data:
             if float(data['Score']) >= getabovehere and str(data['size']) == ms1size:
                 seen[data['Charge']].append(data['image'])
-    # for line in open(f'{path}subimage.json'):
-    #     a = line.split(', "')
-    #     checklist = []
-    #     for f in a:
-    #         if len(checklist) == 4:
-    #             break
-    #
-    #         if 'image' in f.lower():
-    #             name = f[11:-1]
-    #             checklist.append(True)
-    #         elif 'charge' in f.lower():
-    #             charge = int(f[10:-1])
-    #             checklist.append(True)
-    #         elif 'size' in f.lower():
-    #             size = f[7:]
-    #             checklist.append(True)
-    #         elif 'score' in f.lower() and 'dp' not in f.lower():
-    #             score = float(f[9:-1])
-    #             checklist.append(True)
-    #
-    #     if score >= getabovehere and size == ms1size and len(checklist) == 4:
-    #         seen[charge].append(name)
 
     amounts = defaultdict(list)
     for f in seen:
@@ -165,34 +150,8 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     end = time.time()
     print(f'seperating data complete - {end - start} sec')
 
-    for f in Seen:
-        print(f, Seen[f][1:5])
-
 
     print('writing to file', end='\r')
-    # start = time.time()
-    # namesseen = []
-    # i = 0
-    # for line in open(f'{path}subimage.json'):
-    #     a = line.split(', "')
-    #     checklist = []
-    #     for f in a:
-    #         if 'image' in f.lower():
-    #             name = f[11:-1]
-    #             checklist.append(True)
-    #         elif 'charge' in f.lower():
-    #             charge = int(f[10:-1])
-    #             checklist.append(True)
-    #
-    #     if name in Seen[charge] and len(checklist) == 2:
-    #         outfile.write(line + '\n')
-    #         namesseen.append(name)
-    #         i += 1
-    # outfile.close()
-    # print(f'writing to file complete - {end - start} sec')
-    # print(f'Length of filtered file: {i}')
-    # end = time.time()
-    # print(end - start)
 
     start = time.time()
     i = 0
