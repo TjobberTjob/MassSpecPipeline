@@ -13,9 +13,8 @@ import pandas as pd
 
 def nextspots(word, string):
     ab = [f for f in [m.start() for m in re.finditer('"', string)] if f > re.search(word, string).span()[1]]
-    a = ab[0]
-    b = ab[1]
-    return a, b
+    output = string[ab[0]+1: ab[1]]
+    return output
 
 def combine(path):
     if os.path.exists(f'{path}subimage.json'):
@@ -130,32 +129,18 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     start = time.time()
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
-        a = line.split(', "')
         checklist = []
 
-        name = line[re.search('image', line).span()[1] + 4: min(f for f in re.search(',', line).span() if f > re.search('image', line).span()[1]+3) - 1]
+        name = nextspots('"image"', line)
+        size = nextspots('"size"', line)
         if '"Score"' in line:
-            score = float(line[nextspots('"Score"', line)[0]: nextspots('"Score"', line)[1]])
-        print(name,score)
-        quit()
-        for f in a:
-            if len(checklist) == 4:
-                break
+            score = float(nextspots('"Score"', line))
+            checklist.append(True)
+        if '"Charge"' in line:
+            charge = int(nextspots('"Charge"', line))
+            checklist.append(True)
 
-            if 'image' in f.lower():
-                name = f[11:-1]
-                checklist.append(True)
-            elif 'charge' in f.lower():
-                charge = int(f[10:-1])
-                checklist.append(True)
-            elif 'size' in f.lower():
-                size = f[7:]
-                checklist.append(True)
-            elif 'score' in f.lower() and 'dp' not in f.lower():
-                score = float(f[9:-1])
-                checklist.append(True)
-
-        if score >= getabovehere and size == ms1size and len(checklist) == 4:
+        if score >= getabovehere and size == ms1size and len(checklist) == 2:
             seen[charge].append(name)
 
 
