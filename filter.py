@@ -12,6 +12,7 @@ import pandas as pd
 
 
 def nextspots(word, string):
+    print(word, word == "size")
     if word == "size":
         output = string[re.search('\[', string).span()[0]:re.search(']', string).span()[1]]
     else:
