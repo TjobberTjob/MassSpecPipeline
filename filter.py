@@ -92,7 +92,7 @@ def filter(path, file):
 
         start = time.time()
         df = pd.read_csv(f'{path}subimage.csv', low_memory=False)
-        sizes = [size for size in df['size']]
+        sizes = df['size'].to_list()
         uniquesizes = np.unique(sizes)
         print(uniquesizes)
         end = time.time()
