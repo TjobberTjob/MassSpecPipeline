@@ -76,6 +76,9 @@ def filter(path, file):
         # GET MOST COMMON SIZES AND SCORE PERCENTILES #
         print('Getting sizes and scores')
         # outfile = open(f'{path}{str(file)}_filtered.json', 'w')
+        namesseen = []
+        # lines_seen = set()
+
         getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                     open(f'{path}subimage.json')]
         # getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
