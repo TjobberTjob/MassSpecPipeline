@@ -165,29 +165,29 @@ def filtercharge(path, outfile, getabovehere, ms1size):
 
 
     print('writing to file', end='\r')
-    start = time.time()
-    namesseen = []
-    i = 0
-    for line in open(f'{path}subimage.json'):
-        a = line.split(', "')
-        checklist = []
-        for f in a:
-            if 'image' in f.lower():
-                name = f[11:-1]
-                checklist.append(True)
-            elif 'charge' in f.lower():
-                charge = int(f[10:-1])
-                checklist.append(True)
-
-        if name in Seen[charge] and len(checklist) == 2:
-            outfile.write(line + '\n')
-            namesseen.append(name)
-            i += 1
-    outfile.close()
-    print(f'writing to file complete - {end - start} sec')
-    print(f'Length of filtered file: {i}')
-    end = time.time()
-    print(end - start)
+    # start = time.time()
+    # namesseen = []
+    # i = 0
+    # for line in open(f'{path}subimage.json'):
+    #     a = line.split(', "')
+    #     checklist = []
+    #     for f in a:
+    #         if 'image' in f.lower():
+    #             name = f[11:-1]
+    #             checklist.append(True)
+    #         elif 'charge' in f.lower():
+    #             charge = int(f[10:-1])
+    #             checklist.append(True)
+    #
+    #     if name in Seen[charge] and len(checklist) == 2:
+    #         outfile.write(line + '\n')
+    #         namesseen.append(name)
+    #         i += 1
+    # outfile.close()
+    # print(f'writing to file complete - {end - start} sec')
+    # print(f'Length of filtered file: {i}')
+    # end = time.time()
+    # print(end - start)
 
     start = time.time()
     i = 0
