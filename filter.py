@@ -78,8 +78,6 @@ def getsizeandscore(path):
         if len(size) == 3:
             ms1size = sizes[0]
             break
-    print(ms1size)
-    quit()
 
     getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower()]
     getabovehere = np.percentile(getscores, 50)
@@ -151,8 +149,7 @@ def filtercharge(path, outfile, getabovehere, ms1size):
                 score = float(f[11:-1])
                 checklist.append(True)
 
-
-        if len(checklist) == 4 and score >= getabovehere and size == ms1size:
+        if len(checklist) == 4 and size == ms1size:
             seen[charge].append(name)
 
 
