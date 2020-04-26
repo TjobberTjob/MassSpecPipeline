@@ -143,7 +143,7 @@ def filtercharge(path, outfile, getabovehere, ms1size):
                 charge = int(f[-2:-1])
                 checklist.append(True)
             elif '"size"' in f.lower():
-                size = f[7:]
+                size = str(f[7:])
                 checklist.append(True)
             elif '"score"' in f.lower():
                 score = float(f[11:-1])
