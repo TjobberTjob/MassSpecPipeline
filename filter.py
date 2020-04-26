@@ -80,7 +80,6 @@ def filter(path, file):
 
         getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                     open(f'{path}subimage.json')]
-        # getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
         uniquesizes = np.unique(getsizes)
 
         sizedict = defaultdict()
@@ -198,39 +197,39 @@ def filter(path, file):
                     Seen[f] = seen[f][0:minamount]
 
 
+            # start = time.time()
+            # i = 0
+            # for line in open(f'{path}subimage.json'):
+            #     a = line.split(', "')
+            #     checklist = []
+            #     for f in a:
+            #         if len(checklist) == 2:
+            #             break
+            #
+            #         if 'image' in f.lower():
+            #             name = f[11:-1]
+            #             checklist.append(True)
+            #         elif 'charge' in f.lower():
+            #             charge = int(f[10:-1])
+            #             checklist.append(True)
+            #
+            #     if name in Seen[charge] and len(checklist) == 2:
+            #         outfile.write(line + '\n')
+            #         namesseen.append(name)
+            #         i += 1
+            # outfile.close()
+            # print(f'Length of filtered file: {i}')
+            # end = time.time()
+            # print(end - start)
+
             start = time.time()
             i = 0
-            for line in open(f'{path}subimage.json'):
-                a = line.split(', "')
-                checklist = []
-                for f in a:
-                    if len(checklist) == 2:
-                        break
-
-                    if 'image' in f.lower():
-                        name = f[11:-1]
-                        checklist.append(True)
-                    elif 'charge' in f.lower():
-                        charge = int(f[10:-1])
-                        checklist.append(True)
-
-                if name in Seen[charge] and len(checklist) == 2:
-                    outfile.write(line + '\n')
-                    namesseen.append(name)
-                    i += 1
-            outfile.close()
-            print(f'Length of filtered file: {i}')
-            end = time.time()
-            print(end - start)
-
-            start = time.time()
-            i = 0
-            # namesseen = []
             for line in open(f'{path}subimage.json'):
                 data = json.loads(line)
-                if 'Charge' in data and data['image'] in Seen[data['Charge']]:
+                print(str(data['image']) in Seen[data['Charge']])
+                if 'Charge' in data and data['image'] in Seen[data['Charge']] and data['image'] not in namesseen:
                     outfile.write(json.dumps(data) + '\n')
-                    # namesseen.append(name)
+                    namesseen.append(data['image'])
                     i += 1
             outfile.close()
             print(f'Length of filtered file: {i}')
