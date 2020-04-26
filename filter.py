@@ -95,7 +95,7 @@ def filter(path, file):
 
         getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
                      'score' in line.lower() and 'dp' not in line.lower()]
-        getabovehere = np.percentile(getscores, 60)
+        getabovehere = np.percentile(getscores, 50)
         ###############################################
         print('Creating filtered version')
 
@@ -189,7 +189,7 @@ def filter(path, file):
             amounts = defaultdict(list)
             for f in seen:
                 amounts[f] = len(seen[f])
-            minamount = min(f for f in amounts.values() if f >= (0.5 * sum(amounts.values())))
+            minamount = min(f for f in amounts.values() if f >= (0.25 * sum(amounts.values())))
 
             Seen = defaultdict(list)
             for f in seen:
@@ -197,8 +197,6 @@ def filter(path, file):
                     random.shuffle(seen[f])
                     Seen[f] = seen[f][0:minamount]
 
-            for f in Seen:
-                print(f, Seen[f][0:10])
 
             start = time.time()
             i = 0
