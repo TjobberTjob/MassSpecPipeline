@@ -134,7 +134,7 @@ def filtercharge(path, outfile, getabovehere, ms1size):
         checklist = []
         a = line.split(', "')
         for f in a:
-            if len(checklist) == 4:
+            if len(checklist) == 3:
                 break
             elif 'image' in f:
                 name = f[11:-1]
