@@ -64,6 +64,8 @@ def getsizeandscore(path):
         getsizes.append(json.loads(lines)['size'])
         if '"Score"' in lines:
             getscores.append(float(json.loads(lines)['Score']))
+    getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json')]
+    getscores = [json.loads(lines)['Score'] for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines)]
 
     # getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
     #             open(f'{path}subimage.json')]
