@@ -132,9 +132,14 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
         checklist = []
+        scorecheck = False
+        if scorecheck:
+            checklen = 4
+        else:
+            checklen = 3
         a = line.split(', "')
         for f in a:
-            if len(checklist) == 3:
+            if len(checklist) == checklen:
                 break
             elif 'image' in f:
                 name = f[11:-1]
@@ -145,12 +150,15 @@ def filtercharge(path, outfile, getabovehere, ms1size):
             elif 'Charge' in f:
                 charge = int(f[-2:-1])
                 checklist.append(True)
-            # elif 'Score' in f and 'DP' not in f:
-            #     score = float(f[11:-1])
-            #     checklist.append(True)
+            elif 'Score' in f and 'DP' not in f and scorecheck:
+                score = float(f[11:-1])
+                checklist.append(True)
 
-        if len(checklist) == 3 and size == ms1size:# and score >= getabovehere :
-            seen[charge].append(name)
+        if len(checklist) == checklen and size == ms1size:
+            if scorecheck and score >= getabovehere:
+                seen[charge].append(name)
+            elif not scorecheck:
+                seen[charge].append(name)
 
 
     amounts = defaultdict(list)
