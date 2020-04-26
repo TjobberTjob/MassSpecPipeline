@@ -138,7 +138,7 @@ def filtercharge(path, outfile, getabovehere, ms1size):
                 name = f[11:-1]
                 checklist.append(True)
             elif 'charge' in f.lower():
-                charge = int(f[10:-1])
+                charge = int(f[-2:-1])
                 checklist.append(True)
             elif 'size' in f.lower():
                 size = f[7:]
@@ -164,6 +164,26 @@ def filtercharge(path, outfile, getabovehere, ms1size):
     end = time.time()
     print(f'seperating data complete - {end - start} sec')
 
+    print('writing to file', end='\r')
+    start = time.time()
+    i = 0
+    for line in open(f'{path}subimage.json'):
+        checklist = []
+        a = line.split(',')
+        for f in a:
+            if 'image' in f.lower():
+                name = f[11:-1]
+                checklist.append(True)
+            elif 'charge' in f.lower():
+                charge = int(f[10:-1])
+                checklist.append(True)
+        if len(checklist) == 2 and name in Seen[int(charge)]:
+            outfile.write(line + '\n')
+            i += 1
+    outfile.close()
+    end = time.time()
+    print(f'writing to file complete - {end - start} seconds')
+    print(f'Length of filtered file: {i}')
 
     print('writing to file', end='\r')
     start = time.time()
