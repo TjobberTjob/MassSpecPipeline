@@ -58,18 +58,8 @@ def getsizeandscore(path):
     print('Getting sizes and scores', end='\r')
     start = time.time()
 
-    getsizes = []
-    getscores = []
-    for line in open(f'{path}subimage.json'):
-        a = line.split(', "')
-        for f in a:
-            if 'size' in f.lower():
-                getsizes.append(f[7:])
-            elif 'score' in f.lower() and 'dp' not in f.lower():
-                getscores.append(float(f[9:-1]))
-
-    # getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
-    #             open(f'{path}subimage.json')]
+    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
+                open(f'{path}subimage.json')]
     uniquesizes = np.unique(getsizes)
 
     sizedict = defaultdict()
@@ -82,8 +72,8 @@ def getsizeandscore(path):
             ms1size = sizes[0]
             break
 
-    # getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
-    #              'score' in line.lower() and 'dp' not in line.lower()]
+    getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
+                 'score' in line.lower() and 'dp' not in line.lower()]
     getabovehere = np.percentile(getscores, 50)
 
     stop = time.time()
