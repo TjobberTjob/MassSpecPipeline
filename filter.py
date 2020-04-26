@@ -50,7 +50,8 @@ def filter(path, file):
         # GET MOST COMMON SIZES AND SCORE PERCENTILES #
         print('Getting sizes and scores')
         outfile = open(f'{path}{str(file)}_filtered.json', 'w')
-        getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
+        getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
+                    open(f'{path}subimage.json')]
         # getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json') if 'size' in json.loads(lines)]
         uniquesizes = np.unique(getsizes)
 
@@ -64,7 +65,8 @@ def filter(path, file):
                 ms1size = sizes[0]
                 break
 
-        getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower()]
+        getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
+                     'score' in line.lower() and 'dp' not in line.lower()]
         getabovehere = np.percentile(getscores, 60)
         ###############################################
         print('Creating filtered version')
@@ -131,8 +133,8 @@ def filter(path, file):
 
 
         elif sys.argv[2] == 'Charge':
+
             seen = defaultdict(list)
-            start = time.time()
             for line in open(f'{path}subimage.json'):
                 a = line.split(', "')
                 checklist = []
@@ -155,10 +157,7 @@ def filter(path, file):
 
                 if score >= getabovehere and size == ms1size and len(checklist) == 4:
                     seen[charge].append(name)
-            end = time.time()
-            print(end - start)
 
-            start = time.time()
             amounts = defaultdict(list)
             for f in seen:
                 amounts[f] = len(seen[f])
@@ -169,8 +168,6 @@ def filter(path, file):
                 if len(seen[f]) >= minamount:
                     random.shuffle(seen[f])
                     Seen[f] = seen[f][0:minamount]
-            end = time.time()
-            print(end - start)
 
             start = time.time()
             i = 0
@@ -181,13 +178,15 @@ def filter(path, file):
                 for f in a:
                     if len(checklist) == 2:
                         break
+
                     if 'image' in f.lower():
                         name = f[11:-1]
                         checklist.append(True)
                     elif 'charge' in f.lower():
                         charge = int(f[10:-1])
                         checklist.append(True)
-                if name in Seen[charge] and name not in namesseen and len(checklist) == 2:
+
+                if name in Seen[charge] and len(checklist) == 2:# and name not in namesseen:
                     outfile.write(json.dumps(data) + '\n')
                     namesseen.append(name)
                     i += 1
@@ -231,4 +230,3 @@ if __name__ == '__main__':
 
 # python3 filehandler.py filter accessions
 # python3 filehandler.py filter subimage PTM/Charge/Sequence/Length
-
