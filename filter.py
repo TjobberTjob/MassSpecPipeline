@@ -142,10 +142,13 @@ def filtercharge(path, outfile, getabovehere, ms1size):
                 checklist.append(True)
             elif '"size"' in f.lower():
                 size = f[7:]
+                print(size)
+                print(type(size))
                 checklist.append(True)
             elif '"score"' in f.lower():
                 score = float(f[11:-1])
                 checklist.append(True)
+        print(score >= getabovehere, size == ms1size, len(checklist) == 4)
         if score >= getabovehere and size == ms1size and len(checklist) == 4:
             seen[charge].append(name)
 
