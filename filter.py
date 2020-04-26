@@ -225,7 +225,7 @@ def filter(path, file):
             # namesseen = []
             for line in open(f'{path}subimage.json'):
                 data = json.loads(line)
-                if 'Charge' in data and data['image'] in Seen[data['Charge']]
+                if 'Charge' in data and data['image'] in Seen[data['Charge']]:
                     outfile.write(json.dumps(data) + '\n')
                     # namesseen.append(name)
                     i += 1
