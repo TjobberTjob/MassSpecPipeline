@@ -169,7 +169,8 @@ def filtercharge(path, outfile, getabovehere, ms1size):
             outfile.write(line + '\n')
             namesseen.append(name)
             i += 1
-            print(i)
+            if i % 100:
+                print(i)
 
     outfile.close()
     print(f'Length of filtered file: {i}')
