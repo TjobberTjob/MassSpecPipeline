@@ -58,12 +58,6 @@ def getsizeandscore(path):
     print('Getting sizes and scores', end='\r')
     start = time.time()
 
-    getsizes = []
-    getscores = []
-    for lines in open(f'{path}subimage.json'):
-        getsizes.append(json.loads(lines)['size'])
-        if '"Score"' in lines:
-            getscores.append(float(json.loads(lines)['Score']))
     getsizes = [json.loads(lines)['size'] for lines in open(f'{path}subimage.json')]
     getscores = [json.loads(lines)['Score'] for lines in open(f'{path}subimage.json') if 'Score' in json.loads(lines)]
 
