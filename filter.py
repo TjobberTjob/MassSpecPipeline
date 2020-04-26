@@ -136,16 +136,16 @@ def filtercharge(path, outfile, getabovehere, ms1size):
         for f in a:
             if len(checklist) == 4:
                 break
-            elif 'image"' in f:
+            elif 'image' in f:
                 name = f[11:-1]
                 checklist.append(True)
-            elif 'size"' in f:
+            elif 'size' in f:
                 size = str(f[7:])
                 checklist.append(True)
-            elif 'Charge"' in f:
+            elif 'Charge' in f:
                 charge = int(f[-2:-1])
                 checklist.append(True)
-            elif 'Score"' in f:
+            elif 'Score' in f and 'DP' not in f:
                 score = float(f[11:-1])
                 checklist.append(True)
 
