@@ -189,8 +189,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
         a = line.split(', "')
         name = a[0][11:-1]
         if name in Seen2[name.split('-')[-1][:-5]]:
-            data = json.loads(line)
-            outfile.write(json.dumps(data) + '\n')
+            outfile.write(line + '\n')
             i += 1
     outfile.close()
     end = time.time()
