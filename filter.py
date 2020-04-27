@@ -240,7 +240,6 @@ def filter(path, file):
             combine(path)
             quit()
 
-
         elif sys.argv[2] == 'clear':
             clear(path)
             quit()
