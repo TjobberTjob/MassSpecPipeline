@@ -180,11 +180,10 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
 
     fullnamelist = list(chain.from_iterable([Seen[f] for f in Seen]))
     Seen2 = defaultdict(list)
-    for f in Seen2:
-        for g in f:
-            print(Seen2[f][g].split('-')[-1], g)
-            quit()
-            fullnamelist[Seen2[f][g].split('-')[-1]] = g
+    for f in fullnamelist:
+        print(f.split('-')[-1], f)
+        quit()
+        fullnamelist[Seen2[f][g].split('-')[-1]] = g
     print(f'seperating data complete - {end - start} sec')
 
     print('writing to file', end='\r')
