@@ -176,14 +176,14 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
         if len(seen[f]) >= minamount:
             random.shuffle(seen[f])
             Seen[f] = seen[f][0:minamount]
+    for f in Seen:
+        print(f'{f}: {len(Seen[f])}')
     end = time.time()
 
     fullnamelist = list(chain.from_iterable([Seen[f] for f in Seen]))
     Seen2 = defaultdict(list)
     for f in fullnamelist:
-        print(f.split('-')[-1], f)
-        quit()
-        fullnamelist[Seen2[f][g].split('-')[-1]] = g
+        Seen2[f.split('-')[-1][:-5]].append(f)
     print(f'seperating data complete - {end - start} sec')
 
     print('writing to file', end='\r')
