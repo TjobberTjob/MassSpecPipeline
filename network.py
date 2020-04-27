@@ -111,8 +111,8 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     for line in open(f'{path}{filetosuse}'):
         data = loads(line)
         name = data['image']
-        if name not in tests[name.split('-')[-1][:-5]]:
-            labels[name] = data[imageclass]
+        if name in tests[name.split('-')[-1][:-5]]:
+            testlabels[name] = data[imageclass]
         else:
             labels[name] = data[imageclass]
     stop = time.time()
@@ -122,9 +122,13 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     labels = {}
     testlabels = {}
     for line in open(f'{path}{filetosuse}'):
-        name = line.split(', "')[0][11:-1]
-        label = getclass(f'{str(imageclass)}', line)
-        if name not in tests[name.split('-')[-1][:-5]]:
+        a = line.split(', "')
+        name = a[0][11:-1]
+        for f in a:
+            if str(imageclass) in f:
+                print(f)
+                quit()
+        if name in tests[name.split('-')[-1][:-5]]:
             labels[name] = label
         else:
             testlabels[name] = label
