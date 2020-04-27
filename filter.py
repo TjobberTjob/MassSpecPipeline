@@ -66,8 +66,13 @@ def clear(path):
 def getsizeandscore(path, scorecheck):
     print('Getting sizes and scores', end='\r')
     start = time.time()
-
     getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
+    stop = time.time()
+    print(f'Getting sizes and scores complete - {stop - start} sec')
+    start = time.time()
+    getsizes = [eval(lines)['size'] for lines in open(f'{path}subimage.json')]
+    stop = time.time()
+    print(f'Getting sizes and scores complete - {stop - start} sec')
     uniquesizes = np.unique(getsizes)
 
     sizedict = defaultdict()
