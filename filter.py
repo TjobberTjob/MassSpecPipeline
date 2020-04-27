@@ -255,8 +255,13 @@ def filter(path, file):
             clear(path)
             quit()
 
-        scorecheck = [False, 50]
-        amountcheck = [True, 2]
+        with open('config.json') as json_file:
+            data = json.load(json_file)
+
+        scorecheck = data['filterscore']
+        scorecheck[0] = scorecheck[0] == 'True'
+        amountcheck = data['filteramount']
+        amountcheck[0] = amountcheck[0] == 'True'
 
         output = getsizeandscore(path, scorecheck)
         size = output[0]
