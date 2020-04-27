@@ -124,11 +124,14 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     for line in open(f'{path}{filetosuse}'):
         a = line.split(', "')
         name = a[0][11:-1]
+        cont = False
         for f in a:
             if str(imageclass) in f:
-
-                print(f.split('"')[-2])
-                quit()
+                label = f.split('"')[-2]
+                cont = True
+                break
+        if not cont:
+            continue
         if name in tests[name.split('-')[-1][:-5]]:
             labels[name] = label
         else:
