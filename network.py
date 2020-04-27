@@ -44,26 +44,29 @@ def createnetworkfile(lenMS2):
 
 def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     print('Data fetching')
-    imgfiles = os.listdir(imgpath)
-    with gzip.GzipFile(f'{imgpath}{imgfiles[0]}', 'r') as fin:
+    if whichMS == 'both' and os.path.exists(f'{path}subimage_filtered_network.json'):
+        filetouse = 'subimage_filtered_network.json'
+    elif os.path.exists(f'{path}subimage_filtered.json'):
+        filetouse = 'subimage_filtered.json'
+    else:
+        filetouse = 'subimage.json'
+    print(filetouse)
+
+    for f in random.shuffle(list(open(f'{path}{filetouse}'))):
+        imgname = json.loads(f)['image']
+        break
+    with gzip.GzipFile(f'{imgpath}{imgname}', 'r') as fin:
         fullinfoimage = json.loads(fin.read().decode('utf-8'))
     image = fullinfoimage['ms1']
     imagelen = len(image)
     pixellen = len(image[0])
 
-    if whichMS == 'both' and os.path.exists(f'{path}subimage_filtered_network.json'):
-        filetosuse = 'subimage_filtered_network.json'
-    elif os.path.exists(f'{path}subimage_filtered.json'):
-        filetosuse = 'subimage_filtered.json'
-    else:
-        filetosuse = 'subimage.json'
-    print(filetosuse)
     start = time.time()
-    accs = [json.loads(acc)['accession'] for acc in open(f'{path}{filetosuse}') if 'accession' in json.loads(acc)]
+    accs = [json.loads(acc)['accession'] for acc in open(f'{path}{filetouse}') if 'accession' in json.loads(acc)]
     end = time.time()
     print(end-start)
     start = time.time()
-    accs2 = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetosuse}')]
+    accs2 = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetouse}')]
     end = time.time()
     print(end - start)
     print(accs == accs2)
