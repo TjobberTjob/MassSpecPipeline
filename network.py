@@ -194,11 +194,7 @@ class DataGenerator(keras.utils.Sequence):
             y[i] = self.labels[ID]
 
         if classification:
-            try:
-                y = keras.utils.to_categorical(y, num_classes=self.n_classes)
-            except:
-                print(y)
-                quit()
+            y = keras.utils.to_categorical(y, num_classes=self.n_classes)
 
         if self.MS == 'both':
             return [X, X2], y
