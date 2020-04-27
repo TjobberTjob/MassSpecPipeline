@@ -338,7 +338,7 @@ if __name__ == '__main__':
     classification = classification == 'c'
 
     nameofclass = imageclass.replace('/', '')
-
+    print('hey')
     output = datafetcher(metapath, imagepath, imageclass, test_accessions, whichMS)
     partition = output[0]
     labels = output[1]
