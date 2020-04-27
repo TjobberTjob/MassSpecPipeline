@@ -5,6 +5,8 @@ import random
 import sys
 import re
 import time
+from collections import defaultdict
+
 from simplejson import loads
 import keras
 from itertools import chain
@@ -85,12 +87,11 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         else:
             trainvalfiles.append(name)
 
-    random.shuffle(trainvalfiles)
 
     with open('config.json') as json_file:
         config = json.load(json_file)['networkattributes']
     splitratio = config['training_percentage'] / 100
-
+    random.shuffle(trainvalfiles)
     splits = round(len(trainvalfiles) * float(splitratio))
     trainfiles = trainvalfiles[:splits]
     validationfiles = trainvalfiles[splits:]
@@ -100,11 +101,15 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     for f in partition:
         print(f'Datapoint in {f}: {len(partition[f])}')
 
+    tests = defaultdict(list)
+    for f in testfiles:
+        tests[f.split('-')[-1][:-5]].append(f)
+
     labels = {}
     testlabels = {}
     for line in open(f'{path}{filetosuse}'):
         name = line.split(', "')[0][11:-1]
-        if name not in testfiles:
+        if name not in tests[name.split('-')[-1][:-5]]:
             getlabel = [f for f in [m.start() for m in re.finditer('"', line)] if f > re.search(f'{str(imageclass)}', line).span()[1]]
             label = line[getlabel[0] + 1: getlabel[1]]
             labels[name] = label
