@@ -87,7 +87,6 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         else:
             trainvalfiles.append(name)
 
-
     with open('config.json') as json_file:
         config = json.load(json_file)['networkattributes']
     splitratio = config['training_percentage'] / 100
@@ -97,9 +96,6 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     validationfiles = trainvalfiles[splits:]
 
     partition = {'train': trainfiles, 'validation': validationfiles, 'test': testfiles}
-
-    for f in partition:
-        print(f'Datapoint in {f}: {len(partition[f])}')
 
     tests = defaultdict(list)
     for f in testfiles:
@@ -122,6 +118,9 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
             labels[name] = label
         else:
             testlabels[name] = label
+
+    for f in partition:
+        print(f'Datapoint in {f}: {len(partition[f])}')
 
     return partition, labels, imagelen, pixellen, testlabels
 
