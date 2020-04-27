@@ -41,16 +41,11 @@ def createnetworkfile(lenMS2):
                         data['datacollected'] == 'ms2' or data['datacollected'] == 'both'):
                     outfile.write(json.dumps(data) + '\n')
             outfile.close()
+    return lenMS2
 
 
-def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
+def datafetcher(path, filetouse, imageclass, test_accessions, whichMS):
     print('Data fetching')
-    if whichMS == 'both' and os.path.exists(f'{path}subimage_filtered_network.json'):
-        filetouse = 'subimage_filtered_network.json'
-    elif os.path.exists(f'{path}subimage_filtered.json'):
-        filetouse = 'subimage_filtered.json'
-    else:
-        filetouse = 'subimage.json'
 
     for lines in open(f'{path}{filetouse}', 'r'):
         data = loads(lines)
@@ -204,10 +199,10 @@ def r2(y_true, y_pred):
 
 
 # Developing the neural network
-def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass, metapath, patience, whichMS, lenMS2):
+def nnmodel(length, width, classification, n_channels, n_classes, imageclass, metapath, patience, whichMS, lenMS2):
     # HIDDEN LAYERS
     if whichMS == 'ms1':  # MS1
-        input = Input(shape=(imglen, pixellen, n_channels,))
+        input = Input(shape=(length, width, n_channels,))
         x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
         x = MaxPooling2D(pool_size=(2, 2))(x)
         x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
@@ -226,7 +221,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
         x = Dense(32, activation='relu')(x)
 
     else:  # BOTH
-        input = Input(shape=(imglen, pixellen, n_channels,))  # MS1
+        input = Input(shape=(length, width, n_channels,))  # MS1
         x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
         x = MaxPooling2D(pool_size=(2, 2))(x)
         x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
@@ -307,14 +302,12 @@ if __name__ == '__main__':
 
     if os.path.exists(f'{metapath}subimage_filtered.json'):
         filetosuse = 'subimage_filtered.json'
-    elif os.path.exists(f'{metapath}subimage_filtered.json'):
-        filetosuse = 'subimage.json'
     else:
-        print('No datafile exists')
+        print('No filtered datafile exists')
         quit()
 
     # Creating network files
-    createnetworkfile(lenMS2)
+    lenMS2 = createnetworkfile(lenMS2)
 
     if setseed:
         random.seed(1)
@@ -326,20 +319,29 @@ if __name__ == '__main__':
     imageclass = f'{sys.argv[2]}_class'
     classification = classification == 'c'
 
+    if whichMS == 'both' and os.path.exists(f'{metapath}subimage_filtered_network.json'):
+        filetouse = 'subimage_filtered_network.json'
+    elif os.path.exists(f'{metapath}subimage_filtered.json'):
+        filetouse = 'subimage_filtered.json'
+
     nameofclass = imageclass.replace('/', '')
-    output = datafetcher(metapath, imagepath, imageclass, test_accessions, whichMS)
+    output = datafetcher(metapath, filetouse, imageclass, test_accessions, whichMS)
     partition = output[0]
     labels = output[1]
     length = output[2]
     width = output[3]
 
     if classification:
-        classes = [json.loads(line)[imageclass] for line in open(f'{metapath}subimage_filtered.json', 'r') if
-                   str(imageclass) in json.loads(line)]
+        classes = [f.split('"')[-2] for line in open(f'{metapath}{filetouse}', 'r') for f in line.split(', "') if imageclass in f]
         n_classes = len(np.unique(classes))
     else:
         n_classes = 1
-    print(f'# of classes: {n_classes}')
+
+    if batch_size == 'auto':
+        for i in range(10):
+            if 2**(i+4) > n_classes**2 *2:
+                batch_size = 2**(i+4)
+                break
 
     params = {'size': (length, width),
               'batch_size': batch_size,
@@ -352,7 +354,7 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(width, length, classification, n_channels, n_classes, nameofclass, metapath, patience, whichMS, lenMS2)
+    output = nnmodel(length, width, classification, n_channels, n_classes, nameofclass, metapath, patience, whichMS, lenMS2)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
@@ -388,3 +390,24 @@ if __name__ == '__main__':
 # python3 network.py c Length_class
 # python3 network.py c Seq_class
 # python3 network.py c Modi_class
+one = []
+two = []
+three = []
+for f in range(100):
+    start = time.time()
+    with gzip.GzipFile(f'a.json', 'r') as fin:
+        fullinfoimage = json.loads(fin.read().decode('utf-8'))
+    stop = time.time()
+    one.append(stop-start)
+
+    start = time.time()
+    fullinfoimage2 = json.load(open('b.json','r'))
+    stop = time.time()
+    two.append(stop-start)
+
+    # start = time.time()
+    # fullinfoimage2 = loads(open('b.json', 'r'))
+    # stop = time.time()
+    # three.append(stop - start)
+print(np.mean(one), np.mean(two), np.mean(three))
+print(fullinfoimage == fullinfoimage2)

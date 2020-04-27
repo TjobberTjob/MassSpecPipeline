@@ -173,7 +173,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck, amountcheck):
         amounts = defaultdict(list)
         for f in seen:
             amounts[f] = len(seen[f])
-        minamount = min(f for f in amounts.values() if f >= amountcheck[1] * sum(amounts.values()))
+        minamount = min(f for f in amounts.values() if f >= amountcheck[1]/100 * sum(amounts.values()))
 
         Seen = defaultdict(list)
         for f in seen:
@@ -199,7 +199,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck, amountcheck):
         name = a[0][11:-1]
         if name in quickcheckdict[name.split('-')[-1][:-5]]:
             data = loads(line)
-            data['Charge_class'] = [str(index) for index in Seen].index(data['Charge'])
+            data['Charge_class'] = str([str(index) for index in Seen].index(data['Charge']))
             outfile.write(json.dumps(data) + '\n')
             i += 1
     outfile.close()
@@ -256,7 +256,7 @@ def filter(path, file):
             quit()
 
         scorecheck = [False, 50]
-        amountcheck = [False, 10]
+        amountcheck = [True, 2]
 
         output = getsizeandscore(path, scorecheck)
         size = output[0]
@@ -268,7 +268,7 @@ def filter(path, file):
             quit()
 
         elif sys.argv[2] == 'Length':
-            filterlength(path, outfile, scorepercentile, size)
+            filterlength(path, outfile, scorepercentile, size, scorecheck, amountcheck)
             quit()
 
         elif sys.argv[2] == 'PTM':
