@@ -110,7 +110,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     testlabels = {}
     for line in open(f'{path}{filetosuse}'):
         data = loads(line)
-        name = data['images']
+        name = data['image']
         if name not in tests[name.split('-')[-1][:-5]]:
             labels[name] = data[imageclass]
         else:
