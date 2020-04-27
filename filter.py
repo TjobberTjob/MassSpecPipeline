@@ -196,19 +196,6 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
     print(f'writing to file complete - {end - start} sec')
     print(f'Length of filtered file: {i}')
 
-    print('writing to file', end='\r')
-    start = time.time()
-    i = 0
-    for line in open(f'{path}subimage.json'):
-        data = json.loads(line)
-        if 'Charge' in data and data['image'] in Seen[int(data['Charge'])]:
-            outfile.write(json.dumps(data) + '\n')
-            i += 1
-    outfile.close()
-    end = time.time()
-    print(f'writing to file complete - {end-start} seconds')
-    print(f'Length of filtered file: {i}')
-
 
 def filterptm(path, outfile, getabovehere, ms1size):
     seen = defaultdict(list)
