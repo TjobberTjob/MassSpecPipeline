@@ -52,7 +52,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         filetouse = 'subimage.json'
     print(filetouse)
 
-    for f in random.shuffle(list(open(f'{path}{filetouse}'))):
+    for f in list(open(f'{path}{filetouse}')):
         imgname = json.loads(f)['image']
         break
     with gzip.GzipFile(f'{imgpath}{imgname}', 'r') as fin:
