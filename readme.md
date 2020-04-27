@@ -21,6 +21,8 @@ Required python packages:
 
 `pip install pandas`
 
+`pip install numpy`
+
 `pip install lxml`
 
 `tensorflow (CPU or GPU)`

@@ -15,7 +15,7 @@ curl -O https://repo.anaconda.com/archive/Anaconda3-2019.03-Linux-x86_64.sh
 
 bash Anaconda3-2019.03-Linux-x86_64.sh
 
-printf PATH=/work/conda3/bin:$PATH >> ~/.bashrc
+printf PATH=/work/environments/conda/bin/:$PATH >> ~/.bashrc
+alias python="/work/environments/conda/bin/python"
+alias pip="/work/environments/conda/bin/python -m pip"
 source ~/.bashrc
-alias python="/work/conda3/bin/python"
-alias pip="/work/conda3/bin/python -m pip"

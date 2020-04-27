@@ -338,7 +338,6 @@ if __name__ == '__main__':
     classification = classification == 'c'
 
     nameofclass = imageclass.replace('/', '')
-    print('hey')
     output = datafetcher(metapath, imagepath, imageclass, test_accessions, whichMS)
     partition = output[0]
     labels = output[1]
@@ -398,7 +397,7 @@ if __name__ == '__main__':
     else:
         print(f'Accuracy on test data. Loss: {testaccuracy[0]}. R^2: {testaccuracy[1]}')
 
-# python3 network.py r m/z 0.8
-# python3 network.py c Length_class 0.8
-# python3 network.py c Seq_class 0.8
-# python3 network.py c Modi_class 0.8
+# python3 network.py r m/z
+# python3 network.py c Length_class
+# python3 network.py c Seq_class
+# python3 network.py c Modi_class
