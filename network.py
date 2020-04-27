@@ -343,7 +343,6 @@ if __name__ == '__main__':
     labels = output[1]
     imglen = output[2]
     pixellen = output[3]
-    testlabels = output[4]
 
     if classification:
         classes = [json.loads(line)[imageclass] for line in open(f'{metapath}subimage_filtered.json', 'r') if
