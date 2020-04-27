@@ -57,9 +57,9 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         filetosuse = 'subimage_filtered.json'
     else:
         filetosuse = 'subimage.json'
+    print(filetosuse)
     start = time.time()
-    accs = [json.loads(acc)['accession'] for acc in open(f'{path}{filetosuse}') if
-            'accession' in json.loads(acc)]
+    accs = [json.loads(acc)['accession'] for acc in open(f'{path}{filetosuse}') if 'accession' in json.loads(acc)]
     end = time.time()
     print(end-start)
     start = time.time()
