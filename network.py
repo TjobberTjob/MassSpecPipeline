@@ -61,12 +61,13 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     pixellen = len(image[0])
 
     start = time.time()
+    fails = []
     for i,f in enumerate(open(f'{path}{filetouse}')):
         try:
             data = loads(f)
         except:
-            print(f ,i)
-            quit()
+            fails.append(i)
+    print(fails)
     accs = [loads(acc)['accession'] for acc in open(f'{path}{filetouse}') if 'accession' in acc]
     end = time.time()
     print(end-start)
