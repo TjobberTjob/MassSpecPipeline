@@ -49,7 +49,8 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     elif os.path.exists(f'{path}subimage_filtered.json'):
         filetouse = 'subimage_filtered.json'
     else:
-        filetouse = 'subimage.json
+        filetouse = 'subimage.json'
+
     for singleline in open(f'{path}{filetouse}', 'r'):
         print(singleline)
         imgname = singleline.split(', "')[0][11:-1]
