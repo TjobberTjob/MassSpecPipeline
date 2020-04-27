@@ -52,7 +52,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         filetouse = 'subimage.json'
 
     for singleline in open(f'{path}{filetouse}', 'r'):
-        print(singleline)
+        print(singleline.split(', "')[1][-10:-1])
         imgname = singleline.split(', "')[0][11:-1]
         break
     with gzip.GzipFile(f'{imgpath}{imgname}', 'r') as fin:
