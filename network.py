@@ -1,21 +1,18 @@
+import gzip
 import json
 import math
 import os
 import random
-import sys
 import re
-import time
+import sys
 from collections import defaultdict
-
-from simplejson import loads
-import keras
 from itertools import chain
+import keras
 import matplotlib.pyplot as plt
 import numpy as np
-import gzip
 from keras.engine.saving import load_model
-from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
-from keras.utils import plot_model
+from keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
+# from keras.utils import plot_model
 
 
 def getclass(word, string):
@@ -289,7 +286,7 @@ def nnmodel(imglen, pixellen, classification, n_channels, n_classes, imageclass,
     else:
         model = keras.Model(inputs=[input, input2], outputs=output)
     # print(model.summary())
-    plot_model(model, to_file="model.png")
+    # plot_model(model, to_file="model.png")
 
     if classification:
         if n_classes == 2:
