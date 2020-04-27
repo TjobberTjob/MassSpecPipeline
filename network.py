@@ -61,7 +61,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     pixellen = len(image[0])
 
     start = time.time()
-    accs = [loads(acc)['accession'] for acc in open(f'{path}{filetouse}') if 'accession' in json.loads(acc)]
+    accs = [loads(acc)['accession'] for acc in open(f'{path}{filetouse}') if 'accession' in acc]
     end = time.time()
     print(end-start)
     start = time.time()
