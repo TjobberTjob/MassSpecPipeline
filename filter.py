@@ -188,9 +188,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
     for line in open(f'{path}subimage.json'):
         a = line.split(', "')
         name = a[0][11:-1]
-        print(name, Seen2[name.split('-')[-1][:-5]])
-        quit()
-        if name.split('-')[-1][:-5] in Seen2[name.split('-')[-1][:-5]]:
+        if name in Seen2[name.split('-')[-1][:-5]]:
             outfile.write(line + '\n')
             i += 1
     outfile.close()
