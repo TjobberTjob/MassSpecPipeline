@@ -95,26 +95,18 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
 
     partition = {'train': trainfiles, 'validation': validationfiles, 'test': testfiles}
 
-    tests = defaultdict(list)
-    for f in testfiles:
-        tests[f.split('-')[-1][:-5]].append(f)
-
     labels = {}
-    testlabels = {}
     for line in open(f'{path}{filetosuse}'):
         data = loads(line)
         name = data['image']
         label = data[imageclass]
 
-        if name in tests[name.split('-')[-1][:-5]]:
-            testlabels[name] = label
-        else:
-            labels[name] = label
+        labels[name] = label
 
     for f in partition:
         print(f'Datapoint in {f}: {len(partition[f])}')
 
-    return partition, labels, imagelen, pixellen, testlabels
+    return partition, labels, imagelen, pixellen
 
 
 # Developing the data generator
