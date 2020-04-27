@@ -13,6 +13,7 @@ import numpy as np
 from keras.engine.saving import load_model
 from keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
 # from keras.utils import plot_model
+from simplejson import loads
 
 
 def getclass(word, string):
@@ -101,28 +102,14 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     labels = {}
     testlabels = {}
     for line in open(f'{path}{filetosuse}'):
-        a = line.split(', "')
-        name = a[0][11:-1]
-        label = True
-        for f in a:
-            if str(imageclass) in f:
-                label = f.split('"')[-2]
-                break
+        data = loads(line)
+        name = data['image']
+        label = data[imageclass]
 
-        if label:
-            continue
         if name in tests[name.split('-')[-1][:-5]]:
             testlabels[name] = label
         else:
             labels[name] = label
-
-    for f in labels:
-        print(f, labels[f])
-        break
-
-    for f in testlabels:
-        print(f, testlabels[f])
-        quit()
 
     for f in partition:
         print(f'Datapoint in {f}: {len(partition[f])}')
