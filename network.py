@@ -51,9 +51,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     else:
         filetouse = 'subimage.json'
 
-    for f in open(f'{path}{filetouse}', 'r'):
-        loads(f)
-        quit()
+    for lines in open(f'{path}{filetouse}', 'r'):
         imgname = lines.split(', "')[0][11:-1]
         break
     with gzip.GzipFile(f'{imgpath}{imgname}', 'r') as fin:
@@ -63,7 +61,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     pixellen = len(image[0])
 
     start = time.time()
-    accs = [json.loads(acc)['accession'] for acc in open(f'{path}{filetouse}') if 'accession' in json.loads(acc)]
+    accs = [loads(acc)['accession'] for acc in open(f'{path}{filetouse}') if 'accession' in json.loads(acc)]
     end = time.time()
     print(end-start)
     start = time.time()
