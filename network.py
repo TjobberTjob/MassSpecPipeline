@@ -109,6 +109,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     testlabels = {}
     for line in open(f'{path}{filetosuse}'):
         name = line.split(', "')[0][11:-1]
+        print(name,name.split('-')[-1][:-5],tests[name.split('-')[-1][:-5]])
         if name not in tests[name.split('-')[-1][:-5]]:
             getlabel = [f for f in [m.start() for m in re.finditer('"', line)] if f > re.search(f'{str(imageclass)}', line).span()[1]]
             label = line[getlabel[0] + 1: getlabel[1]]
