@@ -167,9 +167,6 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
     for f in seen:
         amounts[f] = len(seen[f])
     minamount = min(f for f in amounts.values() if f >= 0.25 * sum(amounts.values()))
-    for f in amounts:
-        if amounts[f] >= minamount:
-            print(f'{f}: {amounts[f]}')
 
     Seen = defaultdict(list)
     for f in seen:
@@ -177,7 +174,6 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
             random.shuffle(seen[f])
             Seen[f] = seen[f][0:minamount]
     for f in Seen:
-        print(f'{f}: {len(Seen[f])}')
     end = time.time()
 
     fullnamelist = list(chain.from_iterable([Seen[f] for f in Seen]))
@@ -185,6 +181,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
     for f in fullnamelist:
         Seen2[f.split('-')[-1][:-5]].append(f)
     print(f'seperating data complete - {end - start} sec')
+
 
     print('writing to file', end='\r')
     start = time.time()
@@ -200,7 +197,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
                 charge = int(f[-2:-1])
                 checklist.append(True)
 
-        if name in Seen[int(charge)]:
+        if name.split('-')[-1][:-5] in Seen2[name.split('-')[-1][:-5]]:
             outfile.write(line + '\n')
             i += 1
     outfile.close()
