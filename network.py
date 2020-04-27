@@ -66,7 +66,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     # end = time.time()
     # print(end-start)
     start = time.time()
-    accs2 = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetouse}')]
+    accs2 = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetouse}', 'r')]
     end = time.time()
     print(end - start)
     print(accs == accs2)
