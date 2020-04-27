@@ -187,15 +187,8 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
     start = time.time()
     i = 0
     for line in open(f'{path}subimage.json'):
-        checklist = []
         a = line.split(', "')
-        for f in a:
-            if 'image' in f:
-                name = f[11:-1]
-                checklist.append(True)
-            elif 'Charge' in f:
-                charge = int(f[-2:-1])
-                checklist.append(True)
+        name = a[0][11:-1]
 
         if name.split('-')[-1][:-5] in Seen2[name.split('-')[-1][:-5]]:
             outfile.write(line + '\n')
