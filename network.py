@@ -57,7 +57,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         break
     with gzip.GzipFile(f'{imgpath}{imgname}', 'r') as fin:
         fullinfoimage = json.loads(fin.read().decode('utf-8'))
-    image = fullinfoimage['ms1'])
+    image = fullinfoimage['ms1']
     imagelen = len(image)
     pixellen = len(image[0])
 
