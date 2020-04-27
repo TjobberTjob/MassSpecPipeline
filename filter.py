@@ -189,6 +189,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
         a = line.split(', "')
         name = a[0][11:-1]
         print(name, Seen2[name.split('-')[-1][:-5]])
+        quit()
         if name.split('-')[-1][:-5] in Seen2[name.split('-')[-1][:-5]]:
             outfile.write(line + '\n')
             i += 1
