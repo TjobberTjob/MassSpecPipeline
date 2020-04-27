@@ -53,7 +53,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
 
     with open(f'{path}{filetouse}', 'r') as f:
         for lines in f:
-            data = json.loads(lines)
+            type(lines)
             imgname = lines.split(', "')[0][11:-1]
             break
     with gzip.GzipFile(f'{imgpath}{imgname}', 'r') as fin:
