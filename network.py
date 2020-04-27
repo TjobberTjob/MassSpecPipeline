@@ -118,9 +118,11 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
 
     for f in labels:
         print(f, labels[f])
+        break
 
     for f in testlabels:
         print(f, testlabels[f])
+        quit()
 
     for f in partition:
         print(f'Datapoint in {f}: {len(partition[f])}')
