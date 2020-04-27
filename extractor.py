@@ -480,6 +480,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
         rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen)
         rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
         subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
+        subimageshape = np.array(subimage).shape
 
         try:
             ms2info = [mzmlfile['ms2'][str(rows['MS/MS IDs'])]['m/z_array'],
@@ -501,7 +502,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
         new_metadata = {}
         new_metadata['image'] = f'{accnr}-{filename}-{rows["MS/MS IDs"]}.json'
         new_metadata['accession'] = accnr
-        new_metadata['size'] = np.array(subimage).shape
+        new_metadata['size'] = subimageshape
         new_metadata['ms2arraylength'] = len(ms2info[0])
         new_metadata['datacollected'] = datacollected
         for ele in df.columns:

@@ -16,15 +16,6 @@ from keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenat
 from simplejson import loads
 
 
-def getclass(word, string):
-    if word == '"size"':
-        output = string[re.search('\[', string).span()[0]:re.search(']', string).span()[1]]
-    else:
-        ab = [f for f in [m.start() for m in re.finditer('"', string)] if f > re.search(word, string).span()[1]]
-        output = string[ab[0] + 1: ab[1]]
-    return output
-
-
 def createnetworkfile(lenMS2):
     if whichMS == 'both' or whichMS == 'ms2':
         print('Creating MS2 data structure')
@@ -62,13 +53,12 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         filetouse = 'subimage.json'
 
     for lines in open(f'{path}{filetouse}', 'r'):
-        imgname = lines.split(', "')[0][11:-1]
+        data = loads(lines)
+        size = data['size']
         break
-    with gzip.GzipFile(f'{imgpath}{imgname}', 'r') as fin:
-        fullinfoimage = json.loads(fin.read().decode('utf-8'))
-    image = fullinfoimage['ms1']
-    imagelen = len(image)
-    pixellen = len(image[0])
+
+    length = size[0]
+    width = size[1]
 
     accs = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetouse}', 'r')]
     accs = np.unique(accs)
@@ -106,7 +96,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     for f in partition:
         print(f'Datapoint in {f}: {len(partition[f])}')
 
-    return partition, labels, imagelen, pixellen
+    return partition, labels, length, width
 
 
 # Developing the data generator
@@ -152,7 +142,7 @@ class DataGenerator(keras.utils.Sequence):
         'Generates data containing batch_size samples'
         # Initialization
         if self.MS == 'ms1':
-            X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
+            X = np.empty((self.batch_size, self.size[0], self.size[1], self.n_channels))
 
         elif self.MS == 'ms2':
             X = np.empty((self.batch_size, self.mslen))
@@ -161,7 +151,10 @@ class DataGenerator(keras.utils.Sequence):
             X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
             X2 = np.empty((self.batch_size, self.mslen))
 
-        y = np.empty(self.batch_size, dtype=float)
+        if classification:
+            y = np.empty(self.batch_size, dtype=int)
+        else:
+            y = np.empty(self.batch_size, dtype=float)
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
@@ -330,15 +323,15 @@ if __name__ == '__main__':
     if not (classification == 'c' or classification == 'r'):
         print('classification or regression problem not input correctly.')
         quit()
-    imageclass = sys.argv[2]
+    imageclass = f'{sys.argv[2]}_class'
     classification = classification == 'c'
 
     nameofclass = imageclass.replace('/', '')
     output = datafetcher(metapath, imagepath, imageclass, test_accessions, whichMS)
     partition = output[0]
     labels = output[1]
-    imglen = output[2]
-    pixellen = output[3]
+    length = output[2]
+    width = output[3]
 
     if classification:
         classes = [json.loads(line)[imageclass] for line in open(f'{metapath}subimage_filtered.json', 'r') if
@@ -348,7 +341,7 @@ if __name__ == '__main__':
         n_classes = 1
     print(f'# of classes: {n_classes}')
 
-    params = {'size': (pixellen, imglen),
+    params = {'size': (length, width),
               'batch_size': batch_size,
               'n_classes': n_classes,
               'n_channels': n_channels,
@@ -359,8 +352,7 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(imglen, pixellen, classification, n_channels, n_classes, nameofclass, metapath, patience, whichMS,
-                     lenMS2)
+    output = nnmodel(width, length, classification, n_channels, n_classes, nameofclass, metapath, patience, whichMS, lenMS2)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,

@@ -10,6 +10,7 @@ import glob
 import sys
 from collections import defaultdict, Counter
 import pandas as pd
+from simplejson import loads
 
 
 def getclass(word, string):
@@ -81,10 +82,11 @@ def getsizeandscore(path, scorecheck):
         if len(size) == 3:
             ms1size = sizes[0]
             break
-    if scorecheck:
+
+    if scorecheck[0]:
         getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
                      'score' in line.lower() and 'dp' not in line.lower() and str(ms1size) in lines.lower()]
-        getabovehere = np.percentile(getscores, 1)
+        getabovehere = np.percentile(getscores, scorecheck[1])
     else:
         getabovehere = 'Fuckthis'
 
@@ -94,12 +96,14 @@ def getsizeandscore(path, scorecheck):
 
 
 def filtersequence(path, outfile, getabovehere, ms1size):
+    mostfrequent = 10
+
     seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
     Seen = np.unique(seen)
     a = {}
     for f in Seen:
         a[str(f)] = seen.count(f)
-    seen = [f[0] for f in Counter(a).most_common(10)]
+    mostcommon = [f[0] for f in Counter(a).most_common(mostfrequent)]
 
     amounts = [len(seen[f]) for f in Seen]
     Seen = defaultdict(list)
@@ -112,7 +116,7 @@ def filtersequence(path, outfile, getabovehere, ms1size):
 
         if 'size' in data and data['size'] == str(ms1size) and 'Sequence' in data and data[
             'Sequence'] in Seen:
-            data['Seq_class'] = Seen.index(data['Sequence'])
+            data['Sequence_class'] = Seen.index(data['Sequence'])
             outfile.write(json.dumps(data) + '\n')
     outfile.close()
 
@@ -132,13 +136,13 @@ def filterlength(path, outfile, getabovehere, ms1size):
     outfile.close()
 
 
-def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
+def filtercharge(path, outfile, getabovehere, ms1size, scorecheck, amountcheck):
     print('seperating data', end='\r')
     start = time.time()
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
         checklist = []
-        if scorecheck:
+        if scorecheck[0]:
             checklen = 4
         else:
             checklen = 3
@@ -155,32 +159,36 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
             elif 'Charge' in f:
                 charge = int(f[-2:-1])
                 checklist.append(True)
-            elif 'Score' in f and 'DP' not in f and scorecheck:
+            elif 'Score' in f and 'DP' not in f and scorecheck[0]:
                 score = float(f[11:-1])
                 checklist.append(True)
 
         if len(checklist) == checklen and size == ms1size:
-            if scorecheck and score >= getabovehere:
+            if scorecheck[0] and score >= getabovehere:
                 seen[charge].append(name)
-            elif not scorecheck:
+            elif not scorecheck[0]:
                 seen[charge].append(name)
 
-    amounts = defaultdict(list)
-    for f in seen:
-        amounts[f] = len(seen[f])
-    minamount = min(f for f in amounts.values() if f >= 0.25 * sum(amounts.values()))
+    if amountcheck[0]:
+        amounts = defaultdict(list)
+        for f in seen:
+            amounts[f] = len(seen[f])
+        minamount = min(f for f in amounts.values() if f >= amountcheck[1] * sum(amounts.values()))
 
-    Seen = defaultdict(list)
-    for f in seen:
-        if len(seen[f]) >= minamount:
-            random.shuffle(seen[f])
-            Seen[f] = seen[f][0:minamount]
-    end = time.time()
+        Seen = defaultdict(list)
+        for f in seen:
+            if len(seen[f]) >= minamount:
+                random.shuffle(seen[f])
+                Seen[f] = seen[f][0:minamount]
+        end = time.time()
+    else:
+        Seen = seen
 
     fullnamelist = list(chain.from_iterable([Seen[f] for f in Seen]))
-    Seen2 = defaultdict(list)
+    quickcheckdict = defaultdict(list)
     for f in fullnamelist:
-        Seen2[f.split('-')[-1][:-5]].append(f)
+        quickcheckdict[f.split('-')[-1][:-5]].append(f)
+    end = time.time()
     print(f'seperating data complete - {end - start} sec')
 
     print('writing to file', end='\r')
@@ -189,8 +197,10 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
     for line in open(f'{path}subimage.json'):
         a = line.split(', "')
         name = a[0][11:-1]
-        if name in Seen2[name.split('-')[-1][:-5]]:
-            outfile.write(f'{line}')
+        if name in quickcheckdict[name.split('-')[-1][:-5]]:
+            data = loads(line)
+            data['Charge_class'] = [str(index) for index in Seen].index(data['Charge'])
+            outfile.write(json.dumps(data) + '\n')
             i += 1
     outfile.close()
     end = time.time()
@@ -245,7 +255,9 @@ def filter(path, file):
             clear(path)
             quit()
 
-        scorecheck = False
+        scorecheck = [False, 50]
+        amountcheck = [False, 10]
+
         output = getsizeandscore(path, scorecheck)
         size = output[0]
         scorepercentile = output[1]
@@ -264,7 +276,7 @@ def filter(path, file):
             quit()
 
         elif sys.argv[2] == 'Charge':
-            filtercharge(path, outfile, scorepercentile, size, scorecheck)
+            filtercharge(path, outfile, scorepercentile, size, scorecheck, amountcheck)
             quit()
 
 
