@@ -4,6 +4,7 @@ import os
 import re
 import time
 import numpy as np
+from itertools import chain
 import random
 import glob
 import sys
@@ -176,6 +177,14 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
             random.shuffle(seen[f])
             Seen[f] = seen[f][0:minamount]
     end = time.time()
+
+    fullnamelist = list(chain.from_iterable([Seen[f] for f in Seen]))
+    Seen2 = defaultdict(list)
+    for f in Seen2:
+        for g in f:
+            print(Seen2[f][g].split('-')[-1], g)
+            quit()
+            fullnamelist[Seen2[f][g].split('-')[-1]] = g
     print(f'seperating data complete - {end - start} sec')
 
     print('writing to file', end='\r')
