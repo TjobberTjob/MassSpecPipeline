@@ -4,7 +4,7 @@ import os
 import random
 import sys
 import time
-
+from simplejson import loads
 import keras
 from itertools import chain
 import matplotlib.pyplot as plt
@@ -51,12 +51,11 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     else:
         filetouse = 'subimage.json'
 
-    with open(f'{path}{filetouse}', 'r') as f:
-        for lines in f:
-            print(type(eval(lines)))
-            quit()
-            imgname = lines.split(', "')[0][11:-1]
-            break
+    for f in open(f'{path}{filetouse}', 'r'):
+        loads(f)
+        quit()
+        imgname = lines.split(', "')[0][11:-1]
+        break
     with gzip.GzipFile(f'{imgpath}{imgname}', 'r') as fin:
         fullinfoimage = json.loads(fin.read().decode('utf-8'))
     image = fullinfoimage['ms1']
