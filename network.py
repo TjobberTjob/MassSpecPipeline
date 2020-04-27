@@ -3,6 +3,7 @@ import math
 import os
 import random
 import sys
+import re
 import time
 from simplejson import loads
 import keras
@@ -13,6 +14,15 @@ import gzip
 from keras.engine.saving import load_model
 from keras.layers import Dropout, Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
 from keras.utils import plot_model
+
+
+def getclass(word, string):
+    if word == '"size"':
+        output = string[re.search('\[', string).span()[0]:re.search(']', string).span()[1]]
+    else:
+        ab = [f for f in [m.start() for m in re.finditer('"', string)] if f > re.search(word, string).span()[1]]
+        output = string[ab[0] + 1: ab[1]]
+    return output
 
 
 def createnetworkfile(lenMS2):
@@ -60,16 +70,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     imagelen = len(image)
     pixellen = len(image[0])
 
-    start = time.time()
-    accs = [loads(acc)['accession'] for acc in open(f'{path}{filetouse}') if 'accession' in acc]
-    end = time.time()
-    print(end-start)
-    start = time.time()
-    accs2 = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetouse}', 'r')]
-    end = time.time()
-    print(end - start)
-    print(accs == accs2)
-    quit()
+    accs = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetouse}', 'r')]
     accs = np.unique(accs)
     random.shuffle(accs)
     test_accs = accs[0:test_accessions]
@@ -77,10 +78,12 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     testfiles = []
     trainvalfiles = []
     for acc in open(f'{path}{filetosuse}'):
-        if 'accession' in json.loads(acc) and json.loads(acc)['accession'] in test_accs:
-            testfiles.append(json.loads(acc)["image"])
+        accession = acc.split(', "')[1][-10:-1]
+        name = acc.split(', "')[0][11:-1]
+        if accession in test_accs:
+            testfiles.append(name)
         else:
-            trainvalfiles.append(json.loads(acc)["image"])
+            trainvalfiles.append(name)
 
     random.shuffle(trainvalfiles)
 
@@ -100,14 +103,13 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     labels = {}
     testlabels = {}
     for line in open(f'{path}{filetosuse}'):
-        imagedata = json.loads(line)
-        if f'{imagedata["image"]}' not in testfiles:
-            name = f'{imagedata["image"]}'
-            labels[name] = imagedata[imageclass]
+        name = line.split(', "')[0][11:-1]
+        if name not in testfiles:
+            labels[name] = getclass(f'{str(imageclass)}', line)
         else:
-            name = f'{imagedata["image"]}'
-            testlabels[name] = imagedata[imageclass]
-
+            testlabels[name] = getclass(f'{str(imageclass)}', line)
+    print(testlabels)
+    quit()
     return partition, labels, imagelen, pixellen, testlabels
 
 
