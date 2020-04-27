@@ -68,9 +68,6 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
     print(end - start)
     print(accs == accs2)
     quit()
-    for line in open(f'{path}subimage.json'):
-        a =
-        name = a
     accs = np.unique(accs)
     random.shuffle(accs)
     test_accs = accs[0:test_accessions]
