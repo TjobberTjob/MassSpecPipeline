@@ -53,7 +53,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
 
     with open(f'{path}{filetouse}', 'r') as f:
         for lines in f:
-            print(type(lines))
+            print(type(eval(lines)))
             quit()
             imgname = lines.split(', "')[0][11:-1]
             break
