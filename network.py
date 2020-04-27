@@ -127,7 +127,7 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         for f in a:
             if str(imageclass) in f:
 
-                print(f.split('"'))
+                print(f.split('"')[-2])
                 quit()
         if name in tests[name.split('-')[-1][:-5]]:
             labels[name] = label
