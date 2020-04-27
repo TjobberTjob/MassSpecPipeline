@@ -17,8 +17,9 @@ def getclass(word, string):
         output = string[re.search('\[', string).span()[0]:re.search(']', string).span()[1]]
     else:
         ab = [f for f in [m.start() for m in re.finditer('"', string)] if f > re.search(word, string).span()[1]]
-        output = string[ab[0]+1: ab[1]]
+        output = string[ab[0] + 1: ab[1]]
     return output
+
 
 def combine(path):
     if os.path.exists(f'{path}subimage.json'):
@@ -38,7 +39,8 @@ def combine(path):
 
 
 def clear(path):
-    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
+    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
+                open(f'{path}subimage.json')]
 
     uniquesizes = np.unique(getsizes)
 
@@ -66,7 +68,8 @@ def clear(path):
 def getsizeandscore(path, scorecheck):
     print('Getting sizes and scores', end='\r')
     start = time.time()
-    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in open(f'{path}subimage.json')]
+    getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
+                open(f'{path}subimage.json')]
     uniquesizes = np.unique(getsizes)
 
     sizedict = defaultdict()
@@ -79,13 +82,14 @@ def getsizeandscore(path, scorecheck):
             ms1size = sizes[0]
             break
     if scorecheck:
-        getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if 'score' in line.lower() and 'dp' not in line.lower() and str(ms1size) in lines.lower()]
+        getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
+                     'score' in line.lower() and 'dp' not in line.lower() and str(ms1size) in lines.lower()]
         getabovehere = np.percentile(getscores, 1)
     else:
         getabovehere = 'Fuckthis'
 
     stop = time.time()
-    print(f'Getting sizes and scores complete - {stop-start} sec')
+    print(f'Getting sizes and scores complete - {stop - start} sec')
     return ms1size, getabovehere
 
 
@@ -161,7 +165,6 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
             elif not scorecheck:
                 seen[charge].append(name)
 
-
     amounts = defaultdict(list)
     for f in seen:
         amounts[f] = len(seen[f])
@@ -180,7 +183,6 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
         Seen2[f.split('-')[-1][:-5]].append(f)
     print(f'seperating data complete - {end - start} sec')
 
-
     print('writing to file', end='\r')
     start = time.time()
     i = 0
@@ -188,7 +190,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
         a = line.split(', "')
         name = a[0][11:-1]
         if name in Seen2[name.split('-')[-1][:-5]]:
-            outfile.write(line + '\n')
+            outfile.write(f'{line}\n')
             i += 1
     outfile.close()
     end = time.time()
