@@ -390,24 +390,3 @@ if __name__ == '__main__':
 # python3 network.py c Length_class
 # python3 network.py c Seq_class
 # python3 network.py c Modi_class
-one = []
-two = []
-three = []
-for f in range(100):
-    start = time.time()
-    with gzip.GzipFile(f'a.json', 'r') as fin:
-        fullinfoimage = json.loads(fin.read().decode('utf-8'))
-    stop = time.time()
-    one.append(stop-start)
-
-    start = time.time()
-    fullinfoimage2 = json.load(open('b.json','r'))
-    stop = time.time()
-    two.append(stop-start)
-
-    # start = time.time()
-    # fullinfoimage2 = loads(open('b.json', 'r'))
-    # stop = time.time()
-    # three.append(stop - start)
-print(np.mean(one), np.mean(two), np.mean(three))
-print(fullinfoimage == fullinfoimage2)

@@ -67,8 +67,6 @@ def clear(path):
 
 
 def getsizeandscore(path, scorecheck):
-    print('Getting sizes and scores', end='\r')
-    start = time.time()
     getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                 open(f'{path}subimage.json')]
     uniquesizes = np.unique(getsizes)
@@ -89,35 +87,58 @@ def getsizeandscore(path, scorecheck):
         getabovehere = np.percentile(getscores, scorecheck[1])
     else:
         getabovehere = 'Fuckthis'
-
-    stop = time.time()
-    print(f'Getting sizes and scores complete - {stop - start} sec')
     return ms1size, getabovehere
 
 
-def filtersequence(path, outfile, getabovehere, ms1size):
+def filtersequence(path, outfile, getabovehere, ms1size, scorecheck, amountcheck):
     mostfrequent = 10
 
-    seen = [json.loads(line)['Sequence'] for line in open(f'{path}subimage.json') if 'Sequence' in json.loads(line)]
-    Seen = np.unique(seen)
-    a = {}
-    for f in Seen:
-        a[str(f)] = seen.count(f)
-    mostcommon = [f[0] for f in Counter(a).most_common(mostfrequent)]
+    seen = defaultdict(list)
+    for line in open(f'{path}subimage.json'):
+        jsonlist = line.split(', "')
+        if scorecheck[0]:
+            keys = ['image', 'size', 'Sequence', 'Score']
+        else:
+            keys = ['image', 'size', 'Sequence']
+        values = [key.split('"')[-2] for key in jsonlist for part in keys if part in key and 'DP' not in key]
 
-    amounts = [len(seen[f]) for f in Seen]
+        if scorecheck[0] and len(values) == 4 and values[1] == ms1size and float(values[3]) > getabovehere:
+            seen[values[2]].append(values[0])
+        elif not scorecheck[0] and len(values) == 3 and values[1] == ms1size:
+            seen[values[2]].append(values[0])
+
+    uniquesequences = [f for f in seen.keys()]
+    amountdict = defaultdict()
+    for f in uniquesequences:
+        amountdict[f] = len(seen[f])
+    if amountcheck[0]:
+        mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > amountcheck[1]/100 * sum(amountdict.values())]
+        minamount = min([f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
+    else:
+        mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent)]
+        minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
+
     Seen = defaultdict(list)
-    for f in seen:
-        random.shuffle(seen[f])
-        Seen[f] = seen[f][0:min(amounts)]
+    for seq in seen:
+        if seq in mostcommon:
+            random.shuffle(seen[seq])
+            Seen[f] = seen[seq][0:minamount]
 
+    fullnamelist = list(chain.from_iterable([Seen[f] for f in Seen]))
+    quickcheckdict = defaultdict(list)
+    for names in fullnamelist:
+        quickcheckdict[names.split('-')[-1][:-5]].append(f)
+
+    i = 0
     for line in open(f'{path}subimage.json', 'r'):
-        data = json.loads(line)
+        name = line.split(', "')[0][11:-1]
 
-        if 'size' in data and data['size'] == str(ms1size) and 'Sequence' in data and data[
-            'Sequence'] in Seen:
-            data['Sequence_class'] = Seen.index(data['Sequence'])
+        if name in quickcheckdict[name.split('-')[-1][:-5]]:
+            data = loads(line)
+            data['Sequence_class'] = str([str(index) for index in Seen].index(data['Sequence']))
             outfile.write(json.dumps(data) + '\n')
+            i += 1
+    print(f'{i} lines written to filtered version')
     outfile.close()
 
 
@@ -141,33 +162,17 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck, amountcheck):
     start = time.time()
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
-        checklist = []
+        jsonlist = line.split(', "')
         if scorecheck[0]:
-            checklen = 4
+            keys = ['image', 'size', 'Charge', 'Score']
         else:
-            checklen = 3
-        a = line.split(', "')
-        for f in a:
-            if len(checklist) == checklen:
-                break
-            elif 'image' in f:
-                name = f[11:-1]
-                checklist.append(True)
-            elif 'size' in f:
-                size = str(f[7:])
-                checklist.append(True)
-            elif 'Charge' in f:
-                charge = int(f[-2:-1])
-                checklist.append(True)
-            elif 'Score' in f and 'DP' not in f and scorecheck[0]:
-                score = float(f[11:-1])
-                checklist.append(True)
+            keys = ['image', 'size', 'Charge']
+        values = [key.split('"')[-2] for key in jsonlist for part in keys if part in key and 'DP' not in key]
 
-        if len(checklist) == checklen and size == ms1size:
-            if scorecheck[0] and score >= getabovehere:
-                seen[charge].append(name)
-            elif not scorecheck[0]:
-                seen[charge].append(name)
+        if scorecheck[0] and float(values[3]) > getabovehere and len(values) == 4 and values[1] == ms1size:
+            seen[values[2]].append(values[0])
+        elif not scorecheck[0] and len(values) == 3 and values[1] == ms1size:
+            seen[values[2]].append(values[0])
 
     if amountcheck[0]:
         amounts = defaultdict(list)
@@ -180,7 +185,6 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck, amountcheck):
             if len(seen[f]) >= minamount:
                 random.shuffle(seen[f])
                 Seen[f] = seen[f][0:minamount]
-        end = time.time()
     else:
         Seen = seen
 
@@ -195,8 +199,7 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck, amountcheck):
     start = time.time()
     i = 0
     for line in open(f'{path}subimage.json'):
-        a = line.split(', "')
-        name = a[0][11:-1]
+        name = line.split(', "')[0][11:-1]
         if name in quickcheckdict[name.split('-')[-1][:-5]]:
             data = loads(line)
             data['Charge_class'] = str([str(index) for index in Seen].index(data['Charge']))
@@ -263,26 +266,29 @@ def filter(path, file):
         amountcheck = data['filteramount']
         amountcheck[0] = amountcheck[0] == 'True'
 
+        print('Getting sizes and scores', end='\r')
+        start = time.time()
         output = getsizeandscore(path, scorecheck)
+        stop = time.time()
+        print(f'Getting sizes and scores complete - {stop - start} seconds elapsed')
         size = output[0]
         scorepercentile = output[1]
 
-        print('Creating filtered version')
+        print('Creating filtered version', end='\r')
+        start = time.time()
         if sys.argv[2] == 'Sequence':
-            filtersequence(path, outfile, scorepercentile, size)
-            quit()
+            filtersequence(path, outfile, scorepercentile, size, scorecheck, amountcheck)
 
         elif sys.argv[2] == 'Length':
             filterlength(path, outfile, scorepercentile, size, scorecheck, amountcheck)
-            quit()
 
         elif sys.argv[2] == 'PTM':
             filterptm(path, outfile, scorepercentile, size)
-            quit()
 
         elif sys.argv[2] == 'Charge':
             filtercharge(path, outfile, scorepercentile, size, scorecheck, amountcheck)
-            quit()
+        stop = time.time()
+        print(f'Creating filtered version complete - {stop-start} seconds elapsed')
 
 
     elif file == 'accessions':
