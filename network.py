@@ -3,6 +3,8 @@ import math
 import os
 import random
 import sys
+import time
+
 import keras
 from itertools import chain
 import matplotlib.pyplot as plt
@@ -55,9 +57,20 @@ def datafetcher(path, imgpath, imageclass, test_accessions, whichMS):
         filetosuse = 'subimage_filtered.json'
     else:
         filetosuse = 'subimage.json'
-
+    start = time.time()
     accs = [json.loads(acc)['accession'] for acc in open(f'{path}{filetosuse}') if
             'accession' in json.loads(acc)]
+    end = time.time()
+    print(end-start)
+    start = time.time()
+    accs2 = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetosuse}')]
+    end = time.time()
+    print(end - start)
+    print(accs == accs2)
+    quit()
+    for line in open(f'{path}subimage.json'):
+        a =
+        name = a
     accs = np.unique(accs)
     random.shuffle(accs)
     test_accs = accs[0:test_accessions]
