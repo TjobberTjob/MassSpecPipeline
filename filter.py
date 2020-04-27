@@ -173,7 +173,6 @@ def filtercharge(path, outfile, getabovehere, ms1size, scorecheck):
         if len(seen[f]) >= minamount:
             random.shuffle(seen[f])
             Seen[f] = seen[f][0:minamount]
-    for f in Seen:
     end = time.time()
 
     fullnamelist = list(chain.from_iterable([Seen[f] for f in Seen]))
