@@ -2,31 +2,24 @@
 
 Code aimed at facilitating downloading mass spectrometry datasets for repurposing.
 
-#### Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash and python version 3.5 or newer
+##### Disclaimer! Currently only works for MS files analyzed by MaxQuant. Furthermore it only works on Ubuntu / Linux / Bash. repository was coded and tested using python 3.6.8.
 ##### git clone https://github.com/TjobberTjob/MassSpecPipeline
 
-## Requirements.
-
-This repository was coded and tested using python 3.6.8.
-
-Required python packages:
-
+### Requirements.
+#####Required python packages:
 `pip install pyteomics matplotlib keras pydot numpy pandas simplejson lxml pickle-mixin`
 
 `a working version of tensorflow. CPU or GPU (see Optional conda installations)`
 
-Required format tool installation:
-
+#####Required format tool installation:
 `conda install -c bioconda thermorawfileparser`  
 
 OR
 
 `git clone https://github.com/compomics/ThermoRawFileParser.git`       
-
 `docker build --no-cache -t thermorawparser /ThermoRawFileParser` 
 
-Optional conda installations (for tensorflow):
-                          
+#####Optional conda installations (for tensorflow):
 `conda install -y tensorflow-gpu=2.1.0`                                 
 
 `conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch`
