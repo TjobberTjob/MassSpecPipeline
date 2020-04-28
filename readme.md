@@ -11,42 +11,33 @@ This repository was coded and tested using python 3.6.8.
 
 Required python packages:
 
-`pip install pyteomics`
+`pip install pyteomics matplotlib keras pydot numpy pandas simplejson lxml pickle-mixin`
 
-`pip install matplotlib`
+`a working version of tensorflow. CPU or GPU (see Optional conda installations)`
 
-`pip install keras`
+Required format tool installation:
 
-`pip install pydot`
+`conda install -c bioconda thermorawfileparser`  
 
-`pip install pandas`
+OR
 
-`pip install numpy`
+`git clone https://github.com/compomics/ThermoRawFileParser.git`       
 
-`pip install simplejson`
+`docker build --no-cache -t thermorawparser /ThermoRawFileParser` 
 
-`pip install lxml`
-
-`tensorflow (CPU or GPU)`
-
-Optional conda installations:
-
-`conda install -c bioconda thermorawfileparser`                              
-
+Optional conda installations (for tensorflow):
+                          
 `conda install -y tensorflow-gpu=2.1.0`                                 
 
 `conda install -y pytorch=1.4.0 torchvision cudatoolkit=10.1 -c pytorch`
 
 `conda install -c anaconda graphviz`
 
-Optional docker installations:
-`git clone https://github.com/compomics/ThermoRawFileParser.git`       
-
-`docker build --no-cache -t thermorawparser /ThermoRawFileParser`         
+      
 
 
-### config file
-#### extraction attributes:
+#### config file
+##### extraction attributes:
 TOOL is a connector between MS and AI, downloading, handling, formatting and extracting data from raw MS files into singular image files with metadata.
 Before we go into examples of usage, first step is to change config.json file
 
@@ -74,13 +65,17 @@ Errormessage: If files fail, whether to just skip them or skip them and get the 
 
 savepng: Whether or not to save images as png files or only txt - Dafults to "False"
 
+##### filtering attributes:
+
 filterscore: When filtering subimage metadata, do you want to have a score amount that the peptide has to achieve, and what is the percentile of all score you want to have above. - Defaults to ["False", 55],
 
 filteramount: When filtering subimage metadata, do you want to have an amount of datapoints pr class. The filter filters off percentages of total datapoints in either class (so 10(%) means that each class has to have 10% of all datapoints or it wont be incorporated) - Defaults to ["False", 50], 
 
 topxamount: When you want only x classes. This filteres away the classes that arent in the most abundant classes. (fx only 10 most abundant sequences) - Defaults to "max" that is no top limit, else write a numerical value
 
-#### networkattributes:
+minbinary: Forces the filtered version to at least be a binary class. This means that if the filteramount is set too high to get more than one class, it will lower the amount untill it gets at least two classes. Defaults to "True"
+
+##### networkattributes:
 batch_size: Size of batches for stochastic gradient descent - Defaults to 64
 
 epochs: Max epochs used for neural network training - Defaults to 100
@@ -101,115 +96,101 @@ lenms2: The length of the MS2 data used. This is needed because of the size of t
  Has two options, a numerical value where all data points with less data are filtered away, or "max" where it takes the
  n highest values from all ms2 data, where n is the shortest ms2 data in a single datapoint. Only used if MS is "both" - Defualts to "max"
 
-#### NOTE: Values given as "True" and "False" needs to be in quotes.
+##### NOTE: Values given as "True" and "False" needs to be in quotes.
 
 ### Usage:
 #### Part - PRIDE Webscraper:
 Starting of we present a method to getting information on all PRIDE projects.
 To begin with we need the accessions numbers for all PRIDE projects. This is gotten by using the scraper.py using the input "accessions".
 This will create, if it doesnt already exists, the metadata folder and create a txt file with all accession numbers from pride
-Example:
-python scraper.py accessions
+######Example:
+######python scraper.py accessions
 
 Next we need to get metadata for all accessions in the accession list.
 This is also done using scraper.py using the input "metadata".
 This is a lengthy process as it needs to downloads a lot of files from PRIDE database.
 For this reason we have released the newest version as of April 2020 on the website.
-Example:
-python scraper metadata
+######Example:
+######python scraper.py metadata
 
 After running or downloading the metadata, you can utilize the update input to scraper.py aswell.
 This will update the metadata file with all new pride accession numbers.
-Example:
-python scraper update
+######Example:
+######python scraper.py update
 
 
-####Part - Metadata handling:
+####Part - metadata filtering:
 This is an extra part we added to help with metadata handling.
-It can create a filtered version of either PRIDE metadata or subimage metadata. Two possible use cases.
+It can create a filtered version of either PRIDE metadata or subimage metadata. Three possible use cases.
 
-(1): PRIDE metadata filter.
+##### (1): PRIDE metadata filter. (REQUIRED)
+
 This will add a filtered version of PRIDE metadata file, which removes all non maxquant entries, and entries without raw data.
 It also removes any duplicates, if any occoured by error.
+######Example:
+######python filter.py accessions
 
-Example:
 
-python filter.py accessions
+##### (2): Combining metadata files. (REQUIRED)
+Extractor.py creates a metadata file for each accession, in order to not have clashing filewrites while multiprocessing.
+In order to get them into the same metadata file you have to run this part of the code.
+######Example:
+######python filter.py combine
 
-(2): Subimage metadata filter.
 
+##### (3): Subimage metadata filter.
 This will add a filtered version of the subimage metadata file created by the extractor.py script.
 This is used as a precurser to neural networks or as extra data or class creation.
-There are a few defaults added at the time of publishing: (all of these sort away the data with wrong filesize, which in a necessary step)
+The filter works automatically with any class given, if the class exists in the metadata.
 
-PTM - Gives a class called Modi_class with 0 for no modification and 1 for any modification
-
-Length - Gives a class called Length_class
-
-Sequence - Sort only the x most abundant sequences from the data and creates Sequence_class
-
-Charge - Filters away only the 80 lowest percentiles of scores. meaning the data become cleaner (used when you have multi millions of subimages) 
-
-Example:
-
-python filter.py subimage PTM/Length/Sequence/Charge
+If given just a class, it will classify based on the class and the score/amount check parameters in the config.json file.
+If a binary classifier is needed, give the specific class needed after class name. 
+######Example:
+######python filter.py Modifications (nonbinary)
+######python filter.py Modifications Unmodified (binary)
 
 
 ####Part - Extracting:
 This will extract everything from either local or PRIDE database raw files.
 This has five use possible use cases:
 
-(1): A single pride accession. This will download all files needed one at a time and run through untill everything is done.
+#####(1): A single pride accession. This will download all files needed one at a time and run through untill everything is done.
 If a zipfile fails it will proceed to next zipfile.
+######Example:
+######python extractor.py PXD000000
 
-Example:
-
-python extractor.py PXD000000
-
-(2): Usage for all accession in a filtered or unfiltered version of the metadata. Goes through all accessions,
+#####(2): Usage for all accession in a filtered or unfiltered version of the metadata. Goes through all accessions,
 skips if there's a problem with some of them (and there will be)
+######Example:
+######python extractor.py pride OR python3 extractor.py pridefiltered
 
-Example:
-
-python extractor.py pride OR python3 extractor.py pridefiltered
-
-(3): Usage for all accession currently in your local directory that has all informations.
+#####(3): Usage for all accession currently in your local directory that has all informations.
 Used if you change a parameter for subimages and you need to rerun everything faster.
 This will only run if every allPeptides.txt file exists in needed folders.
+######Example:
+######python extractor.py owned
 
-Example:
-
-python extractor.py owned
-
-(4): Used for local rawfiles instead of pride accessions. If you have a local rawfile you want peptides extracted from.
+#####(4): Used for local rawfiles instead of pride accessions. If you have a local rawfile you want peptides extracted from.
 Has to have raw file and maxquant or zipfile in the folder.
+######Example:
+######python extractor.py /path/to/folder/
 
-Example:
-
-python extractor.py /path/to/folder/
-
-
-(5): Used to reset everything regarding the subimages
+#####(5): Used to reset everything regarding the subimages
 This is used if you need to remove all subimages, metadata on subimages, substatistics on files.
 Often only needed if you change subimage parameters and want everything to stay consistent within files.
 If you dont reset you will have multiple of the same name in the subimage metadata file.
+######Example:
+######python extractor.py reset
 
-Example:
-
-python extractor.py reset
-
-
-Part - Neural networks:
+####Part - Neural networks:
 This will automatically use subimage_filtered.json if it exists otherwise it will use subimage.json as it's data source.
 It needs to be given three arguments:
 
 (1) Whether its a classification problem or a regression problem. C for classification and R for regression.
 
 (2) The class or variable the network needs to predict. can be continuous like m/z or a class like length of sequence.
-
-Example:
-
-python network.py c Length & python network.py r m/z 
+######Example:
+######python network.py c Length & python network.py r m/z 
 
 
 

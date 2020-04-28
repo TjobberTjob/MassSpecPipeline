@@ -1,15 +1,12 @@
 import glob
 import json
 import os
-import re
-import time
-import numpy as np
-from itertools import chain
 import random
-import glob
+import re
 import sys
+import time
 from collections import defaultdict, Counter
-import pandas as pd
+import numpy as np
 from simplejson import loads
 
 
@@ -37,7 +34,12 @@ def getsizeandscore(path, scorecheck):
     return ms1size, getabovehere
 
 
-def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass, xmostfrequent):
+def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass, xmostfrequent, minbinary):
+    binary = False
+    if len(sys.argv) > 2:
+        binary = True
+        binaryclass = str(sys.argv[2])
+
     outfile = open(f'{path}subimage_filtered.json', 'w')
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
@@ -47,6 +49,13 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
         else:
             keys = ['image', 'ms1size', filterclass]
         values = [key.split('"')[-2] for key in jsonlist for part in keys if part in key and 'DP' not in key]
+
+        if binary and scorecheck[0] and len(values) == 4:
+            if values[2] != binaryclass:
+                values[2] = f'not_{binaryclass}'
+        elif binary and not scorecheck[0] and len(values) == 3:
+            if values[2] != binaryclass:
+                values[2] = f'not_{binaryclass}'
 
         if scorecheck[0] and len(values) == 4 and values[1] == ms1size and float(values[3]) > getabovehere:
             seen[values[2]].append(values[0])
@@ -64,12 +73,13 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
 
     if amountcheck[0]:
         mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountcheck[1] / 100 * sum(amountdict.values()))]
-        if len(mostcommon) < 2:
-            for amountrange in range(100,0,-1):
+        if minbinary and len(mostcommon) < 2:
+            for amountrange in range(100, 0, -1):
                 mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountrange) / 100 * sum(amountdict.values())]
                 if len(mostcommon) > 1:
                     break
-        minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountcheck[1] / 100 * sum(amountdict.values()))])
+            print(f'Amountcheck changed from {amountcheck[1]}% to {amountrange}% to get binary classes')
+        minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
     else:
         mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent)]
         minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
@@ -92,12 +102,21 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
 
         if name in quickcheckdict[name.split('-')[-1][:-5]]:
             data = loads(line)
-            data[f'{filterclass}_class'] = str([str(index) for index in mostcommon].index(data[filterclass]))
+
+            if binary:
+                if data[filterclass] == binaryclass:
+                    lookup = binaryclass
+                else:
+                    lookup = f'not_{binaryclass}'
+            else:
+                lookup = data[filterclass]
+
+            data[f'{filterclass}_class'] = str([index for index in mostcommon].index(lookup))
             outfile.write(json.dumps(data) + '\n')
             i += 1
     print(f'{i} lines written to filtered version \n{nclasses} classes: {[f for f in mostcommon]}')
     outfile.close()
-    print(f'Currently amountcheck is set to {amountcheck[1]}% which is a single class. Changed to {amountrange}% to get another class')
+
 
 
 def boomaccessions(path):
@@ -140,6 +159,9 @@ if __name__ == '__main__':
     amountcheck = data['filteramount']
     amountcheck[0] = amountcheck[0] == 'True'
     topxamount = data['topxamount']
+    minbinary = data['minbinary'] == 'True'
+
+    filterclass = sys.argv[1]
 
     if sys.argv[1] == 'combine':
         combine(path)
@@ -158,7 +180,7 @@ if __name__ == '__main__':
 
         start = time.time()
         print('Creating filtered version', end='\r')
-        boomfilter(path, scorecheck, amountcheck, size, scorepercentile, sys.argv[1], topxamount)
+        boomfilter(path, scorecheck, amountcheck, size, scorepercentile, filterclass, topxamount, minbinary)
         stop = time.time()
         print(f'Creating filtered version complete - {round(stop-start,5)} seconds elapsed')
 

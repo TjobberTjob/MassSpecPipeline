@@ -3,9 +3,7 @@ import json
 import math
 import os
 import random
-import re
 import sys
-from collections import defaultdict
 from itertools import chain
 import keras
 import matplotlib.pyplot as plt
