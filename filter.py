@@ -43,9 +43,9 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
     for line in open(f'{path}subimage.json'):
         jsonlist = line.split(', "')
         if scorecheck[0]:
-            keys = ['image', 'size', filterclass, 'Score']
+            keys = ['image', 'ms1size', filterclass, 'Score']
         else:
-            keys = ['image', 'size', filterclass]
+            keys = ['image', 'ms1size', filterclass]
         values = [key.split('"')[-2] for key in jsonlist for part in keys if part in key and 'DP' not in key]
 
         if scorecheck[0] and len(values) == 4 and values[1] == ms1size and float(values[3]) > getabovehere:
@@ -64,10 +64,16 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
 
     if amountcheck[0]:
         mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountcheck[1] / 100 * sum(amountdict.values()))]
+        if len(mostcommon) < 2:
+            for amountrange in range(100,0,-1):
+                mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountrange) / 100 * sum(amountdict.values())]
+                if len(mostcommon) > 1:
+                    break
         minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountcheck[1] / 100 * sum(amountdict.values()))])
     else:
         mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent)]
         minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
+    nclasses = len(mostcommon)
 
     namelist = []
     for seq in seen:
@@ -89,8 +95,9 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
             data[f'{filterclass}_class'] = str([str(index) for index in mostcommon].index(data[filterclass]))
             outfile.write(json.dumps(data) + '\n')
             i += 1
-    print(f'{i} lines written to filtered version')
+    print(f'{i} lines written to filtered version \n{nclasses} classes: {[f for f in mostcommon]}')
     outfile.close()
+    print(f'Currently amountcheck is set to {amountcheck[1]}% which is a single class. Changed to {amountrange}% to get another class')
 
 
 def boomaccessions(path):
@@ -132,6 +139,7 @@ if __name__ == '__main__':
     scorecheck[0] = scorecheck[0] == 'True'
     amountcheck = data['filteramount']
     amountcheck[0] = amountcheck[0] == 'True'
+    topxamount = data['topxamount']
 
     if sys.argv[1] == 'combine':
         combine(path)
@@ -150,7 +158,7 @@ if __name__ == '__main__':
 
         start = time.time()
         print('Creating filtered version', end='\r')
-        boomfilter(path, scorecheck, amountcheck, size, scorepercentile, sys.argv[1], 10)
+        boomfilter(path, scorecheck, amountcheck, size, scorepercentile, sys.argv[1], topxamount)
         stop = time.time()
         print(f'Creating filtered version complete - {round(stop-start,5)} seconds elapsed')
 

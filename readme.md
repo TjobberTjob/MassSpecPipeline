@@ -68,13 +68,17 @@ multithread: A Boolean value for running the extraction multithreaded (reduces e
 
 nr_threads: Amount of threads used for multi threading - Defaults to 10
 
-filterbroken: A method to skip PRIDE projects that has problems with them - Defaults to "False"
-
 formatsoftware: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
 
 Errormessage: If files fail, whether to just skip them or skip them and get the error message. Used for debugging - Defaults to "False"
 
 savepng: Whether or not to save images as png files or only txt - Dafults to "False"
+
+filterscore: When filtering subimage metadata, do you want to have a score amount that the peptide has to achieve, and what is the percentile of all score you want to have above. - Defaults to ["False", 55],
+
+filteramount: When filtering subimage metadata, do you want to have an amount of datapoints pr class. The filter filters off percentages of total datapoints in either class (so 10(%) means that each class has to have 10% of all datapoints or it wont be incorporated) - Defaults to ["False", 50], 
+
+topxamount: When you want only x classes. This filteres away the classes that arent in the most abundant classes. (fx only 10 most abundant sequences) - Defaults to "max" that is no top limit, else write a numerical value
 
 #### networkattributes:
 batch_size: Size of batches for stochastic gradient descent - Defaults to 64
