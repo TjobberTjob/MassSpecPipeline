@@ -1,28 +1,26 @@
 import gzip
 import json
-import math
 import os
 import random
 import sys
-from itertools import chain
 import keras
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.engine.saving import load_model
 from keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
-# from keras.utils import plot_model
+from keras.utils import plot_model
 from simplejson import loads
 
 
-def createnetworkfile(lenMS2):
+def createnetworkfile(lenMS2, filetouse):
     print('Creating MS2 data structure')
     outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
 
     if lenMS2 == 'max':
-        lenMS2 = min([int(brokenlines.split('[')[1].split(',')[0]) for line in open(f'{metapath}{filetosuse}') for
+        lenMS2 = min([int(brokenlines.split('[')[1].split(',')[0]) for line in open(f'{metapath}{filetouse}') for
                     brokenlines in line.split(', "') if 'ms2size' in brokenlines and 'both' in line])
 
-    for line in open(f'{metapath}{filetosuse}', 'r'):
+    for line in open(f'{metapath}{filetouse}', 'r'):
         linesplit = line.split(', "')
         for parts in linesplit:
             if 'ms2size' in parts and 'both' in line:
@@ -51,7 +49,7 @@ def datafetcher(path, filetouse, imageclass, test_accessions):
 
     testfiles = []
     trainvalfiles = []
-    for acc in open(f'{path}{filetosuse}'):
+    for acc in open(f'{path}{filetouse}'):
         accession = acc.split(', "')[1][-10:-1]
         name = acc.split(', "')[0][11:-1]
         if accession in test_accs:
@@ -70,7 +68,7 @@ def datafetcher(path, filetouse, imageclass, test_accessions):
     partition = {'train': trainfiles, 'validation': validationfiles, 'test': testfiles}
 
     labels = {}
-    for line in open(f'{path}{filetosuse}'):
+    for line in open(f'{path}{filetouse}'):
         data = loads(line)
         name = data['image']
         label = data[imageclass]
@@ -130,11 +128,11 @@ class DataGenerator(keras.utils.Sequence):
             X = np.empty((self.batch_size, self.ms1size[0], self.ms1size[1], self.n_channels))
 
         elif self.MS == 'ms2':
-            X = np.empty((self.batch_size, self.ms2size[0], self.ms2size[1]))
+            X = np.empty((self.batch_size, self.minMS2, self.ms2size[1]))
 
         else:
-            X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
-            X2 = np.empty((self.batch_size, self.mslen))
+            X = np.empty((self.batch_size, self.ms1size[0], self.ms1size[1], self.n_channels))
+            X2 = np.empty((self.batch_size, self.minMS2, self.ms2size[1]))
 
         if classification:
             y = np.empty(self.batch_size, dtype=int)
@@ -154,15 +152,14 @@ class DataGenerator(keras.utils.Sequence):
                 X[i,] = image
 
             elif self.MS == 'ms2':
-                valuetogetlen = sorted([f[1] for f in ms2], reverse = True)[self.minMS2]
-                X[i,] = np.array([g for g in ms2 if g[1] >= valuetogetlen])
+                X[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse = True)[:self.minMS2])
 
             else:
                 image = np.array(ms1)
                 image = image[:, :, 0:self.n_channels]
                 X[i,] = image
 
-                X2[i,] = np.array(ms2)
+                X2[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse = True)[:self.minMS2])
 
             y[i] = self.labels[ID]
 
@@ -184,7 +181,7 @@ def r2(y_true, y_pred):
 
 
 # Developing the neural network
-def nnmodel(ms1size, ms2size, n_channels, classification, n_classes, imageclass, metapath, patience, whichMS):
+def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, imageclass, metapath, patience, whichMS):
     # HIDDEN LAYERS
     if whichMS == 'ms1':  # MS1
         input = Input(shape=(ms1size[0], ms1size[1], n_channels,))
@@ -199,11 +196,13 @@ def nnmodel(ms1size, ms2size, n_channels, classification, n_classes, imageclass,
         x = Dense(64, activation='relu')(x)
         x = Dense(32, activation='relu')(x)
 
+
     elif whichMS == 'ms2':  # MS2
-        input = Input(shape=(ms2size[0], ms2size[1]))
+        input = Input(shape=(lenMS2, ms2size[1]))
         x = Dense(128, activation='relu')(input)
-        x = Dense(64, activation='relu')(x)
-        x = Dense(32, activation='relu')(x)
+        x = Dense(64, activation='relu')(input)
+        x = Flatten()(x)
+
 
     else:  # BOTH
         input = Input(shape=(ms1size[0], ms1size[1], n_channels,))  # MS1
@@ -216,39 +215,33 @@ def nnmodel(ms1size, ms2size, n_channels, classification, n_classes, imageclass,
         x = Concatenate()([x, x1, x2])
         x = Flatten()(x)
 
-        input2 = Input(shape=(ms2size[0], ms2size[1]))  # MS2
+        input2 = Input(shape=(lenMS2, ms2size[1],))  # MS2
         x1 = Dense(128, activation='relu')(input2)
         x1 = Dense(64, activation='relu')(x1)
-        x1 = Dense(32, activation='relu')(x1)
+        x1 = Flatten()(x1)
 
         x = Concatenate()([x, x1])  # Combine
-        x = Dense(64, activation='relu')(x)
-        x = Dense(32, activation='relu')(x)
 
-    if whichMS == 'ms1' or whichMS == 'both':  # After combining
-        x = Dense(128, activation='relu')(x)
-        x = Dense(64, activation='relu')(x)
+    # if whichMS == 'ms1' or whichMS == 'both':  # After combining
+    x = Dense(128, activation='relu')(x)
+    x = Dense(64, activation='relu')(x)
+
     # OUTPUT LAYER
     if classification:
-        if n_classes == 2:
-            output = Dense(1, activation='sigmoid')(x)
-        else:
-            output = Dense(n_classes, activation='linear')(x)
-    else:
         output = Dense(n_classes, activation='softmax')(x)
+    else:
+        output = Dense(n_classes, activation='linear')(x)
+
     # COMBINE MODEL
     if whichMS == 'ms1' or whichMS == 'ms2':
         model = keras.Model(inputs=input, outputs=output)
     else:
         model = keras.Model(inputs=[input, input2], outputs=output)
     # print(model.summary())
-    # plot_model(model, to_file="model.png")
+    plot_model(model, to_file="model.png")
 
     if classification:
-        if n_classes == 2:
-            model.compile(loss='binary_crossentropy', metrics=['accuracy'], optimizer='adam')
-        else:
-            model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
+        model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
     else:
         model.compile(loss='mse', metrics=[r2], optimizer='rmsprop')
 
@@ -286,14 +279,14 @@ if __name__ == '__main__':
     lenMS2 = config['lenms2']
 
     if os.path.exists(f'{metapath}subimage_filtered.json'):
-        filetosuse = 'subimage_filtered.json'
+        filetouse = 'subimage_filtered.json'
     else:
         print('No filtered datafile exists')
         quit()
 
     # Creating network files
     if whichMS == 'both' or whichMS == 'ms2':
-        lenMS2 = createnetworkfile(lenMS2)
+        lenMS2 = createnetworkfile(lenMS2, filetouse)
 
     if setseed:
         random.seed(1)
@@ -305,7 +298,7 @@ if __name__ == '__main__':
     imageclass = f'{sys.argv[2]}_class'
     classification = classification == 'c'
 
-    if whichMS == 'both' and os.path.exists(f'{metapath}subimage_filtered_network.json'):
+    if (whichMS == 'both' or whichMS == 'ms2') and os.path.exists(f'{metapath}subimage_filtered_network.json'):
         filetouse = 'subimage_filtered_network.json'
     elif os.path.exists(f'{metapath}subimage_filtered.json'):
         filetouse = 'subimage_filtered.json'
@@ -325,7 +318,7 @@ if __name__ == '__main__':
 
     if batch_size == 'auto':
         for i in range(10):
-            if 2**(i+4) > n_classes**2 *2:
+            if 2**(i+4) > n_classes**2 * 2:
                 batch_size = 2**(i+4)
                 break
 
@@ -341,7 +334,7 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(ms1size, ms2size, n_channels, classification, n_classes, nameofclass, metapath, patience, whichMS)
+    output = nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, nameofclass, metapath, patience, whichMS)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
