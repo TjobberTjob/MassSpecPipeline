@@ -139,7 +139,11 @@ def combine(path):
 
 
 def testfunc(path, imgpath):
-    for f in open(f'{path}subimage.json'):
+    totallen = len(list(open(f'{path}subimage.json')))
+    print(totallen)
+    for i, f in enumerate(open(f'{path}subimage.json')):
+        if i % 10000:
+            print(i, end='\r')
         data = loads(f)
 
         image = data['image']
