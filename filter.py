@@ -1,4 +1,5 @@
 import glob
+import gzip
 import json
 import os
 import random
@@ -137,6 +138,29 @@ def combine(path):
     quit()
 
 
+def testfunc(path, imgpath):
+    for f in open(f'{path}subimage.json'):
+        data = loads(f)
+
+        image = data['image']
+
+        with gzip.GzipFile(f'{imgpath}{image}', 'r') as fin:
+            fullinfoimage = json.loads(fin.read().decode('utf-8'))
+
+        ms2info = fullinfoimage['ms2']
+        newms2info = [[mz, int] for mz in ms2info[0] for int in ms2info[1]]
+        fullinfoimage['ms2'] = newms2info
+        if data['ms2size'] == "[2, 0]":
+            newms2size = [0]
+        else:
+            newms2size = str([f for f in np.array(newms2info).shape])
+
+        data['ms2size'] = newms2size
+
+        with gzip.GzipFile(f'{imgpath}{image}', 'w') as fout:
+            fout.write(json.dumps(fullinfoimage).encode('utf-8'))
+
+
 
 if __name__ == '__main__':
     # Read datapath from config file
@@ -144,6 +168,7 @@ if __name__ == '__main__':
         data = json.load(json_file)
 
     path = f'{data["path"]}metadata/'
+    imgpath = f'{data["path"]}images/'
     scorecheck = data['filterscore']
     scorecheck[0] = scorecheck[0] == 'True'
     amountcheck = data['filteramount']
@@ -152,6 +177,8 @@ if __name__ == '__main__':
     minbinary = data['minbinary'] == 'True'
 
     filterclass = sys.argv[1]
+    if sys.argv[1].lower() == 'test':
+        testfunc(path, imgpath)
 
     if sys.argv[1].lower() == 'combine':
         combine(path)
