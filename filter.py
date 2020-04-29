@@ -139,6 +139,7 @@ def combine(path):
 
 
 def testfunc(path, imgpath):
+    outfile = open(f'{path}subimage2.json')
     totallen = len(list(open(f'{path}subimage.json')))
     print(totallen)
     for i, f in enumerate(open(f'{path}subimage.json')):
@@ -163,6 +164,10 @@ def testfunc(path, imgpath):
 
         with gzip.GzipFile(f'{imgpath}{image}', 'w') as fout:
             fout.write(json.dumps(fullinfoimage).encode('utf-8'))
+
+        outfile.write(json.dumps(data) + '\n')
+
+
 
 
 
