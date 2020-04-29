@@ -139,7 +139,7 @@ def combine(path):
 
 
 def testfunc(path, imgpath):
-    outfile = open(f'{path}subimage2.json')
+    outfile = open(f'{path}subimage2.json', 'w')
     totallen = len(list(open(f'{path}subimage.json')))
     print(totallen)
     for i, f in enumerate(open(f'{path}subimage.json')):
