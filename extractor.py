@@ -485,9 +485,10 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
         try:
             ms2info = [mzmlfile['ms2'][str(rows['MS/MS IDs'])]['m/z_array'],
                        [math.log(intval) for intval in mzmlfile['ms2'][str(rows['MS/MS IDs'])]['rt_array']]]
+            ms2info = [[mz, int] for mz in ms2info[0] for int in ms2info[1]]
             datacollected = 'both'
         except:
-            ms2info = [[], []]
+            ms2info = []
             datacollected = 'ms1'
         ms2size = str([f for f in np.array(ms2info).shape])
 

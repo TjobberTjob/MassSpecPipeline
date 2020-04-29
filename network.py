@@ -15,43 +15,34 @@ from simplejson import loads
 
 
 def createnetworkfile(lenMS2):
-    if whichMS == 'both' or whichMS == 'ms2':
-        print('Creating MS2 data structure')
+    print('Creating MS2 data structure')
+    outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
 
-        outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
+    if lenMS2 == 'max':
+        lenMS2 = min([int(brokenlines.split('[')[1].split(',')[0]) for line in open(f'{metapath}{filetosuse}') for
+                    brokenlines in line.split(', "') if 'ms2size' in brokenlines and 'both' in line])
 
-        if lenMS2 == 'max':
-            lenMS2 = min([json.loads(line)['ms2arraylength'] for line in open(f'{metapath}{filetosuse}')
-                          if 'ms2arraylength' in json.loads(line)])
+    for line in open(f'{metapath}{filetosuse}', 'r'):
+        linesplit = line.split(', "')
+        for parts in linesplit:
+            if 'ms2size' in parts and 'both' in line:
+                size = int(parts.split('[')[1].split(',')[0])
+        if 'both' in line and size > lenMS2:
+            data = loads(line)
+            outfile.write(json.dumps(data) + '\n')
+    outfile.close()
 
-        if whichMS == 'both':
-            for line in open(f'{metapath}{filetosuse}', 'r'):
-                data = json.loads(line)
-
-                if data['ms2arraylength'] >= lenMS2 and data['datacollected'] == 'both':
-                    outfile.write(json.dumps(data) + '\n')
-            outfile.close()
-        else:
-            for line in open(f'{metapath}{filetosuse}', 'r'):
-                data = json.loads(line)
-
-                if data['ms2arraylength'] >= lenMS2 and (
-                        data['datacollected'] == 'ms2' or data['datacollected'] == 'both'):
-                    outfile.write(json.dumps(data) + '\n')
-            outfile.close()
     return lenMS2
 
 
-def datafetcher(path, filetouse, imageclass, test_accessions, whichMS):
+def datafetcher(path, filetouse, imageclass, test_accessions):
     print('Data fetching')
 
     for lines in open(f'{path}{filetouse}', 'r'):
         data = loads(lines)
-        size = data['size']
+        ms1size = eval(data['ms1size'])
+        ms2size = eval(data['ms2size'])
         break
-
-    length = size[0]
-    width = size[1]
 
     accs = [acc.split(', "')[1][-10:-1] for acc in open(f'{path}{filetouse}', 'r')]
     accs = np.unique(accs)
@@ -89,16 +80,17 @@ def datafetcher(path, filetouse, imageclass, test_accessions, whichMS):
     for f in partition:
         print(f'Datapoint in {f}: {len(partition[f])}')
 
-    return partition, labels, length, width
+    return partition, labels, ms1size, ms2size
 
 
 # Developing the data generator
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
 
-    def __init__(self, path, list_IDs, labels, batch_size, size, n_channels, n_classes, shuffle, MS, mslen):
+    def __init__(self, path, list_IDs, labels, batch_size, ms1size, ms2size, n_channels, n_classes, shuffle, MS, minMS2):
         'Initialization'
-        self.size = size
+        self.ms1size = ms1size
+        self.ms2size = ms2size
         self.path = path
         self.batch_size = batch_size
         self.labels = labels
@@ -107,7 +99,7 @@ class DataGenerator(keras.utils.Sequence):
         self.n_classes = n_classes
         self.shuffle = shuffle
         self.MS = MS
-        self.mslen = mslen
+        self.minMS2 = minMS2
         self.on_epoch_end()
 
     def __len__(self):
@@ -135,10 +127,10 @@ class DataGenerator(keras.utils.Sequence):
         'Generates data containing batch_size samples'
         # Initialization
         if self.MS == 'ms1':
-            X = np.empty((self.batch_size, self.size[0], self.size[1], self.n_channels))
+            X = np.empty((self.batch_size, self.ms1size[0], self.ms1size[1], self.n_channels))
 
         elif self.MS == 'ms2':
-            X = np.empty((self.batch_size, self.mslen))
+            X = np.empty((self.batch_size, self.ms2size[0], self.ms2size[1]))
 
         else:
             X = np.empty((self.batch_size, self.size[1], self.size[0], self.n_channels))
@@ -162,20 +154,15 @@ class DataGenerator(keras.utils.Sequence):
                 X[i,] = image
 
             elif self.MS == 'ms2':
-                mz_array = ms2[0]
-                # rt_array = ms2[1]
-                rt_array = [math.log(intval) for intval in ms2[1]]
-                X[i,] = list(chain.from_iterable([mz_array, rt_array]))
+                valuetogetlen = sorted([f[1] for f in ms2], reverse = True)[self.minMS2]
+                X[i,] = np.array([g for g in ms2 if g[1] >= valuetogetlen])
 
             else:
                 image = np.array(ms1)
                 image = image[:, :, 0:self.n_channels]
                 X[i,] = image
 
-                mz_array = ms2[0]
-                # rt_array = ms2[1]
-                rt_array = [math.log(intval) for intval in ms2[1]]
-                X2[i,] = list(chain.from_iterable([mz_array, rt_array]))
+                X2[i,] = np.array(ms2)
 
             y[i] = self.labels[ID]
 
@@ -197,10 +184,10 @@ def r2(y_true, y_pred):
 
 
 # Developing the neural network
-def nnmodel(length, width, classification, n_channels, n_classes, imageclass, metapath, patience, whichMS, lenMS2):
+def nnmodel(ms1size, ms2size, n_channels, classification, n_classes, imageclass, metapath, patience, whichMS):
     # HIDDEN LAYERS
     if whichMS == 'ms1':  # MS1
-        input = Input(shape=(length, width, n_channels,))
+        input = Input(shape=(ms1size[0], ms1size[1], n_channels,))
         x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
         x = MaxPooling2D(pool_size=(2, 2))(x)
         x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
@@ -213,13 +200,13 @@ def nnmodel(length, width, classification, n_channels, n_classes, imageclass, me
         x = Dense(32, activation='relu')(x)
 
     elif whichMS == 'ms2':  # MS2
-        input = Input(shape=(lenMS2 * 2,))
+        input = Input(shape=(ms2size[0], ms2size[1]))
         x = Dense(128, activation='relu')(input)
         x = Dense(64, activation='relu')(x)
         x = Dense(32, activation='relu')(x)
 
     else:  # BOTH
-        input = Input(shape=(length, width, n_channels,))  # MS1
+        input = Input(shape=(ms1size[0], ms1size[1], n_channels,))  # MS1
         x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
         x = MaxPooling2D(pool_size=(2, 2))(x)
         x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
@@ -229,7 +216,7 @@ def nnmodel(length, width, classification, n_channels, n_classes, imageclass, me
         x = Concatenate()([x, x1, x2])
         x = Flatten()(x)
 
-        input2 = Input(shape=(lenMS2,))  # MS2
+        input2 = Input(shape=(ms2size[0], ms2size[1]))  # MS2
         x1 = Dense(128, activation='relu')(input2)
         x1 = Dense(64, activation='relu')(x1)
         x1 = Dense(32, activation='relu')(x1)
@@ -305,7 +292,8 @@ if __name__ == '__main__':
         quit()
 
     # Creating network files
-    lenMS2 = createnetworkfile(lenMS2)
+    if whichMS == 'both' or whichMS == 'ms2':
+        lenMS2 = createnetworkfile(lenMS2)
 
     if setseed:
         random.seed(1)
@@ -323,11 +311,11 @@ if __name__ == '__main__':
         filetouse = 'subimage_filtered.json'
 
     nameofclass = imageclass.replace('/', '')
-    output = datafetcher(metapath, filetouse, imageclass, test_accessions, whichMS)
+    output = datafetcher(metapath, filetouse, imageclass, test_accessions)
     partition = output[0]
     labels = output[1]
-    length = output[2]
-    width = output[3]
+    ms1size = output[2]
+    ms2size = output[3]
 
     if classification:
         classes = [f.split('"')[-2] for line in open(f'{metapath}{filetouse}', 'r') for f in line.split(', "') if imageclass in f]
@@ -341,18 +329,19 @@ if __name__ == '__main__':
                 batch_size = 2**(i+4)
                 break
 
-    params = {'size': (length, width),
+    params = {'ms1size': (ms1size[0], ms1size[1]),
+              'ms2size': (ms2size[0], ms2size[1]),
               'batch_size': batch_size,
               'n_classes': n_classes,
               'n_channels': n_channels,
               'shuffle': True,
               'MS': whichMS,
-              'mslen': lenMS2}
+              'minMS2': lenMS2}
 
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(length, width, classification, n_channels, n_classes, nameofclass, metapath, patience, whichMS, lenMS2)
+    output = nnmodel(ms1size, ms2size, n_channels, classification, n_classes, nameofclass, metapath, patience, whichMS)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,

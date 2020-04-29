@@ -13,17 +13,7 @@ from simplejson import loads
 def getsizeandscore(path, scorecheck):
     getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                 open(f'{path}subimage.json')]
-    uniquesizes = np.unique(getsizes)
-
-    sizedict = defaultdict()
-    for sizes in uniquesizes:
-        sizedict[str(sizes)] = getsizes.count(sizes)
-
-    for sizes in Counter(sizedict).most_common():
-        size = str(sizes[0]).replace(" ", "")[1:-1].split(',')
-        if len(size) == 3:
-            ms1size = sizes[0]
-            break
+    ms1size = max(set(getsizes), key=getsizes.count)
 
     if scorecheck[0]:
         getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
@@ -163,10 +153,10 @@ if __name__ == '__main__':
 
     filterclass = sys.argv[1]
 
-    if sys.argv[1] == 'combine':
+    if sys.argv[1].lower() == 'combine':
         combine(path)
 
-    elif sys.argv[1] == 'accessions':
+    elif sys.argv[1].lower() == 'accessions':
         boomaccessions(path)
 
     else:
