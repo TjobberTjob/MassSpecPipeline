@@ -487,7 +487,8 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
         ms1size = str([f for f in np.array(ms1info).shape])
 
         ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'],
-                   [math.log(int) for int in mzmlfile['ms2'][ms2scan]['rt_array']]]
+                   mzmlfile['ms2'][ms2scan]['rt_array']]
+                   # np.log([mzmlfile['ms2'][ms2scan]['rt_array']]).tolist()]
         ms2info = [[mz, intents] for mz in ms2info[0] for intents in ms2info[1]]
 
         ms2size = str([f for f in np.array(ms2info).shape])
