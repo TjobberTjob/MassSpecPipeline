@@ -438,21 +438,6 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def fragments(peptide, types=('b', 'y'), maxcharge=1):
-    """
-    The function generates all possible m/z for fragments of types
-    `types` and of charges from 1 to `maxharge`.
-    """
-    for i in range(1, len(peptide) - 1):
-        for ion_type in types:
-            for charge in range(1, maxcharge + 1):
-                if ion_type[0] in 'abc':
-                    yield mass.fast_mass(
-                        peptide[:i], ion_type=ion_type, charge=charge)
-                else:
-                    yield mass.fast_mass(
-                        peptide[i:], ion_type=ion_type, charge=charge)
-
 
 def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mpath, df, subimage_interval, filename, multiprocessing,
              savepng):
@@ -504,12 +489,14 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
         try:
             ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'],
                        [math.log(intval) for intval in mzmlfile['ms2'][ms2scan]['rt_array']]]
-            ms2info = [[mz, int] for mz in ms2info[0] for int in ms2info[1]]
+            # ms2info = [[mz, int] for mz in ms2info[0] for int in ms2info[1]]
             datacollected = 'both'
         except:
             ms2info = []
             datacollected = 'ms1'
-        ms2size = str([f for f in np.array(ms2info).shape])
+
+        ms2size = ms2info.shape
+        # ms2size = str([f for f in np.array(ms2info).shape])
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
         # Save image as json file
@@ -520,7 +507,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
             subpng(subimage, imgpath, filename, index, lowbound, highbound)
 
         new_metadata = {}
-        new_metadata['image'] = f'{accnr}-{filename}-{rows["MS/MS IDs"]}.json'
+        new_metadata['image'] = f'{accnr}-{filename}-{ms2scan}.json'
         new_metadata['accession'] = accnr
         new_metadata['ms1size'] = ms1size
         new_metadata['ms2size'] = ms2size
