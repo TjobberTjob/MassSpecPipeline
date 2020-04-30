@@ -469,7 +469,8 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
                 interval['mz']['min'] or rows['m/z'] + subimage_interval['mz'] > interval['mz']['max']:
             continue
 
-        if os.path.exists(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json'):
+        ms2scan = str(rows['MSMS Scan Numbers'].split(';')[0])
+        if os.path.exists(f'{imgpath}{accnr}-{filename}-{ms2scan}.json'):
             continue
 
         # if not 450 < rows['m/z'] < 455:  # Filter
@@ -482,36 +483,28 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
         mzupper = int(get_lower_bound(mzrangelist, rows['m/z']) + mzlen)
         rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen)
         rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
-        subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
-        ms1size = str([f for f in np.array(subimage).shape])
+        ms1info = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
+        ms1size = str([f for f in np.array(ms1info).shape])
 
-        ms2scan = str(rows['MSMS Scan Numbers'].split(';')[0])
-        try:
-            ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'],
-                       [math.log(intval) for intval in mzmlfile['ms2'][ms2scan]['rt_array']]]
-            ms2info = [[mz, int] for mz in ms2info[0] for int in ms2info[1]]
-            datacollected = 'both'
-        except:
-            ms2info = []
-            datacollected = 'ms1'
+        ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'],
+                   np.log([mzmlfile['ms2'][ms2scan]['rt_array']])]
+        ms2info = [[mz, intents] for mz in ms2info[0] for intents in ms2info[1]]
 
-        # ms2size = np.array(ms2info).shape
         ms2size = str([f for f in np.array(ms2info).shape])
-        fullsubimage = {'ms1': subimage, 'ms2': ms2info}
+        fullsubimage = {'ms1': ms1info, 'ms2': ms2info}
 
         # Save image as json file
         with gzip.GzipFile(f'{imgpath}{accnr}-{filename}-{ms2scan}.json', 'w') as fout:
             fout.write(json.dumps(fullsubimage).encode('utf-8'))
 
         if savepng:  # save subimages to png
-            subpng(subimage, imgpath, filename, index, lowbound, highbound)
+            subpng(ms1info, imgpath, filename, index, lowbound, highbound)
 
         new_metadata = {}
         new_metadata['image'] = f'{accnr}-{filename}-{ms2scan}.json'
         new_metadata['accession'] = accnr
         new_metadata['ms1size'] = ms1size
         new_metadata['ms2size'] = ms2size
-        new_metadata['datacollected'] = datacollected
         for ele in df.columns:
             if str(rows[ele]) == 'nan' or str(rows[ele]) == ' ' or ";" in str(rows[ele]):
                 continue
