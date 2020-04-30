@@ -12,6 +12,8 @@ import time
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from zipfile import ZipFile
+from pyteomics import mass
+import pylab
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
@@ -436,6 +438,22 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
+def fragments(peptide, types=('b', 'y'), maxcharge=1):
+    """
+    The function generates all possible m/z for fragments of types
+    `types` and of charges from 1 to `maxharge`.
+    """
+    for i in range(1, len(peptide) - 1):
+        for ion_type in types:
+            for charge in range(1, maxcharge + 1):
+                if ion_type[0] in 'abc':
+                    yield mass.fast_mass(
+                        peptide[:i], ion_type=ion_type, charge=charge)
+                else:
+                    yield mass.fast_mass(
+                        peptide[i:], ion_type=ion_type, charge=charge)
+
+
 def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mpath, df, subimage_interval, filename, multiprocessing,
              savepng):
     lowbound = bounds[0]
@@ -470,7 +488,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
             continue
 
         # if not 450 < rows['m/z'] < 455:  # Filter
-        #     continue
+            # continue
 
         mzlen = int(subimage_interval['mz'] / mz_bin)
         rtlen = int(subimage_interval['rt'] / rt_bin)
@@ -482,20 +500,20 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
         subimage = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
         ms1size = str([f for f in np.array(subimage).shape])
 
+        ms2scan = str(rows['MSMS Scan Numbers'].split(';')[0])
         try:
-            ms2info = [mzmlfile['ms2'][str(rows['MS/MS IDs'])]['m/z_array'],
-                       [math.log(intval) for intval in mzmlfile['ms2'][str(rows['MS/MS IDs'])]['rt_array']]]
+            ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'],
+                       [math.log(intval) for intval in mzmlfile['ms2'][ms2scan]['rt_array']]]
             ms2info = [[mz, int] for mz in ms2info[0] for int in ms2info[1]]
             datacollected = 'both'
         except:
             ms2info = []
             datacollected = 'ms1'
         ms2size = str([f for f in np.array(ms2info).shape])
-
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
         # Save image as json file
-        with gzip.GzipFile(f'{imgpath}{accnr}-{filename}-{rows["MS/MS IDs"]}.json', 'w') as fout:
+        with gzip.GzipFile(f'{imgpath}{accnr}-{filename}-{ms2scan}.json', 'w') as fout:
             fout.write(json.dumps(fullsubimage).encode('utf-8'))
 
         if savepng:  # save subimages to png

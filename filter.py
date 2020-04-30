@@ -139,6 +139,11 @@ def combine(path):
 
 
 def testfunc(path, imgpath):
+    for i in range(1000000):
+        if i % 10000 == 0:
+            print(i)
+            a = 0
+
     outfile = open(f'{path}subimage2.json', 'w')
     totallen = len(list(open(f'{path}subimage.json')))
     print(totallen)
