@@ -495,7 +495,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
             ms2info = []
             datacollected = 'ms1'
 
-        ms2size = ms2info.shape
+        ms2size = np.array(ms2info).shape
         # ms2size = str([f for f in np.array(ms2info).shape])
         fullsubimage = {'ms1': subimage, 'ms2': ms2info}
 
