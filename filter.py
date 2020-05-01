@@ -63,10 +63,12 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
         mostfrequent = xmostfrequent
 
     if amountcheck[0]:
-        mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountcheck[1] / 100 * sum(amountdict.values()))]
+        mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if
+                      f[1] > int(amountcheck[1] / 100 * sum(amountdict.values()))]
         if minbinary and len(mostcommon) < 2:
             for amountrange in range(100, 0, -1):
-                mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountrange) / 100 * sum(amountdict.values())]
+                mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if
+                              f[1] > int(amountrange) / 100 * sum(amountdict.values())]
                 if len(mostcommon) > 1:
                     break
             print(f'Amountcheck changed from {amountcheck[1]}% to {amountrange}% to get binary classes')
@@ -107,7 +109,6 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
             i += 1
     print(f'{i} lines written to filtered version \n{nclasses} classes: {[f for f in mostcommon]}')
     outfile.close()
-
 
 
 def boomaccessions(path):
@@ -173,9 +174,6 @@ def testfunc(path, imgpath):
         outfile.write(json.dumps(data) + '\n')
 
 
-
-
-
 if __name__ == '__main__':
     # Read datapath from config file
     with open('config.json') as json_file:
@@ -202,18 +200,18 @@ if __name__ == '__main__':
 
     else:
         start = time.time()
-        print('Getting sizes and scores', end = '\r')
+        print('Getting sizes and scores', end='\r')
         output = getsizeandscore(path, scorecheck)
         size = output[0]
         scorepercentile = output[1]
         stop = time.time()
-        print(f'Getting sizes and scores - {round(stop-start,5)} seconds elapsed')
+        print(f'Getting sizes and scores - {round(stop - start, 5)} seconds elapsed')
 
         start = time.time()
         print('Creating filtered version', end='\r')
         boomfilter(path, scorecheck, amountcheck, size, scorepercentile, filterclass, topxamount, minbinary)
         stop = time.time()
-        print(f'Creating filtered version complete - {round(stop-start,5)} seconds elapsed')
+        print(f'Creating filtered version complete - {round(stop - start, 5)} seconds elapsed')
 
 # python3 filehandler.py filter accessions
 # python3 filehandler.py filter subimage PTM/Charge/Sequence/Length
