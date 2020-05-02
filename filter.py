@@ -25,7 +25,7 @@ def get_size_and_score(path, add_score_filter):
     return ms1size, getabovehere
 
 
-def subimage_filter(path, add_score_filter, add_amount_filter, ms1size, getabovehere, filterclass, xmostfrequent, min_x_classes):
+def subimage_filter(path, add_score_filter, ms1size, getabovehere, filterclass, min_amount_classes, max_amount_classes, min_amount_in_class):
     binary = False
     if len(sys.argv) > 2:
         binary = True
@@ -57,26 +57,21 @@ def subimage_filter(path, add_score_filter, add_amount_filter, ms1size, getabove
     for classes in seen.keys():
         amountdict[classes] = len(seen[classes])
 
-    if xmostfrequent == 'max':
+    if min_amount_classes == 'max':
         mostfrequent = len(seen.keys())
     else:
-        mostfrequent = xmostfrequent
+        mostfrequent = min_amount_classes
 
-    if add_amount_filter[0]:
-        mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if
-                      f[1] > int(add_amount_filter[1] / 100 * sum(amountdict.values()))]
-        if min_x_classes and len(mostcommon) < 2:
-            for amountrange in range(100, 0, -1):
-                mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if
-                              f[1] > int(amountrange) / 100 * sum(amountdict.values())]
-                if len(mostcommon) > 1:
-                    break
-            print(f'add_amount_filter changed from {add_amount_filter[1]}% to {amountrange}% to get binary classes')
-        minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
-    else:
-        mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent)]
-        minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
-    nclasses = len(mostcommon)
+    mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(min_amount_in_class / 100 * sum(amountdict.values()))]
+    if len(mostcommon) < min_amount_classes:
+        for amountrange in range(min_amount_in_class, 0, -1):
+            mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(amountrange) / 100 * sum(amountdict.values())]
+            if len(mostcommon) >= min_amount_classes:
+                print(f'min_amount_in_class changed from {min_amount_in_class}% to {amountrange}% to get {len(mostcommon)} classes')
+                break
+        if len(mostcommon) < min_amount_classes:
+            print(f'min_amount_classes isnt achieveable (Probably not enough classes in data). Only {len(mostcommon)} classes created')
+    minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
 
     namelist = []
     for seq in seen:
@@ -107,7 +102,7 @@ def subimage_filter(path, add_score_filter, add_amount_filter, ms1size, getabove
             data[f'{filterclass}_class'] = str([index for index in mostcommon].index(lookup))
             outfile.write(json.dumps(data) + '\n')
             i += 1
-    print(f'{i} lines written to filtered version \n{nclasses} classes: {[f for f in mostcommon]}')
+    print(f'{i} lines written to filtered version \n{len(mostcommon)} classes: {[f for f in mostcommon]}')
     outfile.close()
 
 
@@ -183,10 +178,9 @@ if __name__ == '__main__':
     imgpath = f'{data["path"]}images/'
     add_score_filter = data['add_score_filter']
     add_score_filter[0] = add_score_filter[0] == 'True'
-    add_amount_filter = data['add_amount_filter']
-    add_amount_filter[0] = add_amount_filter[0] == 'True'
-    only_x_classes = data['only_x_classes']
-    min_x_classes = data['min_x_classes'] == 'True'
+    min_amount_classes = data['min_amount_classes']
+    max_amount_classes = data['max_amount_classes']
+    min_amount_in_class = data['min_amount_in_class']
 
     filterclass = sys.argv[1]
     if sys.argv[1].lower() == 'test':
@@ -209,7 +203,7 @@ if __name__ == '__main__':
 
         start = time.time()
         print('Creating filtered version', end='\r')
-        subimage_filter(path, add_score_filter, add_amount_filter, size, scorepercentile, filterclass, only_x_classes, min_x_classes)
+        subimage_filter(path, add_score_filter, size, scorepercentile, filterclass, min_amount_classes, max_amount_classes, min_amount_in_class)
         stop = time.time()
         print(f'Creating filtered version complete - {round(stop - start, 5)} seconds elapsed')
 

@@ -762,7 +762,7 @@ if __name__ == '__main__':
     acquire_only_new = data['acquire_only_new'] == 'True'
     multi = data['multi_processing'] == 'True'
     nr_processes = data['nr_processes']
-    errormessages = data['recieve_error_messages'] == 'True'
+    errormessages = data['receive_error_messages'] == 'True'
     skip_incomplete = False
 
     # Assigning accession number and maxquant output file name

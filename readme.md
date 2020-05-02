@@ -48,25 +48,24 @@ rt_interval: rt interval used for subimages around the peptides - Defaults to +-
 
 acquire_only_new: A boolean value for skipping PRIDE projects if you have already created all images - Defaults to "True"
 
-multithread: A Boolean value for running the extraction multithreaded (reduces error messages)- Defaults to "True"
+multi_processing: A Boolean value for running the extraction multithreaded (reduces error messages)- Defaults to "True"
 
 nr_threads: Amount of threads used for multi threading - Defaults to 10
 
-formatsoftware: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
+format_software: What software is used for formatting from .raw to .mzml - Possibilies are "conda" or "docker" so the used method must be installed - Defaults to "conda"
 
-Errormessage: If files fail, whether to just skip them or skip them and get the error message. Used for debugging - Defaults to "False"
+recieve_error_messages: If files fail, whether to just skip them or skip them and get the error message. Used for debugging - Defaults to "False"
 
-savepng: Whether or not to save images as png files or only txt - Dafults to "False"
+save_images_as_png: Whether or not to save images as png files or only txt - Dafults to "False"
 
 ##### filtering attributes:
+min_amount_classes: Minimum amounts of classes in filtered file - Defaults to 2
+
+min_amount_in_class: Minimum amount amount of data points (in percentile of total data) that goes into each class. will be changed if it doesnt allow for min_amount_classes classes- Defaults to 10
+
+max_amount_classes: Maximum amounts of classes. Always goes for the n most abundant classes.- Defaults to "max" (all with min_amount_in_class datapoints)
 
 filterscore: When filtering subimage metadata, do you want to have a score amount that the peptide has to achieve, and what is the percentile of all score you want to have above. - Defaults to ["False", 55],
-
-filteramount: When filtering subimage metadata, do you want to have an amount of datapoints pr class. The filter filters off percentages of total datapoints in either class (so 10(%) means that each class has to have 10% of all datapoints or it wont be incorporated) - Defaults to ["False", 50], 
-
-topxamount: When you want only x classes. This filteres away the classes that arent in the most abundant classes. (fx only 10 most abundant sequences) - Defaults to "max" that is no top limit, else write a numerical value
-
-minbinary: Forces the filtered version to at least be a binary class. This means that if the filteramount is set too high to get more than one class, it will lower the amount untill it gets at least two classes. Defaults to "True"
 
 ##### networkattributes:
 batch_size: Size of batches for stochastic gradient descent - Defaults to 64

@@ -16,7 +16,7 @@ def create_network_file(length_ms2, filetouse):
 
     if length_ms2 == 'max':
         length_ms2 = min([int(brokenlines.split('[')[1].split(',')[0]) for line in open(f'{metapath}{filetouse}') for
-                      brokenlines in line.split(', "') if 'ms2size' in brokenlines and 'both' in line])
+                          brokenlines in line.split(', "') if 'ms2size' in brokenlines and 'both' in line])
 
     for line in open(f'{metapath}{filetouse}', 'r'):
         linesplit = line.split(', "')
@@ -89,8 +89,10 @@ def history_plot(metric, metapath, imageclass):
     plt.savefig(f'{metapath}{imageclass}.png')
 
 
-def nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, imageclass, metapath, patience, which_ms_touse):
-    model_network = Network_Model(which_ms_touse, classification, n_classes, ms1size, ms2size, n_channels, length_ms2, metapath,
+def nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, imageclass, metapath, patience,
+            which_ms_touse):
+    model_network = Network_Model(which_ms_touse, classification, n_classes, ms1size, ms2size, n_channels, length_ms2,
+                                  metapath,
                                   imageclass, patience)
     model = model_network.get_network()
     callbacks_list = model_network.get_callbacks()
@@ -132,16 +134,19 @@ if __name__ == '__main__':
 
     if setseed:
         random.seed(1)
-        np.seed(1)
+        os.environ['PYTHONHASHSEED'] = str(1)
+        np.random.seed(1)
+        # set_seed(1)
 
     classification = sys.argv[1].lower()
     if not (classification == 'c' or classification == 'r'):
         print('classification or regression problem not input correctly.')
         quit()
-    imageclass = f'{sys.argv[2]}_class'
     classification = classification == 'c'
+    imageclass = f'{sys.argv[2]}_class'
 
-    if (which_ms_touse == 'both' or which_ms_touse == 'ms2') and os.path.exists(f'{metapath}subimage_filtered_network.json'):
+    if (which_ms_touse == 'both' or which_ms_touse == 'ms2') and os.path.exists(
+            f'{metapath}subimage_filtered_network.json'):
         filetouse = 'subimage_filtered_network.json'
     elif os.path.exists(f'{metapath}subimage_filtered.json'):
         filetouse = 'subimage_filtered.json'
@@ -160,13 +165,6 @@ if __name__ == '__main__':
     else:
         n_classes = 1
 
-    if batch_size == 'auto':
-        for i in range(10):
-            a = 2 ** (i + 7)
-            if a > n_classes ** 2 * 2:
-                batch_size = a
-                break
-
     params = {'ms1size': (ms1size[0], ms1size[1]),
               'ms2size': (ms2size[0], ms2size[1]),
               'batch_size': batch_size,
@@ -182,7 +180,8 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, nameofclass, metapath, patience,
+    output = nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, nameofclass, metapath,
+                     patience,
                      which_ms_touse)
     model = output[0]
     callbacks_list = output[1]
