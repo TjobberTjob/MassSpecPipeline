@@ -154,8 +154,9 @@ if __name__ == '__main__':
 
     if batch_size == 'auto':
         for i in range(10):
-            if 2 ** (i + 4) > n_classes ** 2 * 2:
-                batch_size = 2 ** (i + 4)
+            a = 2 ** (i + 6)
+            if a > n_classes ** 2 * 2:
+                batch_size = a
                 break
 
     params = {'ms1size': (ms1size[0], ms1size[1]),

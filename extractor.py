@@ -438,7 +438,6 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-
 def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mpath, df, subimage_interval, filename, multiprocessing,
              savepng):
     lowbound = bounds[0]
