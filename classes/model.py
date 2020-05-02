@@ -33,7 +33,7 @@ class Network_Model():
     def get_phase1_ms2_net(self):
         input = Input(shape=(self.lenMS2, self.ms2size[1]))
         x = Dense(128, activation='relu')(input)
-        x = Dense(64, activation='relu')(input)
+        x = Dense(64, activation='relu')(x)
         x = Flatten()(x)
 
         return input, x
