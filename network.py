@@ -7,10 +7,11 @@ import keras
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.engine.saving import load_model
-from keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate, GlobalAveragePooling1D, \
-    GlobalAveragePooling2D
+from classes.datagenerator import DataGenerator
+from classes.model import Network_Model
 from keras.utils import plot_model
 from simplejson import loads
+from keras.models import Model
 
 
 def createnetworkfile(lenMS2, filetouse):
@@ -82,178 +83,12 @@ def datafetcher(path, filetouse, imageclass, test_accessions):
     return partition, labels, ms1size, ms2size
 
 
-# Developing the data generator
-class DataGenerator(keras.utils.Sequence):
-    'Generates data for Keras'
-
-    def __init__(self, path, list_IDs, labels, batch_size, ms1size, ms2size, n_channels, n_classes, shuffle, MS,
-                 minMS2):
-        'Initialization'
-        self.ms1size = ms1size
-        self.ms2size = ms2size
-        self.path = path
-        self.batch_size = batch_size
-        self.labels = labels
-        self.list_IDs = list_IDs
-        self.n_channels = n_channels
-        self.n_classes = n_classes
-        self.shuffle = shuffle
-        self.MS = MS
-        self.minMS2 = minMS2
-        self.on_epoch_end()
-
-    def __len__(self):
-        'Denotes the number of batches per epoch'
-        return int(np.floor(len(self.list_IDs) / self.batch_size))
-
-    def __getitem__(self, index):
-        'Generate one batch of data'
-        # Generate indexes of the batch
-        indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
-
-        # Find list of IDs
-        list_IDs_temp = [self.list_IDs[k] for k in indexes]
-        # Generate data
-        X, y = self.__data_generation(list_IDs_temp)
-        return X, y
-
-    def on_epoch_end(self):
-        'Updates indexes after each epoch'
-        self.indexes = np.arange(len(self.list_IDs))
-        if self.shuffle:
-            np.random.shuffle(self.indexes)
-
-    def __data_generation(self, list_IDs_temp):
-        'Generates data containing batch_size samples'
-        # Initialization
-        if self.MS == 'ms1':
-            X = np.empty((self.batch_size, self.ms1size[0], self.ms1size[1], self.n_channels))
-
-        elif self.MS == 'ms2':
-            X = np.empty((self.batch_size, self.minMS2, self.ms2size[1]))
-
-        else:
-            X = np.empty((self.batch_size, self.ms1size[0], self.ms1size[1], self.n_channels))
-            X2 = np.empty((self.batch_size, self.minMS2, self.ms2size[1]))
-
-        if classification:
-            y = np.empty(self.batch_size, dtype=int)
-        else:
-            y = np.empty(self.batch_size, dtype=float)
-
-        # Generate data
-        for i, ID in enumerate(list_IDs_temp):
-            # Store sample
-            with gzip.GzipFile(f'{imagepath}{ID}', 'r') as fin:
-                fullinfoimage = json.loads(fin.read().decode('utf-8'))
-            ms1 = fullinfoimage['ms1']
-            ms2 = fullinfoimage['ms2']
-            if self.MS == 'ms1':
-                image = np.array(ms1)
-                image = image[:, :, 0:self.n_channels]
-                X[i,] = image
-
-            elif self.MS == 'ms2':
-                X[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse=True)[:self.minMS2])
-
-            else:
-                image = np.array(ms1)
-                image = image[:, :, 0:self.n_channels]
-                X[i,] = image
-
-                X2[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse=True)[:self.minMS2])
-
-            y[i] = self.labels[ID]
-
-        if classification:
-            y = keras.utils.to_categorical(y, num_classes=self.n_classes)
-
-        if self.MS == 'both':
-            return [X, X2], y
-
-        else:
-            return X, y
-
-
-def r2(y_true, y_pred):
-    from keras import backend as K
-    SS_res = K.sum(K.square(y_true - y_pred))
-    SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
-    return 1 - SS_res / (SS_tot + K.epsilon())
-
-
-# Developing the neural network
 def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, imageclass, metapath, patience, whichMS):
-    # HIDDEN LAYERS
-    if whichMS == 'ms1':  # MS1
-        input = Input(shape=(ms1size[0], ms1size[1], n_channels,))
-        x = Conv2D(128, kernel_size=(5, 5), activation='relu', padding='same')(input)
-        x = MaxPooling2D(pool_size=(5, 5), strides=(1, 1), padding='same')(x)
-        x1 = Conv2D(128, kernel_size=(3, 3), activation='relu', padding='same')(input)
-        x1 = MaxPooling2D(pool_size=(3, 3), strides=(1, 1), padding='same')(x1)
-        x2 = Conv2D(128, kernel_size=(2, 2), activation='relu', padding='same')(input)
-        x2 = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(x2)
-        x = Concatenate()([x, x1, x2])
-        x = GlobalAveragePooling2D()(x)
-
-
-    elif whichMS == 'ms2':  # MS2
-        input = Input(shape=(lenMS2, ms2size[1]))
-        x = Dense(128, activation='relu')(input)
-        x = Dense(64, activation='relu')(input)
-        x = Flatten()(x)
-
-
-    else:  # BOTH
-        input = Input(shape=(ms1size[0], ms1size[1], n_channels,))  # MS1
-        x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
-        x = MaxPooling2D(pool_size=(2, 2))(x)
-        x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
-        x1 = MaxPooling2D(pool_size=(2, 2))(x1)
-        x2 = Conv2D(124, kernel_size=(2, 2), activation='relu', padding='same')(input)
-        x2 = MaxPooling2D(pool_size=(2, 2))(x2)
-        x = Concatenate()([x, x1, x2])
-        x = Flatten()(x)
-
-        input2 = Input(shape=(lenMS2, ms2size[1],))  # MS2
-        x1 = Dense(128, activation='relu')(input2)
-        x1 = Dense(64, activation='relu')(x1)
-        x1 = Flatten()(x1)
-
-        x = Concatenate()([x, x1])  # Combine
-
-    # if whichMS == 'ms1' or whichMS == 'both':  # After combining
-    x = Dense(128, activation='relu')(x)
-    x = Dense(64, activation='relu')(x)
-
-    # OUTPUT LAYER
-    if classification:
-        output = Dense(n_classes, activation='softmax')(x)
-    else:
-        output = Dense(n_classes, activation='linear')(x)
-
-    # COMBINE MODEL
-    if whichMS == 'ms1' or whichMS == 'ms2':
-        model = keras.Model(inputs=input, outputs=output)
-    else:
-        model = keras.Model(inputs=[input, input2], outputs=output)
+    model_network = Network_Model(whichMS, classification, n_classes, ms1size, ms2size, n_channels, lenMS2, metapath, imageclass, patience)
+    model = model_network.get_network()
+    callbacks_list = model_network.get_callbacks()
     print(model.summary())
-    # plot_model(model, to_file="model.png")
-
-    if classification:
-        model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
-    else:
-        model.compile(loss='mse', metrics=[r2], optimizer='rmsprop')
-
-    # Create callbacks
-    if classification:
-        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_accuracy',
-                                                     save_best_only=True)
-    else:
-        checkpoint = keras.callbacks.ModelCheckpoint(f'{metapath}Best-{imageclass}.h5', monitor='val_r2',
-                                                     save_best_only=True)
-    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience)
-    callbacks_list = [checkpoint, early_stopping]
+    plot_model(model, to_file="model.png")
 
     return model, callbacks_list
 
@@ -330,7 +165,10 @@ if __name__ == '__main__':
               'n_channels': n_channels,
               'shuffle': True,
               'MS': whichMS,
-              'minMS2': lenMS2}
+              'minMS2': lenMS2,
+              'classification': classification,
+              'imagepath': imagepath,
+              }
 
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
@@ -345,7 +183,7 @@ if __name__ == '__main__':
     if classification:
         plt.plot(history.history['accuracy'])
         plt.plot(history.history['val_accuracy'])
-        plt.title('model accuracy')
+        plt.title('classes accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
         plt.legend(['train', 'validation'], loc='upper left')
@@ -359,7 +197,7 @@ if __name__ == '__main__':
         plt.legend(['train', 'validation'], loc='upper left')
         plt.savefig(f'{metapath}{imageclass}.png')
 
-    print('Creating and running model')
+    print('Creating and running classes')
     model = load_model(f'{metapath}Best-{imageclass}.h5')
     test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
     testaccuracy = model.evaluate_generator(test_generator)
