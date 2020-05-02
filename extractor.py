@@ -12,8 +12,6 @@ import time
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from zipfile import ZipFile
-from pyteomics import mass
-import pylab
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,7 +28,7 @@ def get_lower_bound(haystack, needle):
         raise ValueError(f"{needle} is out of bounds of {haystack}")
 
 
-def filefinder(accnr, path):
+def pride_file_finder(accnr, path):
     url = f'https://www.ebi.ac.uk/pride/ws/archive/file/list/project/{accnr}/'
     serverIssue = False
     privacyIssue = False
@@ -106,7 +104,7 @@ def zipfile_downloader(zipfile, path, maxquant_file):
     return rawfiles, df
 
 
-def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
+def file_handler(accnr, filename, path, maxquant_file, df, rawfiles):
     filepath = f'{path}{accnr}/{filename}/'
     # Make the file directory if it doesnt exist
     if not os.path.exists(filepath):
@@ -131,7 +129,7 @@ def filehandling(accnr, filename, path, maxquant_file, df, rawfiles):
     return df2, filepath
 
 
-def formatFile(accnr, filename, path, filepath):
+def file_formatter(accnr, filename, path, filepath):
     if not multiprocessing:
         print('Formatting file to mzML										', end='\r')
 
@@ -248,7 +246,7 @@ def process_ms2(spectrum):
     return {'scan_index': scan_index, 'precursor_scan': ms1_scan, 'precursor_ion': ion, 'm/z': mz, 'rt': intensity}
 
 
-def internalmzML(path):
+def extract_from_mzml(path):
     # Extract the data from the mzml, if we havnt already
     if not os.path.exists(f'{path}mzML.json'):
         if not multiprocessing:
@@ -290,7 +288,7 @@ def internalmzML(path):
         # os.remove(f'{path}file.mzML')
 
 
-def preparameters(filepath):
+def image_preparameters(filepath):
     if not multiprocessing:
         print('Preparing parameter for image creation                                                    ', end='\r')
     with gzip.GzipFile(f'{filepath}mzML.json', 'r') as fin:
@@ -319,7 +317,7 @@ def preparameters(filepath):
     return mzml, [lowbound, highbound], interval, [mz_bin, rt_bin], resolution
 
 
-def fullpng(image, filepath, resolution, interval, lowbound, highbound):
+def full_png_image(image, filepath, resolution, interval, lowbound, highbound):
     listnames = ['Mean', 'Min', 'Max', 'Collapsed']
     for i in range(4):
         fullimage = [[y[i] for y in x] for x in image]
@@ -352,7 +350,7 @@ def fullpng(image, filepath, resolution, interval, lowbound, highbound):
             plt.close()
 
 
-def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
+def full_txt_image(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
     mz_bin = bins[0]
     rt_bin = bins[1]
     # Create an empty array for layer use
@@ -415,11 +413,11 @@ def fullimg(mzmlfile, interval, bins, resolution, filepath, bounds, savepng):
     highbound = bounds[1]
 
     if savepng:  # save full image to png
-        fullpng(image, filepath, resolution, interval, lowbound, highbound)
+        full_png_image(image, filepath, resolution, interval, lowbound, highbound)
     return image
 
 
-def subpng(subimage, imgpath, filename, index, lowbound, highbound):
+def sub_png_image(subimage, imgpath, filename, index, lowbound, highbound):
     newimage = [[y[0] for y in x] for x in subimage]
     newimage.reverse()
     newimage = np.ma.masked_equal(newimage, 0)
@@ -438,8 +436,8 @@ def subpng(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mpath, df, subimage_interval, filename, multiprocessing,
-             savepng):
+def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mpath, df, subimage_interval, filename, multiprocessing,
+                  savepng):
     lowbound = bounds[0]
     highbound = bounds[1]
     mz_bin = bins[0]
@@ -498,7 +496,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
             fout.write(json.dumps(fullsubimage).encode('utf-8'))
 
         if savepng:  # save subimages to png
-            subpng(ms1info, imgpath, filename, index, lowbound, highbound)
+            sub_png_image(ms1info, imgpath, filename, index, lowbound, highbound)
 
         new_metadata = {}
         new_metadata['image'] = f'{accnr}-{filename}-{ms2scan}.json'
@@ -514,7 +512,7 @@ def subimgs(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mp
     outfile.close()
 
 
-def offline(path, filename, mpath):
+def local_file_main(path, filename, mpath):
     global zipfile, rawfile
     maxquant_file = 'allPeptides.txt'
     filepath = f'{sysinput}{filename}/'
@@ -553,7 +551,7 @@ def offline(path, filename, mpath):
         else:
             df = pd.read_csv(f'{filepath}{maxquant_file}', sep='\t', low_memory=False)
 
-        submain(accnr, filename, path, mpath, filepath, df)
+        main_p2(accnr, filename, path, mpath, filepath, df)
     else:
         try:
             os.system('rm /data/ProteomeToolsRaw/*.*')
@@ -564,9 +562,9 @@ def offline(path, filename, mpath):
         quit()
 
 
-def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
-    formatFile(accnr, filename, path, filepath)
-    internalmzML(filepath)
+def main_p2(accnr, filename, path, mpath, filepath, df2, multiprocessing):
+    file_formatter(accnr, filename, path, filepath)
+    extract_from_mzml(filepath)
 
     imagefiles = glob.glob(f'{path}{accnr}/{filename}/*x*.txt')
     binsmatch = False
@@ -598,22 +596,22 @@ def submain(accnr, filename, path, mpath, filepath, df2, multiprocessing):
     savepng = config['savepng'] == 'True'
 
     if not binsmatch:
-        output = preparameters(filepath)
+        output = image_preparameters(filepath)
         mzml = output[0]
         bounds = output[1]
         interval = output[2]
         bins = output[3]
         resolution = output[4]
 
-        output = fullimg(mzml, interval, bins, resolution, filepath, bounds, savepng)
+        output = full_txt_image(mzml, interval, bins, resolution, filepath, bounds, savepng)
         image = output[0]
 
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    subimgs(accnr, interval, bins, image, bounds, resolution, mzml, path, mpath, df2, subimage_interval, filename, multiprocessing,
-             savepng)
+    sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzml, path, mpath, df2, subimage_interval, filename, multiprocessing,
+                  savepng)
 
 
-def main(accnr, maxquant_file, path, mpath, multiprocessing):
+def main_p1(accnr, maxquant_file, path, mpath, multiprocessing):
     if not multiprocessing:
         print(f'\nAccessions: {accnr}')
 
@@ -621,7 +619,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
         os.mkdir(f'{path}{accnr}/')
 
     # Find all zip files
-    output = filefinder(accnr, path)
+    output = pride_file_finder(accnr, path)
     allZip = output[0]
     allRaw = output[1]
     haveallMQF = output[2]
@@ -664,11 +662,11 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
                         if not multiprocessing:
                             print(f'file: {accnr}/{filename}                                               ')
 
-                        output = filehandling(accnr, filename, path, pepfile, df, allRaw)
+                        output = file_handler(accnr, filename, path, pepfile, df, allRaw)
                         df2 = output[0]
                         filepath = output[1]
 
-                        submain(accnr, filename, path, mpath, filepath, df2, multiprocessing)
+                        main_p2(accnr, filename, path, mpath, filepath, df2, multiprocessing)
                         if not multiprocessing:
                             print(f'{filename}: ✔                         ')
 
@@ -709,7 +707,7 @@ def main(accnr, maxquant_file, path, mpath, multiprocessing):
                                     # os.system(f'curl {fileraw} --output {filepath}file.raw')
                                     break
 
-                        submain(accnr, filename, path, mpath, filepath, df2, multiprocessing)
+                        main_p2(accnr, filename, path, mpath, filepath, df2, multiprocessing)
                         if not multiprocessing:
                             print(f'{filename}: ✔                         ')
 
@@ -781,7 +779,7 @@ if __name__ == '__main__':
     elif str(sysinput)[0] == '/':  # For local fine purposes.
         dirsinpath = os.listdir(sysinput)
         for f in dirsinpath:
-            offline(datapath, f, metapath)
+            local_file_main(datapath, f, metapath)
 
     elif str(sysinput) == 'complete':  # For re-creating images from already downloaded and parsed files
         listofowned = [f for f in os.listdir(datapath) if
@@ -793,11 +791,11 @@ if __name__ == '__main__':
                 multiprocessing = True
                 accessions = [(f, pepfile, datapath, metapath, multiprocessing) for f in listofowned]
                 pool = ThreadPool(nr_processes)
-                pool.starmap(main, accessions)
+                pool.starmap(main_p1, accessions)
 
             else:
                 multiprocessing = False
-                main(str(accession), pepfile, datapath, metapath, multiprocessing)
+                main_p1(str(accession), pepfile, datapath, metapath, multiprocessing)
 
     elif str(sysinput) == 'pride' or str(sysinput) == 'pridefiltered':  # Going through the metadata
         if str(sysinput) == 'pride':
@@ -811,19 +809,19 @@ if __name__ == '__main__':
                           for linez in reversed(list(open(f'{metapath}{pridefile}.json'))) if
                           'accession' in json.loads(linez) and json.loads(linez)["maxquant"]]
             pool = ThreadPool(nr_processes)
-            pool.starmap(main, accessions)
+            pool.starmap(main_p1, accessions)
 
         else:
             multiprocessing = False
             for line in reversed(list(open(f'{metapath}{pridefile}.json'))):
                 data = json.loads(line)
                 accession = data['accession']
-                main(str(accession), pepfile, datapath, metapath, multiprocessing)
+                main_p1(str(accession), pepfile, datapath, metapath, multiprocessing)
 
     elif str(sysinput)[0:3] == 'PRD' or str(sysinput)[0:3] == 'PXD':  # For single accessions usage
         accession = sysinput
         multiprocessing = False
-        main(str(accession), pepfile, datapath, metapath, multiprocessing)
+        main_p1(str(accession), pepfile, datapath, metapath, multiprocessing)
 
     else:
         print('Input not recognized. Check readme file for all possible inputs')

@@ -11,7 +11,7 @@ import numpy as np
 from simplejson import loads
 
 
-def getsizeandscore(path, scorecheck):
+def get_size_and_score(path, scorecheck):
     getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                 open(f'{path}subimage.json')]
     ms1size = max(set(getsizes), key=getsizes.count)
@@ -21,11 +21,11 @@ def getsizeandscore(path, scorecheck):
                      'score' in line.lower() and 'dp' not in line.lower() and str(ms1size) in lines.lower()]
         getabovehere = np.percentile(getscores, scorecheck[1])
     else:
-        getabovehere = 'Fuckthis'
+        getabovehere = []
     return ms1size, getabovehere
 
 
-def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass, xmostfrequent, minbinary):
+def subimage_filter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass, xmostfrequent, minbinary):
     binary = False
     if len(sys.argv) > 2:
         binary = True
@@ -111,7 +111,7 @@ def boomfilter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass
     outfile.close()
 
 
-def boomaccessions(path):
+def accession_filter(path):
     outfile = open(f'{path}accessions_filtered.json', 'w')
 
     for line in open(f'{path}accessions.json', 'r'):
@@ -122,7 +122,7 @@ def boomaccessions(path):
     outfile.close()
 
 
-def combine(path):
+def combine_metadata(path):
     if os.path.exists(f'{path}subimage.json'):
         allimgs = [json.loads(line)['image'] for line in open(f'{path}subimage.json') if
                    'image' in json.loads(line)]
@@ -139,7 +139,7 @@ def combine(path):
     quit()
 
 
-def testfunc(path, imgpath):
+def test_function(path, imgpath):
     for i in range(1000000):
         if i % 10000 == 0:
             print(i)
@@ -190,18 +190,18 @@ if __name__ == '__main__':
 
     filterclass = sys.argv[1]
     if sys.argv[1].lower() == 'test':
-        testfunc(path, imgpath)
+        test_function(path, imgpath)
 
     if sys.argv[1].lower() == 'combine':
-        combine(path)
+        combine_metadata(path)
 
     elif sys.argv[1].lower() == 'accessions':
-        boomaccessions(path)
+        accession_filter(path)
 
     else:
         start = time.time()
         print('Getting sizes and scores', end='\r')
-        output = getsizeandscore(path, scorecheck)
+        output = get_size_and_score(path, scorecheck)
         size = output[0]
         scorepercentile = output[1]
         stop = time.time()
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
         start = time.time()
         print('Creating filtered version', end='\r')
-        boomfilter(path, scorecheck, amountcheck, size, scorepercentile, filterclass, topxamount, minbinary)
+        subimage_filter(path, scorecheck, amountcheck, size, scorepercentile, filterclass, topxamount, minbinary)
         stop = time.time()
         print(f'Creating filtered version complete - {round(stop - start, 5)} seconds elapsed')
 

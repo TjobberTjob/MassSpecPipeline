@@ -1,20 +1,16 @@
-import gzip
 import json
 import os
 import random
 import sys
-import keras
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.engine.saving import load_model
+from simplejson import loads
 from classes.datagenerator import DataGenerator
 from classes.model import Network_Model
-from keras.utils import plot_model
-from simplejson import loads
-from keras.models import Model
 
 
-def createnetworkfile(lenMS2, filetouse):
+def create_network_file(lenMS2, filetouse):
     print('Creating MS2 data structure')
     outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
 
@@ -35,7 +31,7 @@ def createnetworkfile(lenMS2, filetouse):
     return lenMS2
 
 
-def datafetcher(path, filetouse, imageclass, test_accessions):
+def data_fetcher(path, filetouse, imageclass, test_accessions):
     print('Data fetching')
 
     for lines in open(f'{path}{filetouse}', 'r'):
@@ -82,6 +78,15 @@ def datafetcher(path, filetouse, imageclass, test_accessions):
 
     return partition, labels, ms1size, ms2size
 
+def history_plot(metric, metapath, imageclass):
+    plt.plot(history.history[f'{metric}'])
+    plt.plot(history.history[f'val_{metric}'])
+    plt.title(f'Plot of {metric} over time')
+    plt.ylabel(f'{metric}')
+    plt.xlabel('Epoch')
+    plt.legend(['Training', 'Validation'], loc='upper left')
+    plt.savefig(f'{metapath}{imageclass}.png')
+
 
 def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, imageclass, metapath, patience, whichMS):
     model_network = Network_Model(whichMS, classification, n_classes, ms1size, ms2size, n_channels, lenMS2, metapath, imageclass, patience)
@@ -121,7 +126,7 @@ if __name__ == '__main__':
 
     # Creating network files
     if whichMS == 'both' or whichMS == 'ms2':
-        lenMS2 = createnetworkfile(lenMS2, filetouse)
+        lenMS2 = create_network_file(lenMS2, filetouse)
 
     if setseed:
         random.seed(1)
@@ -139,7 +144,7 @@ if __name__ == '__main__':
         filetouse = 'subimage_filtered.json'
 
     nameofclass = imageclass.replace('/', '')
-    output = datafetcher(metapath, filetouse, imageclass, test_accessions)
+    output = data_fetcher(metapath, filetouse, imageclass, test_accessions)
     partition = output[0]
     labels = output[1]
     ms1size = output[2]
@@ -181,22 +186,11 @@ if __name__ == '__main__':
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
                                   callbacks=callbacks_list)
 
+
     if classification:
-        plt.plot(history.history['accuracy'])
-        plt.plot(history.history['val_accuracy'])
-        plt.title('classes accuracy')
-        plt.ylabel('accuracy')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'validation'], loc='upper left')
-        plt.savefig(f'{metapath}{imageclass}.png')
+        history_plot('accuracy', metapath, imageclass)
     else:
-        plt.plot(history.history['loss'])
-        plt.plot(history.history['val_loss'])
-        plt.title('MSE over time')
-        plt.ylabel('MSE')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'validation'], loc='upper left')
-        plt.savefig(f'{metapath}{imageclass}.png')
+        history_plot('loss', metapath, imageclass)
 
     print('Creating and running classes')
     model = load_model(f'{metapath}Best-{imageclass}.h5')
