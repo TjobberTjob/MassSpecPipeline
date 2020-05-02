@@ -135,7 +135,7 @@ def file_formatter(accnr, filename, path, filepath):
 
     with open('config.json') as json_file:
         config = json.load(json_file)
-    formatusing = config['formatsoftware']
+    formatusing = config['format_software']
 
     if not (os.path.exists(f'{filepath}file.mzML') or os.path.exists(f'{filepath}mzML.json')):
         if formatusing == 'conda':
@@ -593,7 +593,7 @@ def main_p2(accnr, filename, path, mpath, filepath, df2, multiprocessing):
 
     with open('config.json') as configjson:
         config = json.load(configjson)
-    savepng = config['savepng'] == 'True'
+    savepng = config['save_images_as_png'] == 'True'
 
     if not binsmatch:
         output = image_preparameters(filepath)
@@ -760,9 +760,9 @@ if __name__ == '__main__':
 
     metapath = f'{datapath}metadata/'
     acquire_only_new = data['acquire_only_new'] == 'True'
-    multi = data['multiprocessing'] == 'True'
+    multi = data['multi_processing'] == 'True'
     nr_processes = data['nr_processes']
-    errormessages = data['errormessages'] == 'True'
+    errormessages = data['recieve_error_messages'] == 'True'
     skip_incomplete = False
 
     # Assigning accession number and maxquant output file name

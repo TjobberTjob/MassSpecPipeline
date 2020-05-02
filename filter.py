@@ -11,21 +11,21 @@ import numpy as np
 from simplejson import loads
 
 
-def get_size_and_score(path, scorecheck):
+def get_size_and_score(path, add_score_filter):
     getsizes = [lines[re.search('\[', lines).span()[0]:re.search(']', lines).span()[1]] for lines in
                 open(f'{path}subimage.json')]
     ms1size = max(set(getsizes), key=getsizes.count)
 
-    if scorecheck[0]:
+    if add_score_filter[0]:
         getscores = [float(line[9:-1]) for lines in open(f'{path}subimage.json') for line in lines.split(', "') if
                      'score' in line.lower() and 'dp' not in line.lower() and str(ms1size) in lines.lower()]
-        getabovehere = np.percentile(getscores, scorecheck[1])
+        getabovehere = np.percentile(getscores, add_score_filter[1])
     else:
         getabovehere = []
     return ms1size, getabovehere
 
 
-def subimage_filter(path, scorecheck, amountcheck, ms1size, getabovehere, filterclass, xmostfrequent, minbinary):
+def subimage_filter(path, add_score_filter, add_amount_filter, ms1size, getabovehere, filterclass, xmostfrequent, min_x_classes):
     binary = False
     if len(sys.argv) > 2:
         binary = True
@@ -35,22 +35,22 @@ def subimage_filter(path, scorecheck, amountcheck, ms1size, getabovehere, filter
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
         jsonlist = line.split(', "')
-        if scorecheck[0]:
+        if add_score_filter[0]:
             keys = ['image', 'ms1size', filterclass, 'Score']
         else:
             keys = ['image', 'ms1size', filterclass]
         values = [key.split('"')[-2] for key in jsonlist for part in keys if part in key and 'DP' not in key]
 
-        if binary and scorecheck[0] and len(values) == 4:
+        if binary and add_score_filter[0] and len(values) == 4:
             if values[2] != binaryclass:
                 values[2] = f'not_{binaryclass}'
-        elif binary and not scorecheck[0] and len(values) == 3:
+        elif binary and not add_score_filter[0] and len(values) == 3:
             if values[2] != binaryclass:
                 values[2] = f'not_{binaryclass}'
 
-        if scorecheck[0] and len(values) == 4 and values[1] == ms1size and float(values[3]) > getabovehere:
+        if add_score_filter[0] and len(values) == 4 and values[1] == ms1size and float(values[3]) > getabovehere:
             seen[values[2]].append(values[0])
-        elif not scorecheck[0] and len(values) == 3 and values[1] == ms1size:
+        elif not add_score_filter[0] and len(values) == 3 and values[1] == ms1size:
             seen[values[2]].append(values[0])
 
     amountdict = defaultdict()
@@ -62,16 +62,16 @@ def subimage_filter(path, scorecheck, amountcheck, ms1size, getabovehere, filter
     else:
         mostfrequent = xmostfrequent
 
-    if amountcheck[0]:
+    if add_amount_filter[0]:
         mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if
-                      f[1] > int(amountcheck[1] / 100 * sum(amountdict.values()))]
-        if minbinary and len(mostcommon) < 2:
+                      f[1] > int(add_amount_filter[1] / 100 * sum(amountdict.values()))]
+        if min_x_classes and len(mostcommon) < 2:
             for amountrange in range(100, 0, -1):
                 mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if
                               f[1] > int(amountrange) / 100 * sum(amountdict.values())]
                 if len(mostcommon) > 1:
                     break
-            print(f'Amountcheck changed from {amountcheck[1]}% to {amountrange}% to get binary classes')
+            print(f'add_amount_filter changed from {add_amount_filter[1]}% to {amountrange}% to get binary classes')
         minamount = min([f[1] for f in Counter(amountdict).most_common(mostfrequent) if f[0] == mostcommon[-1]])
     else:
         mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent)]
@@ -181,12 +181,12 @@ if __name__ == '__main__':
 
     path = f'{data["path"]}metadata/'
     imgpath = f'{data["path"]}images/'
-    scorecheck = data['filterscore']
-    scorecheck[0] = scorecheck[0] == 'True'
-    amountcheck = data['filteramount']
-    amountcheck[0] = amountcheck[0] == 'True'
-    topxamount = data['topxamount']
-    minbinary = data['minbinary'] == 'True'
+    add_score_filter = data['add_score_filter']
+    add_score_filter[0] = add_score_filter[0] == 'True'
+    add_amount_filter = data['add_amount_filter']
+    add_amount_filter[0] = add_amount_filter[0] == 'True'
+    only_x_classes = data['only_x_classes']
+    min_x_classes = data['min_x_classes'] == 'True'
 
     filterclass = sys.argv[1]
     if sys.argv[1].lower() == 'test':
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     else:
         start = time.time()
         print('Getting sizes and scores', end='\r')
-        output = get_size_and_score(path, scorecheck)
+        output = get_size_and_score(path, add_score_filter)
         size = output[0]
         scorepercentile = output[1]
         stop = time.time()
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
         start = time.time()
         print('Creating filtered version', end='\r')
-        subimage_filter(path, scorecheck, amountcheck, size, scorepercentile, filterclass, topxamount, minbinary)
+        subimage_filter(path, add_score_filter, add_amount_filter, size, scorepercentile, filterclass, only_x_classes, min_x_classes)
         stop = time.time()
         print(f'Creating filtered version complete - {round(stop - start, 5)} seconds elapsed')
 

@@ -5,15 +5,15 @@
   "mz_interval": 25,
   "rt_interval": 5,
   "acquire_only_new": "False",
-  "multiprocessing": "True",
+  "multi_processing": "True",
   "nr_processes": 5,
-  "formatsoftware": "conda",
-  "errormessages": "True",
-  "savepng": "False",
-  "filterscore": ["False", 50],
-  "filteramount": ["True", 20],
-  "topxamount": "max",
-  "minbinary": "True",
+  "format_software": "conda",
+  "recieve_error_messages": "True",
+  "save_images_as_png": "False",
+  "add_score_filter": ["False", 50],
+  "add_amount_filter": ["True", 20],
+  "only_x_classes": "max",
+  "min_x_classes": 2,
   "networkattributes": {
     "batch_size": "auto",
     "epochs": 100,
@@ -21,9 +21,9 @@
     "test_accessions": 0,
     "training_percentage": 80,
     "early_stopping": 10,
-    "setseed": "True",
-    "MS": "ms1",
-    "lenms2": 100
+    "set_seed": "True",
+    "which_ms_touse": "ms1",
+    "length_ms2": 100
   }
 }
 

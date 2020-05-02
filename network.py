@@ -10,12 +10,12 @@ from classes.datagenerator import DataGenerator
 from classes.model import Network_Model
 
 
-def create_network_file(lenMS2, filetouse):
+def create_network_file(length_ms2, filetouse):
     print('Creating MS2 data structure')
     outfile = open(f'{metapath}subimage_filtered_network.json', 'w')
 
-    if lenMS2 == 'max':
-        lenMS2 = min([int(brokenlines.split('[')[1].split(',')[0]) for line in open(f'{metapath}{filetouse}') for
+    if length_ms2 == 'max':
+        length_ms2 = min([int(brokenlines.split('[')[1].split(',')[0]) for line in open(f'{metapath}{filetouse}') for
                       brokenlines in line.split(', "') if 'ms2size' in brokenlines and 'both' in line])
 
     for line in open(f'{metapath}{filetouse}', 'r'):
@@ -23,12 +23,12 @@ def create_network_file(lenMS2, filetouse):
         for parts in linesplit:
             if 'ms2size' in parts and 'both' in line:
                 size = int(parts.split('[')[1].split(',')[0])
-        if 'both' in line and size > lenMS2:
+        if 'both' in line and size > length_ms2:
             data = loads(line)
             outfile.write(json.dumps(data) + '\n')
     outfile.close()
 
-    return lenMS2
+    return length_ms2
 
 
 def data_fetcher(path, filetouse, imageclass, test_accessions):
@@ -89,8 +89,8 @@ def history_plot(metric, metapath, imageclass):
     plt.savefig(f'{metapath}{imageclass}.png')
 
 
-def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, imageclass, metapath, patience, whichMS):
-    model_network = Network_Model(whichMS, classification, n_classes, ms1size, ms2size, n_channels, lenMS2, metapath,
+def nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, imageclass, metapath, patience, which_ms_touse):
+    model_network = Network_Model(which_ms_touse, classification, n_classes, ms1size, ms2size, n_channels, length_ms2, metapath,
                                   imageclass, patience)
     model = model_network.get_network()
     callbacks_list = model_network.get_callbacks()
@@ -116,9 +116,9 @@ if __name__ == '__main__':
     batch_size = config['batch_size']
     epochs = config['epochs']
     patience = config['early_stopping']
-    setseed = config['setseed'] == 'True'
-    whichMS = config['MS']
-    lenMS2 = config['lenms2']
+    setseed = config['set_seed'] == 'True'
+    which_ms_touse = config['which_ms_touse']
+    length_ms2 = config['length_ms2']
 
     if os.path.exists(f'{metapath}subimage_filtered.json'):
         filetouse = 'subimage_filtered.json'
@@ -127,11 +127,12 @@ if __name__ == '__main__':
         quit()
 
     # Creating network files
-    if whichMS == 'both' or whichMS == 'ms2':
-        lenMS2 = create_network_file(lenMS2, filetouse)
+    if which_ms_touse == 'both' or which_ms_touse == 'ms2':
+        length_ms2 = create_network_file(length_ms2, filetouse)
 
     if setseed:
         random.seed(1)
+        np.seed(1)
 
     classification = sys.argv[1].lower()
     if not (classification == 'c' or classification == 'r'):
@@ -140,7 +141,7 @@ if __name__ == '__main__':
     imageclass = f'{sys.argv[2]}_class'
     classification = classification == 'c'
 
-    if (whichMS == 'both' or whichMS == 'ms2') and os.path.exists(f'{metapath}subimage_filtered_network.json'):
+    if (which_ms_touse == 'both' or which_ms_touse == 'ms2') and os.path.exists(f'{metapath}subimage_filtered_network.json'):
         filetouse = 'subimage_filtered_network.json'
     elif os.path.exists(f'{metapath}subimage_filtered.json'):
         filetouse = 'subimage_filtered.json'
@@ -172,8 +173,8 @@ if __name__ == '__main__':
               'n_classes': n_classes,
               'n_channels': n_channels,
               'shuffle': True,
-              'MS': whichMS,
-              'minMS2': lenMS2,
+              'which_ms_touse': which_ms_touse,
+              'length_ms2': length_ms2,
               'classification': classification,
               'imagepath': imagepath,
               }
@@ -181,8 +182,8 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, nameofclass, metapath, patience,
-                     whichMS)
+    output = nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, nameofclass, metapath, patience,
+                     which_ms_touse)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,

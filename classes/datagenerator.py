@@ -6,8 +6,8 @@ import gzip
 class DataGenerator(Sequence):
     'Generates data for Keras'
 
-    def __init__(self, path, list_IDs, labels, batch_size, ms1size, ms2size, n_channels, n_classes, shuffle, MS,
-                 minMS2, classification, imagepath):
+    def __init__(self, path, list_IDs, labels, batch_size, ms1size, ms2size, n_channels, n_classes, shuffle, which_ms_touse,
+                 length_ms2, classification, imagepath):
         'Initialization'
         self.imagepath = imagepath
         self.classification = classification
@@ -20,8 +20,8 @@ class DataGenerator(Sequence):
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
-        self.MS = MS
-        self.minMS2 = minMS2
+        self.MS = which_ms_touse
+        self.minMS2 = length_ms2
         self.on_epoch_end()
 
     def __len__(self):
