@@ -1,12 +1,11 @@
-import requests
 import json
-from zipfile import ZipFile
-from os.path import join
-import re
-from bs4 import BeautifulSoup
 import os
 import pickle
 import sys
+from os.path import join
+from zipfile import ZipFile
+import requests
+from bs4 import BeautifulSoup
 
 
 def get_accessions(path):
