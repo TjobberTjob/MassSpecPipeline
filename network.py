@@ -240,8 +240,8 @@ def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, ima
         model = keras.Model(inputs=input, outputs=output)
     else:
         model = keras.Model(inputs=[input, input2], outputs=output)
-    print(model.summary())
-    plot_model(model, to_file="model.png")
+    # print(model.summary())
+    # plot_model(model, to_file="model.png")
 
     if classification:
         model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
