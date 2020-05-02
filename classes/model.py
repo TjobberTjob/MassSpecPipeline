@@ -4,8 +4,10 @@ from keras.models import Model
 from classes.utilities import r2
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 
+
 class Network_Model():
-    def __init__(self, whichMS, classification, n_classes, ms1size, ms2size, n_channels, lenMS2, metapath, imageclass, patience):
+    def __init__(self, whichMS, classification, n_classes, ms1size, ms2size, n_channels, lenMS2, metapath, imageclass,
+                 patience):
         self.patience = patience
         self.imageclass = imageclass
         self.metapath = metapath
@@ -49,7 +51,6 @@ class Network_Model():
         else:
             return Dense(self.n_classes, activation='linear')
 
-
     def get_network(self):
         if self.whichMS == 'ms1':
             (self.p1_input_layer, self.p1_output_layer) = self.get_phase1_ms1_net()
@@ -78,11 +79,12 @@ class Network_Model():
 
         return self.model
 
-
     def get_callbacks(self):
         if self.classification:
-            checkpoint = ModelCheckpoint(f'{self.metapath}Best-{self.imageclass}.h5', monitor='val_accuracy', save_best_only=True)
+            checkpoint = ModelCheckpoint(f'{self.metapath}Best-{self.imageclass}.h5', monitor='val_accuracy',
+                                         save_best_only=True)
         else:
-            checkpoint = ModelCheckpoint(f'{self.metapath}Best-{self.imageclass}.h5', monitor='val_r2', save_best_only=True)
+            checkpoint = ModelCheckpoint(f'{self.metapath}Best-{self.imageclass}.h5', monitor='val_r2',
+                                         save_best_only=True)
         early_stopping = EarlyStopping(monitor='val_loss', patience=self.patience)
         return [checkpoint, early_stopping]
