@@ -188,11 +188,13 @@ if __name__ == '__main__':
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
                                   callbacks=callbacks_list)
 
+    # PLOT HISTORY
     if classification:
         history_plot('accuracy', metapath, imageclass)
     else:
         history_plot('loss', metapath, imageclass)
 
+    # TEST MODEL
     if len(partition['test']) > 0:
         model = load_model(f'{metapath}Best-{imageclass}.h5')
         test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
