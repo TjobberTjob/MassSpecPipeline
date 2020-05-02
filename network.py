@@ -78,6 +78,7 @@ def data_fetcher(path, filetouse, imageclass, test_accessions):
 
     return partition, labels, ms1size, ms2size
 
+
 def history_plot(metric, metapath, imageclass):
     plt.plot(history.history[f'{metric}'])
     plt.plot(history.history[f'val_{metric}'])
@@ -89,7 +90,8 @@ def history_plot(metric, metapath, imageclass):
 
 
 def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, imageclass, metapath, patience, whichMS):
-    model_network = Network_Model(whichMS, classification, n_classes, ms1size, ms2size, n_channels, lenMS2, metapath, imageclass, patience)
+    model_network = Network_Model(whichMS, classification, n_classes, ms1size, ms2size, n_channels, lenMS2, metapath,
+                                  imageclass, patience)
     model = model_network.get_network()
     callbacks_list = model_network.get_callbacks()
     print(model.summary())
@@ -186,20 +188,19 @@ if __name__ == '__main__':
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
                                   callbacks=callbacks_list)
 
-
     if classification:
         history_plot('accuracy', metapath, imageclass)
     else:
         history_plot('loss', metapath, imageclass)
 
-    print('Creating and running classes')
-    model = load_model(f'{metapath}Best-{imageclass}.h5')
-    test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
-    testaccuracy = model.evaluate_generator(test_generator)
-    if classification:
-        print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
-    else:
-        print(f'Accuracy on test data. Loss: {testaccuracy[0]}. R^2: {testaccuracy[1]}')
+    if len(partition['test']) > 0:
+        model = load_model(f'{metapath}Best-{imageclass}.h5')
+        test_generator = DataGenerator(imagepath, partition['test'], labels, **params)
+        testaccuracy = model.evaluate_generator(test_generator)
+        if classification:
+            print(f'Accuracy on test data. Loss: {testaccuracy[0]}. Accuracy: {testaccuracy[1]}')
+        else:
+            print(f'Accuracy on test data. Loss: {testaccuracy[0]}. R^2: {testaccuracy[1]}')
 
 # python3 network.py r m/z
 # python3 network.py c Length_class

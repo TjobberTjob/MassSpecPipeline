@@ -71,18 +71,13 @@ class DataGenerator(Sequence):
             ms1 = fullinfoimage['ms1']
             ms2 = fullinfoimage['ms2']
             if self.MS == 'ms1':
-                image = np.array(ms1)
-                image = image[:, :, 0:self.n_channels]
-                X[i,] = image
+                X[i,] = np.array(ms1)[:, :, 0:self.n_channels]
 
             elif self.MS == 'ms2':
                 X[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse=True)[:self.minMS2])
 
             else:
-                image = np.array(ms1)
-                image = image[:, :, 0:self.n_channels]
-                X[i,] = image
-
+                X[i,] = np.array(ms1)[:, :, 0:self.n_channels]
                 X2[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse=True)[:self.minMS2])
 
             y[i] = self.labels[ID]
