@@ -196,9 +196,6 @@ def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, ima
         x = Concatenate()([x, x1, x2])
         x = GlobalAveragePooling2D()(x)
 
-        x = Dense(128, activation='relu')(x)
-        x = Dense(64, activation='relu')(x)
-
 
     elif whichMS == 'ms2':  # MS2
         input = Input(shape=(lenMS2, ms2size[1]))
@@ -240,7 +237,7 @@ def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, ima
         model = keras.Model(inputs=input, outputs=output)
     else:
         model = keras.Model(inputs=[input, input2], outputs=output)
-    # print(model.summary())
+    print(model.summary())
     # plot_model(model, to_file="model.png")
 
     if classification:
