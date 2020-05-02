@@ -96,7 +96,7 @@ def nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes,
                                   imageclass, patience)
     model = model_network.get_network()
     callbacks_list = model_network.get_callbacks()
-    print(model.summary())
+    # print(model.summary())
     # plot_model(model, to_file="model.png")
 
     return model, callbacks_list

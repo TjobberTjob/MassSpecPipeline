@@ -10,7 +10,7 @@
   "format_software": "conda",
   "receive_error_messages": "True",
   "save_images_as_png": "False",
-  "min_amount_classes": 4,
+  "min_amount_classes": 2,
   "min_amount_in_class": 10,
   "max_amount_classes": "max",
   "add_score_filter": ["False", 50],
