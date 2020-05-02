@@ -7,7 +7,8 @@ import keras
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.engine.saving import load_model
-from keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate
+from keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D, Concatenate, GlobalAveragePooling1D, \
+    GlobalAveragePooling2D
 from keras.utils import plot_model
 from simplejson import loads
 
@@ -18,7 +19,7 @@ def createnetworkfile(lenMS2, filetouse):
 
     if lenMS2 == 'max':
         lenMS2 = min([int(brokenlines.split('[')[1].split(',')[0]) for line in open(f'{metapath}{filetouse}') for
-                    brokenlines in line.split(', "') if 'ms2size' in brokenlines and 'both' in line])
+                      brokenlines in line.split(', "') if 'ms2size' in brokenlines and 'both' in line])
 
     for line in open(f'{metapath}{filetouse}', 'r'):
         linesplit = line.split(', "')
@@ -85,7 +86,8 @@ def datafetcher(path, filetouse, imageclass, test_accessions):
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
 
-    def __init__(self, path, list_IDs, labels, batch_size, ms1size, ms2size, n_channels, n_classes, shuffle, MS, minMS2):
+    def __init__(self, path, list_IDs, labels, batch_size, ms1size, ms2size, n_channels, n_classes, shuffle, MS,
+                 minMS2):
         'Initialization'
         self.ms1size = ms1size
         self.ms2size = ms2size
@@ -152,14 +154,14 @@ class DataGenerator(keras.utils.Sequence):
                 X[i,] = image
 
             elif self.MS == 'ms2':
-                X[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse = True)[:self.minMS2])
+                X[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse=True)[:self.minMS2])
 
             else:
                 image = np.array(ms1)
                 image = image[:, :, 0:self.n_channels]
                 X[i,] = image
 
-                X2[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse = True)[:self.minMS2])
+                X2[i,] = np.array(sorted(ms2, key=lambda x: x[1], reverse=True)[:self.minMS2])
 
             y[i] = self.labels[ID]
 
@@ -185,16 +187,17 @@ def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, ima
     # HIDDEN LAYERS
     if whichMS == 'ms1':  # MS1
         input = Input(shape=(ms1size[0], ms1size[1], n_channels,))
-        x = Conv2D(124, kernel_size=(5, 5), activation='relu', padding='same')(input)
-        x = MaxPooling2D(pool_size=(2, 2))(x)
-        x1 = Conv2D(124, kernel_size=(3, 3), activation='relu', padding='same')(input)
-        x1 = MaxPooling2D(pool_size=(2, 2))(x1)
-        x2 = Conv2D(124, kernel_size=(2, 2), activation='relu', padding='same')(input)
-        x2 = MaxPooling2D(pool_size=(2, 2))(x2)
+        x = Conv2D(128, kernel_size=(5, 5), activation='relu', padding='same')(input)
+        x = MaxPooling2D(pool_size=(5, 5), strides=(1, 1), padding='same')(x)
+        x1 = Conv2D(128, kernel_size=(3, 3), activation='relu', padding='same')(input)
+        x1 = MaxPooling2D(pool_size=(3, 3), strides=(1, 1), padding='same')(x1)
+        x2 = Conv2D(128, kernel_size=(2, 2), activation='relu', padding='same')(input)
+        x2 = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(x2)
         x = Concatenate()([x, x1, x2])
-        x = Flatten()(x)
+        x = GlobalAveragePooling2D()(x)
+
+        x = Dense(128, activation='relu')(x)
         x = Dense(64, activation='relu')(x)
-        x = Dense(32, activation='relu')(x)
 
 
     elif whichMS == 'ms2':  # MS2
@@ -237,8 +240,8 @@ def nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, ima
         model = keras.Model(inputs=input, outputs=output)
     else:
         model = keras.Model(inputs=[input, input2], outputs=output)
-    # print(model.summary())
-    # plot_model(model, to_file="model.png")
+    print(model.summary())
+    plot_model(model, to_file="model.png")
 
     if classification:
         model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
@@ -311,15 +314,16 @@ if __name__ == '__main__':
     ms2size = output[3]
 
     if classification:
-        classes = [f.split('"')[-2] for line in open(f'{metapath}{filetouse}', 'r') for f in line.split(', "') if imageclass in f]
+        classes = [f.split('"')[-2] for line in open(f'{metapath}{filetouse}', 'r') for f in line.split(', "') if
+                   imageclass in f]
         n_classes = len(np.unique(classes))
     else:
         n_classes = 1
 
     if batch_size == 'auto':
         for i in range(10):
-            if 2**(i+4) > n_classes**2 * 2:
-                batch_size = 2**(i+4)
+            if 2 ** (i + 4) > n_classes ** 2 * 2:
+                batch_size = 2 ** (i + 4)
                 break
 
     params = {'ms1size': (ms1size[0], ms1size[1]),
@@ -334,7 +338,8 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, nameofclass, metapath, patience, whichMS)
+    output = nnmodel(ms1size, ms2size, n_channels, lenMS2, classification, n_classes, nameofclass, metapath, patience,
+                     whichMS)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
