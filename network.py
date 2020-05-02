@@ -159,7 +159,7 @@ if __name__ == '__main__':
 
     if batch_size == 'auto':
         for i in range(10):
-            a = 2 ** (i + 6)
+            a = 2 ** (i + 7)
             if a > n_classes ** 2 * 2:
                 batch_size = a
                 break
