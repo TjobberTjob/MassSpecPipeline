@@ -13,7 +13,7 @@
   "min_amount_classes": 2,
   "min_amount_in_class": 10,
   "max_amount_classes": "max",
-  "add_score_filter": ["False", 50],
+  "add_score_filter": ["True", 10],
   "networkattributes": {
     "batch_size": 128,
     "epochs": 100,

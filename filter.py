@@ -25,7 +25,30 @@ def get_size_and_score(path, add_score_filter):
     return ms1size, getabovehere
 
 
-def subimage_filter(path, add_score_filter, ms1size, getabovehere, filterclass, min_amount_classes, max_amount_classes, min_amount_in_class):
+def subimage_filter_r(path, add_score_filter, ms1size, getabovehere, filterclass):
+    outfile = open(f'{path}subimage_filtered.json', 'w')
+    i = 0
+    for line in open(f'{path}subimage.json'):
+        jsonlist = line.lower()[2:].split(', "')
+        if add_score_filter[0]:
+            lookupkeys = ['image', 'ms1size', filterclass, 'score']
+        else:
+            lookupkeys = ['image', 'ms1size', filterclass]
+        values = [key.split('"')[-2] for key in jsonlist if key[0:re.search('"', key).span()[0]] in lookupkeys]
+
+        if add_score_filter[0] and len(values) == 4 and values[1] == ms1size and float(values[3]) > getabovehere:
+            data = loads(line)
+            outfile.write(json.dumps(data) + '\n')
+            i += 1
+        elif not add_score_filter[0] and len(values) == 3 and values[1] == ms1size:
+            data = loads(line)
+            outfile.write(json.dumps(data) + '\n')
+            i += 1
+
+    print(f'{i} lines written to filtered version')
+
+
+def subimage_filter_c(path, add_score_filter, ms1size, getabovehere, filterclass, min_amount_classes, max_amount_classes, min_amount_in_class):
     binary = False
     if len(sys.argv) > 2:
         binary = True
@@ -34,12 +57,12 @@ def subimage_filter(path, add_score_filter, ms1size, getabovehere, filterclass, 
     outfile = open(f'{path}subimage_filtered.json', 'w')
     seen = defaultdict(list)
     for line in open(f'{path}subimage.json'):
-        jsonlist = line.split(', "')
+        jsonlist = line[2:].split(', "')
         if add_score_filter[0]:
-            keys = ['image', 'ms1size', filterclass, 'Score']
+            lookupkeys = ['image', 'ms1size', filterclass, 'score']
         else:
-            keys = ['image', 'ms1size', filterclass]
-        values = [key.split('"')[-2] for key in jsonlist for part in keys if part in key and 'DP' not in key]
+            lookupkeys = ['image', 'ms1size', filterclass]
+        values = [key.split('"')[-2] for key in jsonlist if key.lower()[0:re.search('"', key).span()[0]] in lookupkeys]
 
         if binary and add_score_filter[0] and len(values) == 4:
             if values[2] != binaryclass:
@@ -57,10 +80,10 @@ def subimage_filter(path, add_score_filter, ms1size, getabovehere, filterclass, 
     for classes in seen.keys():
         amountdict[classes] = len(seen[classes])
 
-    if min_amount_classes == 'max':
+    if max_amount_classes == 'max':
         mostfrequent = len(seen.keys())
     else:
-        mostfrequent = min_amount_classes
+        mostfrequent = int(max_amount_classes)
 
     mostcommon = [f[0] for f in Counter(amountdict).most_common(mostfrequent) if f[1] > int(min_amount_in_class / 100 * sum(amountdict.values()))]
     if len(mostcommon) < min_amount_classes:
@@ -97,7 +120,7 @@ def subimage_filter(path, add_score_filter, ms1size, getabovehere, filterclass, 
                 else:
                     lookup = f'not_{binaryclass}'
             else:
-                lookup = data[filterclass]
+                lookup = data[filterclass.capitalize()]
 
             data[f'{filterclass}_class'] = str([index for index in mostcommon].index(lookup))
             outfile.write(json.dumps(data) + '\n')
@@ -182,7 +205,7 @@ if __name__ == '__main__':
     max_amount_classes = data['max_amount_classes']
     min_amount_in_class = data['min_amount_in_class']
 
-    filterclass = sys.argv[1]
+    filterclass = sys.argv[1].lower()
     if sys.argv[1].lower() == 'test':
         test_function(path, imgpath)
 
@@ -203,7 +226,10 @@ if __name__ == '__main__':
 
         start = time.time()
         print('Creating filtered version', end='\r')
-        subimage_filter(path, add_score_filter, size, scorepercentile, filterclass, min_amount_classes, max_amount_classes, min_amount_in_class)
+        if filterclass == 'm/z' or filterclass == 'Score':
+            subimage_filter_r(path, add_score_filter, size, scorepercentile, filterclass)
+        else:
+            subimage_filter_c(path, add_score_filter, size, scorepercentile, filterclass, min_amount_classes, max_amount_classes, min_amount_in_class)
         stop = time.time()
         print(f'Creating filtered version complete - {round(stop - start, 5)} seconds elapsed')
 
