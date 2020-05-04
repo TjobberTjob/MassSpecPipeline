@@ -31,9 +31,9 @@ def subimage_filter_r(path, add_score_filter, ms1size, getabovehere, filterclass
     for line in open(f'{path}subimage.json'):
         jsonlist = line.lower()[2:].split(', "')
         if add_score_filter[0]:
-            lookupkeys = ['image', 'ms1size', filterclass, 'score']
+            lookupkeys = ['image', 'ms1size', 'm/z', 'score']
         else:
-            lookupkeys = ['image', 'ms1size', filterclass]
+            lookupkeys = ['image', 'ms1size', 'm/z']
         values = [key.split('"')[-2] for key in jsonlist if key[0:re.search('"', key).span()[0]] in lookupkeys]
 
         if add_score_filter[0] and len(values) == 4 and values[1] == ms1size and float(values[3]) > getabovehere:
@@ -226,7 +226,7 @@ if __name__ == '__main__':
 
         start = time.time()
         print('Creating filtered version', end='\r')
-        if filterclass == 'm/z' or filterclass == 'Score':
+        if filterclass == 'regression':
             subimage_filter_r(path, add_score_filter, size, scorepercentile, filterclass)
         else:
             subimage_filter_c(path, add_score_filter, size, scorepercentile, filterclass, min_amount_classes, max_amount_classes, min_amount_in_class)
