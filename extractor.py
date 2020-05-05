@@ -480,21 +480,16 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
         mzupper = int(get_lower_bound(mzrangelist, rows['m/z']) + mzlen)
         rtlower = int(get_lower_bound(rtrangelist, rows['Retention time']) - rtlen)
         rtupper = int(get_lower_bound(rtrangelist, rows['Retention time']) + rtlen)
-        start = time.time()
+
         ms1info = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
         ms1size = str([f for f in np.array(ms1info).shape])
-        end = time.time()
-        print(end-start)
-        start = time.time()
-        ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'], np.log([mzmlfile['ms2'][ms2scan]['rt_array']]).tolist()[0]]
-        ms2info = [[mz, intents] for mz in ms2info[0] for intents in ms2info[1]]
 
+        ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'], np.log([mzmlfile['ms2'][ms2scan]['rt_array']]).tolist()[0]]
+        ms2info = [[ms2info[0][index], ms2info[1][index]] for index in range(len(ms2info[0]))]
         ms2size = str([f for f in np.array(ms2info).shape])
-        print(len(mzmlfile['ms2'][ms2scan]['m/z_array']))
-        print(ms2size)
+
         fullsubimage = {'ms1': ms1info, 'ms2': ms2info}
-        end = time.time()
-        print(end - start)
+
         # Save image as json file
         imageoutfile = open(f'{imgpath}{accnr}-{filename}-{ms2scan}.json', 'w')
         imageoutfile.write(json.dumps(fullsubimage))
