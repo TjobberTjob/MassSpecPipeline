@@ -493,8 +493,6 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
         # Save image as json file
         imageoutfile = open(f'{imgpath}{accnr}-{filename}-{ms2scan}.json', 'w')
         imageoutfile.write(json.dumps(fullsubimage))
-        end = time.time()
-        print(end - start)
 
         if savepng:  # save subimages to png
             sub_png_image(ms1info, imgpath, filename, index, lowbound, highbound)
