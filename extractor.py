@@ -490,7 +490,7 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
         ms2info = [[mz, intents] for mz in ms2info[0] for intents in ms2info[1]]
 
         ms2size = str([f for f in np.array(ms2info).shape])
-        print(ms2size)
+        print(len(mzmlfile['ms2'][ms2scan]['m/z_array']))
         fullsubimage = {'ms1': ms1info, 'ms2': ms2info}
         end = time.time()
         print(end - start)
