@@ -470,7 +470,7 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
         if os.path.exists(f'{imgpath}{accnr}-{filename}-{ms2scan}.json'):
             continue
 
-        # if not 450 < rows['m/z'] < 455:  # Filter
+        # if not 450 < rows['m/z'] < 455:  # Add a filter here to increase speed and reduce storage
             # continue
 
         mzlen = int(subimage_interval['mz'] / mz_bin)

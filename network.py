@@ -92,8 +92,7 @@ def history_plot(metric, metapath, imageclass):
 def nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, imageclass, metapath, patience,
             which_ms_touse):
     model_network = Network_Model(which_ms_touse, classification, n_classes, ms1size, ms2size, n_channels, length_ms2,
-                                  metapath,
-                                  imageclass, patience)
+                                  metapath, imageclass, patience)
     model = model_network.get_network()
     callbacks_list = model_network.get_callbacks()
     # print(model.summary())
@@ -145,9 +144,9 @@ if __name__ == '__main__':
     classification = classification == 'c'
 
     if classification:
-        imageclass = f'{sys.argv[2]}_class'
+        imageclass = f'{sys.argv[2].lower()}_class'
     else:
-        imageclass = sys.argv[2]
+        imageclass = sys.argv[2].lower()
 
     if (which_ms_touse == 'both' or which_ms_touse == 'ms2') and os.path.exists(
             f'{metapath}subimage_filtered_network.json'):
@@ -184,9 +183,7 @@ if __name__ == '__main__':
     training_generator = DataGenerator(imagepath, partition['train'], labels, **params)
     validation_generator = DataGenerator(imagepath, partition['validation'], labels, **params)
 
-    output = nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, nameofclass, metapath,
-                     patience,
-                     which_ms_touse)
+    output = nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, nameofclass, metapath, patience, which_ms_touse)
     model = output[0]
     callbacks_list = output[1]
     history = model.fit_generator(generator=training_generator, validation_data=validation_generator, epochs=epochs,
@@ -194,9 +191,9 @@ if __name__ == '__main__':
 
     # PLOT HISTORY
     if classification:
-        history_plot('accuracy', metapath, imageclass)
+        history_plot('accuracy', metapath, nameofclass)
     else:
-        history_plot('r2', metapath, imageclass)
+        history_plot('r2', metapath, nameofclass)
 
     # TEST MODEL
     if len(partition['test']) > 0:
