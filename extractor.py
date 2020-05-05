@@ -490,10 +490,10 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
         ms2info = [[mz, intents] for mz in ms2info[0] for intents in ms2info[1]]
 
         ms2size = str([f for f in np.array(ms2info).shape])
+        print(ms2size)
         fullsubimage = {'ms1': ms1info, 'ms2': ms2info}
         end = time.time()
         print(end - start)
-        start = time.time()
         # Save image as json file
         imageoutfile = open(f'{imgpath}{accnr}-{filename}-{ms2scan}.json', 'w')
         imageoutfile.write(json.dumps(fullsubimage))
