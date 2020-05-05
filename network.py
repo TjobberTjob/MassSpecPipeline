@@ -86,7 +86,7 @@ def history_plot(metric, metapath, imageclass):
     plt.ylabel(f'{metric}')
     plt.xlabel('Epoch')
     plt.legend(['Training', 'Validation'], loc='upper left')
-    plt.savefig(f'{metapath}{imageclass}.png')
+    plt.savefig(f'{metapath}{imageclass.replace("/", "")}.png')
 
 
 def nnmodel(ms1size, ms2size, n_channels, length_ms2, classification, n_classes, imageclass, metapath, patience,
@@ -143,7 +143,11 @@ if __name__ == '__main__':
         print('classification or regression problem not input correctly.')
         quit()
     classification = classification == 'c'
-    imageclass = f'{sys.argv[2]}_class'
+
+    if classification:
+        imageclass = f'{sys.argv[2]}_class'
+    else:
+        imageclass = sys.argv[2]
 
     if (which_ms_touse == 'both' or which_ms_touse == 'ms2') and os.path.exists(
             f'{metapath}subimage_filtered_network.json'):
@@ -192,7 +196,7 @@ if __name__ == '__main__':
     if classification:
         history_plot('accuracy', metapath, imageclass)
     else:
-        history_plot('loss', metapath, imageclass)
+        history_plot('r2', metapath, imageclass)
 
     # TEST MODEL
     if len(partition['test']) > 0:

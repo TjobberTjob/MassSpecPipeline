@@ -74,7 +74,7 @@ epochs: Max epochs used for neural network training - Defaults to 100
 
 n_channels: Number of information channels used in neural network training - Defaults to 4
 
-test_accessions: Number of accession projects set aside to testing (not validation) - Defaults to 3
+test_accessions: Number of accession projects set aside to testing (not validation). 0 is no testing - Defaults to 3
 
 training_percentage: The amount of data going to training vs validating - Defaults to 80 (80% train - 20% validation)
 

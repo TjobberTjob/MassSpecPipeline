@@ -66,8 +66,7 @@ class DataGenerator(Sequence):
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            with gzip.GzipFile(f'{self.imagepath}{ID}', 'r') as fin:
-                fullinfoimage = loads(fin.read().decode('utf-8'))
+            fullinfoimage = loads(open(f'{self.imagepath}{ID}').read())
             ms1 = fullinfoimage['ms1']
             ms2 = fullinfoimage['ms2']
             if self.MS == 'ms1':
@@ -90,3 +89,4 @@ class DataGenerator(Sequence):
 
         else:
             return X, y
+

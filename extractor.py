@@ -483,17 +483,15 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
         ms1info = [lines[mzlower:mzupper] for lines in image[rtlower:rtupper]]
         ms1size = str([f for f in np.array(ms1info).shape])
 
-        ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'],
-                   # mzmlfile['ms2'][ms2scan]['rt_array']]
-                   np.log([mzmlfile['ms2'][ms2scan]['rt_array']]).tolist()]
+        ms2info = [mzmlfile['ms2'][ms2scan]['m/z_array'], np.log([mzmlfile['ms2'][ms2scan]['rt_array']]).tolist()[0]]
         ms2info = [[mz, intents] for mz in ms2info[0] for intents in ms2info[1]]
 
         ms2size = str([f for f in np.array(ms2info).shape])
         fullsubimage = {'ms1': ms1info, 'ms2': ms2info}
 
         # Save image as json file
-        with gzip.GzipFile(f'{imgpath}{accnr}-{filename}-{ms2scan}.json', 'w') as fout:
-            fout.write(json.dumps(fullsubimage).encode('utf-8'))
+        imageoutfile = open(f'{imgpath}{accnr}-{filename}-{ms2scan}.json', 'w')
+        imageoutfile.write(json.dumps(fullsubimage))
 
         if savepng:  # save subimages to png
             sub_png_image(ms1info, imgpath, filename, index, lowbound, highbound)
