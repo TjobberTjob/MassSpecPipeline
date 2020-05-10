@@ -436,7 +436,8 @@ def sub_png_image(subimage, imgpath, filename, index, lowbound, highbound):
     plt.close()
 
 
-def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mpath, df, subimage_interval, filename, multiprocessing,
+def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, path, mpath, df, subimage_interval,
+                  filename, multiprocessing,
                   savepng):
     lowbound = bounds[0]
     highbound = bounds[1]
@@ -458,20 +459,25 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
     for index, rows in df.iterrows():
         if int((index + 1) / int(df.shape[0]) * 100) % 5 == 0:
             if not multiprocessing:
-                print(f'Creating subimages: {int(((index + 1) / df.shape[0]) * 100)}%         ',
-                      end='\r')  # Print how far we are
+                print(f'Creating subimages: {int(((index + 1) / df.shape[0]) * 100)}%         ', end='\r')  # Print how far we are
 
         if rows['Retention time'] - subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time'] + \
                 subimage_interval['rt'] > interval['rt']['max'] or rows['m/z'] - subimage_interval['mz'] < \
                 interval['mz']['min'] or rows['m/z'] + subimage_interval['mz'] > interval['mz']['max']:
             continue
 
-        ms2scan = str(rows['MSMS Scan Numbers'].split(';')[0])
+        # Find the closest and highest intensity scan in msms scan list
+        scannumbers = rows['MSMS Scan Numbers'].split(';')
+        ms2list = [[f, mzmlfile['ms2'][f]['precursor_ion'], max(mzmlfile['ms2'][f]['rt_array'])] for f in scannumbers]
+        sortedms2list = sorted(ms2list, key=lambda x: x[2], reverse=True)
+        closestmz = [f[1] for f in sortedms2list][(np.abs(np.array([f[1] for f in sortedms2list]) - rows['m/z'])).argmin()]
+        ms2scan = [f for f in sortedms2list if f[1] == closestmz][0][0]
+
         if os.path.exists(f'{imgpath}{accnr}-{filename}-{ms2scan}.json'):
             continue
 
         # if not 450 < rows['m/z'] < 455:  # Add a filter here to increase speed and reduce storage
-            # continue
+        #     continue
 
         mzlen = int(subimage_interval['mz'] / mz_bin)
         rtlen = int(subimage_interval['rt'] / rt_bin)
@@ -606,7 +612,8 @@ def main_p2(accnr, filename, path, mpath, filepath, df2, multiprocessing):
         image = output[0]
 
     subimage_interval = {'mz': config['mz_interval'], 'rt': config['rt_interval']}
-    sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzml, path, mpath, df2, subimage_interval, filename, multiprocessing,
+    sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzml, path, mpath, df2, subimage_interval, filename,
+                  multiprocessing,
                   savepng)
 
 
