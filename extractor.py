@@ -461,6 +461,9 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
             if not multiprocessing:
                 print(f'Creating subimages: {int(((index + 1) / df.shape[0]) * 100)}%         ', end='\r')  # Print how far we are
 
+        # if not 450 < rows['m/z'] < 455:  # Add a filter here to increase speed and reduce storage
+        #     continue
+
         if rows['Retention time'] - subimage_interval['rt'] < interval['rt']['min'] or rows['Retention time'] + \
                 subimage_interval['rt'] > interval['rt']['max'] or rows['m/z'] - subimage_interval['mz'] < \
                 interval['mz']['min'] or rows['m/z'] + subimage_interval['mz'] > interval['mz']['max']:
@@ -475,9 +478,6 @@ def sub_txt_image(accnr, interval, bins, image, bounds, resolution, mzmlfile, pa
 
         if os.path.exists(f'{imgpath}{accnr}-{filename}-{ms2scan}.json'):
             continue
-
-        # if not 450 < rows['m/z'] < 455:  # Add a filter here to increase speed and reduce storage
-        #     continue
 
         mzlen = int(subimage_interval['mz'] / mz_bin)
         rtlen = int(subimage_interval['rt'] / rt_bin)
